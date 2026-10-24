@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Dichiara la serata</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;padding:56px 20px 28px;display:flex;flex-direction:column;gap:18px;overflow:hidden">
+
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="Locale.dc.html" aria-label="Indietro" style="width:44px;height:44px;border-radius:22px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;display:flex;align-items:center;justify-content:center;text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </a>
+    <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1.5px;color:#9D6BFF">LA TUA SERATA</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <h1 style="margin:0;font-family:Unbounded,sans-serif;font-weight:700;font-size:26px;line-height:1.2">Nome locale</h1>
+    <span style="font-size:14px;color:#A3A1B8">Informazioni da Google Maps</span>
+  </div>
+
+  <div style="display:flex;gap:10px">
+    <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.2px;color:#9D6BFF">SI</span>
+      <span style="font-family:Unbounded,sans-serif;font-weight:700;font-size:24px">30–50</span>
+      <span style="font-size:12px;color:#A3A1B8">persone</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.2px;color:#4ED9C7">FORSE</span>
+      <span style="font-family:Unbounded,sans-serif;font-weight:700;font-size:24px">20–30</span>
+      <span style="font-size:12px;color:#A3A1B8">persone</span>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <span style="font-size:15px;font-weight:600">Dichiara la tua serata</span>
+    <div style="display:flex;gap:10px">
+      <a href="Chat.dc.html" onClick="{{ declare }}" style="flex:1;height:56px;border-radius:16px;background:#9D6BFF;color:#0B0B12;font:600 16px Inter,sans-serif;display:flex;align-items:center;justify-content:center;text-decoration:none">Ci vado</a>
+      <a href="Chat.dc.html" onClick="{{ declare }}" style="flex:1;height:56px;box-sizing:border-box;border-radius:16px;border:1px solid #4ED9C7;background:#4ED9C71A;color:#F2F1F8;font:600 16px Inter,sans-serif;display:flex;align-items:center;justify-content:center;text-decoration:none">Forse</a>
+    </div>
+    <span style="font-size:13px;line-height:1.45;color:#A3A1B8">La dichiarazione scade a fine evento o alla chiusura del locale.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;background:#15151F;border:1px solid #9D6BFF66">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9D6BFF" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4.500 4.500L19 7"/></svg>
+      <span style="font-size:15px;font-weight:600">Serata dichiarata: Ci vado</span>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button style="flex:1;height:44px;border-radius:12px;border:1px solid #2A2A3A;background:transparent;color:#F2F1F8;font:500 14px Inter,sans-serif">Modifica</button>
+      <button style="flex:1;height:44px;border-radius:12px;border:1px solid #2A2A3A;background:transparent;color:#F2F1F8;font:500 14px Inter,sans-serif">Annulla</button>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:15px;font-weight:600">Chiedi all'AI</span>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#4ED9C7">INFO SULLA SERATA</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button style="height:36px;padding:0 14px;border-radius:18px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;font:500 13px Inter,sans-serif">Che musica fanno?</button>
+      <button style="height:36px;padding:0 14px;border-radius:18px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;font:500 13px Inter,sans-serif">C'è un dress code?</button>
+      <button style="height:36px;padding:0 14px;border-radius:18px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;font:500 13px Inter,sans-serif">A che ora conviene arrivare?</button>
+    </div>
+  </div>
+
+  <div style="flex:1"></div>
+  <a href="Mappa.dc.html" onClick="{{ undeclare }}" style="height:52px;box-sizing:border-box;border-radius:16px;border:1px solid #2A2A3A;color:#F2F1F8;font:500 15px Inter,sans-serif;display:flex;align-items:center;justify-content:center;text-decoration:none">Rimuovi la mia icona da questo luogo</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const set = (v) => () => { try { if (v) window.localStorage.setItem('rp_declared', '1'); else window.localStorage.removeItem('rp_declared'); } catch (e) { /* ignora */ } };
+    return { declare: set(true), undeclare: set(false) };
+  }
+}
+</script>
+</body>
+</html>

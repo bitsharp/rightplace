@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Accesso</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4ED9C7}a:hover{color:#8CEBDD}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;padding:64px 28px 36px;display:flex;flex-direction:column;gap:22px;overflow:hidden">
+  <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1.5px;color:#9D6BFF">01 / 03 · ACCESSO</span>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font-family:Unbounded,sans-serif;font-weight:700;font-size:22px;color:#9D6BFF">RightPlace</div>
+    <h1 style="margin:0;font-family:Unbounded,sans-serif;font-weight:700;font-size:30px;line-height:1.15">Dove va la tua serata?</h1>
+    <p style="margin:0;font-size:15px;line-height:1.5;color:#A3A1B8">Registrati con la tua email. Il profilo resta privato: vedi dove va la gente della tua età, senza mostrarti.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <label for="email" style="font-size:13px;font-weight:500;color:#A3A1B8">Email</label>
+    <input id="email" type="email" placeholder="nome@email.com" style="height:52px;box-sizing:border-box;padding:0 16px;border-radius:14px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;font:400 16px Inter,sans-serif">
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <label for="pwd" style="font-size:13px;font-weight:500;color:#A3A1B8">Password</label>
+    <input id="pwd" type="password" placeholder="Almeno 8 caratteri" style="height:52px;box-sizing:border-box;padding:0 16px;border-radius:14px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;font:400 16px Inter,sans-serif">
+  </div>
+  <label style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1px solid #2A2A3A;background:#15151F;font-size:14px">
+    <input type="checkbox" style="width:22px;height:22px;accent-color:#9D6BFF;margin:0">
+    <span style="flex:1">Non sono un robot</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:#A3A1B8">VERIFICA</span>
+  </label>
+  <label style="display:flex;align-items:flex-start;gap:12px;font-size:14px;line-height:1.45;color:#A3A1B8">
+    <input type="checkbox" checked style="width:22px;height:22px;accent-color:#9D6BFF;margin:0;flex:none">
+    <span>Ho letto e accetto la policy sulla privacy. Nessun dato personale viene venduto.</span>
+  </label>
+  <div style="flex:1"></div>
+  <a href="Profilo.dc.html" style="height:56px;border-radius:16px;background:#9D6BFF;color:#0B0B12;font:600 16px Inter,sans-serif;display:flex;align-items:center;justify-content:center;text-decoration:none">Crea account</a>
+  <div style="text-align:center;font-size:14px;color:#A3A1B8">Hai già un account? <a href="Mappa.dc.html">Accedi</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

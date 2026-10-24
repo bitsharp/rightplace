@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Amici</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <dc-import name="TopBar" from="Amici.dc.html" hint-size="390px,170px"></dc-import>
+
+  <div style="flex:none;padding:4px 20px 12px;display:flex;flex-direction:column;gap:12px">
+    <label for="tag" style="display:flex;align-items:center;gap:8px;height:48px;box-sizing:border-box;padding:0 14px;border-radius:14px;background:#15151F;border:1px solid #9D6BFF">
+      <span style="font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:#9D6BFF">@</span>
+      <input id="tag" type="search" value="{{ q }}" onInput="{{ onQ }}" placeholder="Cerca per tag, ad esempio volpe" aria-label="Cerca un utente per tag" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F2F1F8;font:400 15px Inter,sans-serif">
+    </label>
+    <span style="font-size:13px;line-height:1.4;color:#A3A1B8">{{ followLabel }}</span>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 20px 12px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ rows }}" as="item" hint-placeholder-count="4">
+      <div style="flex:none;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+        <div style="{{ item.avatarStyle }}"></div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+          <span style="font-size:15px;font-weight:600">{{ item.tag }}</span>
+          <span style="font-size:12px;color:#A3A1B8">{{ item.meta }}</span>
+          <sc-if value="{{ item.hasVenue }}" hint-placeholder-val="{{ true }}">
+            <span style="font-family:'Space Mono',monospace;font-size:11px;color:#4ED9C7">{{ item.venueLine }}</span>
+          </sc-if>
+        </div>
+        <button onClick="{{ item.toggle }}" aria-pressed="{{ item.followed }}" style="{{ item.btnStyle }}">{{ item.btnLabel }}</button>
+      </div>
+    </sc-for>
+    <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:28px 12px;text-align:center;font-size:14px;line-height:1.5;color:#A3A1B8">Nessun utente con questo tag.</div>
+    </sc-if>
+  </div>
+
+  <nav style="height:72px;flex:none;box-sizing:border-box;display:flex;border-top:1px solid #2A2A3A;background:#0B0B12">
+    <a href="Mappa.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg>Mappa</a>
+    <a href="Amici.dc.html" style="flex:1;text-decoration:none;color:#9D6BFF;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.500"/><path d="M2.500 20c0-3.600 3-6 6.500-6s6.500 2.400 6.500 6"/></svg>Amici</a>
+    <a href="Chat.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Chat</a>
+    <a href="Feed.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.500"/><path d="M21 15l-5-5L5 21"/></svg>Feed</a>
+    <a href="ProfiloApp.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.500-6.500 8-6.500s8 2.500 8 6.500"/></svg>Profilo</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  // Vero se l'utente ha dichiarato una serata (flag condiviso tra le schermate).
+  postVis() {
+    if (!this._pl) {
+      this._pl = true;
+      try { window.addEventListener('storage', () => this.setState({ _pv: Date.now() })); } catch (e) { /* ignora */ }
+    }
+    try { return window.localStorage.getItem('rp_declared') === '1'; } catch (e) { return false; }
+  }
+
+  state = { q: '', follow: { 'volpe.viola': true, 'gatto.blu': true, 'panda.rosa': true, 'orso.grigio': true } };
+
+  renderVals() {
+    const users = [
+      { tag: 'volpe.viola', meta: '18–24 · Donna', venue: 'Arena Club', color: '#9D6BFF' },
+      { tag: 'gatto.blu', meta: '18–24 · Uomo', venue: 'Sunset Rooftop', color: '#4ED9C7' },
+      { tag: 'lupo.verde', meta: '25–34 · Uomo', venue: '', color: '#4ED9C7' },
+      { tag: 'panda.rosa', meta: '18–24 · Donna', venue: 'Vegueta Live', color: '#9D6BFF' },
+      { tag: 'falco.nero', meta: '25–34 · Altro', venue: '', color: '#9D6BFF' },
+      { tag: 'orso.grigio', meta: '25–34 · Uomo', venue: 'Arena Club', color: '#4ED9C7' },
+      { tag: 'civetta.oro', meta: '18–24 · Donna', venue: '', color: '#9D6BFF' },
+      { tag: 'delfino.cyan', meta: '25–34 · Donna', venue: '', color: '#4ED9C7' }
+    ];
+    const follow = this.state.follow || {};
+    const q = String(this.state.q || '').trim().toLowerCase().replace(/^@/, '');
+    const followed = users.filter((u) => follow[u.tag]).length;
+    const rows = users.filter((u) => u.tag.indexOf(q) !== -1).map((u) => {
+      const on = !!follow[u.tag];
+      return {
+        tag: '@' + u.tag,
+        meta: u.meta,
+        hasVenue: !!u.venue,
+        venueLine: 'Stasera: ' + u.venue,
+        followed: on,
+        btnLabel: on ? 'Segui già' : 'Segui',
+        avatarStyle: 'flex:none;width:44px;height:44px;border-radius:22px;box-sizing:border-box;background:' + u.color + '33;border:1px solid ' + u.color,
+        btnStyle: on
+          ? 'flex:none;height:36px;padding:0 14px;border-radius:18px;border:1px solid #2A2A3A;background:transparent;color:#A3A1B8;font:500 13px Inter,sans-serif'
+          : 'flex:none;height:36px;padding:0 14px;border-radius:18px;border:0;background:#9D6BFF;color:#0B0B12;font:600 13px Inter,sans-serif',
+        toggle: () => this.setState({ follow: Object.assign({}, this.state.follow, { [u.tag]: !on }) })
+      };
+    });
+    return { postVis: this.postVis(), rememberFrom: () => { try { window.localStorage.setItem("rp_from", "Amici.dc.html"); } catch (e) { /* ignora */ } },
+      q: this.state.q || '',
+      onQ: (e) => this.setState({ q: e.target.value }),
+      followLabel: 'Cerchi tra amici e sconosciuti della tua zona. Segui ' + followed + (followed === 1 ? ' persona.' : ' persone.'),
+      rows: rows,
+      empty: rows.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

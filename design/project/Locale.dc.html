@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Dettaglio locale</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <sc-if value="{{ postVis }}" hint-placeholder-val="{{ true }}">
+    <a href="GiornoDopo.dc.html" onClick="{{ rememberFrom }}" aria-label="Posta la foto della tua serata" style="position:absolute;left:16px;top:8px;z-index:4;width:40px;height:40px;border-radius:20px;background:#9D6BFF;color:#0B0B12;display:flex;align-items:center;justify-content:center;text-decoration:none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </a>
+  </sc-if>
+
+  <div style="flex:none;padding:56px 20px 12px;display:flex;align-items:center;gap:12px">
+    <sc-if value="{{ embedded }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ onClose }}" aria-label="Chiudi il dettaglio" style="flex:none;width:44px;height:44px;border-radius:22px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+    </sc-if>
+    <sc-if value="{{ standalone }}" hint-placeholder-val="{{ true }}">
+      <a href="Mappa.dc.html" aria-label="Indietro" style="flex:none;width:44px;height:44px;border-radius:22px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;display:flex;align-items:center;justify-content:center;text-decoration:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </a>
+    </sc-if>
+    <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1.5px;color:#9D6BFF">DETTAGLIO LOCALE</span>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:0 20px 16px;display:flex;flex-direction:column;gap:16px">
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-family:Unbounded,sans-serif;font-weight:700;font-size:26px;line-height:1.2">{{ name }}</h1>
+      <span style="font-size:14px;color:#A3A1B8">{{ typeLine }}</span>
+      <span style="font-size:13px;color:#A3A1B8">{{ addressLine }}</span>
+    </div>
+
+    <div style="flex:none;display:flex;gap:10px">
+      <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+        <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.2px;color:#9D6BFF">SI</span>
+        <span style="font-family:Unbounded,sans-serif;font-weight:700;font-size:24px">{{ siLabel }}</span>
+        <span style="font-size:12px;color:#A3A1B8">persone</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+        <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.2px;color:#4ED9C7">FORSE</span>
+        <span style="font-family:Unbounded,sans-serif;font-weight:700;font-size:24px">{{ foLabel }}</span>
+        <span style="font-size:12px;color:#A3A1B8">persone</span>
+      </div>
+    </div>
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:15px;font-weight:600">Chi ci va</span>
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#4ED9C7">SOLO CHI HA DICHIARATO</span>
+      </div>
+      <div style="display:flex;padding:3px;border-radius:12px;background:#15151F;border:1px solid #2A2A3A">
+        <sc-for list="{{ segs }}" as="s" hint-placeholder-count="3">
+          <button onClick="{{ s.pick }}" aria-pressed="{{ s.on }}" style="{{ s.style }}">{{ s.label }}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ hasData }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+            <span style="font-size:14px;color:#A3A1B8">Età media</span>
+            <span style="font-family:Unbounded,sans-serif;font-weight:700;font-size:22px">{{ ageText }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+            <span style="font-size:14px;color:#A3A1B8">Genere</span>
+            <div style="display:flex;height:14px;border-radius:7px;overflow:hidden;background:#2A2A3A" role="img" aria-label="{{ genderAria }}">
+              <div style="{{ femStyle }}"></div>
+              <div style="{{ maleStyle }}"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:14px">
+              <span style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:5px;background:#F2B1CB"></span>Donne {{ femPct }}%</span>
+              <span style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:5px;background:#86B6E3"></span>Uomini {{ malePct }}%</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noData }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:16px;border-radius:16px;background:#15151F;border:1px dashed #2A2A3A;font-size:13px;line-height:1.45;color:#A3A1B8">Meno di 3 persone hanno risposto "Forse": i dati restano nascosti per tutelare l'anonimato.</div>
+      </sc-if>
+      <span style="font-size:12px;line-height:1.4;color:#A3A1B8">{{ basisText }} · dati di esempio</span>
+    </div>
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:15px;font-weight:600">Amici che ci vanno</span>
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#4ED9C7">{{ friendsCount }}</span>
+      </div>
+      <sc-for list="{{ friends }}" as="f" hint-placeholder-count="2">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+          <div style="{{ f.avatarStyle }}"></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:15px;font-weight:600">{{ f.tag }}</span>
+            <span style="font-size:12px;color:#A3A1B8">{{ f.meta }}</span>
+          </div>
+          <span style="{{ f.chipStyle }}">{{ f.status }}</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{ noFriends }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:14px;border-radius:16px;background:#15151F;border:1px dashed #2A2A3A;font-size:13px;line-height:1.45;color:#A3A1B8">Nessuno degli amici che segui ha ancora dichiarato questa serata.</div>
+      </sc-if>
+    </div>
+
+    <div style="flex:none;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:15px;font-weight:600">Andare e tornare</span>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#4ED9C7">NUMERI DI ESEMPIO</span>
+    </div>
+    <div style="flex:none;display:flex;padding:3px;border-radius:12px;background:#15151F;border:1px solid #2A2A3A">
+      <sc-for list="{{ dirs }}" as="s2" hint-placeholder-count="2">
+        <button onClick="{{ s2.pick }}" aria-pressed="{{ s2.on }}" style="{{ s2.style }}">{{ s2.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ modes }}" as="r" hint-placeholder-count="4">
+        <a href="{{ r.href }}" style="{{ r.style }}">
+          <span style="flex:none;width:52px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:#4ED9C7">{{ r.badge }}</span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:15px;font-weight:600">{{ r.name }}</span>
+            <span style="font-size:12px;color:#A3A1B8">{{ r.detail }}</span>
+          </span>
+          <span style="flex:none;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:#9D6BFF">{{ r.action }}</span>
+        </a>
+      </sc-for>
+    </div>
+    <div style="flex:none;font-size:13px;line-height:1.4;color:#A3A1B8">{{ chosenLine }}</div>
+  </div>
+
+  <div style="flex:none;padding:12px 20px 28px;border-top:1px solid #2A2A3A;background:#0B0B12">
+    <a href="Serata.dc.html" style="height:56px;border-radius:16px;background:#9D6BFF;color:#0B0B12;font:600 16px Inter,sans-serif;display:flex;align-items:center;justify-content:center;text-decoration:none">Dichiara la tua serata</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"venue":{"editor":"text","default":"Arena Club"},"embedded":{"editor":null,"default":false},"onClose":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  // Vero se l'utente ha dichiarato una serata (flag condiviso tra le schermate).
+  postVis() {
+    if (!this._pl) {
+      this._pl = true;
+      try { window.addEventListener('storage', () => this.setState({ _pv: Date.now() })); } catch (e) { /* ignora */ }
+    }
+    try { return window.localStorage.getItem('rp_declared') === '1'; } catch (e) { return false; }
+  }
+
+  state = { seg: 'tutti', dir: 'andata' };
+
+  renderVals() {
+    // Dati di esempio (mock): presenze, età e genere sono inventati.
+    // Voce: [tipo, città, SI (fascia), SI (valore medio), FORSE (fascia), FORSE (valore medio),
+    //        età media SI, età media FORSE, % donne SI, % donne FORSE, minuti [piedi, bus, taxi, bici]]
+    const V = {
+      'Arena Club': ['Club', 'Las Palmas', '50–100', 75, '30–50', 40, 23.4, 24.1, 52, 58, [14, 9, 6, 5]],
+      'Sunset Rooftop': ['Rooftop', 'Las Palmas', '30–50', 40, '20–30', 25, 26.2, 27.0, 61, 57, [18, 11, 7, 6]],
+      'La Cala Bar': ['Bar', 'Las Palmas', '20–30', 25, 'pochi', 0, 28.5, 0, 47, 0, [9, 7, 4, 3]],
+      'Vegueta Live': ['Live', 'Las Palmas', '30–50', 40, '20–30', 25, 25.1, 26.3, 44, 50, [22, 14, 9, 8]],
+      'Cobalto Club': ['Club', 'Madrid', '50–100', 75, '50–100', 75, 22.8, 23.5, 49, 53, [16, 10, 7, 6]],
+      'Terraza Gran Vía': ['Rooftop', 'Madrid', '30–50', 40, '30–50', 40, 27.4, 28.0, 58, 55, [12, 8, 5, 4]],
+      'Bar Lavapiés': ['Bar', 'Madrid', '20–30', 25, '20–30', 25, 26.0, 27.2, 46, 52, [10, 7, 5, 4]],
+      'Sala Malasaña': ['Live', 'Madrid', '30–50', 40, '20–30', 25, 24.7, 25.5, 42, 48, [19, 12, 8, 7]],
+      'Nova Club': ['Club', 'Barcellona', '50–100', 75, '30–50', 40, 23.1, 24.0, 51, 56, [20, 13, 9, 8]],
+      'Rooftop Born': ['Rooftop', 'Barcellona', '30–50', 40, '20–30', 25, 26.8, 27.5, 60, 54, [13, 9, 6, 5]],
+      'Bar Gràcia': ['Bar', 'Barcellona', '20–30', 25, 'pochi', 0, 29.2, 0, 45, 0, [8, 6, 4, 3]],
+      'Poble Nou Live': ['Live', 'Barcellona', '30–50', 40, '30–50', 40, 25.4, 26.0, 43, 47, [24, 15, 10, 9]],
+      'Navigli Club': ['Club', 'Milano', '50–100', 75, '50–100', 75, 24.3, 25.1, 50, 55, [17, 11, 8, 6]],
+      'Terrazza Isola': ['Rooftop', 'Milano', '30–50', 40, '20–30', 25, 27.9, 28.4, 59, 56, [15, 10, 7, 5]],
+      'Bar Brera': ['Bar', 'Milano', '20–30', 25, '20–30', 25, 30.1, 29.4, 48, 53, [11, 8, 5, 4]],
+      'Live Lambrate': ['Live', 'Milano', '30–50', 40, 'pochi', 0, 25.9, 0, 41, 0, [21, 13, 9, 8]]
+    };
+    const hours = { Club: 'Aperto fino alle 05:00', Rooftop: 'Aperto fino alle 02:00', Bar: 'Aperto fino alle 01:30', Live: 'Aperto fino alle 03:00' };
+    const asked = this.props.venue || 'Arena Club';
+    const name = V[asked] ? asked : 'Arena Club';
+    const d = V[name];
+    const hasForse = d[5] > 0;
+    // Amici seguiti che hanno dichiarato il locale (mock): [tag, fascia · genere, stato]
+    const F = {
+      'Arena Club': [['volpe.viola', '18–24 · Donna', 'si'], ['orso.grigio', '25–34 · Uomo', 'forse']],
+      'Sunset Rooftop': [['gatto.blu', '18–24 · Uomo', 'si']],
+      'Vegueta Live': [['panda.rosa', '18–24 · Donna', 'si']]
+    };
+    const fl = F[name] || [];
+    const seg = this.state.seg;
+
+    let age = null;
+    let fem = null;
+    if (seg === 'si' || (seg === 'tutti' && !hasForse)) {
+      age = d[6]; fem = d[8];
+    } else if (seg === 'forse' && hasForse) {
+      age = d[7]; fem = d[9];
+    } else if (seg === 'tutti') {
+      const a = d[3]; const b = d[5];
+      age = (d[6] * a + d[7] * b) / (a + b);
+      fem = (d[8] * a + d[9] * b) / (a + b);
+    }
+    const hasData = age !== null;
+    const femPct = hasData ? Math.round(fem) : 0;
+    const malePct = hasData ? 100 - femPct : 0;
+
+    const segDefs = [
+      { id: 'si', label: 'Ci vado', on: 'background:#9D6BFF;color:#0B0B12' },
+      { id: 'forse', label: 'Forse', on: 'background:#4ED9C7;color:#0B0B12' },
+      { id: 'tutti', label: 'Tutti', on: 'background:#F2F1F8;color:#0B0B12' }
+    ];
+    const segBase = 'flex:1;height:36px;border:0;border-radius:9px;font:600 13px Inter,sans-serif;';
+    const basis = { si: 'Calcolato su chi ha dichiarato "Ci vado"', forse: 'Calcolato su chi ha dichiarato "Forse"', tutti: 'Calcolato su tutti i dichiarati' };
+
+    // Numeri di telefono fittizi; i link di Uber, Cabify e Google Maps aprono i servizi reali.
+    const phones = { 'Las Palmas': '+34 928 000 001', 'Madrid': '+34 910 000 002', 'Barcellona': '+34 930 000 003', 'Milano': '+39 02 0000 0004' };
+    const phone = phones[d[1]] || '+00 000 000 000';
+    const place = encodeURIComponent(name + ' ' + d[1]);
+    const back = this.state.dir === 'ritorno';
+    const mapsUrl = 'https://www.google.com/maps/dir/?api=1&travelmode=transit&' + (back ? 'origin=' : 'destination=') + place;
+    const modeData = [
+      { badge: 'TAXI', name: 'Taxi ' + d[1], detail: phone + (back ? ' · chiedi la partenza dal locale' : ' · chiedi di venire da te'), href: 'tel:' + phone.replace(/\s/g, ''), action: 'CHIAMA' },
+      { badge: 'UBER', name: 'Uber', detail: back ? 'Prenota il ritorno da ' + name : 'Prenota la corsa verso ' + name, href: 'https://m.uber.com/', action: 'APRI APP' },
+      { badge: 'CABIFY', name: 'Cabify', detail: back ? 'Prenota il ritorno da ' + name : 'Prenota la corsa verso ' + name, href: 'https://cabify.com/', action: 'APRI APP' },
+      { badge: 'MAPPE', name: 'Trasporto pubblico', detail: back ? 'Indicazioni da ' + name : 'Indicazioni fino a ' + name, href: mapsUrl, action: 'APRI' }
+    ];
+    const rowBase = 'box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A;color:#F2F1F8;text-decoration:none;font-family:Inter,sans-serif;';
+    const dirDefs = [{ id: 'andata', label: 'Per andare' }, { id: 'ritorno', label: 'Per tornare' }];
+
+    return { postVis: this.postVis(), rememberFrom: () => { try { window.localStorage.setItem("rp_from", "Locale.dc.html"); } catch (e) { /* ignora */ } },
+      name: name,
+      typeLine: d[0] + ' · ' + hours[d[0]],
+      addressLine: '[Indirizzo del locale], ' + d[1] + ' · informazioni da Google Maps',
+      siLabel: d[2],
+      foLabel: d[4],
+      friends: fl.map((f) => ({
+        tag: '@' + f[0],
+        meta: f[1],
+        status: f[2] === 'si' ? 'Ci vado' : 'Forse',
+        avatarStyle: 'flex:none;width:40px;height:40px;border-radius:20px;box-sizing:border-box;' + (f[2] === 'si' ? 'background:#9D6BFF33;border:1px solid #9D6BFF' : 'background:#4ED9C733;border:1px solid #4ED9C7'),
+        chipStyle: 'flex:none;padding:4px 10px;border-radius:12px;color:#F2F1F8;font:600 12px Inter,sans-serif;' + (f[2] === 'si' ? 'background:#9D6BFF22;border:1px solid #9D6BFF' : 'background:#4ED9C71A;border:1px solid #4ED9C7')
+      })),
+      noFriends: fl.length === 0,
+      friendsCount: fl.length === 0 ? '' : fl.length + (fl.length === 1 ? ' AMICO' : ' AMICI'),
+      embedded: !!this.props.embedded,
+      standalone: !this.props.embedded,
+      onClose: this.props.onClose || function () {},
+      segs: segDefs.map((s) => ({
+        label: s.label,
+        on: seg === s.id,
+        style: segBase + (seg === s.id ? s.on : 'background:transparent;color:#A3A1B8'),
+        pick: () => this.setState({ seg: s.id })
+      })),
+      hasData: hasData,
+      noData: !hasData,
+      ageText: hasData ? Math.round(age) + ' anni' : '',
+      femPct: femPct,
+      malePct: malePct,
+      femStyle: 'height:14px;background:#F2B1CB;width:' + femPct + '%',
+      maleStyle: 'height:14px;background:#86B6E3;width:' + malePct + '%',
+      genderAria: 'Donne ' + femPct + ' per cento, uomini ' + malePct + ' per cento',
+      basisText: basis[seg],
+      dirs: dirDefs.map((s) => ({
+        label: s.label,
+        on: this.state.dir === s.id,
+        style: segBase + (this.state.dir === s.id ? 'background:#9D6BFF;color:#0B0B12' : 'background:transparent;color:#A3A1B8'),
+        pick: () => this.setState({ dir: s.id })
+      })),
+      modes: modeData.map((m) => ({
+        badge: m.badge,
+        name: m.name,
+        detail: m.detail,
+        href: m.href,
+        action: m.action,
+        style: rowBase
+      })),
+      chosenLine: 'I numeri di telefono sono fittizi. I link aprono le app e i servizi reali.'
+    };
+  }
+}
+</script>
+</body>
+</html>

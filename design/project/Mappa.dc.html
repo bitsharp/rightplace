@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Mappa</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <dc-import name="TopBar" from="Mappa.dc.html" hint-size="390px,170px"></dc-import>
+
+  <div style="flex:none;padding:4px 20px 10px;display:flex;flex-direction:column;gap:10px">
+    <a href="Ricerca.dc.html" style="display:flex;align-items:center;gap:10px;height:48px;box-sizing:border-box;padding:0 14px;border-radius:14px;background:#15151F;border:1px solid #2A2A3A;text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A1B8" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.500"/><path d="M16 16l4 4"/></svg>
+      <span style="flex:1;font:400 15px Inter,sans-serif;color:#A3A1B8">Cerca una serata o un locale</span>
+    </a>
+    <div style="display:flex;padding:3px;border-radius:12px;background:#15151F;border:1px solid #2A2A3A">
+      <button onClick="{{ setGen }}" aria-pressed="{{ isGen }}" style="{{ tabGen }}">Mappa generale</button>
+      <button onClick="{{ setFri }}" aria-pressed="{{ isFri }}" style="{{ tabFri }}">Mappa amici</button>
+    </div>
+  </div>
+
+  <div onPointerDown="{{ ptrDown }}" onPointerMove="{{ ptrMove }}" onPointerUp="{{ ptrUp }}" onPointerCancel="{{ ptrUp }}" onPointerLeave="{{ ptrUp }}" onWheel="{{ onWheel }}" style="flex:none;height:300px;position:relative;background:#101019;border-top:1px solid #2A2A3A;border-bottom:1px solid #2A2A3A;overflow:hidden;touch-action:none;user-select:none">
+    <div style="{{ zoomStyle }}">
+    <svg width="390" height="100%" viewBox="0 30 390 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="{{ mapLabel }}" style="display:block">
+      <g stroke="#23233A" stroke-width="10" stroke-linecap="round" fill="none">
+        <path d="M-10 90 L400 70"/><path d="M-10 200 L400 230"/><path d="M-10 310 L400 300"/>
+        <path d="M70 -10 L90 370"/><path d="M200 -10 L180 370"/><path d="M320 -10 L340 370"/>
+      </g>
+      <g stroke="#1B1B2C" stroke-width="3" fill="none"><path d="M-10 150 L400 150"/><path d="M130 -10 L140 370"/><path d="M260 -10 L270 370"/></g>
+
+      <g style="{{ genSvg }}">
+        <circle cx="105" cy="130" r="50" fill="#9D6BFF" fill-opacity="0.28" stroke="#9D6BFF" stroke-width="2"/>
+        <circle cx="120" cy="140" r="22" fill="#4ED9C7" fill-opacity="0.30" stroke="#4ED9C7" stroke-width="1.500"/>
+        <text x="105" y="124" text-anchor="middle" font-family="Space Mono, monospace" font-size="13" font-weight="700" fill="#F2F1F8">50–100</text>
+
+        <circle cx="262" cy="96" r="36" fill="#9D6BFF" fill-opacity="0.28" stroke="#9D6BFF" stroke-width="2"/>
+        <circle cx="272" cy="104" r="15" fill="#4ED9C7" fill-opacity="0.30" stroke="#4ED9C7" stroke-width="1.500"/>
+        <text x="262" y="92" text-anchor="middle" font-family="Space Mono, monospace" font-size="12" font-weight="700" fill="#F2F1F8">30–50</text>
+
+        <circle cx="300" cy="250" r="26" fill="#9D6BFF" fill-opacity="0.28" stroke="#9D6BFF" stroke-width="2"/>
+        <circle cx="306" cy="256" r="10" fill="#4ED9C7" fill-opacity="0.30" stroke="#4ED9C7" stroke-width="1.500"/>
+        <text x="298" y="246" text-anchor="middle" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="#F2F1F8">20–30</text>
+
+        <circle cx="70" cy="272" r="32" fill="#9D6BFF" fill-opacity="0.28" stroke="#9D6BFF" stroke-width="2"/>
+        <circle cx="78" cy="280" r="13" fill="#4ED9C7" fill-opacity="0.30" stroke="#4ED9C7" stroke-width="1.500"/>
+        <text x="68" y="268" text-anchor="middle" font-family="Space Mono, monospace" font-size="12" font-weight="700" fill="#F2F1F8">30–50</text>
+      </g>
+
+      <g style="{{ friSvg }}">
+        <circle cx="105" cy="130" r="30" fill="#9D6BFF" fill-opacity="0.28" stroke="#9D6BFF" stroke-width="2"/>
+        <circle cx="114" cy="137" r="12" fill="#4ED9C7" fill-opacity="0.30" stroke="#4ED9C7" stroke-width="1.500"/>
+        <text x="105" y="174" text-anchor="middle" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="#F2F1F8">2 amici</text>
+
+        <circle cx="262" cy="96" r="22" fill="#9D6BFF" fill-opacity="0.28" stroke="#9D6BFF" stroke-width="2"/>
+        <text x="262" y="132" text-anchor="middle" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="#F2F1F8">1 amico</text>
+
+        <circle cx="70" cy="272" r="22" fill="#9D6BFF" fill-opacity="0.28" stroke="#9D6BFF" stroke-width="2"/>
+        <text x="70" y="308" text-anchor="middle" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="#F2F1F8">1 amico</text>
+      </g>
+
+      <circle cx="195" cy="205" r="20" fill="#F2F1F8" fill-opacity="0.10"/>
+      <circle cx="195" cy="205" r="9" fill="#F2F1F8" stroke="#0B0B12" stroke-width="3"/>
+    </svg>
+
+    <div style="{{ genWrap }}">
+      <button onClick="{{ openArena }}" aria-label="Arena Club, 50–100 persone. Apri il dettaglio" style="position:absolute;left:26.9%;top:33.3%;width:100px;height:100px;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0"></button>
+      <button onClick="{{ openSunset }}" aria-label="Sunset Rooftop, 30–50 persone. Apri il dettaglio" style="position:absolute;left:67.2%;top:22.0%;width:72px;height:72px;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0"></button>
+      <button onClick="{{ openCala }}" aria-label="La Cala Bar, 20–30 persone. Apri il dettaglio" style="position:absolute;left:76.9%;top:73.3%;width:52px;height:52px;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0"></button>
+      <button onClick="{{ openVegueta }}" aria-label="Vegueta Live, 30–50 persone. Apri il dettaglio" style="position:absolute;left:17.9%;top:80.7%;width:64px;height:64px;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0"></button>
+    </div>
+
+    <div style="{{ friWrap }}">
+      <button onClick="{{ openArena }}" aria-label="Arena Club, 2 amici. Apri il dettaglio" style="position:absolute;left:26.9%;top:33.3%;width:64px;height:64px;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0"></button>
+      <button onClick="{{ openSunset }}" aria-label="Sunset Rooftop, 1 amico. Apri il dettaglio" style="position:absolute;left:67.2%;top:22.0%;width:48px;height:48px;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0"></button>
+      <button onClick="{{ openVegueta }}" aria-label="Vegueta Live, 1 amico. Apri il dettaglio" style="position:absolute;left:17.9%;top:80.7%;width:48px;height:48px;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0"></button>
+    </div>
+
+    </div>
+    <div style="position:absolute;left:14px;top:12px;padding:6px 10px;border-radius:10px;background:#0B0B12E6;border:1px solid #2A2A3A;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:#A3A1B8">{{ hint }}</div>
+    <div style="position:absolute;left:14px;bottom:14px;display:flex;gap:12px;padding:8px 12px;border-radius:12px;background:#0B0B12E6;border:1px solid #2A2A3A;font-family:'Space Mono',monospace;font-size:11px;color:#A3A1B8">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:5px;background:#9D6BFF"></span>SI</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:5px;background:#4ED9C7"></span>FORSE</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:5px;background:#F2F1F8"></span>Tu</span>
+    </div>
+    <div style="position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px">
+      <button onClick="{{ zoomIn }}" aria-label="Ingrandisci la mappa" style="width:44px;height:44px;border-radius:22px;border:1px solid #2A2A3A;background:#0B0B12E6;color:#F2F1F8;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button onClick="{{ zoomOut }}" aria-label="Riduci la mappa" style="width:44px;height:44px;border-radius:22px;border:1px solid #2A2A3A;background:#0B0B12E6;color:#F2F1F8;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div style="{{ genCards }}">
+    <button onClick="{{ openArena }}" style="flex:none;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#15151F;border:1px solid #9D6BFF66;text-align:left;color:#F2F1F8;font-family:Inter,sans-serif">
+      <span style="flex:1;display:flex;flex-direction:column;gap:3px">
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#9D6BFF">SPONSORIZZATA</span>
+        <span style="font-size:15px;font-weight:600">Arena Club</span>
+        <span style="font-size:12px;color:#A3A1B8">Da Google Maps · punto caldo 3</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A1B8" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <button onClick="{{ openSunset }}" style="flex:none;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#15151F;border:1px solid #2A2A3A;text-align:left;color:#F2F1F8;font-family:Inter,sans-serif">
+      <span style="flex:1;display:flex;flex-direction:column;gap:3px">
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#4ED9C7">CONSIGLIATA PER TE</span>
+        <span style="font-size:15px;font-weight:600">Sunset Rooftop</span>
+        <span style="font-size:12px;color:#A3A1B8">Dalla tua cronologia di ricerca</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A1B8" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+
+  <div style="{{ friCards }}">
+    <button onClick="{{ openArena }}" style="flex:none;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:#15151F;border:1px solid #2A2A3A;text-align:left;color:#F2F1F8;font-family:Inter,sans-serif">
+      <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:15px;font-weight:600">Arena Club</span>
+        <span style="font-size:12px;color:#A3A1B8">2 amici · @volpe.viola, @orso.grigio</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A1B8" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <button onClick="{{ openSunset }}" style="flex:none;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:#15151F;border:1px solid #2A2A3A;text-align:left;color:#F2F1F8;font-family:Inter,sans-serif">
+      <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:15px;font-weight:600">Sunset Rooftop</span>
+        <span style="font-size:12px;color:#A3A1B8">1 amico · @gatto.blu</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A1B8" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <button onClick="{{ openVegueta }}" style="flex:none;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:#15151F;border:1px solid #2A2A3A;text-align:left;color:#F2F1F8;font-family:Inter,sans-serif">
+      <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:15px;font-weight:600">Vegueta Live</span>
+        <span style="font-size:12px;color:#A3A1B8">1 amico · @panda.rosa</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A1B8" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+
+  <nav style="height:72px;box-sizing:border-box;display:flex;border-top:1px solid #2A2A3A;background:#0B0B12">
+    <button style="flex:1;border:0;background:transparent;color:#9D6BFF;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg>Mappa</button>
+    <a href="Amici.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.500"/><path d="M2.500 20c0-3.600 3-6 6.500-6s6.500 2.400 6.500 6"/></svg>Amici</a>
+    <a href="Chat.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Chat</a>
+    <a href="Feed.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.500"/><path d="M21 15l-5-5L5 21"/></svg>Feed</a>
+    <a href="ProfiloApp.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.500-6.500 8-6.500s8 2.500 8 6.500"/></svg>Profilo</a>
+  </nav>
+
+  <sc-if value="{{ hasSelected }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;top:0;width:390px;height:844px;z-index:5">
+      <dc-import name="Locale" venue="{{ selected }}" embedded="{{ true }}" onClose="{{ close }}" hint-size="390px,844px"></dc-import>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  // Vero se l'utente ha dichiarato una serata (flag condiviso tra le schermate).
+  postVis() {
+    if (!this._pl) {
+      this._pl = true;
+      try { window.addEventListener('storage', () => this.setState({ _pv: Date.now() })); } catch (e) { /* ignora */ }
+    }
+    try { return window.localStorage.getItem('rp_declared') === '1'; } catch (e) { return false; }
+  }
+
+  state = { selected: null, view: 'generale', zoom: 1, ox: 0, oy: 0 };
+
+  // Misure del riquadro mappa (corrette per lo zoom della canvas).
+  box(e) {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const k = el.offsetWidth ? r.width / el.offsetWidth : 1;
+    this._g = { left: r.left, top: r.top, k: k || 1, w: el.offsetWidth || 390, h: el.offsetHeight || 370 };
+  }
+
+  // Applica zoom e spostamento, tenendo la mappa sempre a riempire il riquadro.
+  zoomTo(z, ox, oy) {
+    const g = this._g || { w: 390, h: 370 };
+    const nz = Math.min(4, Math.max(1, z));
+    this.setState({
+      zoom: nz,
+      ox: Math.min(0, Math.max(g.w * (1 - nz), ox)),
+      oy: Math.min(0, Math.max(g.h * (1 - nz), oy))
+    });
+  }
+
+  // Ingrandisce o riduce di un fattore attorno al punto (lx, ly).
+  zoomAt(factor, lx, ly) {
+    const z = this.state.zoom || 1;
+    const nz = Math.min(4, Math.max(1, z * factor));
+    const r = nz / z;
+    const ox = this.state.ox || 0;
+    const oy = this.state.oy || 0;
+    this.zoomTo(nz, lx - (lx - ox) * r, ly - (ly - oy) * r);
+  }
+
+  renderVals() {
+    const open = (n) => () => {
+      if (this._dragged) { this._dragged = false; return; }
+      this.setState({ selected: n });
+    };
+    const gen = this.state.view === 'generale';
+    const tabBase = 'flex:1;height:34px;border:0;border-radius:9px;';
+    const on = 'background:#9D6BFF;color:#0B0B12;font:600 13px Inter,sans-serif';
+    const off = 'background:transparent;color:#A3A1B8;font:500 13px Inter,sans-serif';
+    const wrapBase = 'position:absolute;left:0;top:0;right:0;bottom:0;';
+    const cardsBase = 'padding:14px 20px 10px;flex:1;min-height:0;box-sizing:border-box;overflow-y:auto;flex-direction:column;gap:10px;';
+    return { postVis: this.postVis(), rememberFrom: () => { try { window.localStorage.setItem("rp_from", "Mappa.dc.html"); } catch (e) { /* ignora */ } },
+      isGen: gen,
+      isFri: !gen,
+      tabGen: tabBase + (gen ? on : off),
+      tabFri: tabBase + (gen ? off : on),
+      setGen: () => this.setState({ view: 'generale' }),
+      setFri: () => this.setState({ view: 'amici' }),
+      genSvg: gen ? 'display:inline' : 'display:none',
+      friSvg: gen ? 'display:none' : 'display:inline',
+      genWrap: wrapBase + (gen ? '' : 'display:none'),
+      friWrap: wrapBase + (gen ? 'display:none' : ''),
+      genCards: cardsBase + (gen ? 'display:flex' : 'display:none'),
+      friCards: cardsBase + (gen ? 'display:none' : 'display:flex'),
+      hint: gen ? 'TOCCA UN PUNTO CALDO · PIZZICA PER ZOOM' : 'DOVE VANNO I TUOI AMICI · PIZZICA PER ZOOM',
+      mapLabel: gen ? 'Mappa con punti caldi di affluenza' : 'Mappa con i locali dove vanno gli amici che segui',
+      selected: this.state.selected || '',
+      hasSelected: !!this.state.selected,
+      close: () => this.setState({ selected: null }),
+      openArena: open('Arena Club'),
+      openSunset: open('Sunset Rooftop'),
+      openCala: open('La Cala Bar'),
+      openVegueta: open('Vegueta Live'),
+      zoomStyle: 'position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0;transform:translate(' + Math.round((this.state.ox || 0) * 10) / 10 + 'px,' + Math.round((this.state.oy || 0) * 10) / 10 + 'px) scale(' + (this.state.zoom || 1) + ')',
+      zoomIn: () => {
+        const g = this._g || { w: 390, h: 370 };
+        this.zoomAt(1.5, g.w / 2, g.h / 2);
+      },
+      zoomOut: () => {
+        const g = this._g || { w: 390, h: 370 };
+        this.zoomAt(1 / 1.5, g.w / 2, g.h / 2);
+      },
+      ptrDown: (e) => {
+        this.box(e);
+        const p = this._p = this._p || {};
+        if (Object.keys(p).length === 0) { this._dragged = false; this._travel = 0; }
+        p[e.pointerId] = { x: e.clientX, y: e.clientY };
+      },
+      ptrMove: (e) => {
+        const p = this._p || {};
+        const cur = p[e.pointerId];
+        if (!cur) return;
+        const g = this._g || { left: 0, top: 0, k: 1 };
+        const ids = Object.keys(p);
+        if (ids.length >= 2) {
+          // Pizzico: due dita cambiano lo zoom attorno al loro punto medio.
+          const other = p[ids.filter((i) => String(i) !== String(e.pointerId))[0]];
+          const pd = Math.hypot(cur.x - other.x, cur.y - other.y);
+          const pmx = (cur.x + other.x) / 2;
+          const pmy = (cur.y + other.y) / 2;
+          cur.x = e.clientX;
+          cur.y = e.clientY;
+          const nd = Math.hypot(cur.x - other.x, cur.y - other.y);
+          const nmx = (cur.x + other.x) / 2;
+          const nmy = (cur.y + other.y) / 2;
+          this._dragged = true;
+          if (pd > 0) {
+            const z = this.state.zoom || 1;
+            const nz = Math.min(4, Math.max(1, z * nd / pd));
+            const r = nz / z;
+            const lx = (nmx - g.left) / g.k;
+            const ly = (nmy - g.top) / g.k;
+            const ox = this.state.ox || 0;
+            const oy = this.state.oy || 0;
+            this.zoomTo(nz, lx - (lx - ox) * r + (nmx - pmx) / g.k, ly - (ly - oy) * r + (nmy - pmy) / g.k);
+          }
+        } else {
+          // Un dito (o il mouse): sposta la mappa quando è ingrandita.
+          const dx = e.clientX - cur.x;
+          const dy = e.clientY - cur.y;
+          cur.x = e.clientX;
+          cur.y = e.clientY;
+          this._travel = (this._travel || 0) + Math.abs(dx) + Math.abs(dy);
+          if (this._travel > 6 && (this.state.zoom || 1) > 1) {
+            this._dragged = true;
+            this.zoomTo(this.state.zoom, (this.state.ox || 0) + dx / g.k, (this.state.oy || 0) + dy / g.k);
+          }
+        }
+      },
+      ptrUp: (e) => {
+        if (this._p) delete this._p[e.pointerId];
+      },
+      onWheel: (e) => {
+        // Pizzico sul trackpad (ctrl o cmd + rotellina).
+        if (!(e.ctrlKey || e.metaKey)) return;
+        try { e.preventDefault(); } catch (err) { /* evento passivo */ }
+        this.box(e);
+        const g = this._g;
+        this.zoomAt(Math.exp(-e.deltaY * 0.01), (e.clientX - g.left) / g.k, (e.clientY - g.top) / g.k);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Barra alta</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;padding-top:50px;display:flex;flex-direction:column">
+
+  <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+    <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:flex-start">
+      <sc-if value="{{ postVis }}" hint-placeholder-val="{{ true }}">
+        <a href="GiornoDopo.dc.html" onClick="{{ rememberFrom }}" aria-label="Posta la foto della tua serata" style="width:40px;height:40px;border-radius:20px;background:#9D6BFF;color:#0B0B12;display:flex;align-items:center;justify-content:center;text-decoration:none">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </a>
+      </sc-if>
+    </div>
+    <a href="ProfiloApp.dc.html" aria-label="Il tuo profilo" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:#F2F1F8">
+      <span style="font-family:Unbounded,sans-serif;font-weight:700;font-size:17px;line-height:1.2">{{ me }}</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg>
+    </a>
+    <a href="Feed.dc.html" aria-label="Novità dai tuoi amici" style="position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:flex-end;color:#F2F1F8;text-decoration:none">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.500-4.600-7.500-10A4.300 4.300 0 0 1 12 7.300 4.300 4.300 0 0 1 19.500 10c0 5.400-7.500 10-7.500 10z"/></svg>
+      <span style="position:absolute;right:-1px;top:6px;width:10px;height:10px;border-radius:5px;background:#9D6BFF;border:2px solid #0B0B12"></span>
+    </a>
+  </div>
+
+  <div style="display:flex;gap:14px;overflow-x:auto;padding:10px 16px 12px">
+    <sc-for list="{{ stories }}" as="s" hint-placeholder-count="3">
+      <a href="Feed.dc.html" aria-label="{{ s.aria }}" style="flex:none;width:64px;display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;color:#F2F1F8">
+        <div style="{{ s.ringStyle }}">
+          <div style="{{ s.avatarStyle }}">{{ s.initial }}</div>
+        </div>
+        <span style="max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:#A3A1B8">{{ s.label }}</span>
+      </a>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":170}}'>
+class Component extends DCLogic {
+  // Vero se l'utente ha dichiarato una serata (flag condiviso tra le schermate).
+  postVis() {
+    if (!this._pl) {
+      this._pl = true;
+      try { window.addEventListener('storage', () => this.setState({ _pv: Date.now() })); } catch (e) { /* ignora */ }
+    }
+    try { return window.localStorage.getItem('rp_declared') === '1'; } catch (e) { return false; }
+  }
+
+  renderVals() {
+    // Dati di esempio: utente collegato e amici seguiti che hanno postato.
+    const list = [
+      { tag: 'tu', label: 'La tua storia', initial: 'T', color: '#A3A1B8', mine: true },
+      { tag: 'volpe.viola', label: 'volpe.viola', initial: 'V', color: '#9D6BFF', mine: false },
+      { tag: 'gatto.blu', label: 'gatto.blu', initial: 'G', color: '#4ED9C7', mine: false }
+    ];
+    return {
+      me: '@lince.rosso',
+      postVis: this.postVis(),
+      rememberFrom: () => { try { window.localStorage.setItem('rp_from', String(this.props.from || 'Mappa.dc.html')); } catch (e) { /* ignora */ } },
+      stories: list.map((s) => ({
+        label: s.label,
+        initial: s.initial,
+        aria: s.mine ? 'Il tuo post' : 'Nuovo post di ' + s.tag,
+        ringStyle: 'width:64px;height:64px;border-radius:32px;box-sizing:border-box;padding:3px;display:flex;align-items:center;justify-content:center;' + (s.mine ? 'background:#2A2A3A' : 'background:linear-gradient(135deg,#9D6BFF,#4ED9C7)'),
+        avatarStyle: 'width:100%;height:100%;border-radius:50%;box-sizing:border-box;border:3px solid #0B0B12;display:flex;align-items:center;justify-content:center;font:700 20px Unbounded,sans-serif;color:#F2F1F8;background:' + s.color + '55'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

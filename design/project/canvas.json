@@ -1,0 +1,161 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Abbonamento.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "8 Creator: abbonamento",
+      "w": 390,
+      "x": 3290,
+      "y": 0
+    },
+    "Amici.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "9 Amici",
+      "w": 390,
+      "x": 3760,
+      "y": 0
+    },
+    "Chat.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "5 Chat di gruppo",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "CreaSerata.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "7 Creator: crea serata",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "Feed.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "12 Feed",
+      "w": 390,
+      "x": 5170,
+      "y": 0
+    },
+    "GiornoDopo.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "6 Il giorno dopo",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "Locale.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "11 Dettaglio locale",
+      "w": 390,
+      "x": 4700,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "1 Accesso",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "Mappa.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "3 Mappa",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "Profilo.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "2 Profilo privato",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Ricerca.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "10 Cerca locali",
+      "w": 390,
+      "x": 4230,
+      "y": 0
+    },
+    "Serata.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "4 Dichiara la serata",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "TopBar.dc.html": {
+      "h": 170,
+      "w": 390,
+      "x": 5640,
+      "y": 0
+    },
+    "ProfiloApp.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "13 Profilo (dentro l'app)",
+      "w": 390,
+      "x": 6110,
+      "y": 0
+    },
+    "CreatorProfilo.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "14 Profilo creator",
+      "w": 390,
+      "x": 6580,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-16T11:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "titolo": {
+      "kind": "title1",
+      "maxW": 6500,
+      "text": "RightPlace: flusso utente dalla board Miro",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Profilo.dc.html",
+    "Mappa.dc.html",
+    "Serata.dc.html",
+    "Chat.dc.html",
+    "GiornoDopo.dc.html",
+    "CreaSerata.dc.html",
+    "Abbonamento.dc.html",
+    "Amici.dc.html",
+    "Ricerca.dc.html",
+    "Locale.dc.html",
+    "Feed.dc.html",
+    "ProfiloApp.dc.html",
+    "CreatorProfilo.dc.html",
+    "TopBar.dc.html"
+  ],
+  "pages": [],
+  "title": "RightPlace Mockup"
+}

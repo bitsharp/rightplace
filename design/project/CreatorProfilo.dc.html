@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Profilo creator</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+
+  <div style="flex:none;padding:56px 20px 12px;display:flex;align-items:center;gap:12px">
+    <div style="flex:none;width:52px;height:52px;border-radius:26px;box-sizing:border-box;background:#4ED9C733;border:1px solid #4ED9C7;display:flex;align-items:center;justify-content:center;font:700 18px Unbounded,sans-serif">L</div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.4px;color:#4ED9C7">PROFILO CREATOR</span>
+      <span style="font-family:Unbounded,sans-serif;font-weight:700;font-size:18px;line-height:1.2">@lince.rosso</span>
+    </div>
+    <a href="ProfiloApp.dc.html" aria-label="Torna al profilo personale" style="flex:none;height:36px;padding:0 14px;border-radius:18px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;font:500 13px Inter,sans-serif;display:flex;align-items:center;text-decoration:none">Profilo</a>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 20px 16px;display:flex;flex-direction:column;gap:16px">
+
+    <div style="{{ planStyle }}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <span style="font-size:16px;font-weight:600">Piano [nome]</span>
+        <span style="{{ badgeStyle }}">{{ badge }}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#A3A1B8">
+        <span>[PREZZO] al mese</span>
+        <span>{{ renewLine }}</span>
+      </div>
+
+      <sc-if value="{{ showActions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:10px">
+          <a href="Abbonamento.dc.html" style="flex:1;height:46px;border-radius:14px;background:#4ED9C7;color:#0B0B12;font:600 14px Inter,sans-serif;display:flex;align-items:center;justify-content:center;text-decoration:none">Cambia piano</a>
+          <button onClick="{{ askCancel }}" style="flex:1;height:46px;border-radius:14px;border:1px solid #2A2A3A;background:transparent;color:#F2F1F8;font:500 14px Inter,sans-serif">Annulla abbonamento</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showConfirm }}" hint-placeholder-val="{{ false }}">
+        <div role="alertdialog" aria-label="Conferma annullamento" style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;background:#0B0B12;border:1px solid #2A2A3A">
+          <span style="font-size:14px;line-height:1.4">Vuoi annullare l'abbonamento? Resta attivo fino al [DATA] e poi non potrai più pubblicizzare le serate.</span>
+          <div style="display:flex;gap:10px">
+            <button onClick="{{ keep }}" style="flex:1;height:44px;border-radius:12px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;font:500 14px Inter,sans-serif">Mantieni</button>
+            <button onClick="{{ confirmCancel }}" style="flex:1;height:44px;border-radius:12px;border:0;background:#F2F1F8;color:#0B0B12;font:600 14px Inter,sans-serif">Conferma annullamento</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ cancelled }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:13px;line-height:1.4;color:#A3A1B8">Abbonamento annullato. Non verrà rinnovato.</span>
+          <button onClick="{{ reactivate }}" style="height:46px;border-radius:14px;border:1px solid #4ED9C7;background:#4ED9C71A;color:#F2F1F8;font:600 14px Inter,sans-serif">Riattiva abbonamento</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="flex:none;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:16px;font-weight:600">Le tue serate</span>
+        <a href="CreaSerata.dc.html" style="height:34px;padding:0 14px;border-radius:17px;background:#9D6BFF;color:#0B0B12;font:600 13px Inter,sans-serif;display:flex;align-items:center;text-decoration:none">Nuova serata</a>
+      </div>
+      <div style="display:flex;padding:3px;border-radius:12px;background:#15151F;border:1px solid #2A2A3A">
+        <button onClick="{{ setNext }}" aria-pressed="{{ isNext }}" style="{{ tabNext }}">In programma</button>
+        <button onClick="{{ setPast }}" aria-pressed="{{ isPast }}" style="{{ tabPast }}">Passate</button>
+      </div>
+      <sc-for list="{{ rows }}" as="e" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:15px;font-weight:600">{{ e.name }}</span>
+              <span style="font-size:12px;color:#A3A1B8">{{ e.meta }}</span>
+            </div>
+            <span style="flex:none;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.8px;color:#A3A1B8">{{ e.when }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;font-family:'Space Mono',monospace;font-size:12px">
+            <span style="color:#9D6BFF">SI {{ e.si }}</span>
+            <span style="color:#4ED9C7">FORSE {{ e.forse }}</span>
+            <span style="color:#A3A1B8">· {{ e.target }}</span>
+          </div>
+        </div>
+      </sc-for>
+      <span style="font-size:12px;color:#A3A1B8">Dati di esempio. Le adesioni sono fasce, non singole persone.</span>
+    </div>
+  </div>
+
+  <nav style="height:72px;flex:none;box-sizing:border-box;display:flex;border-top:1px solid #2A2A3A;background:#0B0B12">
+    <a href="Mappa.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg>Mappa</a>
+    <a href="Amici.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.500"/><path d="M2.500 20c0-3.600 3-6 6.500-6s6.500 2.400 6.500 6"/></svg>Amici</a>
+    <a href="Chat.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Chat</a>
+    <a href="Feed.dc.html" style="flex:1;text-decoration:none;color:#A3A1B8;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.500"/><path d="M21 15l-5-5L5 21"/></svg>Feed</a>
+    <a href="ProfiloApp.dc.html" style="flex:1;text-decoration:none;color:#9D6BFF;font:500 11px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.500-6.500 8-6.500s8 2.500 8 6.500"/></svg>Profilo</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  state = { seg: 'next', confirm: false, cancelled: false };
+
+  renderVals() {
+    // Serate di esempio (mock) create dal creator.
+    const all = [
+      { seg: 'next', name: 'Notte al rooftop', meta: 'Sunset Rooftop · Las Palmas · 22:00', when: 'SAB 31 OTT', si: '30–50', forse: '20–30', target: '18–24 · Tutti' },
+      { seg: 'next', name: 'Live session', meta: 'Vegueta Live · Las Palmas · 21:30', when: 'VEN 06 NOV', si: '20–30', forse: 'pochi', target: '25–34 · Tutti' },
+      { seg: 'past', name: 'Opening Arena', meta: 'Arena Club · Las Palmas · 23:00', when: 'SAB 17 OTT', si: '50–100', forse: '30–50', target: '18–24 · Tutti' },
+      { seg: 'past', name: 'Aperitivo sul mare', meta: 'La Cala Bar · Las Palmas · 19:00', when: 'VEN 09 OTT', si: '20–30', forse: 'pochi', target: '25–34 · Donne' }
+    ];
+    const s = this.state;
+    const next = s.seg !== 'past';
+    const on = 'flex:1;height:38px;border-radius:9px;border:0;background:#4ED9C7;color:#0B0B12;font:600 13px Inter,sans-serif';
+    const off = 'flex:1;height:38px;border-radius:9px;border:0;background:transparent;color:#A3A1B8;font:500 13px Inter,sans-serif';
+    const chip = 'flex:none;padding:4px 10px;border-radius:12px;font:600 11px Inter,sans-serif;color:#F2F1F8;';
+    return {
+      isNext: next, isPast: !next,
+      tabNext: next ? on : off, tabPast: next ? off : on,
+      setNext: () => this.setState({ seg: 'next' }),
+      setPast: () => this.setState({ seg: 'past' }),
+      rows: all.filter((e) => e.seg === (next ? 'next' : 'past')),
+      planStyle: 'flex:none;display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:18px;background:#15151F;border:1px solid ' + (s.cancelled ? '#2A2A3A' : '#4ED9C7'),
+      badge: s.cancelled ? 'Annullato' : 'Attivo',
+      badgeStyle: chip + (s.cancelled ? 'background:#2A2A3A;border:1px solid #2A2A3A' : 'background:#4ED9C71A;border:1px solid #4ED9C7'),
+      renewLine: s.cancelled ? 'Attivo fino al [DATA]' : 'Rinnovo il [DATA]',
+      showActions: !s.confirm && !s.cancelled,
+      showConfirm: !!s.confirm,
+      cancelled: !!s.cancelled,
+      askCancel: () => this.setState({ confirm: true }),
+      keep: () => this.setState({ confirm: false }),
+      confirmCancel: () => this.setState({ confirm: false, cancelled: true }),
+      reactivate: () => this.setState({ cancelled: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

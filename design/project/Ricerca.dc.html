@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Cerca locali</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;background:#0B0B12;color:#F2F1F8;font-family:Inter,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <sc-if value="{{ postVis }}" hint-placeholder-val="{{ true }}">
+    <a href="GiornoDopo.dc.html" onClick="{{ rememberFrom }}" aria-label="Posta la foto della tua serata" style="position:absolute;left:16px;top:8px;z-index:4;width:40px;height:40px;border-radius:20px;background:#9D6BFF;color:#0B0B12;display:flex;align-items:center;justify-content:center;text-decoration:none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </a>
+  </sc-if>
+
+  <div style="padding:56px 20px 12px;display:flex;align-items:center;gap:12px">
+    <a href="Mappa.dc.html" aria-label="Indietro" style="flex:none;width:44px;height:44px;border-radius:22px;border:1px solid #2A2A3A;background:#15151F;color:#F2F1F8;display:flex;align-items:center;justify-content:center;text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </a>
+    <label for="cerca" style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:48px;box-sizing:border-box;padding:0 14px;border-radius:14px;background:#15151F;border:1px solid #9D6BFF">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A1B8" stroke-width="1.800" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.500"/><path d="M16 16l4 4"/></svg>
+      <input id="cerca" type="search" value="{{ q }}" onInput="{{ onQ }}" placeholder="Nome, città o tipo di locale" aria-label="Cerca un locale" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F2F1F8;font:400 15px Inter,sans-serif">
+    </label>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:10px">
+    <span style="padding:0 20px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#A3A1B8">CITTÀ</span>
+    <div style="display:flex;gap:8px;overflow-x:auto;padding:0 20px">
+      <sc-for list="{{ cities }}" as="c" hint-placeholder-count="5">
+        <button onClick="{{ c.pick }}" aria-pressed="{{ c.on }}" style="{{ c.style }}">{{ c.label }}</button>
+      </sc-for>
+    </div>
+    <span style="padding:6px 20px 0;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#A3A1B8">TIPO DI LOCALE</span>
+    <div style="display:flex;gap:8px;overflow-x:auto;padding:0 20px">
+      <sc-for list="{{ types }}" as="t" hint-placeholder-count="5">
+        <button onClick="{{ t.pick }}" aria-pressed="{{ t.on }}" style="{{ t.style }}">{{ t.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-if value="{{ showRecent }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:0 20px 10px;display:flex;align-items:center;gap:8px;overflow-x:auto">
+      <span style="flex:none;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#A3A1B8">RECENTI</span>
+      <sc-for list="{{ recents }}" as="r" hint-placeholder-count="3">
+        <button onClick="{{ r.pick }}" style="flex:none;height:32px;padding:0 12px;border-radius:16px;border:1px solid #2A2A3A;background:transparent;color:#A3A1B8;font:500 12px Inter,sans-serif">{{ r.label }}</button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="padding:4px 20px 8px;font-size:13px;color:#A3A1B8">{{ countLabel }}</div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:0 20px 24px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ rows }}" as="v" hint-placeholder-count="4">
+      <button onClick="{{ v.open }}" style="flex:none;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#15151F;border:1px solid #2A2A3A;text-align:left;color:#F2F1F8;font-family:Inter,sans-serif">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+          <sc-if value="{{ v.sponsored }}" hint-placeholder-val="{{ false }}">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.2px;color:#9D6BFF">SPONSORIZZATA</span>
+          </sc-if>
+          <span style="font-size:15px;font-weight:600">{{ v.name }}</span>
+          <span style="font-size:12px;color:#A3A1B8">{{ v.meta }}</span>
+        </div>
+        <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-family:'Space Mono',monospace;font-size:11px">
+          <span style="color:#9D6BFF">SI {{ v.si }}</span>
+          <span style="color:#4ED9C7">FORSE {{ v.forse }}</span>
+        </div>
+      </button>
+    </sc-for>
+    <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:28px 12px;text-align:center;font-size:14px;line-height:1.5;color:#A3A1B8">Nessun locale trovato. Prova a cambiare città o tipo.</div>
+    </sc-if>
+  </div>
+  <sc-if value="{{ hasSelected }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;top:0;width:390px;height:844px;z-index:5">
+      <dc-import name="Locale" venue="{{ selected }}" embedded="{{ true }}" onClose="{{ close }}" hint-size="390px,844px"></dc-import>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  // Vero se l'utente ha dichiarato una serata (flag condiviso tra le schermate).
+  postVis() {
+    if (!this._pl) {
+      this._pl = true;
+      try { window.addEventListener('storage', () => this.setState({ _pv: Date.now() })); } catch (e) { /* ignora */ }
+    }
+    try { return window.localStorage.getItem('rp_declared') === '1'; } catch (e) { return false; }
+  }
+
+  state = { q: '', city: 'Tutte', type: 'Tutti', selected: null };
+
+  renderVals() {
+    // Dati di esempio (mock): nomi dei locali e affluenze sono inventati.
+    const venues = [
+      { name: 'Arena Club', city: 'Las Palmas', type: 'Club', si: '50–100', forse: '30–50', sponsored: true },
+      { name: 'Sunset Rooftop', city: 'Las Palmas', type: 'Rooftop', si: '30–50', forse: '20–30', sponsored: false },
+      { name: 'La Cala Bar', city: 'Las Palmas', type: 'Bar', si: '20–30', forse: 'pochi', sponsored: false },
+      { name: 'Vegueta Live', city: 'Las Palmas', type: 'Live', si: '30–50', forse: '20–30', sponsored: false },
+      { name: 'Cobalto Club', city: 'Madrid', type: 'Club', si: '50–100', forse: '50–100', sponsored: true },
+      { name: 'Terraza Gran Vía', city: 'Madrid', type: 'Rooftop', si: '30–50', forse: '30–50', sponsored: false },
+      { name: 'Bar Lavapiés', city: 'Madrid', type: 'Bar', si: '20–30', forse: '20–30', sponsored: false },
+      { name: 'Sala Malasaña', city: 'Madrid', type: 'Live', si: '30–50', forse: '20–30', sponsored: false },
+      { name: 'Nova Club', city: 'Barcellona', type: 'Club', si: '50–100', forse: '30–50', sponsored: false },
+      { name: 'Rooftop Born', city: 'Barcellona', type: 'Rooftop', si: '30–50', forse: '20–30', sponsored: false },
+      { name: 'Bar Gràcia', city: 'Barcellona', type: 'Bar', si: '20–30', forse: 'pochi', sponsored: false },
+      { name: 'Poble Nou Live', city: 'Barcellona', type: 'Live', si: '30–50', forse: '30–50', sponsored: false },
+      { name: 'Navigli Club', city: 'Milano', type: 'Club', si: '50–100', forse: '50–100', sponsored: true },
+      { name: 'Terrazza Isola', city: 'Milano', type: 'Rooftop', si: '30–50', forse: '20–30', sponsored: false },
+      { name: 'Bar Brera', city: 'Milano', type: 'Bar', si: '20–30', forse: '20–30', sponsored: false },
+      { name: 'Live Lambrate', city: 'Milano', type: 'Live', si: '30–50', forse: 'pochi', sponsored: false }
+    ];
+    const cityNames = ['Tutte', 'Las Palmas', 'Madrid', 'Barcellona', 'Milano'];
+    const typeNames = ['Tutti', 'Club', 'Bar', 'Rooftop', 'Live'];
+    const q = String(this.state.q || '').trim().toLowerCase();
+    const base = 'flex:none;height:36px;padding:0 14px;border-radius:18px;color:#F2F1F8;white-space:nowrap;';
+    const cityOn = base + 'border:1px solid #9D6BFF;background:#9D6BFF22;font:600 13px Inter,sans-serif';
+    const typeOn = base + 'border:1px solid #4ED9C7;background:#4ED9C71A;font:600 13px Inter,sans-serif';
+    const off = base + 'border:1px solid #2A2A3A;background:#15151F;font:500 13px Inter,sans-serif';
+
+    const rows = venues
+      .filter((v) => this.state.city === 'Tutte' || v.city === this.state.city)
+      .filter((v) => this.state.type === 'Tutti' || v.type === this.state.type)
+      .filter((v) => (v.name + ' ' + v.city + ' ' + v.type).toLowerCase().indexOf(q) !== -1)
+      .map((v) => ({
+        name: v.name,
+        meta: v.type + ' · ' + v.city,
+        si: v.si,
+        forse: v.forse,
+        sponsored: v.sponsored,
+        open: () => this.setState({ selected: v.name })
+      }));
+
+    return { postVis: this.postVis(), rememberFrom: () => { try { window.localStorage.setItem("rp_from", "Ricerca.dc.html"); } catch (e) { /* ignora */ } },
+      q: this.state.q || '',
+      onQ: (e) => this.setState({ q: e.target.value }),
+      cities: cityNames.map((n) => ({
+        label: n,
+        on: this.state.city === n,
+        style: this.state.city === n ? cityOn : off,
+        pick: () => this.setState({ city: n })
+      })),
+      types: typeNames.map((n) => ({
+        label: n,
+        on: this.state.type === n,
+        style: this.state.type === n ? typeOn : off,
+        pick: () => this.setState({ type: n })
+      })),
+      recents: ['Rooftop', 'Las Palmas', 'Live'].map((n) => ({
+        label: n,
+        pick: () => this.setState({ q: n })
+      })),
+      showRecent: q === '',
+      countLabel: rows.length + (rows.length === 1 ? ' locale' : ' locali') + ' · dati di esempio',
+      rows: rows,
+      empty: rows.length === 0,
+      selected: this.state.selected || '',
+      hasSelected: !!this.state.selected,
+      close: () => this.setState({ selected: null })
+    };
+  }
+}
+</script>
+</body>
+</html>
