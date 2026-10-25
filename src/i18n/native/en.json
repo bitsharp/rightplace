@@ -1,0 +1,7 @@
+{
+  "CFBundleDisplayName": "RightPlace",
+  "NSLocationWhenInUseUsageDescription": "To show you on the map, only while you use the app. Your location is rounded to about 500 m and never stored.",
+  "NSCameraUsageDescription": "To take the day-after photos you share with your followers.",
+  "NSPhotoLibraryUsageDescription": "To pick the day-after photos you share with your followers.",
+  "NSContactsUsageDescription": "Optional: to find friends already on RightPlace. We only send hashed phone numbers, never names or numbers."
+}

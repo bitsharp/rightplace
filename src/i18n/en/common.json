@@ -1,0 +1,13 @@
+{
+  "appName": "RightPlace",
+  "tabs": {
+    "map": "Map",
+    "friends": "Friends",
+    "chat": "Chat",
+    "feed": "Feed",
+    "profile": "Profile"
+  },
+  "placeholder": {
+    "body": "Screen under construction"
+  }
+}

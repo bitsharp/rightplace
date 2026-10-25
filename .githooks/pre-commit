@@ -1,0 +1,6 @@
+#!/bin/sh
+# Enabled by `npm install` (prepare script → core.hooksPath). CLAUDE.md: zero warnings and IT/EN complete at every commit.
+set -e
+npm run -s i18n:check
+npm run -s typecheck
+npm run -s lint

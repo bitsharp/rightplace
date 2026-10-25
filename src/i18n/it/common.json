@@ -1,0 +1,13 @@
+{
+  "appName": "RightPlace",
+  "tabs": {
+    "map": "Mappa",
+    "friends": "Amici",
+    "chat": "Chat",
+    "feed": "Feed",
+    "profile": "Profilo"
+  },
+  "placeholder": {
+    "body": "Schermata in costruzione"
+  }
+}

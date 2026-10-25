@@ -1,0 +1,9 @@
+node_modules/
+design/
+roadmap/
+CLAUDE.md
+package-lock.json
+coverage/
+.expo/
+ios/
+android/

@@ -1,0 +1,7 @@
+{
+  "CFBundleDisplayName": "RightPlace",
+  "NSLocationWhenInUseUsageDescription": "Per mostrarti sulla mappa, solo mentre usi l'app. La posizione viene arrotondata a circa 500 m e non viene salvata.",
+  "NSCameraUsageDescription": "Per scattare le foto del giorno dopo da condividere con chi ti segue.",
+  "NSPhotoLibraryUsageDescription": "Per scegliere le foto del giorno dopo da condividere con chi ti segue.",
+  "NSContactsUsageDescription": "Facoltativo: per trovare amici già su RightPlace. Inviamo solo codici cifrati dei numeri, mai nomi o numeri."
+}
