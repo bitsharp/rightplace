@@ -112,6 +112,8 @@ Flusso per ogni prompt `NN`:
 2. `/model sonnet` → **Sviluppatore**: esegue il piano in TDD, una voce alla volta.
 3. `/model opus` (o fable) → **Architetto**: review del `git diff`, Definition of Done punto per punto, violazioni dei principi. Poi lo sviluppatore committa.
 
+**Nelle sessioni cloud (e ovunque non sia pratico usare `/model`)**: il modello principale della sessione fa da **Architetto** (piano e review) e **delega l'implementazione al subagente `implementer`** (`.claude/agents/implementer.md`, configurato su Sonnet; fallback `CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`). Il modello principale non scrive codice di produzione né test: li fa scrivere a `implementer`, poi rivede il `git diff`. Per i prompt puramente esecutivi (schermata già specificata nel mock-up) Luca può avviare la sessione direttamente con Sonnet.
+
 Decisione architetturale non prevista dal piano (nuova libreria, cambio schema, nuova RPC)? **Fermarsi e chiedere il cambio modello.**
 
 ## Clean code e TDD (obbligatori)
