@@ -15,7 +15,7 @@
 
 | Servizio | Azione | Costo |
 |---|---|---|
-| **Expo** | Account, organizzazione `bitsharp` | 0 |
+| **Expo** | ✅ Fatto: account `bitsharp-slu`, progetto EAS `rightplace` (ID `8eb7e0f8-8c1b-43fe-a730-924c140f2438`). Resta: token su expo.dev/settings/access-tokens → `EXPO_TOKEN` nell'ambiente cloud di Claude Code | 0 |
 | **Supabase** | Progetti `rightplace-dev` e `rightplace-prod`, regione **EU (Frankfurt)** | 0 (Free) → Pro 25 $/mese dal Milestone B |
 | **Cloudflare** | Account; **Turnstile** widget "RightPlace" (site key + secret) | 0 |
 | **Resend** | Account, dominio verificato (es. `mail.rightplace.app`), SMTP credentials | 0 |
@@ -23,7 +23,7 @@
 | **Apple Developer Program** | Iscrizione (organizzazione Bitsharp con D-U-N-S, o individuale) | 99 $/anno |
 | **Google Play Console** | Account **organizzazione** (evita i 12 tester × 14 giorni obbligatori per i nuovi account personali) | 25 $ |
 | **Sentry**, **PostHog EU** | Progetti | 0 |
-| **GitHub** | Repo privato `bitsharp/rightplace` | 0 |
+| **GitHub** | ✅ Fatto: repo privato `bitsharp/rightplace`. Resta: Claude GitHub App installata sul repo (github.com/apps/claude/installations/new) per le sessioni cloud | 0 |
 | Dominio | `rightplace.app` (o sottodominio bitsharp.it): landing, privacy, universal link | ~10 €/anno |
 | **RevenueCat** [C] | Progetto, app iOS + Android, prodotti abbonamento | 0 |
 | **App Store Connect / Play Console** [C] | Prodotti in-app: `creator_monthly`, `creator_yearly` | — |
@@ -54,19 +54,24 @@ EXPO_PUBLIC_INVITE_BASE_URL=https://rightplace.app
 
 # solo server (Edge Function secrets / EAS secrets)
 SUPABASE_SERVICE_ROLE_KEY, GOOGLE_PLACES_KEY, TURNSTILE_SECRET, RESEND_API_KEY,
-ANTHROPIC_API_KEY [C], REVENUECAT_WEBHOOK_SECRET [C], EXPO_ACCESS_TOKEN
+ANTHROPIC_API_KEY [C], REVENUECAT_WEBHOOK_SECRET [C]
+
+# solo ambiente cloud di Claude Code (claude.ai/code → Default → variabili) e variabili utente Windows
+EXPO_TOKEN, SUPABASE_ACCESS_TOKEN
 ```
 
 ## Repo
 
+✅ Fatto: la root del repo è `C:\projects\rightplace` (remote `origin` → `github.com/bitsharp/rightplace`), con `CLAUDE.md` nella root e le cartelle `roadmap\` e `design\`. Il codice Expo del prompt 02 nasce **in questa stessa root** (non in una sottocartella `app\`: `app/` è riservata alle route di Expo Router).
+
 ```powershell
-mkdir C:\projects\rightplace\app; cd C:\projects\rightplace\app; git init
-# copia CLAUDE.md nella root, poi le cartelle roadmap\ e design\
+cd C:\projects\rightplace
+git add -A; git commit -m "chore: CLAUDE.md in root, .gitignore, dati progetto EAS"; git push
 ```
 
 ## Definition of Done
 
-- [ ] CLI installate e login fatti (`eas login`, `supabase login`)
+- [ ] CLI installate e login fatti (`eas login`, `supabase login`); `EXPO_TOKEN` e `SUPABASE_ACCESS_TOKEN` impostati nell'ambiente cloud di Claude Code
 - [ ] Supabase dev in EU con Email auth + Turnstile + SMTP Resend configurati e **un'email di conferma di test ricevuta**
 - [ ] Chiavi Google create con le restrizioni giuste (Android key → package; Places key → solo Places API)
 - [ ] Iscrizione Apple inviata; Play Console creato

@@ -1,6 +1,6 @@
 # RightPlace — contesto di progetto per Claude Code
 
-> Copia questo file nella root del repository. Claude Code lo legge automaticamente a ogni sessione.
+> Questo file sta nella root del repository `bitsharp/rightplace` e Claude Code lo legge automaticamente a ogni sessione, locale o cloud.
 > Fonte di verità per il prodotto: il mock-up in `design/project/*.dc.html` (14 schermate + componente TopBar), esportato dall'artifact Claude Design "RightPlace Mockup".
 
 ## Cos'è RightPlace
@@ -71,6 +71,20 @@ App mobile (iOS + Android) per scoprire **dove va la gente stasera**. L'utente d
 - Radius: card 16–18, bottoni 14–16, segmented 12 (interno 9), pill 999. Bottone primario alto 56, tap target ≥ 44.
 - Tab bar a 5 voci: Mappa · Amici · Chat · Feed · Profilo. TopBar: "+" (solo dopo dichiarazione), handle, campanella, storie.
 - Haptics su dichiarazione, follow, like, invio messaggio.
+
+## Expo / EAS: progetto e credenziali
+
+Il progetto EAS esiste già: **non** eseguire `eas init` né crearne un altro. Riferimenti fissi, da usare in `app.config.ts` (prompt 02):
+
+| Chiave | Valore |
+|---|---|
+| Owner (account Expo) | `bitsharp-slu` |
+| Slug | `rightplace` |
+| Project ID (`extra.eas.projectId`) | `8eb7e0f8-8c1b-43fe-a730-924c140f2438` |
+
+- `owner: "bitsharp-slu"` è obbligatorio nella config: l'account Expo non coincide con l'utente GitHub (`bitsharp`); senza di esso `eas` cerca il progetto sull'account sbagliato.
+- Autenticazione non interattiva: variabile d'ambiente **`EXPO_TOKEN`** (token creato su expo.dev/settings/access-tokens). Vive solo nell'ambiente cloud di Claude Code (claude.ai/code → ambiente Default → variabili) e, in locale, nelle variabili utente di Windows. **Mai** nel repo, in `.env` committati, in `eas.json` o nei prompt.
+- Se `EXPO_TOKEN` manca, `eas whoami` fallisce: fermarsi e chiederlo a Luca, non lanciare `eas login`.
 
 ## Budget EAS: restare nel piano Free
 

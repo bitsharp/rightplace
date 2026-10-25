@@ -1,0 +1,49 @@
+# Dipendenze
+node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# Build native (prebuild) e output EAS
+ios/
+android/
+build/
+*.ipa
+*.apk
+*.aab
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Segreti e variabili d'ambiente (le chiavi vivono in Supabase/EAS secrets e nell'ambiente cloud)
+.env
+.env.*
+!.env.example
+
+# Supabase locale
+supabase/.branches/
+supabase/.temp/
+
+# Test e coverage
+coverage/
+.maestro/tests/**/screenshots/
+
+# Editor e sistema
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Sincronizzazione mock-up (file di stato del task orario)
+design/.sync-version
