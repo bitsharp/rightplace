@@ -1,6 +1,6 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { SpaceMono_400Regular, SpaceMono_700Bold } from '@expo-google-fonts/space-mono';
-import { Unbounded_600SemiBold } from '@expo-google-fonts/unbounded';
+import { Unbounded_700Bold } from '@expo-google-fonts/unbounded';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -15,7 +15,7 @@ import { colors } from '@/theme/tokens';
 SplashScreen.preventAutoHideAsync();
 
 const FONTS = {
-  Unbounded_600SemiBold,
+  Unbounded_700Bold,
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
@@ -62,6 +62,9 @@ function RootNavigator() {
         <Stack.Screen name="creator/index" />
         <Stack.Screen name="creator/new-event" />
         <Stack.Screen name="creator/billing" options={{ presentation: 'modal' }} />
+      </Stack.Protected>
+      <Stack.Protected guard={__DEV__}>
+        <Stack.Screen name="(dev)/ui-kit" />
       </Stack.Protected>
     </Stack>
   );

@@ -5,6 +5,7 @@ import { deviceLocales } from '@/test/locales';
 
 import enCommon from './en/common.json';
 import itCommon from './it/common.json';
+import itUi from './it/ui.json';
 import { changeLanguage, i18n, initI18n } from './index';
 import { loadStoredLanguage } from './languageStorage';
 
@@ -43,5 +44,28 @@ describe('changeLanguage', () => {
     await changeLanguage('en');
     expect(i18n.language).toBe('en');
     await expect(loadStoredLanguage()).resolves.toBe('en');
+  });
+});
+
+describe('plurali', () => {
+  beforeEach(() => AsyncStorage.clear());
+
+  it.each(['it', 'en'])('usa singolare e plurale in %s', async (language) => {
+    mockDeviceLanguage(language);
+    await initI18n();
+    expect(i18n.t('ui:friendsGoing', { count: 1 })).not.toBe(
+      i18n.t('ui:friendsGoing', { count: 2 }).replace('2', '1'),
+    );
+  });
+
+  it('scrive "1 amico" e "3 amici" in italiano', async () => {
+    mockDeviceLanguage('it');
+    await initI18n();
+    expect(i18n.t('ui:friendsGoing', { count: 1 })).toBe(
+      itUi.friendsGoing_one.replace('{{count}}', '1'),
+    );
+    expect(i18n.t('ui:friendsGoing', { count: 3 })).toBe(
+      itUi.friendsGoing_other.replace('{{count}}', '3'),
+    );
   });
 });

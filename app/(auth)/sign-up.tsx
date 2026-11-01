@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
-import { colors, fonts } from '@/theme/tokens';
+import { colors, spacing } from '@/theme/tokens';
+import { typography } from '@/theme/typography';
 
 export default function SignUpScreen() {
   const { t } = useTranslation('auth');
@@ -17,5 +18,5 @@ export default function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
-  link: { fontFamily: fonts.body, fontSize: 14, color: colors.secondary, padding: 12 },
+  link: { ...typography.body14, color: colors.secondary, padding: spacing.md },
 });

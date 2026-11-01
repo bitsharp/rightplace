@@ -1,0 +1,68 @@
+{
+  "intent": {
+    "going": "GOING",
+    "maybe": "MAYBE",
+    "goingAction": "I'm going",
+    "maybeAction": "Maybe"
+  },
+  "band": {
+    "few": "few"
+  },
+  "people": "people",
+  "you": "You",
+  "optional": "optional",
+  "password": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "sheet": {
+    "close": "Close"
+  },
+  "topBar": {
+    "post": "Post a photo of your night",
+    "profile": "Your profile",
+    "news": "News from your friends",
+    "myStory": "Your story",
+    "myStoryA11y": "Your post",
+    "storyA11y": "New post from {{handle}}"
+  },
+  "hotSpot": {
+    "a11y": "{{venue}}: going {{going}}, maybe {{maybe}}. Open details"
+  },
+  "labels": {
+    "sponsored": "Sponsored",
+    "recommended": "Recommended for you"
+  },
+  "friendsGoing_one": "{{count}} friend",
+  "friendsGoing_other": "{{count}} friends",
+  "gender": {
+    "title": "Gender",
+    "female": "Women {{pct}}%",
+    "male": "Men {{pct}}%",
+    "a11y": "Women {{female}} percent, men {{male}} percent"
+  },
+  "age": {
+    "average": "Average age",
+    "years": "{{age}} years"
+  },
+  "follow": {
+    "follow": "Follow",
+    "requested": "Requested",
+    "following": "Following",
+    "a11yFollow": "Ask to follow {{handle}}",
+    "a11yCancel": "Cancel your request to {{handle}}",
+    "a11yUnfollow": "Unfollow {{handle}}"
+  },
+  "chat": {
+    "followersOnly": "Only your followers see this"
+  },
+  "post": {
+    "like": "Like",
+    "expires_one": "Expires in {{count}} day",
+    "expires_other": "Expires in {{count}} days"
+  },
+  "plan": {
+    "active": "Active",
+    "cancelled": "Cancelled"
+  }
+}

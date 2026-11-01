@@ -1,0 +1,68 @@
+{
+  "intent": {
+    "going": "SI",
+    "maybe": "FORSE",
+    "goingAction": "Ci vado",
+    "maybeAction": "Forse"
+  },
+  "band": {
+    "few": "pochi"
+  },
+  "people": "persone",
+  "you": "Tu",
+  "optional": "facoltativo",
+  "password": {
+    "show": "Mostra password",
+    "hide": "Nascondi password"
+  },
+  "sheet": {
+    "close": "Chiudi"
+  },
+  "topBar": {
+    "post": "Posta la foto della tua serata",
+    "profile": "Il tuo profilo",
+    "news": "Novità dai tuoi amici",
+    "myStory": "La tua storia",
+    "myStoryA11y": "Il tuo post",
+    "storyA11y": "Nuovo post di {{handle}}"
+  },
+  "hotSpot": {
+    "a11y": "{{venue}}: Ci vado {{going}}, Forse {{maybe}}. Apri il dettaglio"
+  },
+  "labels": {
+    "sponsored": "Sponsorizzata",
+    "recommended": "Consigliata per te"
+  },
+  "friendsGoing_one": "{{count}} amico",
+  "friendsGoing_other": "{{count}} amici",
+  "gender": {
+    "title": "Genere",
+    "female": "Donne {{pct}}%",
+    "male": "Uomini {{pct}}%",
+    "a11y": "Donne {{female}} per cento, uomini {{male}} per cento"
+  },
+  "age": {
+    "average": "Età media",
+    "years": "{{age}} anni"
+  },
+  "follow": {
+    "follow": "Segui",
+    "requested": "Richiesto",
+    "following": "Seguito",
+    "a11yFollow": "Chiedi di seguire {{handle}}",
+    "a11yCancel": "Annulla la richiesta a {{handle}}",
+    "a11yUnfollow": "Smetti di seguire {{handle}}"
+  },
+  "chat": {
+    "followersOnly": "Vista solo dai tuoi follower"
+  },
+  "post": {
+    "like": "Mi piace",
+    "expires_one": "Scade tra {{count}} g",
+    "expires_other": "Scade tra {{count}} gg"
+  },
+  "plan": {
+    "active": "Attivo",
+    "cancelled": "Annullato"
+  }
+}

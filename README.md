@@ -20,6 +20,8 @@ Se telefono e PC non sono sulla stessa rete: `npx expo start --tunnel`.
 
 L'accesso è ancora finto (prompt 05): dalla schermata **Accedi** usa "Entra in modalità demo" per arrivare alle tab; "Esci" nel Profilo torna all'accesso.
 
+**UI kit** (solo in sviluppo): link "Apri la UI kit" in Accedi e in Profilo, oppure `rightplace:///ui-kit`. Mostra tutti i componenti del design system nei vari stati, da confrontare con `design/project/*.dc.html`.
+
 ## Variabili d'ambiente
 
 Elenco completo e commentato in [`.env.example`](.env.example). `.env` è ignorato da git.
@@ -50,12 +52,12 @@ L'hook `pre-commit` esegue `i18n:check`, `typecheck` e `lint`.
 
 ```
 app/                   route Expo Router: (auth), (tabs) a 5 voci, venue, event, night, post, creator
-src/components/ui      componenti base (prompt 03)
-src/components/app     componenti dell'app (TabIcon, AppProviders, …)
+src/components/ui      componenti base: Button, Chip, SegmentedControl, Sheet, Toggle, campi, … (prompt 03)
+src/components/app     componenti dell'app: TabBar, TopBar, HotSpot, PostCard, … (solo visuali, dati via props)
 src/features/<f>/      domain/ (funzioni pure) · store/ · hook · componenti
 src/lib/               env, query client, (supabase dal prompt 04/05)
 src/i18n/              it/*.json · en/*.json (namespace per feature) · native/ (testi permessi iOS)
-src/theme/             token di design
+src/theme/             tokens.ts (unico posto con colori hex, oltre a mapStyle.ts), typography.ts, useTheme()
 supabase/              migrations · functions · tests (dal prompt 04)
 scripts/               i18n-check
 ```

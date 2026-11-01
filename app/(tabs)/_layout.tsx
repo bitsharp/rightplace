@@ -1,35 +1,21 @@
-import { Tabs } from 'expo-router/js-tabs';
-import { useTranslation } from 'react-i18next';
+import { Tabs, type BottomTabBarProps } from 'expo-router/js-tabs';
 
-import { TAB_NAMES, TabIcon } from '@/components/app/TabIcon';
-import { colors, fonts, layout } from '@/theme/tokens';
+import { isTabName, TAB_NAMES, TabBar } from '@/components/app/TabBar';
+
+function RouterTabBar({ state, navigateToTab }: BottomTabBarProps) {
+  const current = state.routes[state.index]?.name ?? 'map';
+  const select = (name: string) => {
+    const route = state.routes.find((candidate) => candidate.name === name);
+    if (route) navigateToTab(route.key);
+  };
+  return <TabBar active={isTabName(current) ? current : 'map'} onSelect={select} />;
+}
 
 export default function TabsLayout() {
-  const { t } = useTranslation('common');
-
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          height: layout.tabBarHeight,
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
-        },
-        tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 11 },
-      }}
-    >
+    <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <RouterTabBar {...props} />}>
       {TAB_NAMES.map((name) => (
-        <Tabs.Screen
-          key={name}
-          name={name}
-          options={{
-            title: t(`tabs.${name}`),
-            tabBarIcon: ({ color }) => <TabIcon name={name} color={color} />,
-          }}
-        />
+        <Tabs.Screen key={name} name={name} />
       ))}
     </Tabs>
   );

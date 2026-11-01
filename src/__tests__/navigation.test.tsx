@@ -61,3 +61,22 @@ describe('tab bar', () => {
     expect(await screen.findByRole('header', { name: titleKey })).toBeOnTheScreen();
   });
 });
+
+describe('ui kit (solo sviluppo)', () => {
+  it.each([
+    ['senza sessione', false],
+    ['con sessione', true],
+  ])('si apre %s', async (_, signedIn) => {
+    if (signedIn) useSessionStore.getState().signIn();
+    else useSessionStore.getState().signOut();
+    await renderRouter(APP_DIR, { initialUrl: '/ui-kit' });
+    expect(await screen.findByRole('header', { name: 'dev:title' })).toBeOnTheScreen();
+  });
+
+  it("si raggiunge dalla schermata d'accesso", async () => {
+    useSessionStore.getState().signOut();
+    await renderRouter(APP_DIR, { initialUrl: '/sign-in' });
+    await fireEvent.press(await screen.findByText('dev:open'));
+    expect(await screen.findByRole('header', { name: 'dev:title' })).toBeOnTheScreen();
+  });
+});

@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, fonts } from '@/theme/tokens';
+import { colors, spacing } from '@/theme/tokens';
+
+import { Text } from './Text';
 
 type Props = {
   title: string;
@@ -16,10 +18,12 @@ export function PlaceholderScreen({ title, children }: Props) {
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.content}>
-        <Text accessibilityRole="header" style={styles.title}>
+        <Text accessibilityRole="header" variant="display24" style={styles.center}>
           {title}
         </Text>
-        <Text style={styles.body}>{t('placeholder.body')}</Text>
+        <Text color="textSecondary" style={styles.center}>
+          {t('placeholder.body')}
+        </Text>
         {children}
       </View>
     </SafeAreaView>
@@ -28,7 +32,12 @@ export function PlaceholderScreen({ title, children }: Props) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16, padding: 24 },
-  title: { fontFamily: fonts.display, fontSize: 24, color: colors.text, textAlign: 'center' },
-  body: { fontFamily: fonts.body, fontSize: 15, color: colors.textSecondary, textAlign: 'center' },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.lg,
+    padding: spacing.xxl,
+  },
+  center: { textAlign: 'center' },
 });
