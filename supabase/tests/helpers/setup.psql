@@ -20,6 +20,11 @@ begin
   return v_id;
 end $$;
 
+-- Random but valid handle (profiles.handle must look like animale.colore)
+create function tests.unique_handle(p_prefix text) returns text language sql as $$
+  select p_prefix || '.' || translate(left(replace(gen_random_uuid()::text, '-', ''), 12), '0123456789', 'ghijklmnop')
+$$;
+
 create function tests.authenticate_as(p_user uuid) returns void language plpgsql as $$
 begin
   perform set_config('request.jwt.claims', json_build_object('sub', p_user, 'role', 'authenticated')::text, true);
@@ -60,7 +65,7 @@ returns void language plpgsql as $$
 begin
   for i in 1..p_count loop
     perform tests.make_declaration(
-      tests.create_user('crowd.' || p_intent || '.' || i || '.' || left(gen_random_uuid()::text, 6), p_age, p_gender),
+      tests.create_user(tests.unique_handle('crowd'), p_age, p_gender),
       p_venue, p_intent);
   end loop;
 end $$;

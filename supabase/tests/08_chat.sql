@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(7);
+select plan(9);
 
 select tests.create_user('lince.rosso') as a \gset
 select tests.create_user('volpe.viola') as b \gset
@@ -26,6 +26,16 @@ select lives_ok(format($$ insert into chat_messages (room_id, user_id, kind, tex
 select throws_ok(format($$ insert into chat_messages (room_id, user_id, kind, text) values (%L, %L, 'text', 'falso') $$, :'room', :'b'),
   '42501', null, 'non si scrive a nome di un altro');
 select is((select count(*)::int from chat_messages), 1, 'il membro legge i messaggi della stanza');
+
+reset role;
+insert into chat_messages (room_id, user_id, kind, text) values (:'room', :'b', 'text', 'ci sono');
+select tests.authenticate_as(:'a');
+select is((select count(*)::int from chat_messages where user_id = :'b'), 0,
+  'i messaggi di chi non seguo non si vedono (principio 6)');
+reset role;
+select tests.follow(:'a', :'b');
+select tests.authenticate_as(:'a');
+select is((select count(*)::int from chat_messages where user_id = :'b'), 1, 'con follow accettato sì');
 
 select * from finish();
 rollback;

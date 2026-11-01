@@ -48,7 +48,8 @@ select is((select friends_going from friends_map where venue_id = :'v_friend'), 
 select is((select friends_count from friends_map where venue_id = :'v_friend'), 1, 'e il numero di amici');
 
 reset role;
-update follows set status = 'pending' where follower_id = :'me';
+delete from follows where follower_id = :'me';
+select tests.follow(:'me', :'friend', 'pending');
 select tests.authenticate_as(:'me');
 select is((select count(*)::int from get_city_map('milano', 'friends')), 0, 'un follow pending non conta nella mappa amici');
 select throws_ok($$ select * from get_city_map('milano', 'tutto') $$, 'INVALID_ARGUMENT', 'vista sconosciuta rifiutata');

@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(7);
+select plan(8);
 
 select tests.create_user('lince.rosso') as a \gset
 select tests.create_user('volpe.viola') as b \gset
@@ -18,9 +18,12 @@ reset role;
 select tests.follow(:'a', :'c');
 
 select tests.authenticate_as(:'a');
+select throws_ok(format($$ select * from match_contacts(array[%L]) $$, :'hash_b'), 'CONTACTS_OPT_OUT',
+  'senza consenso ai contatti il matching è rifiutato');
+update profiles set contacts_opt_in = true where id = auth.uid();
 select is((select array_agg(handle) from match_contacts(array[:'hash_b', :'hash_c', repeat('d', 64)])), array['volpe.viola'],
   'match_contacts trova i contatti non ancora seguiti');
-select is((select count(*)::int from contact_hashes_tmp), 0, 'il client non legge gli hash temporanei');
+select throws_ok($$ select count(*) from contact_hashes_tmp $$, '42501', null, 'il client non legge gli hash temporanei');
 reset role;
 select is((select count(*)::int from contact_hashes_tmp), 0, 'contact_hashes_tmp è vuota a fine chiamata');
 select tests.authenticate_as(:'b');

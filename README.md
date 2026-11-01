@@ -36,15 +36,18 @@ Mai nel repo, in `.env` o nel client: `service_role`, chiave Google Places, chia
 
 ## Script
 
-| Comando                                   | Cosa fa                                                      |
-| ----------------------------------------- | ------------------------------------------------------------ |
-| `npm start`                               | dev server Expo                                              |
-| `npm test` / `npm run test:watch`         | Jest (`jest-expo` + Testing Library)                         |
-| `npm run typecheck`                       | `tsc --noEmit` (TypeScript strict)                           |
-| `npm run lint`                            | ESLint (config Expo + Prettier), zero warning                |
-| `npm run format` / `npm run format:check` | Prettier                                                     |
-| `npm run i18n:check`                      | fallisce se una chiave esiste in una lingua e non nell'altra |
-| `npm run doctor`                          | `expo-doctor` (richiede rete verso le API Expo)              |
+| Comando                                   | Cosa fa                                                                            |
+| ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| `npm start`                               | dev server Expo                                                                    |
+| `npm test` / `npm run test:watch`         | Jest (`jest-expo` + Testing Library)                                               |
+| `npm run typecheck`                       | `tsc --noEmit` (TypeScript strict)                                                 |
+| `npm run lint`                            | ESLint (config Expo + Prettier), zero warning                                      |
+| `npm run format` / `npm run format:check` | Prettier                                                                           |
+| `npm run i18n:check`                      | fallisce se una chiave esiste in una lingua e non nell'altra                       |
+| `npm run doctor`                          | `expo-doctor` (richiede rete verso le API Expo)                                    |
+| `npm run db:reset` / `npm run db:test`    | Supabase locale (Docker): migration + seed, test pgTAP — vedi `supabase/README.md` |
+| `npm run db:test:local`                   | pgTAP su Postgres semplice, senza Docker                                           |
+| `npm run db:types`                        | rigenera `src/lib/database.types.ts`                                               |
 
 L'hook `pre-commit` esegue `i18n:check`, `typecheck` e `lint`.
 
@@ -55,10 +58,11 @@ app/                   route Expo Router: (auth), (tabs) a 5 voci, venue, event,
 src/components/ui      componenti base: Button, Chip, SegmentedControl, Sheet, Toggle, campi, … (prompt 03)
 src/components/app     componenti dell'app: TabBar, TopBar, HotSpot, PostCard, … (solo visuali, dati via props)
 src/features/<f>/      domain/ (funzioni pure) · store/ · hook · componenti
-src/lib/               env, query client, (supabase dal prompt 04/05)
+src/lib/               env, query client, database.types.ts (generato), supabase client dal prompt 05
 src/i18n/              it/*.json · en/*.json (namespace per feature) · native/ (testi permessi iOS)
 src/theme/             tokens.ts (unico posto con colori hex, oltre a mapStyle.ts), typography.ts, useTheme()
-supabase/              migrations · functions · tests (dal prompt 04)
+supabase/              migrations · seed · tests pgTAP · README con le garanzie di privacy
+scripts/db/            runner pgTAP senza Docker + shim degli oggetti Supabase
 scripts/               i18n-check
 ```
 

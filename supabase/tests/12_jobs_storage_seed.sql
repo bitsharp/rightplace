@@ -2,10 +2,9 @@ begin;
 \ir helpers/setup.psql
 select plan(12);
 
-select set_has(
-  $$ select jobname::text from cron.job $$,
+select ok(
   array['purge-expired-content', 'purge-contact-hashes', 'expire-coarse-locations', 'daily-cleanup',
-        'expire-sponsorships', 'refresh-typical-from-history'],
+        'expire-sponsorships', 'refresh-typical-from-history'] <@ (select array_agg(jobname::text) from cron.job),
   'tutti i job pg_cron sono registrati');
 
 -- purge job: expired rooms, messages and posts disappear

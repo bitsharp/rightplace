@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(12);
+select plan(14);
 
 select tests.create_user('lince.rosso') as a \gset
 select tests.create_user('volpe.viola') as b \gset
@@ -20,6 +20,13 @@ select is((select author_handle from get_feed()), 'volpe.viola', 'con l''handle 
 select is((select count(*)::int from get_stories()), 1, 'B compare nella barra storie');
 select lives_ok(format($$ insert into post_likes (post_id, user_id) values (%L, %L) $$, :'visible_post', :'a'), 'A mette like');
 select is((select liked_by_me from get_feed()), true, 'il feed segna il like');
+
+reset role;
+select tests.create_user('orso.grigio') as other_follower \gset
+select tests.follow(:'other_follower', :'b');
+select tests.authenticate_as(:'other_follower');
+select is((select count(*)::int from post_likes), 0, 'un altro follower non vede chi ha messo like (rivelerebbe chi segue chi)');
+select is((select like_count from get_feed()), 1, 'ma vede il conteggio nel feed');
 
 reset role;
 select tests.authenticate_as(:'stranger');

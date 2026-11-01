@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(13);
+select plan(15);
 
 select tests.create_user('lince.rosso') as me \gset
 select tests.create_user('volpe.viola', 20, 'female') as friend \gset
@@ -45,6 +45,14 @@ select is((select jsonb_array_length(friends) from get_venue_stats(:'v_big', 'al
 select is((select friends -> 0 ->> 'handle' from get_venue_stats(:'v_big', 'all')), 'volpe.viola', 'con il loro handle');
 select is((select (friends -> 0) ?| array['birth_date', 'email', 'coarse_location'] from get_venue_stats(:'v_big', 'all')), false,
   'friends non contiene dati privati');
+
+-- differencing attack: "all" = 3 going + 1 maybe would reveal the lone maybe's age by subtraction
+reset role;
+select tests.make_crowd(:'v_mid', 1, 'maybe', 50, 'male');
+select tests.authenticate_as(:'me');
+select isnt((select avg_age from get_venue_stats(:'v_mid', 'going')), null, '3 going → visibili');
+select is((select avg_age from get_venue_stats(:'v_mid', 'all')), null,
+  'segmento all nascosto se un sottogruppo ha 1–2 persone (niente attacco per differenza)');
 
 select * from finish();
 rollback;
