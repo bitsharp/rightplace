@@ -1,0 +1,79 @@
+-- Shared pgTAP helpers. Included by every test file with `\ir helpers/setup.psql` inside the test
+-- transaction, so the `tests` schema disappears with the final ROLLBACK.
+set local search_path = public, extensions, tests;
+set local timezone = 'UTC';
+
+create schema tests;
+
+-- Creates an auth user (the trigger creates the profile) and completes the profile directly.
+create function tests.create_user(p_handle text, p_age int default 25, p_gender text default 'female', p_city text default 'milano')
+returns uuid language plpgsql as $$
+declare v_id uuid := gen_random_uuid();
+begin
+  insert into auth.users (id, email) values (v_id, p_handle || '@test.local');
+  update public.profiles
+     set handle = p_handle,
+         birth_date = (current_date - make_interval(years => p_age) - interval '30 days')::date,
+         gender = p_gender,
+         city_id = (select id from public.cities where slug = p_city)
+   where id = v_id;
+  return v_id;
+end $$;
+
+create function tests.authenticate_as(p_user uuid) returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims', json_build_object('sub', p_user, 'role', 'authenticated')::text, true);
+  perform set_config('role', 'authenticated', true);
+end $$;
+
+create function tests.make_venue(p_name text, p_kind text default 'club', p_city text default 'milano')
+returns uuid language sql as $$
+  insert into public.venues (city_id, google_place_id, name, kind, location, is_active)
+  values ((select id from public.cities where slug = p_city), 'test-' || gen_random_uuid(), p_name, p_kind,
+          extensions.st_setsrid(extensions.st_makepoint(9.19, 45.46), 4326)::extensions.geography, true)
+  returning id
+$$;
+
+-- Follow rows can only be inserted as 'pending' (principle 6), so accepted follows are promoted after insert.
+create function tests.follow(p_follower uuid, p_followee uuid, p_status text default 'accepted')
+returns void language plpgsql as $$
+begin
+  insert into public.follows (follower_id, followee_id) values (p_follower, p_followee);
+  if p_status = 'accepted' then
+    update public.follows set status = 'accepted' where follower_id = p_follower and followee_id = p_followee;
+  end if;
+end $$;
+
+-- Declares tonight at a venue for a user (bypassing RPC checks; triggers still apply).
+create function tests.make_declaration(p_user uuid, p_venue uuid, p_intent text default 'going')
+returns uuid language plpgsql as $$
+declare v_night uuid; v_id uuid;
+begin
+  v_night := private.ensure_night(p_venue, public.current_night_date(
+    (select city_id from public.venues where id = p_venue)));
+  insert into public.declarations (user_id, night_id, intent) values (p_user, v_night, p_intent) returning id into v_id;
+  return v_id;
+end $$;
+
+create function tests.make_crowd(p_venue uuid, p_count int, p_intent text default 'going', p_age int default 25, p_gender text default 'female')
+returns void language plpgsql as $$
+begin
+  for i in 1..p_count loop
+    perform tests.make_declaration(
+      tests.create_user('crowd.' || p_intent || '.' || i || '.' || left(gen_random_uuid()::text, 6), p_age, p_gender),
+      p_venue, p_intent);
+  end loop;
+end $$;
+
+create function tests.make_post(p_user uuid, p_venue uuid, p_visible_from timestamptz, p_expires_at timestamptz)
+returns uuid language plpgsql as $$
+declare v_id uuid;
+begin
+  insert into public.posts (user_id, night_id, caption)
+  values (p_user, private.ensure_night(p_venue, public.current_night_date(
+    (select city_id from public.venues where id = p_venue))), 'test')
+  returning id into v_id;
+  -- the trigger computes the real window; tests override it to simulate time passing
+  update public.posts set visible_from = p_visible_from, expires_at = p_expires_at where id = v_id;
+  return v_id;
+end $$;
