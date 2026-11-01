@@ -1,5 +1,74 @@
 {
   "title": "Profilo",
-  "signOut": "Esci",
-  "creatorProfile": "Il tuo profilo creator"
+  "setup": {
+    "step": "02 / 03 · Profilo privato",
+    "title": "Dicci chi sei, senza dirlo a nessuno",
+    "body": "Agli altri compaiono solo la fascia d'età e il genere.",
+    "cta": "Continua",
+    "signOut": "Esci"
+  },
+  "form": {
+    "birthDate": "Data di nascita",
+    "day": "Giorno",
+    "month": "Mese",
+    "year": "Anno",
+    "dayPlaceholder": "GG",
+    "monthPlaceholder": "MM",
+    "yearPlaceholder": "AAAA",
+    "underage": "RightPlace è riservata ai maggiorenni. Potrai iscriverti al compimento dei 18 anni.",
+    "gender": {
+      "label": "Genere",
+      "female": "Donna",
+      "male": "Uomo",
+      "other": "Altro"
+    },
+    "location": {
+      "title": "Posizione",
+      "body": "Ti mostra sulla mappa in base a dove sei",
+      "denied": "Permesso negato: la posizione resta spenta. Puoi attivarla dalle impostazioni del telefono."
+    },
+    "contacts": {
+      "title": "Contatti",
+      "body": "Per trovare amici da seguire"
+    },
+    "creator": "Sono un creator: organizzo serate",
+    "language": {
+      "label": "Lingua",
+      "it": "Italiano",
+      "en": "English"
+    }
+  },
+  "handle": {
+    "step": "03 / 03 · Il tuo nome",
+    "title": "Questo è il tuo nome qui dentro",
+    "body": "Gli altri vedranno solo questo, la tua fascia d'età e il genere.",
+    "change": "Cambialo",
+    "changedOnce": "Hai già cambiato il tuo nome una volta.",
+    "enter": "Entra"
+  },
+  "app": {
+    "step": "Profilo privato",
+    "save": "Salva",
+    "saved": "Profilo salvato.",
+    "creatorProfile": "Il tuo profilo creator",
+    "becomeCreator": "Diventa creator"
+  },
+  "account": {
+    "title": "Account",
+    "email": "Email (non visibile agli altri)",
+    "changePassword": "Cambia password",
+    "signOut": "Esci",
+    "delete": "Elimina account",
+    "privacy": "Privacy",
+    "terms": "Termini"
+  },
+  "delete": {
+    "explainTitle": "Eliminare l'account?",
+    "explainBody": "Cancelliamo subito profilo, dichiarazioni, foto, messaggi e follow. L'operazione non si può annullare.",
+    "confirmTitle": "Confermi l'eliminazione?",
+    "confirmBody": "Ultimo passaggio: il tuo account verrà eliminato definitivamente entro 24 ore.",
+    "continue": "Continua",
+    "confirm": "Elimina definitivamente",
+    "cancel": "Annulla"
+  }
 }

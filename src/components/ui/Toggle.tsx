@@ -51,10 +51,16 @@ export function Toggle({
           </Text>
         ) : null}
       </View>
-      <View testID="toggle-track" style={[styles.track, value ? styles.trackOn : styles.trackOff]}>
-        <View style={[styles.knob, value ? styles.knobOn : styles.knobOff]} />
-      </View>
+      <SwitchTrack on={value} />
     </Pressable>
+  );
+}
+
+function SwitchTrack({ on }: { on: boolean }) {
+  return (
+    <View testID="toggle-track" style={[styles.track, on ? styles.trackOn : styles.trackOff]}>
+      <View style={[styles.knob, on ? styles.knobOn : styles.knobOff]} />
+    </View>
   );
 }
 

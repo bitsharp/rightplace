@@ -1,0 +1,12 @@
+{
+  "provisional": "Provisional version: the full text will be published before release.",
+  "back": "Back",
+  "privacy": {
+    "title": "Privacy",
+    "body": "Other users only see your animal.colour name, age band and gender: never your email, exact age, location or contacts.\n\nVenue turnout is always shown in bands and statistics appear only with at least 3 people.\n\nLocation is optional, rounded to about 500 m, used only while the app is open and deleted after 3 hours. Contacts are optional: we only send encrypted codes of phone numbers, deleted right after matching.\n\nChats are deleted 2 days after the night, photos 7 days after posting. Where you go and what you post is visible only to followers you accepted.\n\nWe don't sell data and use no advertising SDKs. You can delete your account at any time from your profile."
+  },
+  "terms": {
+    "title": "Terms of use",
+    "body": "RightPlace is for adults only.\n\nOffensive, violent, sexual or illegal content and harassment are not tolerated: reported content is removed within 24 hours and responsible accounts are suspended.\n\nYou can report content and block users at any time."
+  }
+}

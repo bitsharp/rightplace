@@ -9,5 +9,10 @@
   },
   "placeholder": {
     "body": "Schermata in costruzione"
+  },
+  "boot": {
+    "loading": "Caricamento",
+    "error": "Non riusciamo a caricare il tuo profilo. Controlla la connessione.",
+    "retry": "Riprova"
   }
 }

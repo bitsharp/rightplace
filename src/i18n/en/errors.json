@@ -1,0 +1,31 @@
+{
+  "auth": {
+    "INVALID_CREDENTIALS": "Wrong email or password.",
+    "EMAIL_TAKEN": "An account with this email already exists. Try signing in.",
+    "CAPTCHA_FAILED": "The anti-bot check failed. Please try again.",
+    "EMAIL_NOT_CONFIRMED": "Please confirm your email first.",
+    "WEAK_PASSWORD": "Password too weak: use at least 8 characters, ideally mixed.",
+    "RATE_LIMITED": "Too many attempts. Wait a few minutes and try again.",
+    "NETWORK": "You seem to be offline. Check your connection and try again.",
+    "UNKNOWN": "Something went wrong. Please try again shortly."
+  },
+  "rpc": {
+    "NOT_AUTHENTICATED": "Your session expired. Please sign in again.",
+    "UNDERAGE": "RightPlace is for adults only.",
+    "INVALID_ARGUMENT": "Some details are not valid.",
+    "INVALID_INTENT": "Invalid choice.",
+    "CITY_NOT_ACTIVE": "This city is not available yet.",
+    "VENUE_NOT_ACTIVE": "This venue is not available.",
+    "EVENT_NOT_ACTIVE": "This event is no longer available.",
+    "LOCATION_OPT_OUT": "Turn on location in your profile first.",
+    "CONTACTS_OPT_OUT": "Turn on contacts in your profile first.",
+    "INVALID_HASH": "Invalid contact data.",
+    "CANNOT_FOLLOW_SELF": "You can't follow yourself.",
+    "BLOCKED": "Not possible with this user.",
+    "NOT_CREATOR": "You need a creator profile.",
+    "NOT_FOUND": "Not found.",
+    "HANDLE_ALREADY_CHANGED": "You have already changed your name once.",
+    "NETWORK": "You seem to be offline. Check your connection and try again.",
+    "UNKNOWN": "Something went wrong. Please try again shortly."
+  }
+}

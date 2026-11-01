@@ -10,7 +10,20 @@ describe('parseEnv', () => {
     expect(parseEnv(validRaw)).toEqual({
       supabaseUrl: 'https://abcd.supabase.co',
       supabaseAnonKey: 'anon-key',
+      turnstileSiteKey: null,
     });
+  });
+
+  it('legge la site key di Turnstile quando c’è', () => {
+    expect(
+      parseEnv({ ...validRaw, EXPO_PUBLIC_TURNSTILE_SITE_KEY: '0x4AAA' }).turnstileSiteKey,
+    ).toBe('0x4AAA');
+  });
+
+  it('tratta una site key vuota come assente', () => {
+    expect(
+      parseEnv({ ...validRaw, EXPO_PUBLIC_TURNSTILE_SITE_KEY: '' }).turnstileSiteKey,
+    ).toBeNull();
   });
 
   it('rifiuta un URL Supabase non valido', () => {

@@ -18,7 +18,7 @@ npx expo start            # scansiona il QR con Expo Go (Android) o con la Fotoc
 
 Se telefono e PC non sono sulla stessa rete: `npx expo start --tunnel`.
 
-L'accesso è ancora finto (prompt 05): dalla schermata **Accedi** usa "Entra in modalità demo" per arrivare alle tab; "Esci" nel Profilo torna all'accesso.
+Il primo avvio porta alla registrazione (email, password, verifica anti-bot, consenso privacy) → conferma email → profilo privato → handle → mappa. Per provarlo sul progetto Supabase dev servono le impostazioni di **Supabase Auth** qui sotto.
 
 **UI kit** (solo in sviluppo): link "Apri la UI kit" in Accedi e in Profilo, oppure `rightplace:///ui-kit`. Mostra tutti i componenti del design system nei vari stati, da confrontare con `design/project/*.dc.html`.
 
@@ -33,6 +33,14 @@ Elenco completo e commentato in [`.env.example`](.env.example). `.env` è ignora
 | `GOOGLE_MAPS_ANDROID_API_KEY`   | `app.config.ts` | solo dev client/build Android; Expo Go non la usa |
 
 Mai nel repo, in `.env` o nel client: `service_role`, chiave Google Places, chiave Anthropic, segreti RevenueCat. Vivono in Supabase Edge Function secrets / EAS secrets. `EXPO_TOKEN` resta nelle variabili d'ambiente di sistema.
+
+## Supabase Auth (dashboard del progetto dev)
+
+1. **Authentication → Sign In / Providers → Email**: _Confirm email_ attivo, lunghezza minima password 8.
+2. **Authentication → URL Configuration**: Site URL `rightplace://`; Redirect URLs `rightplace://**` e `exp://**` (Expo Go).
+3. **Authentication → Emails → Templates**: in _Confirm signup_ e _Reset password_ incolla `supabase/templates/confirmation.html` e `recovery.html`, con gli oggetti indicati in `supabase/config.toml`.
+4. **Captcha** (quando Cloudflare è pronto): in _Attack Protection_ attiva Turnstile con la secret key e metti la site key in `EXPO_PUBLIC_TURNSTILE_SITE_KEY`. Il widget deve consentire l'hostname `rightplace.app`. Finché la site key è vuota, il riquadro anti-bot non compare e il captcha di Supabase va lasciato spento.
+5. L'SMTP di default di Supabase invia poche email all'ora: per i test reali serve Resend (SMTP custom).
 
 ## Script
 

@@ -47,23 +47,23 @@ Le migration in `migrations/` sono ordinate e **non si modificano dopo essere st
 5. **Contenuti effimeri.** Chat cancellata 2 giorni dopo la fine della serata. Post visibili dal giorno dopo alle 06:00 e cancellati 7 giorni dopo. Dichiarazioni scadute invisibili e cancellate dopo 7 giorni.
 6. **Follow con accettazione.** Una richiesta nasce sempre `pending`: inserire `accepted` è rifiutato e solo il followee può accettare. Una richiesta pending non sblocca nulla. Rifiuto, rimozione e blocco hanno effetto immediato. Dove sei stasera, post, storie, amici al locale e messaggi in chat sono visibili solo con follow accettato. Chi ha messo like lo vedono solo l'autore e chi l'ha messo, per non rivelare chi segue chi. I blocchi valgono in entrambe le direzioni in ogni lettura sociale.
 7. **Moderazione.** Le segnalazioni sono scrivibili da tutti e leggibili solo dai moderatori. Il blocco elimina i follow in entrambe le direzioni.
-8. **Cancellazione account.** `delete_my_account()` elimina subito contenuti, relazioni e dati personali. Una Edge Function con service role elimina `auth.users` entro 24 h (coda `private.account_deletion_requests`). Le foto vanno in `private.storage_deletion_queue`, perché Supabase non permette di cancellare oggetti di Storage via SQL.
+8. **Cancellazione account.** `delete_my_account()` elimina subito contenuti, relazioni e dati personali. Il job `process-account-deletions` (ogni ora) cancella l'utente da `auth.users`, email compresa, partendo dalla coda `private.account_deletion_requests`. Le foto vanno in `private.storage_deletion_queue` e le svuoterà una Edge Function (prompt 11), perché Supabase non permette di cancellare oggetti di Storage via SQL.
 9. **Strato "di solito".** Viene da curatela manuale (`source='manual'`) o dalla nostra storia aggregata (`source='history'`, solo celle con almeno 3 serate e media di almeno 3 dichiarati). Non usa mai i Popular times di Google e non si somma mai alle dichiarazioni di stasera.
 
 ## RPC (tutte `security definer`, `search_path` fissato, eseguibili solo da `authenticated`)
 
 Gli errori sono codici tipizzati nel messaggio dell'eccezione: `NOT_AUTHENTICATED`, `UNDERAGE`, `INVALID_ARGUMENT`, `INVALID_INTENT`, `CITY_NOT_ACTIVE`, `VENUE_NOT_ACTIVE`, `EVENT_NOT_ACTIVE`, `LOCATION_OPT_OUT`, `CONTACTS_OPT_OUT`, `INVALID_HASH`, `CANNOT_FOLLOW_SELF`, `BLOCKED`, `NOT_CREATOR`, `NOT_FOUND`.
 
-| Area           | RPC                                                                                                                                                                                    |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Profilo        | `complete_profile(birth_date, gender, city_slug, locale, location_opt_in, contacts_opt_in, is_creator)`, `set_locale`, `update_coarse_location(lat, lng)`, `delete_my_account()`       |
-| Serata         | `declare(intent, venue_id?, event_id?)` (una sola dichiarazione attiva), `undeclare()`, `get_my_declaration()`                                                                         |
-| Mappa e locali | `get_city_map(city_slug, 'general'\|'friends')`, `get_venue_stats(venue_id, 'going'\|'maybe'\|'all')`, `search_venues(city_slug, kind?, query?)`, `get_recommended_venue(city_slug)`   |
-| Persone        | `search_users(query)`, `request_follow`, `cancel_follow_request`, `accept_follow`, `decline_follow`, `unfollow`, `remove_follower`, `get_follow_requests()`, `count_follow_requests()` |
-| Contatti       | `match_contacts(hashes[])`, `set_my_phone_hash(hash)`, `clear_my_phone_hash()`                                                                                                         |
-| Feed           | `get_feed(before?, limit?)`, `get_stories()`                                                                                                                                           |
-| Creator        | `create_event(...)`, `get_my_creator_events()`, `get_event_attendance(event_id)`                                                                                                       |
-| Moderazione    | `report(kind, id, reason)`, `block_user`, `unblock_user`                                                                                                                               |
+| Area           | RPC                                                                                                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Profilo        | `complete_profile(birth_date, gender, city_slug, locale, location_opt_in, contacts_opt_in, is_creator)`, `set_locale`, `update_coarse_location(lat, lng)`, `regenerate_handle()` (una sola volta), `delete_my_account()` |
+| Serata         | `declare(intent, venue_id?, event_id?)` (una sola dichiarazione attiva), `undeclare()`, `get_my_declaration()`                                                                                                           |
+| Mappa e locali | `get_city_map(city_slug, 'general'\|'friends')`, `get_venue_stats(venue_id, 'going'\|'maybe'\|'all')`, `search_venues(city_slug, kind?, query?)`, `get_recommended_venue(city_slug)`                                     |
+| Persone        | `search_users(query)`, `request_follow`, `cancel_follow_request`, `accept_follow`, `decline_follow`, `unfollow`, `remove_follower`, `get_follow_requests()`, `count_follow_requests()`                                   |
+| Contatti       | `match_contacts(hashes[])`, `set_my_phone_hash(hash)`, `clear_my_phone_hash()`                                                                                                                                           |
+| Feed           | `get_feed(before?, limit?)`, `get_stories()`                                                                                                                                                                             |
+| Creator        | `create_event(...)`, `get_my_creator_events()`, `get_event_attendance(event_id)`                                                                                                                                         |
+| Moderazione    | `report(kind, id, reason)`, `block_user`, `unblock_user`                                                                                                                                                                 |
 
 Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attendance_band`, `level_from_avg`, `night_date_at`, `current_night_date`, `night_end`, `coarsen`, `typical_level`, `generate_handle`.
 
@@ -77,6 +77,14 @@ Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attend
 | `daily-cleanup`                | 06:00 UTC (07:00 Roma d'inverno) | salva i conteggi per serata, cancella dichiarazioni scadute da oltre 7 giorni, tiene 20 ricerche per utente |
 | `expire-sponsorships`          | lunedì 05:00 UTC                 | spegne le sponsorizzazioni scadute                                                                          |
 | `refresh-typical-from-history` | lunedì 06:00 UTC                 | ricalcola lo strato "di solito" dalla storia delle ultime 8 settimane                                       |
+| `process-account-deletions`    | ogni ora (:15)                   | elimina da `auth.users` gli account per cui è stata chiesta la cancellazione                                |
+
+## Supabase Auth (prompt 05)
+
+- Accesso con email e password (min. 8 caratteri) e **conferma email obbligatoria**. I link delle email tornano all'app con flusso PKCE su `rightplace://auth/callback` (in Expo Go: `exp://…/--/auth/callback`).
+- La lingua scelta alla registrazione (`user_metadata.locale`) viene copiata in `profiles.locale` dal trigger di registrazione. `set_locale` aggiorna entrambe, così le email di conferma e di reset escono in italiano o in inglese (template in `templates/`).
+- Captcha: Cloudflare Turnstile, attivato insieme a `EXPO_PUBLIC_TURNSTILE_SITE_KEY` nel client.
+- Configurazione locale in `config.toml`. Sul progetto hosted gli stessi valori vanno impostati dalla dashboard (vedi il README principale).
 
 ## Storage
 

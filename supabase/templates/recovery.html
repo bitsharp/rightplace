@@ -1,0 +1,15 @@
+<!-- Supabase Auth: password reset. Language from user_metadata.locale (kept in sync by set_locale). -->
+<div style="background:#0B0B12;color:#F2F1F8;font-family:Inter,Arial,sans-serif;padding:32px">
+  <p style="color:#9D6BFF;font-weight:700;font-size:22px;margin:0 0 24px">RightPlace</p>
+  {{ if eq .Data.locale "en" }}
+  <h1 style="font-size:24px;margin:0 0 12px">Choose a new password</h1>
+  <p style="color:#A3A1B8;font-size:15px;line-height:1.5">Open this link on your phone to set a new password.</p>
+  <p><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#9D6BFF;color:#0B0B12;padding:14px 24px;border-radius:14px;text-decoration:none;font-weight:600">Set a new password</a></p>
+  <p style="color:#A3A1B8;font-size:12px">If you didn't ask for this, ignore this email: your password stays the same.</p>
+  {{ else }}
+  <h1 style="font-size:24px;margin:0 0 12px">Scegli una nuova password</h1>
+  <p style="color:#A3A1B8;font-size:15px;line-height:1.5">Apri questo link dal telefono per impostare una nuova password.</p>
+  <p><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#9D6BFF;color:#0B0B12;padding:14px 24px;border-radius:14px;text-decoration:none;font-weight:600">Imposta la nuova password</a></p>
+  <p style="color:#A3A1B8;font-size:12px">Se non l'hai chiesto tu, ignora questa email: la password resta quella di prima.</p>
+  {{ end }}
+</div>

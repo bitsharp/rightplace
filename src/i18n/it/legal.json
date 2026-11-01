@@ -1,0 +1,12 @@
+{
+  "provisional": "Versione provvisoria: il testo completo verrà pubblicato prima del rilascio.",
+  "back": "Indietro",
+  "privacy": {
+    "title": "Privacy",
+    "body": "Agli altri utenti mostriamo solo il tuo nome animale.colore, la fascia d'età e il genere: mai email, età esatta, posizione o contatti.\n\nL'affluenza dei locali è sempre mostrata a fasce e le statistiche compaiono solo con almeno 3 persone.\n\nLa posizione è facoltativa, arrotondata a circa 500 m, usata solo mentre l'app è aperta e cancellata dopo 3 ore. I contatti sono facoltativi: inviamo solo codici cifrati dei numeri, cancellati subito dopo il confronto.\n\nLe chat si cancellano 2 giorni dopo la serata, le foto 7 giorni dopo la pubblicazione. Dove vai e cosa pubblichi lo vede solo chi hai accettato come follower.\n\nNon vendiamo dati e non usiamo SDK pubblicitari. Puoi eliminare l'account in qualsiasi momento dal profilo."
+  },
+  "terms": {
+    "title": "Termini d'uso",
+    "body": "RightPlace è riservata ai maggiorenni.\n\nNon sono tollerati contenuti offensivi, violenti, sessuali o illegali, né molestie: i contenuti segnalati vengono rimossi entro 24 ore e gli account responsabili sospesi.\n\nPuoi segnalare contenuti e bloccare utenti in qualsiasi momento."
+  }
+}

@@ -1,0 +1,15 @@
+<!-- Supabase Auth: confirm sign-up. Language from user_metadata.locale (set at sign-up / in the profile). -->
+<div style="background:#0B0B12;color:#F2F1F8;font-family:Inter,Arial,sans-serif;padding:32px">
+  <p style="color:#9D6BFF;font-weight:700;font-size:22px;margin:0 0 24px">RightPlace</p>
+  {{ if eq .Data.locale "en" }}
+  <h1 style="font-size:24px;margin:0 0 12px">Confirm your email</h1>
+  <p style="color:#A3A1B8;font-size:15px;line-height:1.5">Tap the button on your phone to finish creating your account. Your profile stays private.</p>
+  <p><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#9D6BFF;color:#0B0B12;padding:14px 24px;border-radius:14px;text-decoration:none;font-weight:600">Confirm and open the app</a></p>
+  <p style="color:#A3A1B8;font-size:12px">If you didn't sign up for RightPlace, ignore this email.</p>
+  {{ else }}
+  <h1 style="font-size:24px;margin:0 0 12px">Conferma la tua email</h1>
+  <p style="color:#A3A1B8;font-size:15px;line-height:1.5">Tocca il pulsante dal telefono per finire di creare l'account. Il tuo profilo resta privato.</p>
+  <p><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#9D6BFF;color:#0B0B12;padding:14px 24px;border-radius:14px;text-decoration:none;font-weight:600">Conferma e apri l'app</a></p>
+  <p style="color:#A3A1B8;font-size:12px">Se non ti sei registrato a RightPlace, ignora questa email.</p>
+  {{ end }}
+</div>

@@ -9,5 +9,10 @@
   },
   "placeholder": {
     "body": "Screen under construction"
+  },
+  "boot": {
+    "loading": "Loading",
+    "error": "We can't load your profile. Check your connection.",
+    "retry": "Try again"
   }
 }

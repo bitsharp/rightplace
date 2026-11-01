@@ -1,51 +1,47 @@
 import { fireEvent, screen } from '@testing-library/react-native';
-import { renderRouter } from 'expo-router/testing-library';
-import path from 'path';
 
-import { useSessionStore } from '@/features/auth/store/sessionStore';
-
-const APP_DIR = path.join(__dirname, '..', '..', 'app');
+import { renderApp } from '@/test/appFlows';
 
 describe('guard di sessione', () => {
-  beforeEach(() => useSessionStore.getState().signOut());
-
-  it("manda all'accesso chi apre l'app senza sessione", async () => {
-    await renderRouter(APP_DIR, { initialUrl: '/' });
-    expect(await screen.findByRole('header', { name: 'auth:signIn.title' })).toBeOnTheScreen();
-    expect(screen).toHavePathname('/sign-in');
+  it('senza account apre la registrazione', async () => {
+    await renderApp('signedOut');
+    expect(await screen.findByRole('header', { name: 'auth:signUp.title' })).toBeOnTheScreen();
   });
 
-  it('non lascia aprire una tab senza sessione', async () => {
-    await renderRouter(APP_DIR, { initialUrl: '/friends' });
-    expect(await screen.findByRole('header', { name: 'auth:signIn.title' })).toBeOnTheScreen();
+  it('senza account non si apre una tab', async () => {
+    await renderApp('signedOut', '/map');
+    expect(await screen.findByRole('header', { name: 'auth:signUp.title' })).toBeOnTheScreen();
   });
 
-  it('porta alla mappa dopo l’ingresso in modalità demo', async () => {
-    await renderRouter(APP_DIR, { initialUrl: '/sign-in' });
-    await fireEvent.press(await screen.findByText('auth:signIn.demoEnter'));
+  it('con email da confermare porta alla verifica', async () => {
+    await renderApp('unverified');
+    expect(await screen.findByRole('header', { name: 'auth:verify.title' })).toBeOnTheScreen();
+  });
+
+  it('con profilo incompleto porta al profilo privato, anche se si prova ad aprire la mappa', async () => {
+    await renderApp('needsProfile', '/map');
+    expect(await screen.findByRole('header', { name: 'profile:setup.title' })).toBeOnTheScreen();
+  });
+
+  it('con profilo completo apre la mappa', async () => {
+    await renderApp('ready');
     expect(await screen.findByRole('header', { name: 'map:title' })).toBeOnTheScreen();
-    expect(screen).toHavePathname('/map');
   });
 
-  it("riporta all'accesso dopo l'uscita dal profilo", async () => {
-    useSessionStore.getState().signIn();
-    await renderRouter(APP_DIR, { initialUrl: '/profile' });
-    await fireEvent.press(await screen.findByText('profile:signOut'));
-    expect(await screen.findByRole('header', { name: 'auth:signIn.title' })).toBeOnTheScreen();
+  it('a profilo completo le schermate di accesso non sono più raggiungibili', async () => {
+    await renderApp('ready', '/sign-in');
+    expect(await screen.findByRole('header', { name: 'map:title' })).toBeOnTheScreen();
   });
 });
 
-describe('tab bar', () => {
-  beforeEach(() => useSessionStore.getState().signIn());
-
+describe('tab bar e route', () => {
   it('mostra le 5 voci e naviga tra le tab', async () => {
-    await renderRouter(APP_DIR, { initialUrl: '/map' });
+    await renderApp('ready', '/map');
     for (const tab of ['map', 'friends', 'chat', 'feed', 'profile']) {
       expect(await screen.findByText(`common:tabs.${tab}`)).toBeOnTheScreen();
     }
     await fireEvent.press(screen.getByText('common:tabs.friends'));
     expect(await screen.findByRole('header', { name: 'friends:title' })).toBeOnTheScreen();
-    expect(screen).toHavePathname('/friends');
   });
 
   it.each([
@@ -57,26 +53,19 @@ describe('tab bar', () => {
     ['/creator/new-event', 'creator:newEvent'],
     ['/creator/billing', 'creator:billing'],
   ])('apre la route %s', async (url, titleKey) => {
-    await renderRouter(APP_DIR, { initialUrl: url });
+    await renderApp('ready', url);
     expect(await screen.findByRole('header', { name: titleKey })).toBeOnTheScreen();
   });
-});
 
-describe('ui kit (solo sviluppo)', () => {
-  it.each([
-    ['senza sessione', false],
-    ['con sessione', true],
-  ])('si apre %s', async (_, signedIn) => {
-    if (signedIn) useSessionStore.getState().signIn();
-    else useSessionStore.getState().signOut();
-    await renderRouter(APP_DIR, { initialUrl: '/ui-kit' });
-    expect(await screen.findByRole('header', { name: 'dev:title' })).toBeOnTheScreen();
+  it.each(['/legal/privacy', '/legal/terms'])('apre %s anche senza account', async (url) => {
+    await renderApp('signedOut', url);
+    expect(
+      await screen.findByRole('header', { name: `legal:${url.split('/')[2]}.title` }),
+    ).toBeOnTheScreen();
   });
 
-  it("si raggiunge dalla schermata d'accesso", async () => {
-    useSessionStore.getState().signOut();
-    await renderRouter(APP_DIR, { initialUrl: '/sign-in' });
-    await fireEvent.press(await screen.findByText('dev:open'));
+  it('apre la UI kit in sviluppo', async () => {
+    await renderApp('signedOut', '/ui-kit');
     expect(await screen.findByRole('header', { name: 'dev:title' })).toBeOnTheScreen();
   });
 });

@@ -3,11 +3,14 @@ import { z } from 'zod';
 const envSchema = z.object({
   EXPO_PUBLIC_SUPABASE_URL: z.url({ protocol: /^https$/ }),
   EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  EXPO_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
 });
 
 export type Env = {
   supabaseUrl: string;
   supabaseAnonKey: string;
+  // null until Cloudflare is set up: the captcha box is then hidden and Supabase must not require it
+  turnstileSiteKey: string | null;
 };
 
 export function parseEnv(raw: Record<string, string | undefined>): Env {
@@ -19,6 +22,7 @@ export function parseEnv(raw: Record<string, string | undefined>): Env {
   return {
     supabaseUrl: result.data.EXPO_PUBLIC_SUPABASE_URL,
     supabaseAnonKey: result.data.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    turnstileSiteKey: result.data.EXPO_PUBLIC_TURNSTILE_SITE_KEY || null,
   };
 }
 
@@ -27,4 +31,5 @@ export const loadEnv = (): Env =>
   parseEnv({
     EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
     EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    EXPO_PUBLIC_TURNSTILE_SITE_KEY: process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY,
   });

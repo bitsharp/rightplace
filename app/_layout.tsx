@@ -2,15 +2,13 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-goog
 import { SpaceMono_400Regular, SpaceMono_700Bold } from '@expo-google-fonts/space-mono';
 import { Unbounded_700Bold } from '@expo-google-fonts/unbounded';
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from 'expo-router';
+import { SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { AppProviders } from '@/components/app/AppProviders';
-import { useSessionStore } from '@/features/auth/store/sessionStore';
-import { useDeviceLanguageSync } from '@/i18n/useDeviceLanguageSync';
+import { RootNavigator } from '@/components/app/RootNavigator';
 import { useI18nReady } from '@/i18n/useI18nReady';
-import { colors } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,34 +36,5 @@ export default function RootLayout() {
       <StatusBar style="light" />
       <RootNavigator />
     </AppProviders>
-  );
-}
-
-function RootNavigator() {
-  useDeviceLanguageSync();
-  const isSignedIn = useSessionStore((state) => state.isSignedIn);
-
-  return (
-    <Stack
-      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}
-    >
-      <Stack.Screen name="index" />
-      <Stack.Protected guard={!isSignedIn}>
-        <Stack.Screen name="(auth)" />
-      </Stack.Protected>
-      <Stack.Protected guard={isSignedIn}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="venue/[id]" />
-        <Stack.Screen name="event/[id]" />
-        <Stack.Screen name="night/[id]/chat" />
-        <Stack.Screen name="post/new" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="creator/index" />
-        <Stack.Screen name="creator/new-event" />
-        <Stack.Screen name="creator/billing" options={{ presentation: 'modal' }} />
-      </Stack.Protected>
-      <Stack.Protected guard={__DEV__}>
-        <Stack.Screen name="(dev)/ui-kit" />
-      </Stack.Protected>
-    </Stack>
   );
 }

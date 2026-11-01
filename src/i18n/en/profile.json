@@ -1,5 +1,74 @@
 {
   "title": "Profile",
-  "signOut": "Sign out",
-  "creatorProfile": "Your creator profile"
+  "setup": {
+    "step": "02 / 03 · Private profile",
+    "title": "Tell us who you are, without telling anyone",
+    "body": "Others only see your age band and gender.",
+    "cta": "Continue",
+    "signOut": "Sign out"
+  },
+  "form": {
+    "birthDate": "Date of birth",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "dayPlaceholder": "DD",
+    "monthPlaceholder": "MM",
+    "yearPlaceholder": "YYYY",
+    "underage": "RightPlace is for adults only. You can join when you turn 18.",
+    "gender": {
+      "label": "Gender",
+      "female": "Woman",
+      "male": "Man",
+      "other": "Other"
+    },
+    "location": {
+      "title": "Location",
+      "body": "Shows you on the map based on where you are",
+      "denied": "Permission denied: location stays off. You can turn it on in your phone settings."
+    },
+    "contacts": {
+      "title": "Contacts",
+      "body": "To find friends to follow"
+    },
+    "creator": "I'm a creator: I organise nights",
+    "language": {
+      "label": "Language",
+      "it": "Italiano",
+      "en": "English"
+    }
+  },
+  "handle": {
+    "step": "03 / 03 · Your name",
+    "title": "This is your name in here",
+    "body": "Others will only see this, your age band and gender.",
+    "change": "Change it",
+    "changedOnce": "You have already changed your name once.",
+    "enter": "Let's go"
+  },
+  "app": {
+    "step": "Private profile",
+    "save": "Save",
+    "saved": "Profile saved.",
+    "creatorProfile": "Your creator profile",
+    "becomeCreator": "Become a creator"
+  },
+  "account": {
+    "title": "Account",
+    "email": "Email (not visible to others)",
+    "changePassword": "Change password",
+    "signOut": "Sign out",
+    "delete": "Delete account",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "delete": {
+    "explainTitle": "Delete your account?",
+    "explainBody": "We immediately erase your profile, declarations, photos, messages and follows. This cannot be undone.",
+    "confirmTitle": "Confirm deletion?",
+    "confirmBody": "Last step: your account will be permanently deleted within 24 hours.",
+    "continue": "Continue",
+    "confirm": "Delete permanently",
+    "cancel": "Cancel"
+  }
 }

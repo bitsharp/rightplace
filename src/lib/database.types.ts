@@ -1214,6 +1214,7 @@ export type Database = {
       };
       night_date_at: { Args: { p_at: string; p_city_id: string }; Returns: string };
       night_end: { Args: { p_night_date: string; p_timezone: string }; Returns: string };
+      regenerate_handle: { Args: Record<PropertyKey, never>; Returns: string };
       remove_follower: { Args: { p_follower_id: string }; Returns: undefined };
       report: {
         Args: { p_reason?: string; p_target_id: string; p_target_kind: string };

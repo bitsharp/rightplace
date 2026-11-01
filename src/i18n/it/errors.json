@@ -1,0 +1,31 @@
+{
+  "auth": {
+    "INVALID_CREDENTIALS": "Email o password non corretti.",
+    "EMAIL_TAKEN": "Esiste già un account con questa email. Prova ad accedere.",
+    "CAPTCHA_FAILED": "La verifica anti-bot non è riuscita. Riprova.",
+    "EMAIL_NOT_CONFIRMED": "Conferma prima la tua email.",
+    "WEAK_PASSWORD": "Password troppo debole: usa almeno 8 caratteri, meglio se vari.",
+    "RATE_LIMITED": "Troppi tentativi. Aspetta qualche minuto e riprova.",
+    "NETWORK": "Sembra che tu sia offline. Controlla la connessione e riprova.",
+    "UNKNOWN": "Qualcosa è andato storto. Riprova tra poco."
+  },
+  "rpc": {
+    "NOT_AUTHENTICATED": "La sessione è scaduta. Accedi di nuovo.",
+    "UNDERAGE": "RightPlace è riservata ai maggiorenni.",
+    "INVALID_ARGUMENT": "Alcuni dati non sono validi.",
+    "INVALID_INTENT": "Scelta non valida.",
+    "CITY_NOT_ACTIVE": "Questa città non è ancora disponibile.",
+    "VENUE_NOT_ACTIVE": "Questo locale non è disponibile.",
+    "EVENT_NOT_ACTIVE": "Questa serata non è più disponibile.",
+    "LOCATION_OPT_OUT": "Attiva prima la posizione nel profilo.",
+    "CONTACTS_OPT_OUT": "Attiva prima i contatti nel profilo.",
+    "INVALID_HASH": "Dati dei contatti non validi.",
+    "CANNOT_FOLLOW_SELF": "Non puoi seguire te stesso.",
+    "BLOCKED": "Non è possibile con questo utente.",
+    "NOT_CREATOR": "Serve un profilo creator.",
+    "NOT_FOUND": "Non trovato.",
+    "HANDLE_ALREADY_CHANGED": "Hai già cambiato il tuo nome una volta.",
+    "NETWORK": "Sembra che tu sia offline. Controlla la connessione e riprova.",
+    "UNKNOWN": "Qualcosa è andato storto. Riprova tra poco."
+  }
+}
