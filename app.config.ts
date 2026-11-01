@@ -4,6 +4,7 @@ import italianNative from './src/i18n/native/it.json';
 
 const BACKGROUND = '#0B0B12';
 const APP_ID = 'it.bitsharp.rightplace';
+const EAS_PROJECT_ID = '8eb7e0f8-8c1b-43fe-a730-924c140f2438';
 
 // Privacy (CLAUDE.md §3–4): foreground, coarse-by-design location only; no background, no microphone.
 const BLOCKED_ANDROID_PERMISSIONS = [
@@ -22,6 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   owner: 'bitsharp-slu',
   version: '0.1.0',
   scheme: 'rightplace',
+  platforms: ['ios', 'android'],
   orientation: 'portrait',
   userInterfaceStyle: 'dark',
   icon: './assets/icon.png',
@@ -79,7 +81,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ['expo-contacts', { contactsPermission: italianNative.NSContactsUsageDescription }],
   ],
   experiments: { typedRoutes: true },
+  updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}` },
+  // Perché appVersion: un update JS arriva solo alle build con la stessa versione nativa.
+  runtimeVersion: { policy: 'appVersion' },
   extra: {
-    eas: { projectId: '8eb7e0f8-8c1b-43fe-a730-924c140f2438' },
+    eas: { projectId: EAS_PROJECT_ID },
   },
 });
