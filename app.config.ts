@@ -82,8 +82,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ],
   experiments: { typedRoutes: true },
   updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}` },
-  // Perché appVersion: un update JS arriva solo alle build con la stessa versione nativa.
-  runtimeVersion: { policy: 'appVersion' },
+  // Perché sdkVersion: Expo Go carica solo update con runtime exposdk:<SDK>; un update JS
+  // arriva così alle build e a Expo Go con lo stesso SDK.
+  runtimeVersion: { policy: 'sdkVersion' },
   extra: {
     eas: { projectId: EAS_PROJECT_ID },
   },

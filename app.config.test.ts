@@ -39,9 +39,9 @@ describe('app.config', () => {
     expect(config.platforms).toEqual(['ios', 'android']);
   });
 
-  it('abilita EAS Update sul progetto esistente con runtime legato alla versione', () => {
+  it('abilita EAS Update sul progetto esistente con runtime legato alla versione SDK', () => {
     expect(config.updates?.url).toBe('https://u.expo.dev/8eb7e0f8-8c1b-43fe-a730-924c140f2438');
-    expect(config.runtimeVersion).toEqual({ policy: 'appVersion' });
+    expect(config.runtimeVersion).toEqual({ policy: 'sdkVersion' });
   });
 
   it('dichiara solo i permessi iOS che il prodotto usa, con il perché in italiano', () => {
