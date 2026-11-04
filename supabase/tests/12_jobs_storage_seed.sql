@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(12);
+select plan(13);
 
 select ok(
   array['purge-expired-content', 'purge-contact-hashes', 'expire-coarse-locations', 'daily-cleanup',
@@ -42,9 +42,14 @@ select is((select count(*)::int from storage.objects), 0, 'nessuna lettura diret
 reset role;
 
 -- seed
-select is((select array_agg(slug order by slug) from cities where is_active), array['milano'], 'solo Milano è attiva');
-select is((select count(*)::int from venues where name like '% (demo)' and google_place_id like 'demo-%'), 20,
+select is((select array_agg(slug order by slug) from cities where is_active), array['las-palmas', 'milano'],
+  'sono attive solo Milano e Las Palmas');
+select is((select count(*)::int from venues v join cities c on c.id = v.city_id
+            where c.slug = 'milano' and v.name like '% (demo)' and v.google_place_id like 'demo-%'), 20,
   '20 locali di Milano dichiaratamente finti');
+select is((select count(*)::int from venues v join cities c on c.id = v.city_id
+            where c.slug = 'las-palmas' and v.name like '% (demo)' and v.google_place_id like 'demo-lp-%'), 10,
+  '10 locali di Las Palmas dichiaratamente finti');
 
 select * from finish();
 rollback;

@@ -6,7 +6,7 @@ insert into public.cities (slug, name, country, center, default_zoom, timezone, 
   ('milano', 'Milano', 'IT', extensions.st_setsrid(extensions.st_makepoint(9.1900, 45.4642), 4326)::extensions.geography,
    13, 'Europe/Rome', '+39 02 8585', true),
   ('las-palmas', 'Las Palmas', 'ES', extensions.st_setsrid(extensions.st_makepoint(-15.4134, 28.1235), 4326)::extensions.geography,
-   13, 'Atlantic/Canary', null, false),
+   13, 'Atlantic/Canary', null, true),
   ('madrid', 'Madrid', 'ES', extensions.st_setsrid(extensions.st_makepoint(-3.7038, 40.4168), 4326)::extensions.geography,
    13, 'Europe/Madrid', null, false),
   ('barcelona', 'Barcelona', 'ES', extensions.st_setsrid(extensions.st_makepoint(2.1734, 41.3851), 4326)::extensions.geography,
@@ -41,6 +41,27 @@ select c.id, 'demo-' || lpad(v.n::text, 2, '0'), v.name || ' (demo)', v.kind,
     (20, 'Spazio Ortica', 'other', 45.4730, 9.2470)
   ) as v(n, name, kind, lat, lng)
  where c.slug = 'milano'
+on conflict (google_place_id) do nothing;
+
+-- Las Palmas: demo venues too, same declaratively-fake rule (real ones come from Places, prompt 06).
+insert into public.venues (city_id, google_place_id, name, kind, location, address, is_active)
+select c.id, 'demo-lp-' || lpad(v.n::text, 2, '0'), v.name || ' (demo)', v.kind,
+       extensions.st_setsrid(extensions.st_makepoint(v.lng, v.lat), 4326)::extensions.geography,
+       'Dirección de prueba, Las Palmas', true
+  from public.cities c,
+  (values
+    (1, 'Club Las Canteras', 'club', 28.1380, -15.4350),
+    (2, 'Club Puerto', 'club', 28.1450, -15.4260),
+    (3, 'Club Alcaravaneras', 'club', 28.1260, -15.4200),
+    (4, 'Bar Triana', 'bar', 28.1060, -15.4130),
+    (5, 'Bar Vegueta', 'bar', 28.1020, -15.4150),
+    (6, 'Bar Playa Chica', 'bar', 28.1320, -15.4330),
+    (7, 'Terraza Santa Catalina', 'rooftop', 28.1440, -15.4240),
+    (8, 'Terraza Mesa y López', 'rooftop', 28.1330, -15.4310),
+    (9, 'Live Guanarteme', 'live', 28.1410, -15.4380),
+    (10, 'Live Vegueta', 'live', 28.1030, -15.4170)
+  ) as v(n, name, kind, lat, lng)
+ where c.slug = 'las-palmas'
 on conflict (google_place_id) do nothing;
 
 -- "Di solito" layer, example only (source='manual'); real curation arrives with prompt 06.
