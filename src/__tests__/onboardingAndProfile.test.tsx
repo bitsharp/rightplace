@@ -32,7 +32,7 @@ describe('profilo privato e handle', () => {
     );
     expect(await screen.findByText('@lince.rosso')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'profile:handle.enter' }));
-    expect(await screen.findByRole('header', { name: 'map:title' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
   });
 
   it('a 17 anni blocca il profilo e propone di uscire', async () => {

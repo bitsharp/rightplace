@@ -25,12 +25,12 @@ describe('guard di sessione', () => {
 
   it('con profilo completo apre la mappa', async () => {
     await renderApp('ready');
-    expect(await screen.findByRole('header', { name: 'map:title' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
   });
 
   it('a profilo completo le schermate di accesso non sono più raggiungibili', async () => {
     await renderApp('ready', '/sign-in');
-    expect(await screen.findByRole('header', { name: 'map:title' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
   });
 });
 

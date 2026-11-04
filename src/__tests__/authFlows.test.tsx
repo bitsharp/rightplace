@@ -101,7 +101,7 @@ describe('accesso', () => {
     );
     await sendCaptchaToken();
     await fireEvent.press(screen.getByRole('button', { name: 'auth:signIn.cta' }));
-    expect(await screen.findByRole('header', { name: 'map:title' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
   });
 
   it('manda il link per reimpostare la password', async () => {

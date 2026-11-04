@@ -1,11 +1,18 @@
 import * as Location from 'expo-location';
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
+import { create } from 'zustand';
 
 import { updateCoarseLocation } from './api';
-import { coarsen } from './domain/coarsen';
+import { coarsen, type LatLng } from './domain/coarsen';
 
 export const SYNC_INTERVAL_MS = 15 * 60 * 1000;
+
+// Last coarse cell, in memory only (never persisted): it feeds the "Tu" marker, so the map shows
+// exactly what the server knows. Cleared as soon as the location toggle is off.
+export const useCoarsePositionStore = create<{ cell: LatLng | null }>()(() => ({ cell: null }));
+
+const clearCoarsePosition = () => useCoarsePositionStore.setState({ cell: null });
 
 // Principle 3: only the "when in use" permission is ever requested.
 export async function requestLocationPermission(): Promise<boolean> {
@@ -21,6 +28,7 @@ export async function syncCoarseLocation(): Promise<void> {
     accuracy: Location.Accuracy.Balanced,
   });
   const cell = coarsen({ lat: coords.latitude, lng: coords.longitude });
+  useCoarsePositionStore.setState({ cell });
   await updateCoarseLocation(cell.lat, cell.lng);
 }
 
@@ -31,7 +39,10 @@ function syncSafely(): void {
 // Foreground only: the timer stops as soon as the app leaves the screen (no background tracking).
 export function useCoarseLocationSync(enabled: boolean): void {
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      clearCoarsePosition();
+      return;
+    }
     let timer: ReturnType<typeof setInterval> | null = null;
     const start = () => {
       if (timer) return;

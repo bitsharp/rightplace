@@ -64,5 +64,12 @@
   "plan": {
     "active": "Attivo",
     "cancelled": "Annullato"
+  },
+  "typical": {
+    "quiet": "tranquillo",
+    "lively": "animato",
+    "packed": "pieno",
+    "usually": "di solito {{level}}",
+    "a11y": "{{venue}}: di solito {{level}}. Apri il dettaglio"
   }
 }

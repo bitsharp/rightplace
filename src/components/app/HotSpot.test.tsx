@@ -29,7 +29,12 @@ describe('HotSpot', () => {
     expect(screen.getByTestId('hot-spot-outer', { includeHiddenElements: true })).toHaveStyle({
       borderColor: colors.maybe,
     });
-    expect(screen.getByText('20–30', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+
+  it('la label è sempre la fascia dei "Ci vado", anche se dominano i "Forse"', async () => {
+    await render(<HotSpot venueName="A" goingBand="pochi" maybeBand="20–30" onPress={jest.fn()} />);
+    expect(screen.getByText('ui:band.few', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.queryByText('20–30', { includeHiddenElements: true })).not.toBeOnTheScreen();
   });
 
   it('scrive "pochi" tradotto invece di un numero', async () => {

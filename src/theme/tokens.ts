@@ -10,6 +10,7 @@ const palette = {
   female: '#F2B1CB',
   male: '#86B6E3',
   mapCanvas: '#101019',
+  surface3: '#3A3A4E',
   // Not in the mock-up: needed for form errors (prompt 05), kept warm so it never reads as "Forse".
   error: '#FF7A90',
 } as const;
@@ -36,6 +37,7 @@ export const colors = {
   female: palette.female,
   male: palette.male,
   mapCanvas: palette.mapCanvas,
+  typicalDot: palette.surface3,
   error: palette.error,
   overlay: withAlpha(palette.background, 0.9),
   backdrop: withAlpha(palette.background, 0.7),

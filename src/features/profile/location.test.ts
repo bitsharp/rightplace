@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { renderHook } from '@testing-library/react-native';
 import * as Location from 'expo-location';
 import { act } from 'react';
@@ -10,6 +11,7 @@ import {
   SYNC_INTERVAL_MS,
   syncCoarseLocation,
   useCoarseLocationSync,
+  useCoarsePositionStore,
 } from './location';
 
 jest.mock('expo-location', () => ({
@@ -35,6 +37,8 @@ describe('requestLocationPermission', () => {
 });
 
 describe('syncCoarseLocation', () => {
+  beforeEach(() => useCoarsePositionStore.setState({ cell: null }));
+
   it('senza permesso non legge né invia la posizione', async () => {
     jest
       .mocked(Location.getForegroundPermissionsAsync)
@@ -59,6 +63,48 @@ describe('syncCoarseLocation', () => {
       p_lat: 45.4625,
       p_lng: 9.1925,
     });
+  });
+});
+
+describe('posizione grossolana in memoria (marker "Tu")', () => {
+  beforeEach(() => useCoarsePositionStore.setState({ cell: null }));
+
+  it('dopo la sync con permesso tiene solo la cella già arrotondata', async () => {
+    jest
+      .mocked(Location.getForegroundPermissionsAsync)
+      .mockResolvedValueOnce(granted(true) as never);
+    jest
+      .mocked(Location.getCurrentPositionAsync)
+      .mockResolvedValueOnce({ coords: { latitude: 45.4641, longitude: 9.1901 } } as never);
+    await syncCoarseLocation();
+    expect(useCoarsePositionStore.getState().cell).toEqual({ lat: 45.4625, lng: 9.1925 });
+  });
+
+  it('senza permesso non c’è nessuna cella', async () => {
+    jest
+      .mocked(Location.getForegroundPermissionsAsync)
+      .mockResolvedValueOnce(granted(false) as never);
+    await syncCoarseLocation();
+    expect(useCoarsePositionStore.getState().cell).toBeNull();
+  });
+
+  it('spegnere il toggle posizione cancella la cella', async () => {
+    useCoarsePositionStore.setState({ cell: { lat: 45.4625, lng: 9.1925 } });
+    await renderHook(() => useCoarseLocationSync(false));
+    expect(useCoarsePositionStore.getState().cell).toBeNull();
+  });
+
+  it('non viene mai scritta su disco', async () => {
+    jest
+      .mocked(Location.getForegroundPermissionsAsync)
+      .mockResolvedValueOnce(granted(true) as never);
+    jest
+      .mocked(Location.getCurrentPositionAsync)
+      .mockResolvedValueOnce({ coords: { latitude: 45.4641, longitude: 9.1901 } } as never);
+    await syncCoarseLocation();
+    const keys = await AsyncStorage.getAllKeys();
+    const stored = await AsyncStorage.multiGet(keys);
+    expect(JSON.stringify(stored)).not.toContain('45.4625');
   });
 });
 

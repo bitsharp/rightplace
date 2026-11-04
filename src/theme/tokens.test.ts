@@ -1,6 +1,12 @@
 import { colors, heights, radius, spacing, withAlpha } from './tokens';
 
 describe('theme tokens', () => {
+  it('ha un grigio neutro per lo strato "di solito", distinto dai colori di "stasera"', () => {
+    expect(colors.typicalDot).toBe('#3A3A4E');
+    expect(colors.typicalDot).not.toBe(colors.going);
+    expect(colors.typicalDot).not.toBe(colors.maybe);
+  });
+
   it('riprende i colori del mock-up', () => {
     expect(colors).toMatchObject({
       background: '#0B0B12',

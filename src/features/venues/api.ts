@@ -8,7 +8,13 @@ import { supabase } from '@/lib/supabase';
 import { parseRecentVenues, MAX_RECENT_VENUES, type RecentVenue } from './domain/recent';
 import { VENUE_KINDS, type VenueBands, type VenueKind } from './domain/venueList';
 
-export type ActiveCity = { id: string; slug: string; name: string };
+export type ActiveCity = {
+  slug: string;
+  name: string;
+  lat: number;
+  lng: number;
+  defaultZoom: number;
+};
 
 export type CatalogVenue = {
   id: string;
@@ -19,7 +25,13 @@ export type CatalogVenue = {
   cityName: string;
 };
 
-const citySchema = z.object({ id: z.string(), slug: z.string(), name: z.string() });
+const citySchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  lat: z.number(),
+  lng: z.number(),
+  default_zoom: z.number(),
+});
 
 const venueSchema = z.object({
   id: z.string(),
@@ -44,11 +56,19 @@ async function selectRows(query: PromiseLike<{ data: unknown; error: unknown }>)
   return data;
 }
 
+// Catalog data only; a RPC because PostgREST would return cities.center as hex EWKB.
 export async function fetchActiveCities(): Promise<ActiveCity[]> {
-  const data = await selectRows(
-    supabase.from('cities').select('id, slug, name').eq('is_active', true).order('name'),
-  );
-  return z.array(citySchema).parse(data);
+  const data = await callRpc<unknown>('get_active_cities');
+  return z
+    .array(citySchema)
+    .parse(data)
+    .map((row) => ({
+      slug: row.slug,
+      name: row.name,
+      lat: row.lat,
+      lng: row.lng,
+      defaultZoom: row.default_zoom,
+    }));
 }
 
 // Plain select: the venue catalog is readable by every signed-in user (no per-user data).

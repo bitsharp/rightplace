@@ -1097,6 +1097,17 @@ export type Database = {
       decline_follow: { Args: { p_follower_id: string }; Returns: undefined };
       delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
       generate_handle: { Args: Record<PropertyKey, never>; Returns: string };
+      get_active_cities: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          country: string;
+          default_zoom: number;
+          lat: number;
+          lng: number;
+          name: string;
+          slug: string;
+        }[];
+      };
       get_city_map: {
         Args: { p_city_slug: string; p_view?: string };
         Returns: {

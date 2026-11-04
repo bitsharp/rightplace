@@ -1,4 +1,32 @@
 {
   "title": "Mappa",
-  "searchPlaceholder": "Cerca una serata o un locale"
+  "searchPlaceholder": "Cerca una serata o un locale",
+  "view": {
+    "general": "Mappa generale",
+    "friends": "Mappa amici"
+  },
+  "hint": {
+    "general": "Tocca un punto caldo · pizzica per zoom",
+    "friends": "Dove vanno i tuoi amici · pizzica per zoom"
+  },
+  "legend": {
+    "tonight": "Stasera",
+    "usually": "Di solito"
+  },
+  "banner": {
+    "typicalOnly": "Ancora nessuna dichiarazione stasera: i punti grigi sono l'affluenza abituale. Dichiara la tua e invita amici.",
+    "empty": "Serata tranquilla finora. Dichiara la tua e invita amici."
+  },
+  "pill": {
+    "text": "Stasera: {{venue}} · {{intent}}",
+    "a11y": "La tua serata: {{venue}}, {{intent}}. Apri il locale"
+  },
+  "cards": {
+    "history": "Dalla tua cronologia di ricerca",
+    "hot": "Il più caldo stasera",
+    "tonightBand": "stasera {{band}}"
+  },
+  "friendsEmpty": "Nessuno dei tuoi amici ha ancora dichiarato la serata.",
+  "loadError": "Non riusciamo a caricare la mappa. Riprova tra poco.",
+  "mapA11y": "Mappa dei locali di {{city}}"
 }

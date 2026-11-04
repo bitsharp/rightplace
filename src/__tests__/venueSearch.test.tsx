@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { renderApp } from '@/test/appFlows';
+import { useMapStore } from '@/features/map/store/mapStore';
 import { fakeSupabase, setFakeTable } from '@/test/fakeSupabase';
 
 jest.mock('expo-location', () => ({
@@ -26,10 +27,6 @@ const band = (id: string, going: string, maybe: string, sponsored = false) => ({
 });
 
 function seedCatalog() {
-  setFakeTable('cities', [
-    { id: 'c1', slug: 'milano', name: 'Milano', is_active: true },
-    { id: 'c2', slug: 'las-palmas', name: 'Las Palmas', is_active: true },
-  ]);
   setFakeTable('venues', [
     venue('1', 'Bar Brera', 'bar'),
     venue('2', 'Club Navigli', 'club'),
@@ -38,6 +35,29 @@ function seedCatalog() {
     venue('5', 'Azotea Canteras', 'rooftop', 'las-palmas'),
   ]);
   fakeSupabase.rpc.mockImplementation(async (name: string) => {
+    if (name === 'get_active_cities') {
+      return {
+        data: [
+          {
+            slug: 'las-palmas',
+            name: 'Las Palmas',
+            country: 'ES',
+            lat: 28.1,
+            lng: -15.4,
+            default_zoom: 13,
+          },
+          {
+            slug: 'milano',
+            name: 'Milano',
+            country: 'IT',
+            lat: 45.46,
+            lng: 9.19,
+            default_zoom: 13,
+          },
+        ],
+        error: null,
+      };
+    }
     if (name === 'search_venues') {
       return {
         data: [
@@ -108,6 +128,20 @@ describe('ricerca locali', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Las Palmas' }));
     expect(await screen.findByText('Azotea Canteras')).toBeOnTheScreen();
     expect(screen.queryByText('Club Navigli')).not.toBeOnTheScreen();
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('search_venues', { p_city_slug: 'las-palmas' });
+  });
+
+  it('la città scelta nella ricerca è la stessa della mappa (una sola fonte di verità)', async () => {
+    await renderApp('ready', '/search');
+    await screen.findByText('Club Sponsor');
+    await fireEvent.press(screen.getByRole('button', { name: 'Las Palmas' }));
+    expect(useMapStore.getState().citySlug).toBe('las-palmas');
+  });
+
+  it('la ricerca parte dalla città già scelta sulla mappa', async () => {
+    useMapStore.setState({ citySlug: 'las-palmas' });
+    await renderApp('ready', '/search');
+    expect(await screen.findByText('Azotea Canteras')).toBeOnTheScreen();
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('search_venues', { p_city_slug: 'las-palmas' });
   });
 

@@ -54,3 +54,22 @@ jest.mock('react-native-webview', () => {
       createElement(View, { testID: 'turnstile-webview', ...props }),
   };
 });
+
+// Persisted UI preferences (view, city) would leak between tests of the same file.
+beforeEach(() =>
+  jest
+    .requireActual<typeof import('@/features/map/store/mapStore')>('@/features/map/store/mapStore')
+    .resetMapStore(),
+);
+
+// react-native-maps is a native module: map and markers render as plain Views that show their
+// children, so tests can find (and press) the markers the app places on the map.
+jest.mock('react-native-maps', () => {
+  const { createElement } = jest.requireActual<typeof import('react')>('react');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
+  const MapView = ({ children, ...props }: Record<string, unknown>) =>
+    createElement(View, { testID: 'map-view', ...props }, children as never);
+  const Marker = ({ children, ...props }: Record<string, unknown>) =>
+    createElement(View, { testID: 'map-marker', ...props }, children as never);
+  return { __esModule: true, default: MapView, Marker };
+});

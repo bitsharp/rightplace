@@ -31,7 +31,7 @@ export function SearchFilters({ cities, citySlug, onCity, kind, onKind }: Props)
       >
         {cities.map((city) => (
           <Chip
-            key={city.id}
+            key={city.slug}
             label={city.name}
             selected={city.slug === citySlug}
             onPress={() => onCity(city.slug)}

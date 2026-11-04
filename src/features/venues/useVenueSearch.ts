@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 
-import { DEFAULT_CITY_SLUG } from '@/features/profile/api';
+import { useMapStore } from '@/features/map/store/mapStore';
 
 import {
   filterVenues,
@@ -22,7 +22,8 @@ const NO_BANDS: ReadonlyMap<string, VenueBands> = new Map();
 
 export function useVenueSearch() {
   const router = useRouter();
-  const [citySlug, setCitySlug] = useState(DEFAULT_CITY_SLUG);
+  // Same city as the map: one source of truth in the persisted map store.
+  const { citySlug, setCitySlug } = useMapStore();
   const [kind, setKind] = useState<VenueKind | null>(null);
   const [query, setQuery] = useState('');
   const cities = useActiveCities();

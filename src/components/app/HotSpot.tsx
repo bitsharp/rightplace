@@ -45,7 +45,6 @@ function hotSpotLayout(goingBand: Band, maybeBand: Band) {
   return {
     main,
     secondary: (main === 'going' ? 'maybe' : 'going') as Intent,
-    mainBand,
     diameter: hotSpotDiameter(mainBand),
     inner:
       bandRank(secondaryBand) > 0 ? Math.round(hotSpotDiameter(secondaryBand) * INNER_SCALE) : 0,
@@ -55,10 +54,11 @@ function hotSpotLayout(goingBand: Band, maybeBand: Band) {
 const circle = (size: number) => ({ width: size, height: size, borderRadius: size / 2 });
 
 // "Stasera" layer (CLAUDE.md principle 11): coloured, sized by band, never by an exact count.
+// Size and colour follow the dominant intent; the label is always the "Ci vado" band.
 export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: Props) {
   const { t } = useTranslation('ui');
   const bandLabel = useBandLabel();
-  const { main, secondary, mainBand, diameter, inner } = hotSpotLayout(goingBand, maybeBand);
+  const { main, secondary, diameter, inner } = hotSpotLayout(goingBand, maybeBand);
   return (
     <Pressable
       accessibilityRole="button"
@@ -81,7 +81,7 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
           />
         ) : null}
         <Text variant="label12" style={styles.label}>
-          {caption ?? bandLabel(mainBand)}
+          {caption ?? bandLabel(goingBand)}
         </Text>
       </View>
     </Pressable>

@@ -105,6 +105,17 @@ export const fakeSupabase = {
   })),
 };
 
+type RpcResponse = unknown | ((args: unknown) => unknown);
+
+// Answers each RPC by name; names not listed return no data (like the default fake).
+export function setFakeRpc(responses: Record<string, RpcResponse>): void {
+  fakeSupabase.rpc.mockImplementation(async (name: string, args?: unknown): Promise<Result> => {
+    const response = responses[name];
+    const data = typeof response === 'function' ? response(args) : response;
+    return { data: data ?? null, error: null };
+  });
+}
+
 export function setFakeSession(session: FakeSession | null, event: AuthEvent = 'SIGNED_IN'): void {
   state.session = session;
   state.listeners.forEach((listener) => listener(event, session));

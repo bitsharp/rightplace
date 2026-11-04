@@ -21,16 +21,43 @@ const venueRow = (overrides: Record<string, unknown> = {}) => ({
 });
 
 describe('venues api', () => {
-  it('legge solo le città attive', async () => {
-    setFakeTable('cities', [
-      { id: 'c1', slug: 'milano', name: 'Milano', is_active: true },
-      { id: 'c2', slug: 'madrid', name: 'Madrid', is_active: false },
-      { id: 'c3', slug: 'las-palmas', name: 'Las Palmas', is_active: true },
-    ]);
+  it('legge le città attive con il centro e lo zoom dalla RPC del catalogo', async () => {
+    fakeSupabase.rpc.mockResolvedValueOnce({
+      data: [
+        {
+          slug: 'las-palmas',
+          name: 'Las Palmas',
+          country: 'ES',
+          lat: 28.1235,
+          lng: -15.4134,
+          default_zoom: 13,
+        },
+        {
+          slug: 'milano',
+          name: 'Milano',
+          country: 'IT',
+          lat: 45.4642,
+          lng: 9.19,
+          default_zoom: 12,
+        },
+      ],
+      error: null,
+    });
     await expect(fetchActiveCities()).resolves.toEqual([
-      { id: 'c3', slug: 'las-palmas', name: 'Las Palmas' },
-      { id: 'c1', slug: 'milano', name: 'Milano' },
+      { slug: 'las-palmas', name: 'Las Palmas', lat: 28.1235, lng: -15.4134, defaultZoom: 13 },
+      { slug: 'milano', name: 'Milano', lat: 45.4642, lng: 9.19, defaultZoom: 12 },
     ]);
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_active_cities', undefined);
+  });
+
+  it('rifiuta una risposta con coordinate non numeriche', async () => {
+    fakeSupabase.rpc.mockResolvedValueOnce({
+      data: [
+        { slug: 'milano', name: 'Milano', country: 'IT', lat: '45', lng: 9, default_zoom: 13 },
+      ],
+      error: null,
+    });
+    await expect(fetchActiveCities()).rejects.toThrow();
   });
 
   it('legge i locali attivi della città richiesta e li converte', async () => {

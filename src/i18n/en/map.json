@@ -1,4 +1,32 @@
 {
   "title": "Map",
-  "searchPlaceholder": "Search for a night or a venue"
+  "searchPlaceholder": "Search for a night or a venue",
+  "view": {
+    "general": "General map",
+    "friends": "Friends map"
+  },
+  "hint": {
+    "general": "Tap a hot spot · pinch to zoom",
+    "friends": "Where your friends are going · pinch to zoom"
+  },
+  "legend": {
+    "tonight": "Tonight",
+    "usually": "Usually"
+  },
+  "banner": {
+    "typicalOnly": "No one has declared tonight yet: the grey dots show the usual crowd. Declare yours and invite friends.",
+    "empty": "Quiet night so far. Declare yours and invite friends."
+  },
+  "pill": {
+    "text": "Tonight: {{venue}} · {{intent}}",
+    "a11y": "Your night: {{venue}}, {{intent}}. Open the venue"
+  },
+  "cards": {
+    "history": "From your search history",
+    "hot": "The hottest tonight",
+    "tonightBand": "tonight {{band}}"
+  },
+  "friendsEmpty": "None of your friends has declared tonight yet.",
+  "loadError": "We can't load the map. Try again in a moment.",
+  "mapA11y": "Map of venues in {{city}}"
 }
