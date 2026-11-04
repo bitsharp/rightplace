@@ -1,4 +1,4 @@
-import { bearerToken, json, safeEqual } from '../_shared/auth.ts';
+import { json, safeEqual } from '../_shared/auth.ts';
 import { DEFAULT_MAX_REQUESTS } from '../_shared/places/sync.ts';
 import { HARD_MAX_REQUESTS, type SyncQuery } from '../_shared/places/textSearch.ts';
 import type { SyncResult } from '../_shared/places/types.ts';
@@ -22,7 +22,7 @@ export type SyncOutcome = ({ dryRun: false } & SyncResult) | { dryRun: true; que
 export type SyncOptions = { maxRequests: number; dryRun: boolean };
 
 export type SyncHandlerDeps = {
-  serviceRoleKey: string;
+  syncAdminKey: string;
   runSync: (citySlug: string, options: SyncOptions) => Promise<SyncOutcome>;
   log: (message: string) => void;
 };
@@ -70,12 +70,18 @@ function respond(citySlug: string, outcome: SyncOutcome, log: (message: string) 
   });
 }
 
-// Only the service role may trigger a sync: it spends Places quota and writes the venue catalog.
+// Fail closed: an unset SYNC_ADMIN_KEY or a missing/empty header never authorizes (an empty string
+// must not equal an empty string).
+function isAuthorized(request: Request, syncAdminKey: string): boolean {
+  const provided = request.headers.get('x-sync-key');
+  if (syncAdminKey === '' || provided === null || provided === '') return false;
+  return safeEqual(provided, syncAdminKey);
+}
+
+// A sync spends Places quota and writes the venue catalog, so it needs the dedicated SYNC_ADMIN_KEY in
+// `x-sync-key`. The Authorization Bearer only passes the Supabase gateway (verify_jwt) and proves nothing here.
 export async function handleSync(request: Request, deps: SyncHandlerDeps): Promise<Response> {
-  const token = bearerToken(request);
-  if (token === null || !safeEqual(token, deps.serviceRoleKey)) {
-    return json({ error: 'UNAUTHORIZED' }, 401);
-  }
+  if (!isAuthorized(request, deps.syncAdminKey)) return json({ error: 'UNAUTHORIZED' }, 401);
   if (request.method !== 'POST') return json({ error: 'METHOD_NOT_ALLOWED' }, 405);
 
   const input = await parseInput(request);

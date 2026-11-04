@@ -13,7 +13,7 @@ function makeDeps(overrides: Partial<SyncHandlerDeps> = {}) {
   const logs: string[] = [];
   const calls: Call[] = [];
   const deps: SyncHandlerDeps = {
-    serviceRoleKey: 'service-key',
+    syncAdminKey: 'admin-key',
     runSync: (citySlug, options): Promise<SyncOutcome> => {
       calls.push({ citySlug, ...options });
       return Promise.resolve(
@@ -28,28 +28,75 @@ function makeDeps(overrides: Partial<SyncHandlerDeps> = {}) {
   return { deps, logs, calls };
 }
 
-const request = (body: unknown, authorization?: string) =>
+const request = (body: unknown, headers: Record<string, string> = {}) =>
   new Request('http://localhost/places-sync', {
     method: 'POST',
-    headers: authorization ? { Authorization: authorization } : {},
+    headers,
     body: JSON.stringify(body),
   });
-const asService = (body: unknown) => request(body, 'Bearer service-key');
+// The Bearer only gets through the Supabase gateway; the handler authorizes with x-sync-key.
+const asAdmin = (body: unknown) =>
+  request(body, { 'x-sync-key': 'admin-key', Authorization: 'Bearer any-project-jwt' });
+const asService = asAdmin;
 
-Deno.test('401 senza Authorization o con una chiave diversa dalla service role', async () => {
-  const { deps } = makeDeps();
+Deno.test('401 senza x-sync-key', async () => {
+  const { deps, calls } = makeDeps();
   assertEquals((await handleSync(request({ city_slug: 'milano' }), deps)).status, 401);
-  assertEquals(
-    (await handleSync(request({ city_slug: 'milano' }, 'Bearer jwt-utente'), deps)).status,
-    401,
+  assertEquals(calls.length, 0);
+});
+
+Deno.test('401 con una x-sync-key sbagliata', async () => {
+  const { deps } = makeDeps();
+  const response = await handleSync(
+    request({ city_slug: 'milano' }, { 'x-sync-key': 'sbagliata' }),
+    deps,
   );
+  assertEquals(response.status, 401);
+});
+
+Deno.test(
+  'fail closed: SYNC_ADMIN_KEY vuota non autorizza mai, nemmeno con header vuoto',
+  async () => {
+    const { deps, calls } = makeDeps({ syncAdminKey: '' });
+    const emptyHeader = await handleSync(
+      request({ city_slug: 'milano' }, { 'x-sync-key': '' }),
+      deps,
+    );
+    assertEquals(emptyHeader.status, 401);
+    const filledHeader = await handleSync(
+      request({ city_slug: 'milano' }, { 'x-sync-key': 'qualcosa' }),
+      deps,
+    );
+    assertEquals(filledHeader.status, 401);
+    const noHeader = await handleSync(request({ city_slug: 'milano' }), deps);
+    assertEquals(noHeader.status, 401);
+    assertEquals(calls.length, 0);
+  },
+);
+
+Deno.test('401 se la chiave giusta è solo nel Bearer', async () => {
+  const { deps } = makeDeps();
+  const response = await handleSync(
+    request({ city_slug: 'milano' }, { Authorization: 'Bearer admin-key' }),
+    deps,
+  );
+  assertEquals(response.status, 401);
+});
+
+Deno.test('200 con x-sync-key giusta, qualunque sia il Bearer', async () => {
+  const { deps } = makeDeps();
+  const response = await handleSync(
+    request({ city_slug: 'milano' }, { 'x-sync-key': 'admin-key', Authorization: 'Bearer altro' }),
+    deps,
+  );
+  assertEquals(response.status, 200);
 });
 
 Deno.test('405 per metodi diversi da POST', async () => {
   const { deps } = makeDeps();
   const response = await handleSync(
     new Request('http://localhost/places-sync', {
-      headers: { Authorization: 'Bearer service-key' },
+      headers: { 'x-sync-key': 'admin-key' },
     }),
     deps,
   );
@@ -61,7 +108,7 @@ Deno.test('400 senza city_slug o con corpo non valido', async () => {
   assertEquals((await handleSync(asService({}), deps)).status, 400);
   const broken = new Request('http://localhost/places-sync', {
     method: 'POST',
-    headers: { Authorization: 'Bearer service-key' },
+    headers: { 'x-sync-key': 'admin-key' },
     body: 'non json',
   });
   assertEquals((await handleSync(broken, deps)).status, 400);
@@ -103,7 +150,7 @@ Deno.test(
     });
     assertEquals(logs.length, 1);
     assertEquals(logs[0]?.includes('calls=7'), true);
-    assertEquals(logs[0]?.includes('service-key'), false);
+    assertEquals(logs[0]?.includes('admin-key'), false);
   },
 );
 

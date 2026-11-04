@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Usage: npm run venues:sync -- --city milano [--city las-palmas] [--dry-run] [--max-requests 10]
 // Calls the places-sync Edge Function. The Google Places key stays on Supabase (secret
-// GOOGLE_PLACES_API_KEY): this script only needs the service_role key of the maintainer's shell.
-const { readServiceEnv } = require('./lib/serviceEnv');
+// GOOGLE_PLACES_API_KEY). This script never uses the service_role key.
+const { readSyncEnv } = require('./lib/serviceEnv');
 
 const CITY_SLUG = /^[a-z0-9-]+$/;
 const DEFAULT_MAX_REQUESTS = 10;
@@ -38,12 +38,20 @@ function parseSyncArgs(argv) {
 }
 
 function buildSyncRequest(env, { citySlug, dryRun, maxRequests }) {
-  const { url, serviceRoleKey } = readServiceEnv(env);
+  const { url, syncAdminKey, anonKey } = readSyncEnv(env);
   return {
     url: `${url}/functions/v1/places-sync`,
     init: {
       method: 'POST',
-      headers: { Authorization: `Bearer ${serviceRoleKey}`, 'Content-Type': 'application/json' },
+      headers: {
+        // x-sync-key: the function authorizes ONLY with x-sync-key (secret SYNC_ADMIN_KEY).
+        'x-sync-key': syncAdminKey,
+        // Authorization + apikey: any JWT signed by the project passes the gateway (verify_jwt); the
+        // legacy anon key is the least privileged one. A sb_publishable_… key is not a JWT and would fail.
+        Authorization: `Bearer ${anonKey}`,
+        apikey: anonKey,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ city_slug: citySlug, max_requests: maxRequests, dry_run: dryRun }),
     },
   };

@@ -5,6 +5,8 @@ import { CityNotActiveError, CityNotFoundError, handleSync, type SyncOptions } f
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+// Dedicated admin secret (`supabase secrets set SYNC_ADMIN_KEY=...`), sent in the x-sync-key header.
+const syncAdminKey = Deno.env.get('SYNC_ADMIN_KEY') ?? '';
 // Secret set with `supabase secrets set GOOGLE_PLACES_API_KEY=...`. Not the Maps SDK key.
 const placesKey = Deno.env.get('GOOGLE_PLACES_API_KEY') ?? '';
 
@@ -54,5 +56,5 @@ async function runSync(slug: string, options: SyncOptions) {
 }
 
 Deno.serve((request) =>
-  handleSync(request, { serviceRoleKey, runSync, log: (message) => console.log(message) }),
+  handleSync(request, { syncAdminKey, runSync, log: (message) => console.log(message) }),
 );
