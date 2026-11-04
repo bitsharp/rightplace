@@ -14,6 +14,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "i18n:check": "node scripts/i18n-check.js",
+    "functions:test": "cd supabase/functions && npx -y deno test --no-prompt --no-lock",
+    "venues:sync": "node scripts/venues-sync.js",
+    "typical:import": "node scripts/typical-import.js",
     "doctor": "npx expo-doctor@latest",
     "prepare": "git config core.hooksPath .githooks || true",
     "db:start": "supabase start",
@@ -89,7 +92,8 @@
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/design/"
+      "/design/",
+      "/supabase/functions/"
     ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"

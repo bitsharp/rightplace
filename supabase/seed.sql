@@ -13,6 +13,12 @@ insert into public.cities (slug, name, country, center, default_zoom, timezone, 
    13, 'Europe/Madrid', null, false)
 on conflict (slug) do nothing;
 
+-- Neighbourhood names that the Places sync turns into text queries (names of areas, not of venues).
+update public.cities set places_areas = array['Navigli', 'Isola', 'Brera', 'Porta Venezia', 'Lambrate', 'Corso Como']
+ where slug = 'milano' and places_areas = '{}';
+update public.cities set places_areas = array['Las Canteras', 'Santa Catalina', 'Vegueta', 'Triana', 'Mesa y López']
+ where slug = 'las-palmas' and places_areas = '{}';
+
 insert into public.venues (city_id, google_place_id, name, kind, location, address, is_active)
 select c.id, 'demo-' || lpad(v.n::text, 2, '0'), v.name || ' (demo)', v.kind,
        extensions.st_setsrid(extensions.st_makepoint(v.lng, v.lat), 4326)::extensions.geography,

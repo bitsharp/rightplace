@@ -1,0 +1,23 @@
+{
+  "back": "Back",
+  "searchLabel": "Search for a venue",
+  "searchPlaceholder": "Name, city or type of venue",
+  "city": "City",
+  "kindTitle": "Type of venue",
+  "kind": {
+    "all": "All",
+    "club": "Club",
+    "rooftop": "Rooftop",
+    "bar": "Bar",
+    "live": "Live",
+    "other": "Other"
+  },
+  "recent": "Recent",
+  "recentA11y": "Open {{name}}",
+  "count_one": "{{count}} venue",
+  "count_other": "{{count}} venues",
+  "empty": "No venues found. Try a different city or type.",
+  "loadError": "We could not load the venues. Please try again shortly.",
+  "googleAttribution": "Information from Google Maps",
+  "openInGoogleMaps": "Open in Google Maps"
+}

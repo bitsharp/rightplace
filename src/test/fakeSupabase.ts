@@ -17,19 +17,57 @@ const state = {
   listeners: new Set<Listener>(),
 };
 
-function queryBuilder(table: string) {
-  const filters: [string, unknown][] = [];
-  const rows = () =>
-    (state.tables[table] ?? []).filter((row) =>
-      filters.every(([key, value]) => row[key] === value),
+// Reads "cities.slug" from { cities: { slug } } so tests can filter on embedded relations.
+function readPath(row: Record<string, unknown>, key: string): unknown {
+  return key
+    .split('.')
+    .reduce<unknown>(
+      (node, part) =>
+        typeof node === 'object' && node !== null
+          ? (node as Record<string, unknown>)[part]
+          : undefined,
+      row,
     );
+}
+
+function queryBuilder(table: string) {
+  const filters: ((row: Record<string, unknown>) => boolean)[] = [];
+  let sort: { key: string; ascending: boolean } | null = null;
+  let max = Infinity;
+  const rows = () => {
+    const matching = (state.tables[table] ?? []).filter((row) =>
+      filters.every((test) => test(row)),
+    );
+    const ordered = sort
+      ? [...matching].sort((a, b) => {
+          const left = String(readPath(a, sort!.key));
+          const right = String(readPath(b, sort!.key));
+          return (left < right ? -1 : left > right ? 1 : 0) * (sort!.ascending ? 1 : -1);
+        })
+      : matching;
+    return ordered.slice(0, max);
+  };
   const builder = {
-    select: () => builder,
+    select: (_columns?: string) => builder,
     eq: (key: string, value: unknown) => {
-      filters.push([key, value]);
+      filters.push((row) => readPath(row, key) === value);
+      return builder;
+    },
+    in: (key: string, values: unknown[]) => {
+      filters.push((row) => values.includes(readPath(row, key)));
+      return builder;
+    },
+    order: (key: string, options?: { ascending?: boolean }) => {
+      sort = { key, ascending: options?.ascending ?? true };
+      return builder;
+    },
+    limit: (count: number) => {
+      max = count;
       return builder;
     },
     maybeSingle: async (): Promise<Result> => ({ data: rows()[0] ?? null, error: null }),
+    // Awaiting the builder returns the list, like the real PostgREST client.
+    then: <T>(resolve: (result: Result) => T) => resolve({ data: rows(), error: null }),
   };
   return builder;
 }

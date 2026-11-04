@@ -153,6 +153,8 @@ export type Database = {
           id: string;
           is_active: boolean;
           name: string;
+          places_areas: string[];
+          places_radius_m: number;
           slug: string;
           taxi_phone: string | null;
           timezone: string;
@@ -166,6 +168,8 @@ export type Database = {
           id?: string;
           is_active?: boolean;
           name: string;
+          places_areas?: string[];
+          places_radius_m?: number;
           slug: string;
           taxi_phone?: string | null;
           timezone: string;
@@ -178,6 +182,8 @@ export type Database = {
           id?: string;
           is_active?: boolean;
           name?: string;
+          places_areas?: string[];
+          places_radius_m?: number;
           slug?: string;
           taxi_phone?: string | null;
           timezone?: string;
@@ -944,7 +950,7 @@ export type Database = {
           id?: string;
           is_active?: boolean;
           kind: string;
-          location: unknown;
+          location?: unknown;
           name: string;
           opening_hours?: Json | null;
           places_synced_at?: string | null;
@@ -1108,6 +1114,18 @@ export type Database = {
           venue_id: string;
         }[];
       };
+      get_city_sync_info: {
+        Args: { p_city_slug: string };
+        Returns: {
+          areas: string[];
+          country: string;
+          is_active: boolean;
+          lat: number;
+          lng: number;
+          name: string;
+          radius_m: number;
+        }[];
+      };
       get_event_attendance: {
         Args: { p_event_id: string };
         Returns: {
@@ -1200,6 +1218,13 @@ export type Database = {
           other_pct: number;
         }[];
       };
+      import_typical_manual: {
+        Args: { p_city_slug: string; p_rows: Json };
+        Returns: {
+          cells: number;
+          venues: number;
+        }[];
+      };
       is_adult: { Args: { p_birth_date: string }; Returns: boolean };
       level_from_avg: { Args: { p_avg: number }; Returns: number };
       match_contacts: {
@@ -1215,6 +1240,7 @@ export type Database = {
       night_date_at: { Args: { p_at: string; p_city_id: string }; Returns: string };
       night_end: { Args: { p_night_date: string; p_timezone: string }; Returns: string };
       regenerate_handle: { Args: Record<PropertyKey, never>; Returns: string };
+      remember_venue: { Args: { p_venue_id: string }; Returns: undefined };
       remove_follower: { Args: { p_follower_id: string }; Returns: undefined };
       report: {
         Args: { p_reason?: string; p_target_id: string; p_target_kind: string };
@@ -1249,6 +1275,14 @@ export type Database = {
       };
       set_locale: { Args: { p_locale: string }; Returns: undefined };
       set_my_phone_hash: { Args: { p_hash: string }; Returns: undefined };
+      sync_places_venues: {
+        Args: { p_city_slug: string; p_rows: Json };
+        Returns: {
+          demo_deactivated: number;
+          inserted: number;
+          updated: number;
+        }[];
+      };
       typical_level: { Args: { p_at: string; p_venue_id: string }; Returns: number };
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       undeclare: { Args: Record<PropertyKey, never>; Returns: undefined };

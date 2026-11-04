@@ -16,27 +16,27 @@ Le migration in `migrations/` sono ordinate e **non si modificano dopo essere st
 
 ## Modello dati
 
-| Tabella                                | Contenuto                                                                           | Chi la legge                                           |
-| -------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `cities`                               | città (Milano attiva; Las Palmas, Madrid, Barcellona inattive)                      | utenti autenticati                                     |
-| `venues`                               | locali (da Google Places, prompt 06; ora 20 demo)                                   | utenti autenticati                                     |
-| `venue_typical_busyness`               | strato "di solito": livello 0–3 per venue/giorno/ora, `source` `manual` o `history` | utenti autenticati                                     |
-| `night_hour_stats`                     | medie storiche per venue/giorno/ora, **mai per utente**                             | nessun client                                          |
-| `profiles`                             | handle, data di nascita, genere, città, lingua, consensi, posizione grossolana      | **solo la propria riga**                               |
-| `public_profiles` (view)               | `id, handle, age_band, gender, is_creator`                                          | utenti autenticati: **unico accesso ad altri profili** |
-| `follows`                              | A → B con `status` `pending` / `accepted`                                           | solo le proprie righe (entrambe le direzioni)          |
-| `accepted_follows` (view)              | follow accettati                                                                    | come `follows`                                         |
-| `blocks`                               | blocchi                                                                             | solo i propri                                          |
-| `events`                               | serate dei creator                                                                  | utenti autenticati                                     |
-| `nights`                               | serata logica di un locale (06:00 → 06:00, fuso della città)                        | utenti autenticati                                     |
-| `declarations`                         | "Ci vado" / "Forse"                                                                 | solo le proprie (scritture solo via RPC)               |
-| `chat_rooms`, `chat_messages`          | chat della serata                                                                   | membri della serata; messaggi propri o di chi seguo    |
-| `posts`, `post_likes`, `post_comments` | foto del giorno dopo                                                                | vedi "Visibilità"                                      |
-| `search_history`                       | ultime ricerche (max 20)                                                            | solo le proprie                                        |
-| `contact_hashes_tmp`, `phone_hashes`   | hash SHA-256 di numeri E.164                                                        | **nessun client**                                      |
-| `reports`                              | segnalazioni                                                                        | nessun client (moderatori via service role)            |
-| `subscriptions`, `push_tokens`         | abbonamento creator, token push                                                     | solo i propri                                          |
-| `private.*`                            | liste per gli handle, conteggi per serata, code di cancellazione                    | nessun client                                          |
+| Tabella                                | Contenuto                                                                                    | Chi la legge                                           |
+| -------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `cities`                               | città (Milano attiva; Las Palmas, Madrid, Barcellona inattive)                               | utenti autenticati                                     |
+| `venues`                               | locali (da Google Places, prompt 06; finché una città non ha 10 locali reali restano i demo) | utenti autenticati                                     |
+| `venue_typical_busyness`               | strato "di solito": livello 0–3 per venue/giorno/ora, `source` `manual` o `history`          | utenti autenticati                                     |
+| `night_hour_stats`                     | medie storiche per venue/giorno/ora, **mai per utente**                                      | nessun client                                          |
+| `profiles`                             | handle, data di nascita, genere, città, lingua, consensi, posizione grossolana               | **solo la propria riga**                               |
+| `public_profiles` (view)               | `id, handle, age_band, gender, is_creator`                                                   | utenti autenticati: **unico accesso ad altri profili** |
+| `follows`                              | A → B con `status` `pending` / `accepted`                                                    | solo le proprie righe (entrambe le direzioni)          |
+| `accepted_follows` (view)              | follow accettati                                                                             | come `follows`                                         |
+| `blocks`                               | blocchi                                                                                      | solo i propri                                          |
+| `events`                               | serate dei creator                                                                           | utenti autenticati                                     |
+| `nights`                               | serata logica di un locale (06:00 → 06:00, fuso della città)                                 | utenti autenticati                                     |
+| `declarations`                         | "Ci vado" / "Forse"                                                                          | solo le proprie (scritture solo via RPC)               |
+| `chat_rooms`, `chat_messages`          | chat della serata                                                                            | membri della serata; messaggi propri o di chi seguo    |
+| `posts`, `post_likes`, `post_comments` | foto del giorno dopo                                                                         | vedi "Visibilità"                                      |
+| `search_history`                       | ultime ricerche (max 20)                                                                     | solo le proprie                                        |
+| `contact_hashes_tmp`, `phone_hashes`   | hash SHA-256 di numeri E.164                                                                 | **nessun client**                                      |
+| `reports`                              | segnalazioni                                                                                 | nessun client (moderatori via service role)            |
+| `subscriptions`, `push_tokens`         | abbonamento creator, token push                                                              | solo i propri                                          |
+| `private.*`                            | liste per gli handle, conteggi per serata, code di cancellazione                             | nessun client                                          |
 
 ## Garanzie di privacy
 
@@ -58,7 +58,7 @@ Gli errori sono codici tipizzati nel messaggio dell'eccezione: `NOT_AUTHENTICATE
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Profilo        | `complete_profile(birth_date, gender, city_slug, locale, location_opt_in, contacts_opt_in, is_creator)`, `set_locale`, `update_coarse_location(lat, lng)`, `regenerate_handle()` (una sola volta), `delete_my_account()` |
 | Serata         | `declare(intent, venue_id?, event_id?)` (una sola dichiarazione attiva), `undeclare()`, `get_my_declaration()`                                                                                                           |
-| Mappa e locali | `get_city_map(city_slug, 'general'\|'friends')`, `get_venue_stats(venue_id, 'going'\|'maybe'\|'all')`, `search_venues(city_slug, kind?, query?)`, `get_recommended_venue(city_slug)`                                     |
+| Mappa e locali | `get_city_map(city_slug, 'general'\|'friends')`, `get_venue_stats(venue_id, 'going'\|'maybe'\|'all')`, `search_venues(city_slug, kind?, query?)`, `get_recommended_venue(city_slug)`, `remember_venue(venue_id)`         |
 | Persone        | `search_users(query)`, `request_follow`, `cancel_follow_request`, `accept_follow`, `decline_follow`, `unfollow`, `remove_follower`, `get_follow_requests()`, `count_follow_requests()`                                   |
 | Contatti       | `match_contacts(hashes[])`, `set_my_phone_hash(hash)`, `clear_my_phone_hash()`                                                                                                                                           |
 | Feed           | `get_feed(before?, limit?)`, `get_stories()`                                                                                                                                                                             |
@@ -78,6 +78,7 @@ Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attend
 | `expire-sponsorships`          | lunedì 05:00 UTC                 | spegne le sponsorizzazioni scadute                                                                          |
 | `refresh-typical-from-history` | lunedì 06:00 UTC                 | ricalcola lo strato "di solito" dalla storia delle ultime 8 settimane                                       |
 | `process-account-deletions`    | ogni ora (:15)                   | elimina da `auth.users` gli account per cui è stata chiesta la cancellazione                                |
+| `expire-stale-places`          | ogni giorno 04:30 UTC            | locali Places non sincronizzati da 30 giorni: disattivati, senza nome/indirizzo/orari                       |
 
 ## Supabase Auth (prompt 05)
 
@@ -97,3 +98,17 @@ I bucket `posts` e `chat-photos` sono privati. Il caricamento è permesso solo n
 - La chat mostra solo i messaggi propri o di chi segui con follow accettato (principio 6), non tutti quelli dei membri della serata.
 - `match_contacts` richiede `contacts_opt_in` anche lato server.
 - Le scritture su `profiles`, `declarations`, `follows.status` ed `events` (sponsorizzazione esclusa) sono limitate per colonna. Tutto il resto passa dalle RPC.
+
+## Google Places (prompt 06)
+
+Regole complete in `docs/places-terms.md`, passi operativi in `docs/places-sync.md`.
+
+- **Secret** della Edge Function: `GOOGLE_PLACES_API_KEY` (`npx supabase secrets set GOOGLE_PLACES_API_KEY=<chiave>`; il valore non va mai in un file). Non è la chiave dell'SDK Maps.
+- **Chiave service role** per gli script e per il cron: deve essere la chiave `service_role` **legacy in formato JWT** (Dashboard → Project Settings → API Keys → Legacy API keys → `service_role`): la Edge Function la confronta con la `SUPABASE_SERVICE_ROLE_KEY` iniettata da Supabase e il gateway delle Functions verifica il JWT. Le nuove chiavi `sb_secret_…` non funzionano con questa protezione. Nessun valore reale va nel repo.
+- **Deploy**: `npx supabase functions deploy places-sync places-detail`. Test: `npm run functions:test` (Deno).
+- `places-sync`: solo con `Authorization: Bearer <service_role>`. Input `{ city_slug, max_requests? (default 10, max 20), dry_run? }`; solo città con `is_active = true` (altrimenti 400 `CITY_NOT_ACTIVE`). Risposta `{ city, calls, inserted, updated, demo_deactivated }`, oppure in dry run `{ city, dry_run, estimated_calls, queries }`.
+- `places-detail`: chiamata dall'app con il JWT utente; Place Details solo se i dati hanno 30 giorni o più.
+- **Colonne** `cities.places_radius_m` (1000–50000, default 8000) e `cities.places_areas` (quartieri usati nelle query).
+- **RPC solo `service_role`** (revocate ad `anon` e `authenticated`): `sync_places_venues(city_slug, rows)` (upsert su `google_place_id`; disattiva i demo della sola città quando ha almeno 10 locali reali attivi), `get_city_sync_info(city_slug)`, `import_typical_manual(city_slug, rows)` (atomica; rimpiazza solo le righe `manual`, errori `UNKNOWN_VENUE` / `INVALID_ARGUMENT` / `NOT_FOUND`).
+- **RPC per gli utenti**: `remember_venue(venue_id)` scrive solo nella cronologia ricerche propria.
+- **Job**: `expire-stale-places` (tabella sopra).

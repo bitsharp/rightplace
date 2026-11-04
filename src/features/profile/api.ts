@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { Language } from '@/i18n/domain/pickLanguage';
+import { callRpc } from '@/lib/callRpc';
 import { RpcError, toRpcErrorCode } from '@/lib/rpcError';
 import { supabase } from '@/lib/supabase';
 
@@ -58,15 +59,6 @@ export async function fetchMyProfile(userId: string): Promise<MyProfile | null> 
     .maybeSingle();
   if (error) throw new RpcError(toRpcErrorCode(error));
   return data ? toMyProfile(profileRowSchema.parse(data)) : null;
-}
-
-async function callRpc<T>(name: string, args?: Record<string, unknown>): Promise<T> {
-  // Generic wrapper: names are typed by callers below; responses are validated where they carry data.
-  const { data, error } = await (
-    supabase.rpc as (fn: string, params?: object) => PromiseLike<{ data: unknown; error: unknown }>
-  )(name, args);
-  if (error) throw new RpcError(toRpcErrorCode(error));
-  return data as T;
 }
 
 export type ProfileInput = {

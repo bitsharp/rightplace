@@ -11,6 +11,7 @@ import enMap from './en/map.json';
 import enProfile from './en/profile.json';
 import enUi from './en/ui.json';
 import enVenue from './en/venue.json';
+import enVenues from './en/venues.json';
 import itAuth from './it/auth.json';
 import itChat from './it/chat.json';
 import itCommon from './it/common.json';
@@ -24,6 +25,7 @@ import itMap from './it/map.json';
 import itProfile from './it/profile.json';
 import itUi from './it/ui.json';
 import itVenue from './it/venue.json';
+import itVenues from './it/venues.json';
 
 export const resources = {
   it: {
@@ -35,6 +37,7 @@ export const resources = {
     feed: itFeed,
     profile: itProfile,
     venue: itVenue,
+    venues: itVenues,
     creator: itCreator,
     ui: itUi,
     dev: itDev,
@@ -50,6 +53,7 @@ export const resources = {
     feed: enFeed,
     profile: enProfile,
     venue: enVenue,
+    venues: enVenues,
     creator: enCreator,
     ui: enUi,
     dev: enDev,

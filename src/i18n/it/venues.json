@@ -1,0 +1,23 @@
+{
+  "back": "Indietro",
+  "searchLabel": "Cerca un locale",
+  "searchPlaceholder": "Nome, città o tipo di locale",
+  "city": "Città",
+  "kindTitle": "Tipo di locale",
+  "kind": {
+    "all": "Tutti",
+    "club": "Club",
+    "rooftop": "Rooftop",
+    "bar": "Bar",
+    "live": "Live",
+    "other": "Altro"
+  },
+  "recent": "Recenti",
+  "recentA11y": "Apri {{name}}",
+  "count_one": "{{count}} locale",
+  "count_other": "{{count}} locali",
+  "empty": "Nessun locale trovato. Prova a cambiare città o tipo.",
+  "loadError": "Non riusciamo a caricare i locali. Riprova tra poco.",
+  "googleAttribution": "Informazioni da Google Maps",
+  "openInGoogleMaps": "Apri in Google Maps"
+}
