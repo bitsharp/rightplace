@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
@@ -33,8 +33,9 @@ type BarProps = Pick<Props, 'view' | 'onChangeView' | 'onClose'>;
 
 function FullScreenBar({ view, onChangeView, onClose }: BarProps) {
   const { t } = useTranslation('map');
+  const { top } = useSafeAreaInsets();
   return (
-    <View style={styles.bar}>
+    <View testID="map-fullscreen-bar" style={[styles.bar, { paddingTop: top + spacing.sm }]}>
       <View style={styles.switch}>
         <MapViewSwitch view={view} onChange={onChangeView} />
       </View>
@@ -57,9 +58,9 @@ type ContentProps = Omit<Props, 'visible' | 'onOpenVenue'> & {
 function FullScreenContent(props: ContentProps) {
   const { bottom } = useSafeAreaInsets();
   return (
-    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+    <View style={styles.screen}>
       <FullScreenBar view={props.view} onChangeView={props.onChangeView} onClose={props.onClose} />
-      <View style={styles.map}>
+      <View testID="map-fullscreen-map" style={styles.map}>
         <MapCanvas
           city={props.city}
           layers={props.layers}
@@ -80,7 +81,7 @@ function FullScreenContent(props: ContentProps) {
           <MapLegend />
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -101,7 +102,10 @@ export function MapFullScreen({ visible, onOpenVenue, ...content }: Props) {
       onRequestClose={onClose}
       onDismiss={deferred.onDismiss}
     >
-      <FullScreenContent {...content} onOpenVenue={openAfterClose} />
+      {/* A Modal is a separate native root: without its own provider the insets read as zero. */}
+      <SafeAreaProvider>
+        <FullScreenContent {...content} onOpenVenue={openAfterClose} />
+      </SafeAreaProvider>
     </Modal>
   );
 }

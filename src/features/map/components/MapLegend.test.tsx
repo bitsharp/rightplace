@@ -38,4 +38,33 @@ describe('MapLegend', () => {
     }
     expect(screen.getAllByTestId('legend-items')).toHaveLength(2);
   });
+
+  it('ogni blocco ha l’etichetta su una riga propria, senza larghezza fissa', async () => {
+    await render(<MapLegend />);
+    for (const key of ['map:legend.tonight', 'map:legend.usually']) {
+      const label = screen.getByText(key);
+      expect(label.props.numberOfLines).toBe(1);
+      expect(StyleSheet.flatten(label.props.style).width).toBeUndefined();
+      expect(StyleSheet.flatten(label.parent?.props.style).width).toBeUndefined();
+    }
+    for (const row of screen.getAllByTestId('legend-items')) {
+      expect(StyleSheet.flatten(row.props.style).width).toBeUndefined();
+    }
+  });
+
+  it('il riquadro si estende a tutta la larghezza disponibile e i blocchi stanno uno sotto l’altro', async () => {
+    await render(<MapLegend />);
+    const box = StyleSheet.flatten(screen.getByTestId('map-legend').props.style);
+    expect(box.alignSelf).toBe('stretch');
+    expect(box.flexDirection ?? 'column').toBe('column');
+  });
+
+  it('ogni elemento è pallino e testo sulla stessa riga, su una riga sola', async () => {
+    await render(<MapLegend />);
+    for (const key of ['ui:intent.going', 'ui:you', 'ui:typical.packed']) {
+      const text = screen.getByText(key);
+      expect(text.props.numberOfLines).toBe(1);
+      expect(StyleSheet.flatten(text.parent?.props.style).flexDirection).toBe('row');
+    }
+  });
 });

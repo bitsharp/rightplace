@@ -1,9 +1,27 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Platform, StyleSheet } from 'react-native';
 
+import { spacing } from '@/theme/tokens';
+
 import type { MapVenue } from '../domain/mapLayers';
 
 import { MapFullScreen } from './MapFullScreen';
+
+// The Modal is a separate native root: only a provider inside it knows the real insets, so the
+// test provider both records that it is used and supplies the insets of an iPhone with a notch.
+let mockInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+const mockProvider = jest.fn();
+jest.mock('react-native-safe-area-context', () => {
+  const actual = jest.requireActual('react-native-safe-area-context/jest/mock').default;
+  const { createElement } = jest.requireActual('react');
+  return {
+    ...actual,
+    SafeAreaProvider: ({ children }: { children: unknown }) => {
+      mockProvider();
+      return createElement(actual.SafeAreaInsetsContext.Provider, { value: mockInsets }, children);
+    },
+  };
+});
 
 const hot: MapVenue = {
   venueId: 'hot',
@@ -34,7 +52,10 @@ const baseProps = {
 };
 
 describe('MapFullScreen', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+  });
 
   it('chiuso non disegna niente', async () => {
     await render(<MapFullScreen {...baseProps} visible={false} />);
@@ -110,5 +131,46 @@ describe('MapFullScreen', () => {
       expect(typeof style.left).toBe('number');
       expect(typeof style.right).toBe('number');
     }
+  });
+
+  describe('safe area dentro il Modal', () => {
+    afterEach(() => jest.restoreAllMocks());
+
+    const provideInsets = (insets: { top: number; bottom: number }) => {
+      mockInsets = { left: 0, right: 0, ...insets };
+    };
+
+    afterEach(() => {
+      mockInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+    });
+
+    it('il contenuto è dentro un SafeAreaProvider', async () => {
+      await render(<MapFullScreen {...baseProps} />);
+      expect(mockProvider).toHaveBeenCalled();
+    });
+
+    it('la barra in alto sta sotto la status bar: padding top = inset + spacing', async () => {
+      provideInsets({ top: 47, bottom: 34 });
+      await render(<MapFullScreen {...baseProps} />);
+      const bar = StyleSheet.flatten(screen.getByTestId('map-fullscreen-bar').props.style);
+      expect(bar.paddingTop).toBe(47 + spacing.sm);
+    });
+
+    it('la legenda sta sopra la safe area inferiore', async () => {
+      provideInsets({ top: 47, bottom: 34 });
+      await render(<MapFullScreen {...baseProps} />);
+      const legend = StyleSheet.flatten(screen.getByTestId('map-legend-overlay').props.style);
+      expect(legend.bottom).toBe(spacing.md + 34);
+    });
+
+    it('l’hint sta nell’area della mappa, sotto la barra, e va a capo su due righe', async () => {
+      provideInsets({ top: 47, bottom: 34 });
+      await render(<MapFullScreen {...baseProps} />);
+      const hint = StyleSheet.flatten(screen.getByTestId('map-hint-overlay').props.style);
+      expect(hint.top).toBe(spacing.md);
+      expect(screen.getByText('map:hint.general').props.numberOfLines).toBe(2);
+      const mapArea = screen.getByTestId('map-fullscreen-map');
+      expect(mapArea.children).toContain(screen.getByTestId('map-hint-overlay'));
+    });
   });
 });
