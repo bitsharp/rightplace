@@ -70,5 +70,32 @@
     "continue": "Continue",
     "confirm": "Delete permanently",
     "cancel": "Cancel"
+  },
+  "followers": {
+    "title": "Your followers",
+    "empty": "Nobody follows you yet. Share your @tag with friends.",
+    "remove": "Remove",
+    "a11yRemove": "Remove {{handle}} from your followers"
+  },
+  "blocked": {
+    "title": "Blocked",
+    "empty": "You haven't blocked anyone.",
+    "unblock": "Unblock",
+    "a11yUnblock": "Unblock {{handle}}"
+  },
+  "share": {
+    "cta": "Share my @tag",
+    "message": "Follow me on RightPlace: {{handle}}\n{{web}}\n{{app}}"
+  },
+  "findMe": {
+    "title": "Be found",
+    "body": "Your number stays on your phone: we only send an encrypted code, so friends who have you in their address book can find you.",
+    "label": "Your number",
+    "placeholder": "E.g. 345 123 4567",
+    "save": "Save",
+    "saved": "Done: friends with your number in their address book can now find you.",
+    "invalid": "Invalid number.",
+    "clear": "Stop letting people find me",
+    "cleared": "People can no longer find you by number."
   }
 }

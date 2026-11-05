@@ -11,6 +11,7 @@ import { VENUE_KINDS, type VenueBands, type VenueKind } from './domain/venueList
 export type ActiveCity = {
   slug: string;
   name: string;
+  country: string;
   lat: number;
   lng: number;
   defaultZoom: number;
@@ -28,6 +29,7 @@ export type CatalogVenue = {
 const citySchema = z.object({
   slug: z.string(),
   name: z.string(),
+  country: z.string(),
   lat: z.number(),
   lng: z.number(),
   default_zoom: z.number(),
@@ -65,6 +67,7 @@ export async function fetchActiveCities(): Promise<ActiveCity[]> {
     .map((row) => ({
       slug: row.slug,
       name: row.name,
+      country: row.country,
       lat: row.lat,
       lng: row.lng,
       defaultZoom: row.default_zoom,

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EventRow } from '@/components/app/EventRow';
-import { FriendRow, type FollowState } from '@/components/app/FriendRow';
+import { FriendRow } from '@/components/app/FriendRow';
 import { MessageBubble } from '@/components/app/MessageBubble';
 import { PlanCard } from '@/components/app/PlanCard';
 import { PostCard } from '@/components/app/PostCard';
@@ -10,16 +10,17 @@ import { TabBar, type TabName } from '@/components/app/TabBar';
 import { TopBar } from '@/components/app/TopBar';
 import { TransportRow } from '@/components/app/TransportRow';
 import { Toggle } from '@/components/ui/Toggle';
+import type { FollowStatus } from '@/features/friends/domain/followButton';
 
 import { SAMPLE_FRIENDS, SAMPLE_HANDLE, SAMPLE_STORIES, SAMPLE_VENUE } from './samples';
 import { Section } from './Section';
 
 const noop = () => undefined;
 const [FIRST = '', SECOND = ''] = SAMPLE_FRIENDS;
-const NEXT_FOLLOW: Record<FollowState, FollowState> = {
-  none: 'requested',
-  requested: 'none',
-  following: 'none',
+const NEXT_FOLLOW: Record<FollowStatus, FollowStatus> = {
+  none: 'pending',
+  pending: 'none',
+  accepted: 'none',
 };
 
 export function SocialSection() {
@@ -35,21 +36,21 @@ export function SocialSection() {
 
 function PeopleDemo() {
   const { t } = useTranslation('dev');
-  const [follow, setFollow] = useState<FollowState>('none');
+  const [follow, setFollow] = useState<FollowStatus>('none');
   return (
     <>
       <FriendRow
         handle={FIRST}
         meta={t('sample.friendMeta')}
         venueLine={SAMPLE_VENUE}
-        followState="following"
-        onPressFollow={noop}
+        followState="accepted"
+        onAction={noop}
       />
       <FriendRow
         handle={SECOND}
         meta={t('sample.friendMeta')}
         followState={follow}
-        onPressFollow={() => setFollow(NEXT_FOLLOW[follow])}
+        onAction={() => setFollow(NEXT_FOLLOW[follow])}
       />
     </>
   );

@@ -1,3 +1,53 @@
 {
-  "title": "Amici"
+  "title": "Amici",
+  "searchLabel": "Cerca un utente per tag",
+  "searchPlaceholder": "Cerca per tag, ad esempio volpe",
+  "hint": "Chi accetta la tua richiesta ti mostra dove va e cosa posta.",
+  "followingCount_one": "Segui {{count}} persona",
+  "followingCount_other": "Segui {{count}} persone",
+  "noResults": "Nessun utente con questo tag.",
+  "loadError": "Non riusciamo a caricare gli utenti. Riprova tra poco.",
+  "tonight": "Stasera: {{venue}}",
+  "meta": "{{age}} · {{gender}}",
+  "gender": {
+    "female": "Donna",
+    "male": "Uomo",
+    "other": "Altro"
+  },
+  "requests": {
+    "title": "Richieste",
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "a11yAccept": "Accetta la richiesta di {{handle}}",
+    "a11yDecline": "Rifiuta la richiesta di {{handle}}"
+  },
+  "following": {
+    "title": "Seguiti",
+    "empty": "Non segui ancora nessuno. Cerca un amico per tag e chiedi di seguirlo."
+  },
+  "contacts": {
+    "title": "Suggeriti dai contatti",
+    "cta": "Trova amici dai contatti",
+    "body": "Dalla rubrica usiamo solo un codice cifrato dei numeri: numeri e nomi restano sul tuo telefono.",
+    "fromBook": "Dalla tua rubrica",
+    "empty": "Nessun amico trovato tra i tuoi contatti.",
+    "denied": "Permesso negato: puoi attivare i contatti dalle impostazioni del telefono.",
+    "optOut": "Attiva i contatti nel profilo per trovare amici."
+  },
+  "person": {
+    "menuTitle": "Azioni su {{handle}}",
+    "block": "Blocca",
+    "report": "Segnala",
+    "cancel": "Annulla",
+    "blockTitle": "Bloccare {{handle}}?",
+    "blockBody": "Non vi vedrete più: smettete di seguirvi e sparite dalle rispettive ricerche. Potrai sbloccarlo dal profilo.",
+    "blockConfirm": "Blocca",
+    "reported": "Segnalazione inviata. Grazie.",
+    "blocked": "Utente bloccato."
+  },
+  "publicProfile": {
+    "title": "Profilo",
+    "notFound": "Nessun utente con questo tag.",
+    "back": "Indietro"
+  }
 }

@@ -15,7 +15,11 @@ import { typography } from '@/theme/typography';
 
 import { setLocale, type ProfileInput } from '../api';
 import { AccountSection } from '../components/AccountSection';
+import { BlockedSection } from '../components/BlockedSection';
+import { FindMeByPhone } from '../components/FindMeByPhone';
+import { FollowersSection } from '../components/FollowersSection';
 import { ProfileForm } from '../components/ProfileForm';
+import { ShareHandleButton } from '../components/ShareHandleButton';
 import { useSaveProfile } from '../useSaveProfile';
 
 export function ProfileTabScreen() {
@@ -48,6 +52,10 @@ export function ProfileTabScreen() {
       <Link href="/creator" style={styles.link}>
         {profile.isCreator ? t('app.creatorProfile') : t('app.becomeCreator')}
       </Link>
+      <ShareHandleButton handle={profile.handle} />
+      {profile.contactsOptIn ? <FindMeByPhone /> : null}
+      <FollowersSection />
+      <BlockedSection />
       <AccountSection email={email ?? ''} />
       <UiKitLink />
     </Screen>

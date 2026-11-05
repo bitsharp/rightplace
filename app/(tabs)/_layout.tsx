@@ -1,6 +1,7 @@
 import { Tabs, type BottomTabBarProps } from 'expo-router/js-tabs';
 
 import { isTabName, TAB_NAMES, TabBar } from '@/components/app/TabBar';
+import { useFollowRequestsCount } from '@/features/friends/hooks';
 
 function RouterTabBar({ state, navigateToTab }: BottomTabBarProps) {
   const current = state.routes[state.index]?.name ?? 'map';
@@ -8,7 +9,14 @@ function RouterTabBar({ state, navigateToTab }: BottomTabBarProps) {
     const route = state.routes.find((candidate) => candidate.name === name);
     if (route) navigateToTab(route.key);
   };
-  return <TabBar active={isTabName(current) ? current : 'map'} onSelect={select} />;
+  const requests = useFollowRequestsCount();
+  return (
+    <TabBar
+      active={isTabName(current) ? current : 'map'}
+      onSelect={select}
+      badges={{ friends: requests.data ?? 0 }}
+    />
+  );
 }
 
 export default function TabsLayout() {

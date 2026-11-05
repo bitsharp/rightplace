@@ -29,6 +29,38 @@ describe('TabBar', () => {
   });
 });
 
+describe('TabBar: pallino con il numero di richieste', () => {
+  it('mostra il numero sulla voce Amici con la descrizione per i lettori di schermo', async () => {
+    await render(<TabBar active="map" onSelect={jest.fn()} badges={{ friends: 3 }} />);
+    const badge = screen.getByLabelText('common:tabBadge({"count":3})');
+    expect(badge).toBeOnTheScreen();
+    expect(screen.getByText('3')).toBeOnTheScreen();
+  });
+
+  it('non mostra nulla senza richieste', async () => {
+    await render(<TabBar active="map" onSelect={jest.fn()} badges={{ friends: 0 }} />);
+    expect(screen.queryByTestId('tab-badge-friends')).not.toBeOnTheScreen();
+  });
+
+  it('senza la proprietà badges la barra resta identica', async () => {
+    await render(<TabBar active="map" onSelect={jest.fn()} />);
+    TAB_NAMES.forEach((name) => expect(screen.queryByTestId(`tab-badge-${name}`)).toBeNull());
+  });
+
+  it('oltre 9 richieste mostra 9+', async () => {
+    await render(<TabBar active="map" onSelect={jest.fn()} badges={{ friends: 14 }} />);
+    expect(screen.getByText('9+')).toBeOnTheScreen();
+    expect(screen.getByLabelText('common:tabBadge({"count":14})')).toBeOnTheScreen();
+  });
+
+  it('il pallino usa il viola del design system', async () => {
+    await render(<TabBar active="map" onSelect={jest.fn()} badges={{ friends: 2 }} />);
+    expect(screen.getByTestId('tab-badge-friends')).toHaveStyle({
+      backgroundColor: colors.primary,
+    });
+  });
+});
+
 describe('isTabName', () => {
   it('riconosce solo le 5 voci della tab bar', () => {
     const { isTabName } = jest.requireActual<typeof import('./TabBar')>('./TabBar');

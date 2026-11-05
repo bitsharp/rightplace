@@ -46,12 +46,17 @@
     "years": "{{age}} anni"
   },
   "follow": {
-    "follow": "Segui",
-    "requested": "Richiesto",
+    "request": "Richiedi",
+    "requested": "Richiesta inviata",
     "following": "Seguito",
-    "a11yFollow": "Chiedi di seguire {{handle}}",
+    "followsYou": "Ti segue",
+    "a11yRequest": "Chiedi di seguire {{handle}}",
     "a11yCancel": "Annulla la richiesta a {{handle}}",
-    "a11yUnfollow": "Smetti di seguire {{handle}}"
+    "a11yUnfollow": "Smetti di seguire {{handle}}",
+    "unfollowTitle": "Smettere di seguire {{handle}}?",
+    "unfollowBody": "Non vedrai più dove va e cosa posta. Per seguirlo di nuovo dovrai rifare la richiesta.",
+    "unfollowConfirm": "Smetti di seguire",
+    "cancel": "Annulla"
   },
   "chat": {
     "followersOnly": "Vista solo dai tuoi follower"

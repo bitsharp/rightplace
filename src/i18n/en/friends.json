@@ -1,3 +1,53 @@
 {
-  "title": "Friends"
+  "title": "Friends",
+  "searchLabel": "Search a user by tag",
+  "searchPlaceholder": "Search by tag, for example fox",
+  "hint": "Whoever accepts your request shows you where they go and what they post.",
+  "followingCount_one": "You follow {{count}} person",
+  "followingCount_other": "You follow {{count}} people",
+  "noResults": "No user with this tag.",
+  "loadError": "We can't load users right now. Please try again shortly.",
+  "tonight": "Tonight: {{venue}}",
+  "meta": "{{age}} · {{gender}}",
+  "gender": {
+    "female": "Woman",
+    "male": "Man",
+    "other": "Other"
+  },
+  "requests": {
+    "title": "Requests",
+    "accept": "Accept",
+    "decline": "Decline",
+    "a11yAccept": "Accept the request from {{handle}}",
+    "a11yDecline": "Decline the request from {{handle}}"
+  },
+  "following": {
+    "title": "Following",
+    "empty": "You don't follow anyone yet. Search a friend by tag and ask to follow them."
+  },
+  "contacts": {
+    "title": "Suggested from contacts",
+    "cta": "Find friends from contacts",
+    "body": "From your address book we only use an encrypted code of each number: numbers and names stay on your phone.",
+    "fromBook": "From your address book",
+    "empty": "No friends found among your contacts.",
+    "denied": "Permission denied: you can allow contacts in your phone settings.",
+    "optOut": "Turn on contacts in your profile to find friends."
+  },
+  "person": {
+    "menuTitle": "Actions for {{handle}}",
+    "block": "Block",
+    "report": "Report",
+    "cancel": "Cancel",
+    "blockTitle": "Block {{handle}}?",
+    "blockBody": "You will no longer see each other: you stop following each other and disappear from each other's search. You can unblock from your profile.",
+    "blockConfirm": "Block",
+    "reported": "Report sent. Thank you.",
+    "blocked": "User blocked."
+  },
+  "publicProfile": {
+    "title": "Profile",
+    "notFound": "No user with this tag.",
+    "back": "Back"
+  }
 }

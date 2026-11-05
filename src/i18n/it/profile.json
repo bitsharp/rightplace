@@ -70,5 +70,32 @@
     "continue": "Continua",
     "confirm": "Elimina definitivamente",
     "cancel": "Annulla"
+  },
+  "followers": {
+    "title": "I tuoi follower",
+    "empty": "Nessuno ti segue ancora. Condividi il tuo @tag con gli amici.",
+    "remove": "Rimuovi",
+    "a11yRemove": "Rimuovi {{handle}} dai tuoi follower"
+  },
+  "blocked": {
+    "title": "Bloccati",
+    "empty": "Non hai bloccato nessuno.",
+    "unblock": "Sblocca",
+    "a11yUnblock": "Sblocca {{handle}}"
+  },
+  "share": {
+    "cta": "Condividi il mio @tag",
+    "message": "Seguimi su RightPlace: {{handle}}\n{{web}}\n{{app}}"
+  },
+  "findMe": {
+    "title": "Farti trovare",
+    "body": "Il tuo numero resta sul telefono: inviamo solo un codice cifrato, così gli amici che ti hanno in rubrica possono trovarti.",
+    "label": "Il tuo numero",
+    "placeholder": "Es. 345 123 4567",
+    "save": "Salva",
+    "saved": "Fatto: ora gli amici con il tuo numero in rubrica possono trovarti.",
+    "invalid": "Numero non valido.",
+    "clear": "Non farmi più trovare",
+    "cleared": "Non ti troveranno più dal numero."
   }
 }

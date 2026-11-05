@@ -41,7 +41,7 @@ describe('tab bar e route', () => {
       expect(await screen.findByText(`common:tabs.${tab}`)).toBeOnTheScreen();
     }
     await fireEvent.press(screen.getByText('common:tabs.friends'));
-    expect(await screen.findByRole('header', { name: 'friends:title' })).toBeOnTheScreen();
+    expect(await screen.findByLabelText('friends:searchLabel')).toBeOnTheScreen();
   });
 
   it.each([

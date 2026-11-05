@@ -14,5 +14,7 @@
     "loading": "Caricamento",
     "error": "Non riusciamo a caricare il tuo profilo. Controlla la connessione.",
     "retry": "Riprova"
-  }
+  },
+  "tabBadge_one": "{{count}} richiesta",
+  "tabBadge_other": "{{count}} richieste"
 }

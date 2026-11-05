@@ -58,6 +58,7 @@ const READY_SCREENS = [
   { name: 'handle' },
   { name: '(tabs)' },
   { name: 'search' },
+  { name: 'u/[handle]' },
   { name: 'venue/[id]' },
   { name: 'event/[id]' },
   { name: 'night/[id]/chat' },

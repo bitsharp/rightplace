@@ -1108,6 +1108,14 @@ export type Database = {
           slug: string;
         }[];
       };
+      get_blocked_users: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          blocked_at: string;
+          handle: string;
+          user_id: string;
+        }[];
+      };
       get_city_map: {
         Args: { p_city_slug: string; p_view?: string };
         Returns: {
@@ -1170,6 +1178,32 @@ export type Database = {
           handle: string;
           is_creator: boolean;
           requested_at: string;
+          user_id: string;
+        }[];
+      };
+      get_followers: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          age_band: string;
+          followed_at: string;
+          gender: string;
+          handle: string;
+          i_follow: boolean;
+          is_creator: boolean;
+          user_id: string;
+        }[];
+      };
+      get_following: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          age_band: string;
+          followed_at: string;
+          follows_me: boolean;
+          gender: string;
+          handle: string;
+          is_creator: boolean;
+          tonight_venue_id: string;
+          tonight_venue_name: string;
           user_id: string;
         }[];
       };

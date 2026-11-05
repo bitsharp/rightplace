@@ -46,12 +46,17 @@
     "years": "{{age}} years"
   },
   "follow": {
-    "follow": "Follow",
-    "requested": "Requested",
+    "request": "Request",
+    "requested": "Request sent",
     "following": "Following",
-    "a11yFollow": "Ask to follow {{handle}}",
+    "followsYou": "Follows you",
+    "a11yRequest": "Ask to follow {{handle}}",
     "a11yCancel": "Cancel your request to {{handle}}",
-    "a11yUnfollow": "Unfollow {{handle}}"
+    "a11yUnfollow": "Unfollow {{handle}}",
+    "unfollowTitle": "Unfollow {{handle}}?",
+    "unfollowBody": "You will no longer see where they go or what they post. To follow again you will need to send a new request.",
+    "unfollowConfirm": "Unfollow",
+    "cancel": "Cancel"
   },
   "chat": {
     "followersOnly": "Only your followers see this"

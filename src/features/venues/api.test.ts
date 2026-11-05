@@ -44,8 +44,22 @@ describe('venues api', () => {
       error: null,
     });
     await expect(fetchActiveCities()).resolves.toEqual([
-      { slug: 'las-palmas', name: 'Las Palmas', lat: 28.1235, lng: -15.4134, defaultZoom: 13 },
-      { slug: 'milano', name: 'Milano', lat: 45.4642, lng: 9.19, defaultZoom: 12 },
+      {
+        slug: 'las-palmas',
+        name: 'Las Palmas',
+        country: 'ES',
+        lat: 28.1235,
+        lng: -15.4134,
+        defaultZoom: 13,
+      },
+      {
+        slug: 'milano',
+        name: 'Milano',
+        country: 'IT',
+        lat: 45.4642,
+        lng: 9.19,
+        defaultZoom: 12,
+      },
     ]);
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_active_cities', undefined);
   });
