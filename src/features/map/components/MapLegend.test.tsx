@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 import { MapLegend } from './MapLegend';
 
@@ -28,5 +29,13 @@ describe('MapLegend', () => {
   it('non attribuisce lo strato grigio a Google', async () => {
     await render(<MapLegend />);
     expect(screen.queryByText(/google/i)).not.toBeOnTheScreen();
+  });
+
+  it('manda a capo gli elementi invece di sbordare a destra', async () => {
+    await render(<MapLegend />);
+    for (const row of screen.getAllByTestId('legend-items')) {
+      expect(StyleSheet.flatten(row.props.style).flexWrap).toBe('wrap');
+    }
+    expect(screen.getAllByTestId('legend-items')).toHaveLength(2);
   });
 });

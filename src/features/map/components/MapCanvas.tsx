@@ -10,7 +10,7 @@ import type { LatLng } from '@/features/profile/domain/coarsen';
 
 import { isVisibleTypical } from '../domain/typical';
 import type { MapLayers, MapVenue } from '../domain/mapLayers';
-import { cityRegion, type CityCenter } from '../domain/region';
+import { cityRegion, type CityCenter, type MapRegion } from '../domain/region';
 import { mapAppearance } from '../mapStyle';
 import type { MapViewMode } from '../store/mapStore';
 
@@ -22,6 +22,9 @@ type Props = {
   view: MapViewMode;
   // Already coarsened to ~500 m (principle 3); null when the location toggle is off.
   you: LatLng | null;
+  // Overrides the city centre, e.g. to keep the framing when switching to full screen.
+  initialRegion?: MapRegion;
+  onRegionChange?: (region: MapRegion) => void;
   onOpenVenue: (venueId: string) => void;
 };
 
@@ -126,13 +129,22 @@ function HotSpotMarkers({
   ));
 }
 
-export function MapCanvas({ city, layers, view, you, onOpenVenue }: Props) {
+export function MapCanvas({
+  city,
+  layers,
+  view,
+  you,
+  initialRegion,
+  onRegionChange,
+  onOpenVenue,
+}: Props) {
   const { t } = useTranslation('map');
   return (
     <MapView
       style={styles.map}
       accessibilityLabel={t('mapA11y', { city: city.name })}
-      initialRegion={cityRegion(city)}
+      initialRegion={initialRegion ?? cityRegion(city)}
+      onRegionChangeComplete={onRegionChange}
       showsUserLocation={false}
       showsPointsOfInterests={false}
       showsTraffic={false}

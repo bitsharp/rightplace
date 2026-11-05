@@ -28,5 +28,9 @@
   },
   "friendsEmpty": "None of your friends has declared tonight yet.",
   "loadError": "We can't load the map. Try again in a moment.",
-  "mapA11y": "Map of venues in {{city}}"
+  "mapA11y": "Map of venues in {{city}}",
+  "fullscreen": {
+    "open": "Open the map full screen",
+    "close": "Close the map"
+  }
 }

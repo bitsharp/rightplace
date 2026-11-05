@@ -177,4 +177,32 @@ describe('MapCanvas', () => {
       expect(tracks('hot-hot')).toBe(false);
     });
   });
+
+  describe('regione', () => {
+    const region = { latitude: 45.5, longitude: 9.2, latitudeDelta: 0.01, longitudeDelta: 0.02 };
+
+    it('parte dalla regione ricevuta, se c’è, invece che dal centro città', async () => {
+      await render(
+        <MapCanvas
+          {...baseProps}
+          initialRegion={region}
+          layers={{ hotSpots: [], typicalDots: [] }}
+        />,
+      );
+      expect(screen.getByTestId('map-view').props.initialRegion).toEqual(region);
+    });
+
+    it('comunica la regione quando l’utente finisce di spostare la mappa', async () => {
+      const onRegionChange = jest.fn();
+      await render(
+        <MapCanvas
+          {...baseProps}
+          onRegionChange={onRegionChange}
+          layers={{ hotSpots: [], typicalDots: [] }}
+        />,
+      );
+      await fireEvent(screen.getByTestId('map-view'), 'regionChangeComplete', region);
+      expect(onRegionChange).toHaveBeenCalledWith(region);
+    });
+  });
 });

@@ -1,42 +1,77 @@
-import { StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-import { colors, spacing } from '@/theme/tokens';
+import { Icon } from '@/components/ui/Icon';
+import { colors, heights, radius, spacing } from '@/theme/tokens';
 
 import type { MapLayers } from '../domain/mapLayers';
+import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
 
 import { MapCanvas, type MapCity } from './MapCanvas';
-import { MapHint } from './MapHint';
-import { MapLegend } from './MapLegend';
+import { MapFullScreen } from './MapFullScreen';
 
 type Props = {
   city: MapCity | null;
   layers: MapLayers;
   view: MapViewMode;
   you: { lat: number; lng: number } | null;
+  onChangeView: (view: MapViewMode) => void;
   onOpenVenue: (venueId: string) => void;
 };
 
-// The map with its two overlays: hint on top, legend at the bottom (Mappa.dc.html).
-export function MapStage({ city, layers, view, you, onOpenVenue }: Props) {
+function ExpandButton({ onPress }: { onPress: () => void }) {
+  const { t } = useTranslation('map');
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('fullscreen.open')}
+      onPress={onPress}
+      style={styles.expand}
+    >
+      <Icon name="expand" />
+    </Pressable>
+  );
+}
+
+// Compact map: markers only and one icon button. Hint and legend live in full screen.
+export function MapStage({ city, layers, view, you, onChangeView, onOpenVenue }: Props) {
+  const [fullScreen, setFullScreen] = useState(false);
+  // Local framing only (never persisted), shared by both maps: whichever moved last wins.
+  const [region, setRegion] = useState<MapRegion | undefined>(undefined);
   return (
     <View testID="map-box" style={styles.box}>
       {city ? (
-        <MapCanvas
-          key={city.slug}
-          city={city}
-          layers={layers}
-          view={view}
-          you={you}
-          onOpenVenue={onOpenVenue}
-        />
+        <>
+          {/* Never two MapViews at once: the compact one is unmounted while full screen is open. */}
+          {fullScreen ? null : (
+            <MapCanvas
+              key={city.slug}
+              city={city}
+              layers={layers}
+              view={view}
+              you={you}
+              initialRegion={region}
+              onRegionChange={setRegion}
+              onOpenVenue={onOpenVenue}
+            />
+          )}
+          <MapFullScreen
+            visible={fullScreen}
+            city={city}
+            layers={layers}
+            view={view}
+            you={you}
+            initialRegion={region}
+            onChangeView={onChangeView}
+            onRegionChange={setRegion}
+            onClose={() => setFullScreen(false)}
+            onOpenVenue={onOpenVenue}
+          />
+          <ExpandButton onPress={() => setFullScreen(true)} />
+        </>
       ) : null}
-      <View pointerEvents="none" style={styles.hint}>
-        <MapHint view={view} />
-      </View>
-      <View pointerEvents="none" style={styles.legend}>
-        <MapLegend />
-      </View>
     </View>
   );
 }
@@ -51,6 +86,17 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     overflow: 'hidden',
   },
-  hint: { position: 'absolute', left: spacing.md + 2, top: spacing.md },
-  legend: { position: 'absolute', left: spacing.md + 2, bottom: spacing.md + 2 },
+  expand: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    width: heights.minTapTarget,
+    height: heights.minTapTarget,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.overlay,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

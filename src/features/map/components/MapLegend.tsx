@@ -19,35 +19,45 @@ const USUALLY_LEVELS: { level: VisibleTypicalLevel; size: number }[] = [
   { level: 3, size: 13 },
 ];
 
+const TITLE_WIDTH = 64;
+
 // Two rows on purpose: the coloured "stasera" layer and the grey "di solito" layer never mix.
 export function MapLegend() {
   const { t } = useTranslation('map');
   return (
     <View style={styles.box}>
       <View style={styles.row}>
-        <MonoLabel>{t('legend.tonight')}</MonoLabel>
-        {TONIGHT.map(({ labelKey, color }) => (
-          <View key={labelKey} style={styles.item}>
-            <View style={[styles.dot, { backgroundColor: colors[color] }]} />
-            <Text variant="label11" color="textSecondary">
-              {t(`ui:${labelKey}`)}
-            </Text>
-          </View>
-        ))}
+        <View style={styles.title}>
+          <MonoLabel>{t('legend.tonight')}</MonoLabel>
+        </View>
+        <View testID="legend-items" style={styles.items}>
+          {TONIGHT.map(({ labelKey, color }) => (
+            <View key={labelKey} style={styles.item}>
+              <View style={[styles.dot, { backgroundColor: colors[color] }]} />
+              <Text variant="label11" color="textSecondary">
+                {t(`ui:${labelKey}`)}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
       <View style={styles.row}>
-        <MonoLabel>{t('legend.usually')}</MonoLabel>
-        {USUALLY_LEVELS.map(({ level, size }) => (
-          <View key={level} style={styles.item}>
-            <View
-              testID="legend-typical-dot"
-              style={[styles.dot, styles.typical, { width: size, height: size }]}
-            />
-            <Text variant="label11" color="textSecondary">
-              {t(`ui:typical.${typicalLabelKey(level)}`)}
-            </Text>
-          </View>
-        ))}
+        <View style={styles.title}>
+          <MonoLabel>{t('legend.usually')}</MonoLabel>
+        </View>
+        <View testID="legend-items" style={styles.items}>
+          {USUALLY_LEVELS.map(({ level, size }) => (
+            <View key={level} style={styles.item}>
+              <View
+                testID="legend-typical-dot"
+                style={[styles.dot, styles.typical, { width: size, height: size }]}
+              />
+              <Text variant="label11" color="textSecondary">
+                {t(`ui:typical.${typicalLabelKey(level)}`)}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -55,6 +65,8 @@ export function MapLegend() {
 
 const styles = StyleSheet.create({
   box: {
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
     gap: spacing.xs,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
@@ -63,7 +75,15 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.overlay,
   },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  row: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
+  title: { width: TITLE_WIDTH, paddingTop: 1 },
+  items: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: spacing.md,
+    rowGap: spacing.xs,
+  },
   item: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2 },
   dot: { width: 10, height: 10, borderRadius: 999 },
   typical: { backgroundColor: colors.typicalDot },

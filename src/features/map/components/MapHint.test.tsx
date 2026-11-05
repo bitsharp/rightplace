@@ -12,4 +12,9 @@ describe('MapHint', () => {
     await render(<MapHint view="friends" />);
     expect(screen.getByText('map:hint.friends')).toBeOnTheScreen();
   });
+
+  it('va a capo su due righe invece di uscire dallo schermo', async () => {
+    await render(<MapHint view="general" />);
+    expect(screen.getByText('map:hint.general').props.numberOfLines).toBe(2);
+  });
 });

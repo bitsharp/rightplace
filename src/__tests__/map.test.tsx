@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as Location from 'expo-location';
+import { Platform } from 'react-native';
 
 import { useMapStore } from '@/features/map/store/mapStore';
 import { useCoarsePositionStore } from '@/features/profile/location';
@@ -95,6 +96,8 @@ const typicalDot = (venue: string, level: string) =>
   `ui:typical.a11y({"venue":"${venue}","level":"ui:typical.${level}"})`;
 
 describe('mappa', () => {
+  afterEach(() => jest.restoreAllMocks());
+
   beforeEach(() => {
     useCoarsePositionStore.setState({ cell: null });
     jest
@@ -132,11 +135,36 @@ describe('mappa', () => {
       );
     });
 
-    it('legenda con i due strati e hint della mappa generale', async () => {
+    it('nella vista compatta non ci sono scritte sovrapposte alla mappa', async () => {
       await renderApp('ready', '/map');
-      expect(await screen.findByText('map:legend.tonight')).toBeOnTheScreen();
-      expect(screen.getByText('map:legend.usually')).toBeOnTheScreen();
+      await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') });
+      expect(screen.queryByText('map:hint.general')).toBeNull();
+      expect(screen.queryByText('map:legend.tonight')).toBeNull();
+    });
+
+    it('a schermo intero compaiono hint e legenda con i due strati, e si richiude', async () => {
+      await renderApp('ready', '/map');
+      await fireEvent.press(await screen.findByRole('button', { name: 'map:fullscreen.open' }));
       expect(screen.getByText('map:hint.general')).toBeOnTheScreen();
+      expect(screen.getByText('map:legend.tonight')).toBeOnTheScreen();
+      expect(screen.getByText('map:legend.usually')).toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'map:fullscreen.close' }));
+      expect(screen.queryByText('map:hint.general')).toBeNull();
+    });
+
+    it('a schermo intero il selettore cambia la vista (stesso store) e un tap sul marker apre il locale', async () => {
+      // Android: no onDismiss, the venue opens right after the map closes.
+      jest.replaceProperty(Platform, 'OS', 'android');
+      await renderApp('ready', '/map');
+      await fireEvent.press(await screen.findByRole('button', { name: 'map:fullscreen.open' }));
+      await fireEvent.press(screen.getAllByRole('button', { name: 'map:view.friends' })[1]!);
+      expect(useMapStore.getState().view).toBe('friends');
+      expect(await screen.findByText('map:hint.friends')).toBeOnTheScreen();
+      await fireEvent.press(
+        (await screen.findAllByTestId('marker-hot-terrace', { includeHiddenElements: true }))[0]!,
+      );
+      expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
+      expect(screen.queryByText('map:hint.friends')).toBeNull();
     });
   });
 
@@ -149,7 +177,6 @@ describe('mappa', () => {
 
     it('mostra solo i locali con amici, con il numero di amici sul punto caldo', async () => {
       await openFriendsView();
-      expect(await screen.findByText('map:hint.friends')).toBeOnTheScreen();
       expect(
         await screen.findByRole('button', { name: hotSpot('Terrazza', 'ui:band.few') }),
       ).toBeOnTheScreen();
@@ -171,7 +198,7 @@ describe('mappa', () => {
 
     it('i typical dot restano, ma non c’è più il punto caldo generale degli altri locali', async () => {
       await openFriendsView();
-      await screen.findByText('map:hint.friends');
+      await screen.findByRole('button', { name: hotSpot('Terrazza', 'ui:band.few') });
       expect(
         screen.getByRole('button', { name: typicalDot('Bar Quieto', 'lively') }),
       ).toBeOnTheScreen();

@@ -28,5 +28,9 @@
   },
   "friendsEmpty": "Nessuno dei tuoi amici ha ancora dichiarato la serata.",
   "loadError": "Non riusciamo a caricare la mappa. Riprova tra poco.",
-  "mapA11y": "Mappa dei locali di {{city}}"
+  "mapA11y": "Mappa dei locali di {{city}}",
+  "fullscreen": {
+    "open": "Apri la mappa a schermo intero",
+    "close": "Chiudi la mappa"
+  }
 }

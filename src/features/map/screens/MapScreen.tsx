@@ -31,6 +31,7 @@ export function MapScreen() {
         layers={map.layers}
         view={map.view}
         you={map.you}
+        onChangeView={map.setView}
         onOpenVenue={map.openVenue}
       />
       <MapBottomPanel
