@@ -4,9 +4,9 @@ import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/Icon';
+import { afterModalDismiss } from '@/lib/afterModalDismiss';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
 
-import { createDeferredOpen } from '../domain/deferredOpen';
 import type { MapLayers } from '../domain/mapLayers';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
@@ -88,7 +88,10 @@ function FullScreenContent(props: ContentProps) {
 // The only place where hint and legend are drawn over the map.
 export function MapFullScreen({ visible, onOpenVenue, ...content }: Props) {
   const { onClose } = content;
-  const deferred = useMemo(() => createDeferredOpen(Platform.OS, onOpenVenue), [onOpenVenue]);
+  const deferred = useMemo(
+    () => afterModalDismiss<string>(Platform.OS, onOpenVenue),
+    [onOpenVenue],
+  );
   const openAfterClose = (venueId: string) => {
     onClose();
     deferred.request(venueId);

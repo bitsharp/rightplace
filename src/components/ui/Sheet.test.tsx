@@ -23,6 +23,13 @@ describe('Sheet', () => {
     expect(screen.getByTestId('sheet-handle')).toBeOnTheScreen();
   });
 
+  it('inoltra onDismiss al Modal, per aprire cose native solo a foglio sparito', async () => {
+    const onDismiss = jest.fn();
+    await render(<Sheet visible onClose={jest.fn()} onDismiss={onDismiss} />);
+    await fireEvent(screen.getByTestId('sheet-panel', { includeHiddenElements: true }), 'dismiss');
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
   it('si chiude toccando lo sfondo', async () => {
     const onClose = jest.fn();
     await render(<Sheet visible onClose={onClose} />);

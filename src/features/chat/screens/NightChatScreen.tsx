@@ -66,6 +66,7 @@ function ChatOverlays({ screen }: { screen: ReturnType<typeof useNightChatScreen
         visible={screen.photoFlow.sheetOpen}
         onPick={(source) => void screen.photoFlow.choose(source)}
         onClose={screen.photoFlow.closeSheet}
+        onDismiss={screen.photoFlow.onSheetDismiss}
       />
       <MessageActionsSheet
         message={screen.selected}

@@ -12,12 +12,13 @@ type Props = {
   visible: boolean;
   onPick: (source: PhotoSource) => void;
   onClose: () => void;
+  onDismiss?: () => void;
 };
 
-export function PhotoSourceSheet({ visible, onPick, onClose }: Props) {
+export function PhotoSourceSheet({ visible, onPick, onClose, onDismiss }: Props) {
   const { t } = useTranslation('chat');
   return (
-    <Sheet visible={visible} onClose={onClose}>
+    <Sheet visible={visible} onClose={onClose} onDismiss={onDismiss}>
       <View style={styles.body}>
         <Text variant="display17">{t('photoSource.title')}</Text>
         <Button label={t('photoSource.camera')} variant="ghost" onPress={() => onPick('camera')} />

@@ -21,4 +21,13 @@ describe('PhotoSourceSheet', () => {
     expect(onClose).toHaveBeenCalled();
     expect(onPick).not.toHaveBeenCalled();
   });
+
+  it('passa onDismiss al foglio, che lo inoltra al Modal', async () => {
+    const onDismiss = jest.fn();
+    await render(
+      <PhotoSourceSheet visible onPick={jest.fn()} onClose={jest.fn()} onDismiss={onDismiss} />,
+    );
+    await fireEvent(screen.getByTestId('sheet-panel', { includeHiddenElements: true }), 'dismiss');
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
 });

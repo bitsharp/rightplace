@@ -10,6 +10,8 @@ import { shouldDismissSheet } from './sheetGesture';
 type Props = {
   visible: boolean;
   onClose: () => void;
+  // Fires when the Modal is fully gone (iOS only): the moment it is safe to present something native.
+  onDismiss?: () => void;
   children?: ReactNode;
 };
 
@@ -32,7 +34,7 @@ function useDragToDismiss(onClose: () => void) {
   return { translateY, responder, setHeight };
 }
 
-export function Sheet({ visible, onClose, children }: Props) {
+export function Sheet({ visible, onClose, onDismiss, children }: Props) {
   const insets = useSafeAreaInsets();
   const { translateY, responder, setHeight } = useDragToDismiss(onClose);
 
@@ -46,6 +48,7 @@ export function Sheet({ visible, onClose, children }: Props) {
       transparent
       animationType="slide"
       onRequestClose={onClose}
+      onDismiss={onDismiss}
       statusBarTranslucent
     >
       <View style={styles.root}>

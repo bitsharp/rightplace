@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as Crypto from 'expo-crypto';
 import * as ImagePicker from 'expo-image-picker';
+import { Platform } from 'react-native';
 
 import { seedChatBackend, type FakeMessage } from '@/test/chatBackend';
 import { renderApp } from '@/test/appFlows';
@@ -64,6 +65,8 @@ describe('tab Chat', () => {
 });
 
 describe('chat di serata', () => {
+  afterEach(() => jest.restoreAllMocks());
+
   const open = () => renderApp('ready', '/night/r1/chat');
 
   it('mostra me e chi seguo, mai chi non seguo, anche se il server lo mandasse', async () => {
@@ -129,6 +132,8 @@ describe('chat di serata', () => {
   });
 
   it('scatto una foto: viene ripulita, caricata nel mio prefisso e inviata come messaggio', async () => {
+    // Android opens the picker right away; the iOS wait for onDismiss is covered in usePhotoFlow.test.
+    jest.replaceProperty(Platform, 'OS', 'android');
     jest
       .mocked(ImagePicker.requestCameraPermissionsAsync)
       .mockResolvedValue({ granted: true } as never);
@@ -157,6 +162,8 @@ describe('chat di serata', () => {
   });
 
   it('permesso della fotocamera negato: lo dice e non invia nulla', async () => {
+    // Android opens the picker right away; the iOS wait for onDismiss is covered in usePhotoFlow.test.
+    jest.replaceProperty(Platform, 'OS', 'android');
     jest
       .mocked(ImagePicker.requestCameraPermissionsAsync)
       .mockResolvedValue({ granted: false } as never);
