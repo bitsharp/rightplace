@@ -1216,6 +1216,24 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_venue_detail: {
+        Args: { p_venue_id: string };
+        Returns: {
+          address: string;
+          city_name: string;
+          city_slug: string;
+          country: string;
+          google_place_id: string;
+          kind: string;
+          lat: number;
+          lng: number;
+          name: string;
+          opening_hours: Json;
+          taxi_number: string;
+          timezone: string;
+          venue_id: string;
+        }[];
+      };
       get_venue_stats: {
         Args: { p_segment?: string; p_venue_id: string };
         Returns: {

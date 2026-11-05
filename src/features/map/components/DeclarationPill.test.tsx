@@ -5,6 +5,7 @@ import { DeclarationPill } from './DeclarationPill';
 const declaration = {
   venueId: 'v1',
   venueName: 'Arena Club',
+  eventId: null,
   intent: 'going' as const,
   expiresAt: '2026-11-05T05:00:00Z',
 };

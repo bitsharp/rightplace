@@ -1,4 +1,103 @@
 {
-  "title": "Venue",
-  "eventTitle": "Event"
+  "title": "Venue details",
+  "eventTitle": "Event",
+  "back": "Back",
+  "loadError": "We can't load this venue. Try again shortly.",
+  "typeLine": "{{kind}} · Open until {{time}}",
+  "gender": {
+    "female": "Woman",
+    "male": "Man",
+    "other": "Other"
+  },
+  "who": {
+    "title": "Who's going",
+    "label": "Only people who declared",
+    "basis": "Based on people who declared this night in RightPlace. Never fewer than 3 people.",
+    "segment": {
+      "going": "Going",
+      "maybe": "Maybe",
+      "all": "All"
+    },
+    "hidden": {
+      "going": "Fewer than 3 people answered \"Going\": the data stays hidden to protect anonymity.",
+      "maybe": "Fewer than 3 people answered \"Maybe\": the data stays hidden to protect anonymity.",
+      "all": "Fewer than 3 people declared this night, or one group is too small: the data stays hidden to protect anonymity."
+    }
+  },
+  "friends": {
+    "title": "Friends going",
+    "empty": "None of the friends you follow has declared this night yet.",
+    "meta": "{{age}} · {{gender}}"
+  },
+  "transport": {
+    "title": "Getting there and back",
+    "there": "Going there",
+    "back": "Coming back",
+    "note": "Links open the real apps and services.",
+    "badge": {
+      "taxi": "TAXI",
+      "uber": "UBER",
+      "freenow": "FREE NOW",
+      "cabify": "CABIFY",
+      "transit": "MAPS"
+    },
+    "name": {
+      "taxi": "{{city}} taxi",
+      "uber": "Uber",
+      "freenow": "Free Now",
+      "cabify": "Cabify",
+      "transit": "Public transport"
+    },
+    "detail": {
+      "uber": {
+        "there": "Start from your location",
+        "back": "Start from {{venue}}"
+      },
+      "freenow": {
+        "there": "Taxi with the app, to {{venue}}",
+        "back": "Taxi with the app, from {{venue}}"
+      },
+      "cabify": {
+        "there": "Ride with a driver, to {{venue}}",
+        "back": "Ride with a driver, from {{venue}}"
+      },
+      "transit": {
+        "there": "Public transport route to {{venue}}",
+        "back": "Public transport route from {{venue}}"
+      }
+    },
+    "action": {
+      "call": "CALL",
+      "open": "OPEN"
+    }
+  },
+  "cta": "Declare your night",
+  "declare": {
+    "label": "Your night",
+    "heading": "Declare your night",
+    "going": "Going",
+    "maybe": "Maybe",
+    "goingHere": "Going here",
+    "maybeHere": "Maybe here",
+    "replaces": "You already declared tonight at {{venue}}. Choosing here replaces it.",
+    "expiresGeneric": "Your declaration expires at the end of the event or when the venue closes.",
+    "expiresAt": "Your declaration expires at {{time}}, at the end of the event or when the venue closes.",
+    "declared": "Night declared: {{intent}}",
+    "edit": "Edit",
+    "editA11y": "Edit: change to {{intent}}",
+    "cancel": "Cancel",
+    "cancelConfirm": "Cancel your declaration?",
+    "remove": "Remove my icon from this place",
+    "removeConfirm": "Remove your icon from this place?",
+    "confirmYes": "Yes, confirm",
+    "confirmNo": "Keep it"
+  },
+  "ai": {
+    "title": "Ask the AI",
+    "label": "Info about the night",
+    "music": "What music do they play?",
+    "dress": "Is there a dress code?",
+    "arrive": "What time is best to arrive?",
+    "soon": "Coming soon: you'll be able to ask the AI."
+  }
 }

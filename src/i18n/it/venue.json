@@ -1,4 +1,103 @@
 {
-  "title": "Locale",
-  "eventTitle": "Serata"
+  "title": "Dettaglio locale",
+  "eventTitle": "Serata",
+  "back": "Indietro",
+  "loadError": "Non riusciamo a caricare il locale. Riprova tra poco.",
+  "typeLine": "{{kind}} · Aperto fino alle {{time}}",
+  "gender": {
+    "female": "Donna",
+    "male": "Uomo",
+    "other": "Altro"
+  },
+  "who": {
+    "title": "Chi ci va",
+    "label": "Solo chi ha dichiarato",
+    "basis": "Calcolato su chi ha dichiarato la serata in RightPlace. Mai sotto le 3 persone.",
+    "segment": {
+      "going": "Ci vado",
+      "maybe": "Forse",
+      "all": "Tutti"
+    },
+    "hidden": {
+      "going": "Meno di 3 persone hanno risposto \"Ci vado\": i dati restano nascosti per tutelare l'anonimato.",
+      "maybe": "Meno di 3 persone hanno risposto \"Forse\": i dati restano nascosti per tutelare l'anonimato.",
+      "all": "Meno di 3 persone hanno dichiarato la serata, o un gruppo è troppo piccolo: i dati restano nascosti per tutelare l'anonimato."
+    }
+  },
+  "friends": {
+    "title": "Amici che ci vanno",
+    "empty": "Nessuno degli amici che segui ha ancora dichiarato questa serata.",
+    "meta": "{{age}} · {{gender}}"
+  },
+  "transport": {
+    "title": "Andare e tornare",
+    "there": "Per andare",
+    "back": "Per tornare",
+    "note": "I link aprono le app e i servizi reali.",
+    "badge": {
+      "taxi": "TAXI",
+      "uber": "UBER",
+      "freenow": "FREE NOW",
+      "cabify": "CABIFY",
+      "transit": "MAPPE"
+    },
+    "name": {
+      "taxi": "Radiotaxi {{city}}",
+      "uber": "Uber",
+      "freenow": "Free Now",
+      "cabify": "Cabify",
+      "transit": "Mezzi pubblici"
+    },
+    "detail": {
+      "uber": {
+        "there": "Parti dalla tua posizione",
+        "back": "Parti da {{venue}}"
+      },
+      "freenow": {
+        "there": "Taxi con l'app, verso {{venue}}",
+        "back": "Taxi con l'app, da {{venue}}"
+      },
+      "cabify": {
+        "there": "Auto con conducente, verso {{venue}}",
+        "back": "Auto con conducente, da {{venue}}"
+      },
+      "transit": {
+        "there": "Percorso con i mezzi fino a {{venue}}",
+        "back": "Percorso con i mezzi da {{venue}}"
+      }
+    },
+    "action": {
+      "call": "CHIAMA",
+      "open": "APRI"
+    }
+  },
+  "cta": "Dichiara la tua serata",
+  "declare": {
+    "label": "La tua serata",
+    "heading": "Dichiara la tua serata",
+    "going": "Ci vado",
+    "maybe": "Forse",
+    "goingHere": "Ci vado qui",
+    "maybeHere": "Forse qui",
+    "replaces": "Hai già dichiarato la serata da {{venue}}. Scegliendo qui, la sostituisci.",
+    "expiresGeneric": "La dichiarazione scade a fine evento o alla chiusura del locale.",
+    "expiresAt": "La dichiarazione scade alle {{time}}, a fine evento o alla chiusura del locale.",
+    "declared": "Serata dichiarata: {{intent}}",
+    "edit": "Modifica",
+    "editA11y": "Modifica: cambia in {{intent}}",
+    "cancel": "Annulla",
+    "cancelConfirm": "Annullare la dichiarazione?",
+    "remove": "Rimuovi la mia icona da questo luogo",
+    "removeConfirm": "Rimuovere la tua icona da questo luogo?",
+    "confirmYes": "Sì, conferma",
+    "confirmNo": "Mantieni"
+  },
+  "ai": {
+    "title": "Chiedi all'AI",
+    "label": "Info sulla serata",
+    "music": "Che musica fanno?",
+    "dress": "C'è un dress code?",
+    "arrive": "A che ora conviene arrivare?",
+    "soon": "In arrivo: presto potrai chiedere all'AI."
+  }
 }

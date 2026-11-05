@@ -49,6 +49,7 @@ export async function fetchCityMap(citySlug: string, view: MapViewMode): Promise
 const declarationRowSchema = z.object({
   venue_id: z.string(),
   venue_name: z.string(),
+  event_id: z.string().nullable(),
   intent: z.enum(['going', 'maybe']),
   expires_at: z.string(),
 });
@@ -56,6 +57,7 @@ const declarationRowSchema = z.object({
 export type MyDeclaration = {
   venueId: string;
   venueName: string;
+  eventId: string | null;
   intent: 'going' | 'maybe';
   expiresAt: string;
 };
@@ -68,6 +70,7 @@ export async function fetchMyDeclaration(): Promise<MyDeclaration | null> {
   return {
     venueId: row.venue_id,
     venueName: row.venue_name,
+    eventId: row.event_id,
     intent: row.intent,
     expiresAt: row.expires_at,
   };

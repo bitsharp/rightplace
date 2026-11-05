@@ -78,10 +78,25 @@ describe('fetchMyDeclaration', () => {
     await expect(fetchMyDeclaration()).resolves.toEqual({
       venueId: 'v1',
       venueName: 'Arena Club',
+      eventId: null,
       intent: 'going',
       expiresAt: '2026-11-05T05:00:00Z',
     });
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_my_declaration', undefined);
+  });
+
+  it('riporta l’evento quando la dichiarazione è per una serata di un creator', async () => {
+    respondWith([
+      {
+        declaration_id: 'd1',
+        venue_id: 'v1',
+        venue_name: 'Arena Club',
+        event_id: 'e1',
+        intent: 'maybe',
+        expires_at: '2026-11-05T05:00:00Z',
+      },
+    ]);
+    await expect(fetchMyDeclaration()).resolves.toMatchObject({ eventId: 'e1', intent: 'maybe' });
   });
 
   it('senza dichiarazione restituisce null', async () => {

@@ -5,7 +5,10 @@ import type { ReactNode } from 'react';
 // timer left pending (it keeps Testing Library's async cleanup from ever finishing).
 export function createQueryWrapper() {
   const client = new QueryClient({
-    defaultOptions: { queries: { retry: false, gcTime: Infinity }, mutations: { retry: false } },
+    defaultOptions: {
+      queries: { retry: false, gcTime: Infinity },
+      mutations: { retry: false, gcTime: Infinity },
+    },
   });
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
