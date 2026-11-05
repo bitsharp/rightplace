@@ -1,4 +1,53 @@
 {
   "title": "Chat",
-  "nightTitle": "Night chat"
+  "nightTitle": "Night chat",
+  "venueTitle": "Night at {{venue}}",
+  "subtitle": "Only friends you follow who are going",
+  "info": "The chat deletes itself 2 days after the night. Photos reach the feed the day after.",
+  "expiresIn_one": "Deletes in {{count}} hour",
+  "expiresIn_other": "Deletes in {{count}} hours",
+  "created": "CHAT CREATED",
+  "photos": "PHOTOS OF THE NIGHT · {{count}} · FOLLOWERS ONLY",
+  "photoThumb": "Photo by {{handle}}",
+  "loadOlder": "Show earlier messages",
+  "loadError": "We can't load the chat. Try again shortly.",
+  "openFromVenue": "Night chat",
+  "list": {
+    "empty": "Declare a night to join its chat",
+    "loadError": "We can't load your chats. Try again shortly.",
+    "friendsInside_one": "{{count}} friend inside",
+    "friendsInside_other": "{{count}} friends inside",
+    "noMessages": "No messages from your friends yet",
+    "photoMessage": "sent a photo",
+    "lastMessage": "{{handle}}: {{text}}"
+  },
+  "composer": {
+    "placeholder": "Write to the friends who are going",
+    "send": "Send",
+    "photo": "Add a photo",
+    "mentionHint": "YOU CAN ONLY TAG PEOPLE YOU FOLLOW",
+    "follow": "Follow",
+    "followA11y": "Follow {{handle}} to be able to tag them",
+    "requested": "Request sent"
+  },
+  "photoSource": {
+    "title": "Add a photo",
+    "camera": "Camera",
+    "library": "Gallery",
+    "cancel": "Cancel",
+    "denied": "Permission denied: you can enable the camera in your phone settings.",
+    "failed": "We couldn't prepare the photo. Try again."
+  },
+  "actions": {
+    "title": "Actions for {{handle}}",
+    "report": "Report message",
+    "block": "Block user",
+    "cancel": "Cancel",
+    "blockTitle": "Block {{handle}}?",
+    "blockBody": "You won't see each other any more: you stop following each other and their messages disappear from this chat.",
+    "blockConfirm": "Block",
+    "reported": "Report sent. Thank you.",
+    "blocked": "User blocked."
+  },
+  "back": "Back"
 }

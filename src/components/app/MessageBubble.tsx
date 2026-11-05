@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
@@ -15,9 +15,22 @@ type Props = {
   author: 'me' | 'other';
   content: Content;
   senderName?: string;
+  // Only for my own messages while they are being sent (optimistic) or when sending failed.
+  status?: 'sending' | 'failed';
+  onRetry?: () => void;
+  // Long press opens the moderation actions (report / block).
+  onLongPress?: () => void;
 };
 
-export function MessageBubble({ author, content, senderName }: Props) {
+export function MessageBubble({
+  author,
+  content,
+  senderName,
+  status,
+  onRetry,
+  onLongPress,
+}: Props) {
+  const { t } = useTranslation('ui');
   const mine = author === 'me';
   return (
     <View testID="bubble-wrap" style={[styles.wrap, mine ? styles.mine : styles.theirs]}>
@@ -26,11 +39,23 @@ export function MessageBubble({ author, content, senderName }: Props) {
           {senderName}
         </Text>
       ) : null}
-      {content.kind === 'text' ? (
-        <TextBubble mine={mine} text={content.text} />
-      ) : (
-        <PhotoBubble mine={mine} {...content} />
-      )}
+      <Pressable
+        accessibilityRole={status === 'failed' ? 'button' : undefined}
+        onPress={status === 'failed' ? onRetry : undefined}
+        onLongPress={onLongPress}
+        style={mine ? styles.mine : undefined}
+      >
+        {content.kind === 'text' ? (
+          <TextBubble mine={mine} text={content.text} />
+        ) : (
+          <PhotoBubble mine={mine} {...content} />
+        )}
+      </Pressable>
+      {status ? (
+        <Text variant="label10" color={status === 'failed' ? 'error' : 'textSecondary'}>
+          {t(`chat.${status === 'failed' ? 'failed' : 'sending'}`)}
+        </Text>
+      ) : null}
     </View>
   );
 }

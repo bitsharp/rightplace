@@ -54,3 +54,25 @@ grant all on storage.objects to authenticated, service_role;
 create or replace function storage.foldername(name text) returns text[] language sql immutable as $$
   select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1]
 $$;
+
+-- Realtime publication (a real project ships it; migrations add tables to it).
+do $$
+begin
+  if not exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    create publication supabase_realtime;
+  end if;
+end $$;
+
+-- Vault stand-in: a plain table with the same read view the migrations use.
+create schema if not exists vault;
+create table if not exists vault.decrypted_secrets (name text primary key, decrypted_secret text);
+
+-- pg_net stand-in: records each call instead of sending it, so tests can assert on the request.
+create schema if not exists net;
+create table if not exists net._calls (url text, body jsonb, headers jsonb, called_at timestamptz default now());
+create or replace function net.http_post(
+  url text, body jsonb default '{}'::jsonb, params jsonb default '{}'::jsonb,
+  headers jsonb default '{"Content-Type": "application/json"}'::jsonb, timeout_milliseconds integer default 5000
+) returns bigint language sql as $$
+  insert into net._calls (url, body, headers) values (url, body, headers) returning 1::bigint
+$$;

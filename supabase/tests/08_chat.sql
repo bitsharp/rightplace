@@ -21,10 +21,10 @@ select is((select count(*)::int from chat_rooms), 0, 'senza dichiarazione non si
 reset role;
 select tests.make_declaration(:'a', :'v', 'maybe');
 select tests.authenticate_as(:'a');
-select lives_ok(format($$ insert into chat_messages (room_id, user_id, kind, text) values (%L, %L, 'text', 'ciao') $$, :'room', :'a'),
+select lives_ok(format($$ select * from send_chat_message(%L, 'ciao') $$, :'room'),
   'con una dichiarazione attiva si scrive in chat');
 select throws_ok(format($$ insert into chat_messages (room_id, user_id, kind, text) values (%L, %L, 'text', 'falso') $$, :'room', :'b'),
-  '42501', null, 'non si scrive a nome di un altro');
+  '42501', null, 'non si scrive a nome di un altro (insert diretto negato)');
 select is((select count(*)::int from chat_messages), 1, 'il membro legge i messaggi della stanza');
 
 reset role;

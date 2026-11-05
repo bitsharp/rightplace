@@ -59,7 +59,9 @@
     "cancel": "Cancel"
   },
   "chat": {
-    "followersOnly": "Only your followers see this"
+    "followersOnly": "Only your followers see this",
+    "sending": "Sending…",
+    "failed": "Not sent. Tap to retry."
   },
   "post": {
     "like": "Like",

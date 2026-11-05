@@ -89,13 +89,14 @@ Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attend
 
 ## Storage
 
-I bucket `posts` e `chat-photos` sono privati. Il caricamento è permesso solo nel proprio prefisso `<user_id>/…`. **Non esiste una policy di lettura**: le immagini si servono solo con signed URL generati lato server (prompt 10–11).
+I bucket `posts` e `chat-photos` sono privati. Il caricamento è permesso solo nel proprio prefisso `<user_id>/…`. **Non esiste una policy di lettura**: le immagini si servono solo con signed URL generati lato server (`chat-photo-urls` per la chat, prompt 10; i post nel prompt 11).
 
 ## Decisioni rispetto a `roadmap/04`
 
 - `venue_typical_busyness` ha come chiave `(venue_id, weekday, hour, source)`, così la riga `history` prevale senza cancellare quella `manual`.
 - `private.night_attendance` conserva solo i **conteggi per serata**, perché le dichiarazioni vengono cancellate dopo 7 giorni ma lo storico copre 8 settimane. Ogni serata si attribuisce alle ore 21–02 (una dichiarazione non dice l'orario).
 - La chat mostra solo i messaggi propri o di chi segui con follow accettato (principio 6), non tutti quelli dei membri della serata.
+- Chat (prompt 10): si entra con qualunque dichiarazione non annullata sulla serata/evento finché la stanza è viva (`expires_at`), non solo con quella attiva; i messaggi si inviano solo con `send_chat_message` (l'insert diretto è revocato).
 - `match_contacts` richiede `contacts_opt_in` anche lato server.
 - Le scritture su `profiles`, `declarations`, `follows.status` ed `events` (sponsorizzazione esclusa) sono limitate per colonna. Tutto il resto passa dalle RPC.
 
@@ -112,3 +113,28 @@ Regole complete in `docs/places-terms.md`, passi operativi in `docs/places-sync.
 - **RPC solo `service_role`** (revocate ad `anon` e `authenticated`): `sync_places_venues(city_slug, rows)` (upsert su `google_place_id`; disattiva i demo della sola città quando ha almeno 10 locali reali attivi), `get_city_sync_info(city_slug)`, `import_typical_manual(city_slug, rows)` (atomica; rimpiazza solo le righe `manual`, errori `UNKNOWN_VENUE` / `INVALID_ARGUMENT` / `NOT_FOUND`).
 - **RPC per gli utenti**: `remember_venue(venue_id)` scrive solo nella cronologia ricerche propria.
 - **Job**: `expire-stale-places` (tabella sopra).
+
+## Chat di serata (prompt 10)
+
+Dettagli e verifiche in `docs/night-chat.md`.
+
+- **RPC per gli utenti** (`authenticated`): `send_chat_message(room_id, text?, photo_path?)` (errori `NOT_ROOM_MEMBER`, `INVALID_MESSAGE`, `INVALID_PHOTO_PATH`), `get_my_chat_rooms()`, `get_room_messages(room_id, before?, limit?)` (mai il path delle foto), `get_chat_photo_paths(message_ids[])` (solo per la Edge Function di firma).
+- **RPC solo `service_role`**: `claim_storage_deletions(limit?)` e `complete_storage_deletions(ids[])`: la coda dei file da cancellare. Se in futuro si rilancia lo "sweep" dei privilegi (migration 0011), questi due vanno esclusi dal grant ad `authenticated`.
+- **Coda file**: un trigger su `chat_messages` mette in coda la foto di ogni messaggio che muore (cancellazione, scadenza della stanza, account). Il job `purge-expired-content` ora gira **ogni 5 minuti** e dopo la pulizia chiama `private.invoke_storage_gc()`, che a sua volta chiama la Edge Function `storage-gc` con `pg_net`.
+- **Realtime**: `chat_messages` è nella publication `supabase_realtime`; Realtime applica la policy di lettura per ogni abbonato.
+- **Edge Functions**: `chat-photo-urls` (JWT utente, `verify_jwt` attivo; firma per 1 ora solo i path che `get_chat_photo_paths` restituisce all'utente) e `storage-gc` (`verify_jwt = false` in `config.toml`: la chiama pg_cron senza JWT; l'unica credenziale è l'header `x-gc-key` contro il secret `STORAGE_GC_KEY`, confronto a tempo costante, fail closed).
+
+### Azioni manuali per Luca (dopo aver applicato la migration `20261108000100_night_chat.sql`)
+
+1. Genera una chiave lunga e casuale e salvala come secret (il valore non va mai in un file):
+   `npx supabase secrets set STORAGE_GC_KEY=<valore>`
+2. Pubblica le due funzioni (la seconda **senza** verifica JWT):
+   `npx supabase functions deploy chat-photo-urls`
+   `npx supabase functions deploy storage-gc --no-verify-jwt`
+3. Nel SQL editor del progetto salva i due segreti in Vault (stesso valore del punto 1; l'URL è quello del progetto):
+   ```sql
+   select vault.create_secret('https://<project-ref>.supabase.co/functions/v1/storage-gc', 'storage_gc_url');
+   select vault.create_secret('<stesso valore di STORAGE_GC_KEY>', 'storage_gc_key');
+   ```
+4. Dashboard → Database → Extensions: verifica che `pg_net` e `pg_cron` siano attive (la migration abilita `pg_net` se disponibile).
+5. Verifica: `select jobname, schedule, command from cron.job where jobname = 'purge-expired-content';` deve mostrare `*/5 * * * *` e le due chiamate. Dopo qualche minuto `select * from net._http_response order by created desc limit 5;` deve mostrare risposte 200 di `storage-gc`.

@@ -1,8 +1,5 @@
-import { useTranslation } from 'react-i18next';
-
-import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
+import { ChatListScreen } from '@/features/chat/screens/ChatListScreen';
 
 export default function ChatScreen() {
-  const { t } = useTranslation('chat');
-  return <PlaceholderScreen title={t('title')} />;
+  return <ChatListScreen />;
 }

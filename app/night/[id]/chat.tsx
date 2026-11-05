@@ -1,8 +1,8 @@
-import { useTranslation } from 'react-i18next';
+import { useLocalSearchParams } from 'expo-router';
 
-import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
+import { NightChatScreen } from '@/features/chat/screens/NightChatScreen';
 
-export default function NightChatScreen() {
-  const { t } = useTranslation('chat');
-  return <PlaceholderScreen title={t('nightTitle')} />;
+export default function NightChatRoute() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <NightChatScreen roomId={id} />;
 }

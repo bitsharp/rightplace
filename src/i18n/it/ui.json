@@ -59,7 +59,9 @@
     "cancel": "Annulla"
   },
   "chat": {
-    "followersOnly": "Vista solo dai tuoi follower"
+    "followersOnly": "Vista solo dai tuoi follower",
+    "sending": "Invio…",
+    "failed": "Non inviato. Tocca per riprovare."
   },
   "post": {
     "like": "Mi piace",

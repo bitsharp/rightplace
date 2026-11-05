@@ -25,6 +25,9 @@
     "NOT_CREATOR": "You need a creator profile.",
     "NOT_FOUND": "Not found.",
     "HANDLE_ALREADY_CHANGED": "You have already changed your name once.",
+    "NOT_ROOM_MEMBER": "You are not (or no longer) part of this chat.",
+    "INVALID_MESSAGE": "This message is not valid: write between 1 and 1000 characters.",
+    "INVALID_PHOTO_PATH": "The photo could not be attached. Try again.",
     "NETWORK": "You seem to be offline. Check your connection and try again.",
     "UNKNOWN": "Something went wrong. Please try again shortly."
   }

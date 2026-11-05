@@ -1062,6 +1062,14 @@ export type Database = {
       attendance_band: { Args: { p_count: number }; Returns: string };
       block_user: { Args: { p_user_id: string }; Returns: undefined };
       cancel_follow_request: { Args: { p_user_id: string }; Returns: undefined };
+      claim_storage_deletions: {
+        Args: { p_limit?: number };
+        Returns: {
+          bucket_id: string;
+          id: number;
+          object_path: string;
+        }[];
+      };
       clear_my_phone_hash: { Args: Record<PropertyKey, never>; Returns: undefined };
       coarsen: { Args: { p_point: unknown }; Returns: unknown };
       complete_profile: {
@@ -1076,6 +1084,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      complete_storage_deletions: { Args: { p_ids: number[] }; Returns: number };
       count_follow_requests: { Args: Record<PropertyKey, never>; Returns: number };
       create_event: {
         Args: {
@@ -1114,6 +1123,13 @@ export type Database = {
           blocked_at: string;
           handle: string;
           user_id: string;
+        }[];
+      };
+      get_chat_photo_paths: {
+        Args: { p_message_ids: string[] };
+        Returns: {
+          message_id: string;
+          photo_path: string;
         }[];
       };
       get_city_map: {
@@ -1207,6 +1223,23 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_my_chat_rooms: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          event_id: string;
+          event_name: string;
+          expires_at: string;
+          friends_inside: number;
+          last_at: string;
+          last_handle: string;
+          last_kind: string;
+          last_text: string;
+          photo_count: number;
+          room_id: string;
+          venue_id: string;
+          venue_name: string;
+        }[];
+      };
       get_my_creator_events: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1240,6 +1273,18 @@ export type Database = {
           name: string;
           reason: string;
           venue_id: string;
+        }[];
+      };
+      get_room_messages: {
+        Args: { p_before?: string; p_limit?: number; p_room_id: string };
+        Returns: {
+          created_at: string;
+          handle: string;
+          is_mine: boolean;
+          kind: string;
+          message_id: string;
+          text: string;
+          user_id: string;
         }[];
       };
       get_stories: {
@@ -1334,6 +1379,13 @@ export type Database = {
           maybe_band: string;
           name: string;
           venue_id: string;
+        }[];
+      };
+      send_chat_message: {
+        Args: { p_photo_path?: string; p_room_id: string; p_text?: string };
+        Returns: {
+          created_at: string;
+          message_id: string;
         }[];
       };
       set_locale: { Args: { p_locale: string }; Returns: undefined };

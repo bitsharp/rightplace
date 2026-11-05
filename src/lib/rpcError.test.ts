@@ -8,6 +8,12 @@ describe('toRpcErrorCode', () => {
     );
   });
 
+  it('riconosce i codici della chat di serata', () => {
+    for (const code of ['NOT_ROOM_MEMBER', 'INVALID_MESSAGE', 'INVALID_PHOTO_PATH']) {
+      expect(toRpcErrorCode({ message: code, code: 'P0001' })).toBe(code);
+    }
+  });
+
   it('distingue gli errori di rete', () => {
     expect(toRpcErrorCode(new TypeError('Network request failed'))).toBe('NETWORK');
   });

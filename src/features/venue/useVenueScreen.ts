@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import { useMyChatRooms } from '@/features/chat/hooks';
 import { useMyDeclaration } from '@/features/map/hooks';
 
 import type { VenueDetail } from './api';
@@ -30,6 +31,10 @@ export function useVenueScreen(venueId: string) {
   const [segment, setSegment] = useState<StatsSegment>('going');
   const stats = useVenueStats(venueId, segment);
   const mine = useMyDeclaration();
+  // Rooms listed are only those I belong to, i.e. where I declared: no room, no button.
+  const chatRoom = useMyChatRooms().data?.find(
+    (room) => room.venueId === venueId && room.eventId === null,
+  );
   const [direction, setDirection] = useState<TransportDirection>('there');
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -52,6 +57,9 @@ export function useVenueScreen(venueId: string) {
     openLink: (link: Parameters<typeof openTransportLink>[0]) => void openTransportLink(link),
     closingTime: venue ? closingTimeTonight(venue.openingHours, new Date(), venue.timezone) : null,
     declaration: declarationFor(mine.data ?? null, { kind: 'night', id: venueId }),
+    chatRoomId: chatRoom?.roomId ?? null,
+    openChat: () =>
+      chatRoom && router.push({ pathname: '/night/[id]/chat', params: { id: chatRoom.roomId } }),
     sheetOpen,
     openSheet: () => setSheetOpen(true),
     closeSheet: () => setSheetOpen(false),

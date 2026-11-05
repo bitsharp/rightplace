@@ -379,6 +379,11 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# storage-gc is called by pg_cron/pg_net, which has no user JWT: its only credential is the x-gc-key header
+# (secret STORAGE_GC_KEY, compared in constant time, fail closed). Every other function keeps verify_jwt on.
+[functions.storage-gc]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

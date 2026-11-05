@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/ui/EmptyState';
+import { OpenChatButton } from '@/features/chat/components/OpenChatButton';
 import { RangeStat } from '@/components/ui/RangeStat';
 import { colors, spacing } from '@/theme/tokens';
 
@@ -62,6 +63,7 @@ function VenueBody({ screen }: BodyProps) {
       </View>
       <WhoIsGoing segment={screen.segment} onSegment={screen.setSegment} view={screen.statsView} />
       <FriendsGoing friends={screen.friends} />
+      {screen.chatRoomId ? <OpenChatButton onPress={screen.openChat} /> : null}
       <GettingThere
         venueName={venue.name}
         cityName={venue.cityName}

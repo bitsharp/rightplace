@@ -72,6 +72,51 @@ function queryBuilder(table: string) {
   return builder;
 }
 
+export type FakeRealtimeStatus = 'SUBSCRIBED' | 'CHANNEL_ERROR' | 'TIMED_OUT' | 'CLOSED';
+type ChangeHandler = (payload: { new: Record<string, unknown> }) => void;
+
+// Stand-in for a Realtime channel: tests push INSERT payloads and status changes by hand.
+export type FakeChannel = {
+  name: string;
+  filters: Record<string, unknown>[];
+  on: (type: string, filter: Record<string, unknown>, handler: ChangeHandler) => FakeChannel;
+  subscribe: (callback?: (status: FakeRealtimeStatus) => void) => FakeChannel;
+  emitInsert: (row: Record<string, unknown>) => void;
+  emitStatus: (status: FakeRealtimeStatus) => void;
+};
+
+export const fakeChannels: FakeChannel[] = [];
+
+function createFakeChannel(name: string): FakeChannel {
+  const handlers: ChangeHandler[] = [];
+  let onStatus: ((status: FakeRealtimeStatus) => void) | undefined;
+  const channel: FakeChannel = {
+    name,
+    filters: [],
+    on: (_type, filter, handler) => {
+      channel.filters.push(filter);
+      handlers.push(handler);
+      return channel;
+    },
+    subscribe: (callback) => {
+      onStatus = callback;
+      return channel;
+    },
+    emitInsert: (row) => handlers.forEach((handler) => handler({ new: row })),
+    emitStatus: (status) => onStatus?.(status),
+  };
+  fakeChannels.push(channel);
+  return channel;
+}
+
+// One shared `upload` so tests can assert on what was sent, whatever bucket asked for it.
+export const fakeStorageUpload = jest.fn(
+  async (path: string, _body: unknown, _options?: unknown): Promise<Result> => ({
+    data: { path },
+    error: null,
+  }),
+);
+
 export const fakeSupabase = {
   auth: {
     getSession: jest.fn(async () => ({ data: { session: state.session }, error: null })),
@@ -103,6 +148,15 @@ export const fakeSupabase = {
     data: null,
     error: null,
   })),
+  channel: jest.fn((name: string) => createFakeChannel(name)),
+  removeChannel: jest.fn(async (_channel: FakeChannel) => 'ok'),
+  storage: { from: jest.fn((_bucket: string) => ({ upload: fakeStorageUpload })) },
+  functions: {
+    invoke: jest.fn(async (_name: string, _options?: unknown): Promise<Result> => ({
+      data: null,
+      error: null,
+    })),
+  },
 };
 
 type RpcResponse = unknown | ((args: unknown) => unknown);
@@ -154,6 +208,7 @@ export function fakeProfileRow(overrides: Record<string, unknown> = {}): Record<
 }
 
 export function resetFakeSupabase(): void {
+  fakeChannels.length = 0;
   state.session = null;
   state.tables = {};
   state.listeners.clear();

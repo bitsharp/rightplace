@@ -128,7 +128,8 @@ function answerRpcs(world: World) {
   };
 }
 
-export function seedFriendsBackend(options: Options) {
+// `extra` adds the RPCs of another feature on top of the friends ones (setFakeRpc replaces them all).
+export function seedFriendsBackend(options: Options, extra: Record<string, unknown> = {}) {
   const world: World = {
     users: options.users,
     follow: new Map((options.accepted ?? []).map((id) => [id, 'accepted' as const])),
@@ -146,6 +147,7 @@ export function seedFriendsBackend(options: Options) {
     clear_my_phone_hash: null,
     get_stories: [],
     get_my_declaration: [],
+    ...extra,
   });
   return world;
 }
