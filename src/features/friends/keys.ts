@@ -11,7 +11,14 @@ export const BLOCKED_KEY = ['blocked'] as const;
 
 // Everything that is visible only through an accepted follow: when the set of followed people
 // changes, the map of friends, the feed, the stories bar and the venue friends must be reloaded.
-const FOLLOW_DEPENDENT_KEYS = [['cityMap'], ['feed'], ['stories'], ['venueStats']] as const;
+const FOLLOW_DEPENDENT_KEYS = [
+  ['cityMap'],
+  ['feed'],
+  ['stories'],
+  ['storyPosts'],
+  ['postComments'],
+  ['venueStats'],
+] as const;
 
 export function invalidateFollowDependents(queryClient: QueryClient): Promise<unknown> {
   return Promise.all(

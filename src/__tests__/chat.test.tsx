@@ -146,7 +146,7 @@ describe('chat di serata', () => {
     seedChatBackend({ rooms: [ARENA] });
     await open();
     await fireEvent.press(await screen.findByLabelText('chat:composer.photo'));
-    await fireEvent.press(await screen.findByText('chat:photoSource.camera'));
+    await fireEvent.press(await screen.findByText('ui:photoSource.camera'));
     await waitFor(() => expect(rpcCalls('send_chat_message')).toHaveLength(1));
     expect(fakeStorageUpload).toHaveBeenCalledWith(
       'user-1/11111111-2222-4333-8444-555555555555.jpg',
@@ -170,8 +170,8 @@ describe('chat di serata', () => {
     seedChatBackend({ rooms: [ARENA] });
     await open();
     await fireEvent.press(await screen.findByLabelText('chat:composer.photo'));
-    await fireEvent.press(await screen.findByText('chat:photoSource.camera'));
-    expect(await screen.findByText('chat:photoSource.denied')).toBeOnTheScreen();
+    await fireEvent.press(await screen.findByText('ui:photoSource.camera'));
+    expect(await screen.findByText('ui:photoSource.denied')).toBeOnTheScreen();
     expect(rpcCalls('send_chat_message')).toHaveLength(0);
   });
 

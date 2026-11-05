@@ -1058,6 +1058,13 @@ export type Database = {
     };
     Functions: {
       accept_follow: { Args: { p_follower_id: string }; Returns: undefined };
+      add_post_comment: {
+        Args: { p_post_id: string; p_text: string };
+        Returns: {
+          comment_id: string;
+          created_at: string;
+        }[];
+      };
       age_band: { Args: { p_birth_date: string }; Returns: string };
       attendance_band: { Args: { p_count: number }; Returns: string };
       block_user: { Args: { p_user_id: string }; Returns: undefined };
@@ -1098,6 +1105,14 @@ export type Database = {
         };
         Returns: string;
       };
+      create_post: {
+        Args: { p_caption?: string; p_chat_photo_path?: string; p_photo_path?: string };
+        Returns: {
+          expires_at: string;
+          post_id: string;
+          visible_from: string;
+        }[];
+      };
       current_night_date: { Args: { p_city_id: string }; Returns: string };
       declare: {
         Args: { p_event_id?: string; p_intent: string; p_venue_id?: string };
@@ -1105,6 +1120,8 @@ export type Database = {
       };
       decline_follow: { Args: { p_follower_id: string }; Returns: undefined };
       delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
+      delete_post: { Args: { p_post_id: string }; Returns: undefined };
+      delete_post_comment: { Args: { p_comment_id: string }; Returns: undefined };
       generate_handle: { Args: Record<PropertyKey, never>; Returns: string };
       get_active_cities: {
         Args: Record<PropertyKey, never>;
@@ -1171,16 +1188,18 @@ export type Database = {
         }[];
       };
       get_feed: {
-        Args: { p_before?: string; p_limit?: number };
+        Args: { p_before_id?: string; p_before_visible?: string; p_limit?: number };
         Returns: {
           author_handle: string;
           author_id: string;
           caption: string;
           comment_count: number;
           expires_at: string;
+          has_photo: boolean;
+          is_mine: boolean;
           like_count: number;
           liked_by_me: boolean;
-          photo_path: string;
+          night_date: string;
           post_id: string;
           venue_name: string;
           visible_from: string;
@@ -1266,6 +1285,35 @@ export type Database = {
           venue_name: string;
         }[];
       };
+      get_post_comments: {
+        Args: { p_before?: string; p_limit?: number; p_post_id: string };
+        Returns: {
+          can_delete: boolean;
+          comment_id: string;
+          created_at: string;
+          handle: string;
+          is_mine: boolean;
+          text: string;
+          user_id: string;
+        }[];
+      };
+      get_post_photo_paths: {
+        Args: { p_post_ids: string[] };
+        Returns: {
+          photo_path: string;
+          post_id: string;
+        }[];
+      };
+      get_post_target: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          event_id: string;
+          night_date: string;
+          night_id: string;
+          room_id: string;
+          venue_name: string;
+        }[];
+      };
       get_recommended_venue: {
         Args: { p_city_slug: string };
         Returns: {
@@ -1293,6 +1341,24 @@ export type Database = {
           handle: string;
           latest_post_at: string;
           user_id: string;
+        }[];
+      };
+      get_story_posts: {
+        Args: { p_user_id: string };
+        Returns: {
+          author_handle: string;
+          author_id: string;
+          caption: string;
+          comment_count: number;
+          expires_at: string;
+          has_photo: boolean;
+          is_mine: boolean;
+          like_count: number;
+          liked_by_me: boolean;
+          night_date: string;
+          post_id: string;
+          venue_name: string;
+          visible_from: string;
         }[];
       };
       get_venue_detail: {
@@ -1390,6 +1456,13 @@ export type Database = {
       };
       set_locale: { Args: { p_locale: string }; Returns: undefined };
       set_my_phone_hash: { Args: { p_hash: string }; Returns: undefined };
+      set_post_like: {
+        Args: { p_liked: boolean; p_post_id: string };
+        Returns: {
+          like_count: number;
+          liked_by_me: boolean;
+        }[];
+      };
       sync_places_venues: {
         Args: { p_city_slug: string; p_rows: Json };
         Returns: {

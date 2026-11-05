@@ -29,6 +29,10 @@
     "INVALID_MESSAGE": "Il messaggio non è valido: scrivi da 1 a 1000 caratteri.",
     "INVALID_PHOTO_PATH": "Non è stato possibile allegare la foto. Riprova.",
     "NETWORK": "Sembra che tu sia offline. Controlla la connessione e riprova.",
-    "UNKNOWN": "Qualcosa è andato storto. Riprova tra poco."
+    "UNKNOWN": "Qualcosa è andato storto. Riprova tra poco.",
+    "NO_RECENT_DECLARATION": "Per pubblicare devi aver dichiarato una serata nelle ultime 24 ore.",
+    "INVALID_POST": "Aggiungi una foto o scrivi qualcosa (massimo 500 caratteri).",
+    "INVALID_COMMENT": "Il commento deve avere da 1 a 300 caratteri.",
+    "POST_NOT_FOUND": "Questo post non è più disponibile."
   }
 }

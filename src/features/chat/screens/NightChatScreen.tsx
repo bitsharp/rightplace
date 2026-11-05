@@ -8,11 +8,11 @@ import { Text } from '@/components/ui/Text';
 import { Toast } from '@/components/ui/Toast';
 import { colors, heights, spacing } from '@/theme/tokens';
 
+import { PhotoSourceSheet } from '@/components/app/PhotoSourceSheet';
 import { ChatComposer } from '../components/ChatComposer';
 import { ExpiryBanner } from '../components/ExpiryBanner';
 import { MessageActionsSheet } from '../components/MessageActionsSheet';
 import { MessageList } from '../components/MessageList';
-import { PhotoSourceSheet } from '../components/PhotoSourceSheet';
 import { PhotoStrip } from '../components/PhotoStrip';
 import { useNightChatScreen } from '../useNightChatScreen';
 import { useNotice } from '../useNotice';
@@ -56,12 +56,13 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
 
 function ChatOverlays({ screen }: { screen: ReturnType<typeof useNightChatScreen> }) {
   const { t } = useTranslation('chat');
+  const { t: tUi } = useTranslation('ui');
   const [notice, setNotice] = useNotice();
   const photoNotice = screen.photoFlow.notice;
   return (
     <>
       {notice ? <Toast tone="success" message={t(`actions.${notice}`)} /> : null}
-      {photoNotice ? <Toast tone="info" message={t(`photoSource.${photoNotice}`)} /> : null}
+      {photoNotice ? <Toast tone="info" message={tUi(`photoSource.${photoNotice}`)} /> : null}
       <PhotoSourceSheet
         visible={screen.photoFlow.sheetOpen}
         onPick={(source) => void screen.photoFlow.choose(source)}

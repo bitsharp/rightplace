@@ -7,9 +7,9 @@ describe('PhotoSourceSheet', () => {
     const onPick = jest.fn();
     const onClose = jest.fn();
     await render(<PhotoSourceSheet visible onPick={onPick} onClose={onClose} />);
-    await fireEvent.press(screen.getByText('chat:photoSource.camera'));
+    await fireEvent.press(screen.getByText('ui:photoSource.camera'));
     expect(onPick).toHaveBeenCalledWith('camera');
-    await fireEvent.press(screen.getByText('chat:photoSource.library'));
+    await fireEvent.press(screen.getByText('ui:photoSource.library'));
     expect(onPick).toHaveBeenCalledWith('library');
   });
 
@@ -17,7 +17,7 @@ describe('PhotoSourceSheet', () => {
     const onPick = jest.fn();
     const onClose = jest.fn();
     await render(<PhotoSourceSheet visible onPick={onPick} onClose={onClose} />);
-    await fireEvent.press(screen.getByText('chat:photoSource.cancel'));
+    await fireEvent.press(screen.getByText('ui:photoSource.cancel'));
     expect(onClose).toHaveBeenCalled();
     expect(onPick).not.toHaveBeenCalled();
   });

@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 
 import { afterModalDismiss } from '@/lib/afterModalDismiss';
 
-import { pickChatPhoto, preparePhoto, type PhotoSource } from './photos';
+import { pickPhoto, preparePhoto, type PhotoSource } from './photos';
 
 export type PhotoNotice = 'denied' | 'failed';
 
@@ -16,7 +16,7 @@ async function pick(
   setNotice: (notice: PhotoNotice) => void,
 ) {
   try {
-    const result = await pickChatPhoto(source);
+    const result = await pickPhoto(source);
     if (result.status === 'denied') return setNotice('denied');
     if (result.status === 'picked') onReady(await preparePhoto(result.photo));
   } catch {

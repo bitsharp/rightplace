@@ -1,4 +1,59 @@
 {
   "title": "Feed",
-  "newPost": "Il giorno dopo"
+  "banner": "Vedi solo le persone che segui. Le foto di ieri sera arrivano oggi e si cancellano dopo una settimana.",
+  "loadError": "Non riusciamo a caricare il feed. Tira giù per riprovare.",
+  "loading": "Carico il feed…",
+  "empty": {
+    "title": "Ancora niente da vedere",
+    "body": "Le foto di ieri sera dei tuoi amici compaiono qui dalle 06:00."
+  },
+  "meta": {
+    "tonight": "{{venue}} · stasera",
+    "lastNight": "{{venue}} · ieri sera",
+    "daysAgo_one": "{{venue}} · {{count}} giorno fa",
+    "daysAgo_other": "{{venue}} · {{count}} giorni fa",
+    "venueOnly": "{{venue}}",
+    "unknown": "Serata"
+  },
+  "comments": {
+    "title": "Commenti",
+    "placeholder": "Scrivi un commento",
+    "send": "Invia",
+    "empty": "Nessun commento. Scrivi tu il primo.",
+    "older": "Mostra commenti precedenti",
+    "counter": "{{count}}/{{max}}",
+    "loadError": "Non riusciamo a caricare i commenti. Riprova.",
+    "close": "Chiudi",
+    "delete": "Elimina commento",
+    "a11yMine": "Il tuo commento",
+    "hint": "Tocco lungo per segnalare"
+  },
+  "actions": {
+    "postTitle": "Azioni sul post di {{handle}}",
+    "commentTitle": "Azioni sul commento di {{handle}}",
+    "reportPost": "Segnala post",
+    "reportComment": "Segnala commento",
+    "block": "Blocca autore",
+    "deletePost": "Elimina post",
+    "deleteComment": "Elimina commento",
+    "cancel": "Annulla",
+    "blockTitle": "Bloccare {{handle}}?",
+    "blockBody": "Non vi vedrete più: smettete di seguirvi e i suoi post spariscono dal feed.",
+    "blockConfirm": "Blocca",
+    "deleteTitle": "Eliminare il post?",
+    "deleteBody": "Sparisce dal feed, insieme a like e commenti. Non si può annullare.",
+    "deleteConfirm": "Elimina",
+    "reported": "Segnalazione inviata. Grazie.",
+    "blocked": "Utente bloccato.",
+    "deleted": "Post eliminato."
+  },
+  "story": {
+    "title": "Storia di {{handle}}",
+    "mine": "La tua storia",
+    "close": "Chiudi",
+    "empty": "Nessun post da mostrare.",
+    "position": "{{current}} di {{total}}",
+    "a11yPhoto": "Foto di {{handle}}"
+  },
+  "followMore": "Segui altre persone per vedere più foto"
 }

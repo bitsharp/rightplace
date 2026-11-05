@@ -30,14 +30,6 @@
     "followA11y": "Segui {{handle}} per poterlo taggare",
     "requested": "Richiesta inviata"
   },
-  "photoSource": {
-    "title": "Aggiungi una foto",
-    "camera": "Fotocamera",
-    "library": "Galleria",
-    "cancel": "Annulla",
-    "denied": "Permesso negato: puoi attivare la fotocamera dalle impostazioni del telefono.",
-    "failed": "Non siamo riusciti a preparare la foto. Riprova."
-  },
   "actions": {
     "title": "Azioni su {{handle}}",
     "report": "Segnala messaggio",

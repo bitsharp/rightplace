@@ -30,14 +30,6 @@
     "followA11y": "Follow {{handle}} to be able to tag them",
     "requested": "Request sent"
   },
-  "photoSource": {
-    "title": "Add a photo",
-    "camera": "Camera",
-    "library": "Gallery",
-    "cancel": "Cancel",
-    "denied": "Permission denied: you can enable the camera in your phone settings.",
-    "failed": "We couldn't prepare the photo. Try again."
-  },
   "actions": {
     "title": "Actions for {{handle}}",
     "report": "Report message",

@@ -66,7 +66,8 @@
   "post": {
     "like": "Mi piace",
     "expires_one": "Scade tra {{count}} g",
-    "expires_other": "Scade tra {{count}} gg"
+    "expires_other": "Scade tra {{count}} gg",
+    "comments": "Commenti"
   },
   "plan": {
     "active": "Attivo",
@@ -78,5 +79,13 @@
     "packed": "pieno",
     "usually": "di solito {{level}}",
     "a11y": "{{venue}}: di solito {{level}}. Apri il dettaglio"
+  },
+  "photoSource": {
+    "title": "Aggiungi una foto",
+    "camera": "Fotocamera",
+    "library": "Galleria",
+    "cancel": "Annulla",
+    "denied": "Permesso negato: puoi attivare la fotocamera dalle impostazioni del telefono.",
+    "failed": "Non siamo riusciti a preparare la foto. Riprova."
   }
 }

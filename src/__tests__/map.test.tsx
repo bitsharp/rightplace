@@ -76,6 +76,16 @@ const DECLARATION = [
   },
 ];
 
+const POST_TARGET = [
+  {
+    night_id: 'n1',
+    event_id: null,
+    venue_name: 'Arena Club',
+    night_date: '2026-11-04',
+    room_id: null,
+  },
+];
+
 function seedBackend(overrides: Record<string, unknown> = {}) {
   setFakeRpc({
     get_active_cities: CITIES,
@@ -84,6 +94,8 @@ function seedBackend(overrides: Record<string, unknown> = {}) {
         ? [friendArena, friendTerrace]
         : [arena, quiet, hidden],
     get_my_declaration: [],
+    get_post_target: [],
+    get_story_posts: [],
     get_stories: [],
     get_recommended_venue: [],
     ...overrides,
@@ -230,10 +242,10 @@ describe('mappa', () => {
     });
 
     it('con una dichiarazione compaiono il "+" e la pillola, e il "+" apre il post', async () => {
-      seedBackend({ get_my_declaration: DECLARATION });
+      seedBackend({ get_my_declaration: DECLARATION, get_post_target: POST_TARGET });
       await renderApp('ready', '/map');
       await fireEvent.press(await screen.findByRole('button', { name: 'ui:topBar.post' }));
-      expect(await screen.findByText('feed:newPost')).toBeOnTheScreen();
+      expect(await screen.findByRole('header', { name: 'post:title' })).toBeOnTheScreen();
     });
 
     it('la pillola apre il locale dichiarato', async () => {
@@ -253,7 +265,7 @@ describe('mappa', () => {
       expect(screen.queryByTestId('news-dot')).toBeNull();
     });
 
-    it('con storie: pallino sulla campanella, la tua storia e i seguiti nella barra', async () => {
+    it('con storie: pallino sulla campanella e i seguiti nella barra, senza "La tua storia"', async () => {
       seedBackend({
         get_stories: [
           { user_id: 'u2', handle: 'volpe.viola', latest_post_at: '2026-11-04T09:00:00Z' },
@@ -261,10 +273,34 @@ describe('mappa', () => {
       });
       await renderApp('ready', '/map');
       expect(await screen.findByTestId('news-dot')).toBeOnTheScreen();
-      expect(screen.getByText('ui:topBar.myStory')).toBeOnTheScreen();
+      expect(screen.queryByText('ui:topBar.myStory')).toBeNull();
       expect(screen.getByText('volpe.viola')).toBeOnTheScreen();
       await fireEvent.press(screen.getByRole('button', { name: 'ui:topBar.news' }));
       expect(await screen.findByRole('header', { name: 'feed:title' })).toBeOnTheScreen();
+    });
+
+    it('"La tua storia" compare quando ho un post delle ultime 24 ore', async () => {
+      seedBackend({
+        get_story_posts: [
+          {
+            post_id: 'm1',
+            author_id: 'user-1',
+            author_handle: 'lince.rosso',
+            venue_name: 'Arena Club',
+            night_date: '2026-11-04',
+            caption: 'io',
+            has_photo: false,
+            visible_from: '2026-11-05T05:00:00Z',
+            expires_at: '2026-11-12T05:00:00Z',
+            like_count: 0,
+            comment_count: 0,
+            liked_by_me: false,
+            is_mine: true,
+          },
+        ],
+      });
+      await renderApp('ready', '/map');
+      expect(await screen.findByText('ui:topBar.myStory')).toBeOnTheScreen();
     });
   });
 

@@ -29,6 +29,10 @@
     "INVALID_MESSAGE": "This message is not valid: write between 1 and 1000 characters.",
     "INVALID_PHOTO_PATH": "The photo could not be attached. Try again.",
     "NETWORK": "You seem to be offline. Check your connection and try again.",
-    "UNKNOWN": "Something went wrong. Please try again shortly."
+    "UNKNOWN": "Something went wrong. Please try again shortly.",
+    "NO_RECENT_DECLARATION": "To post you need to have declared a night out in the last 24 hours.",
+    "INVALID_POST": "Add a photo or write something (500 characters at most).",
+    "INVALID_COMMENT": "A comment must be 1 to 300 characters.",
+    "POST_NOT_FOUND": "This post is no longer available."
   }
 }

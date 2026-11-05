@@ -65,6 +65,14 @@ const declarationRow = (intent: 'going' | 'maybe') => ({
   expires_at: '2026-11-07T04:00:00Z',
 });
 
+const POST_TARGET = {
+  night_id: 'n1',
+  event_id: null,
+  venue_name: 'Arena Club',
+  night_date: '2026-11-06',
+  room_id: null,
+};
+
 // Stand-in for the server: remembers the one active declaration, like get_my_declaration/declare.
 function seedBackend(
   options: { stats?: (segment: string) => unknown; mine?: 'going' | 'maybe' } = {},
@@ -78,6 +86,8 @@ function seedBackend(
       options.stats?.((args as { p_segment: string }).p_segment) ?? stats(),
     ],
     get_my_declaration: () => (mine ? [mine] : []),
+    get_post_target: () => (mine ? [POST_TARGET] : []),
+    get_story_posts: [],
     declare: (args: unknown) => {
       mine = declarationRow((args as { p_intent: 'going' | 'maybe' }).p_intent);
       return 'd1';

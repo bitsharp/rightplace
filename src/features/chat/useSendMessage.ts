@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 
 import { selectionFeedback } from '@/lib/haptics';
+import { uploadPhoto } from '@/lib/photos/photos';
 
 import { sendChatMessage } from './api';
 import {
@@ -12,7 +13,6 @@ import {
   type ChatMessage,
 } from './domain/messages';
 import { roomMessagesKey } from './keys';
-import { uploadChatPhoto } from './photos';
 import type { RealtimePerson } from './realtime';
 
 // `cleanUri` is the output of preparePhoto (EXIF-free JPEG, <= 1280 px), never the original picture.
@@ -46,7 +46,7 @@ export function useSendMessage(roomId: string, me: RealtimePerson) {
     mutationFn: async ({ input }: Variables) => {
       if ('text' in input) return sendChatMessage(roomId, { text: input.text });
       return sendChatMessage(roomId, {
-        photoPath: await uploadChatPhoto(me.userId, input.cleanUri),
+        photoPath: await uploadPhoto('chat-photos', me.userId, input.cleanUri),
       });
     },
     onMutate: async (variables) => {

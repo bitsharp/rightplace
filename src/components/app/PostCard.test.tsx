@@ -12,6 +12,7 @@ const baseProps = {
   liked: false,
   commentCount: 3,
   onToggleLike: jest.fn(),
+  onOpenComments: jest.fn(),
 };
 
 describe('PostCard', () => {
@@ -50,5 +51,41 @@ describe('PostCard', () => {
   it('segnala il like già messo', async () => {
     await render(<PostCard {...baseProps} liked />);
     expect(screen.getByRole('button', { name: 'ui:post.like' })).toBeSelected();
+  });
+
+  it('apre i commenti dal contatore', async () => {
+    const onOpenComments = jest.fn();
+    await render(<PostCard {...baseProps} onOpenComments={onOpenComments} />);
+    await fireEvent.press(screen.getByRole('button', { name: 'ui:post.comments' }));
+    expect(onOpenComments).toHaveBeenCalled();
+  });
+
+  it('il tocco lungo sul post apre le azioni di moderazione', async () => {
+    const onLongPress = jest.fn();
+    await render(<PostCard {...baseProps} onLongPress={onLongPress} />);
+    await fireEvent(screen.getByTestId('post-card'), 'longPress');
+    expect(onLongPress).toHaveBeenCalled();
+  });
+
+  it('con la foto passa a PhotoFrame la chiave di cache in memoria', async () => {
+    await render(
+      <PostCard
+        {...baseProps}
+        caption="Si inizia!"
+        photoUri="https://signed.test/a"
+        photoCacheKey="p1"
+      />,
+    );
+    expect(screen.getByLabelText('Si inizia!').props).toMatchObject({
+      cachePolicy: 'memory',
+      source: [{ uri: 'https://signed.test/a', cacheKey: 'p1' }],
+    });
+  });
+
+  it('senza foto mostra il segnaposto', async () => {
+    await render(<PostCard {...baseProps} />);
+    expect(
+      screen.getByTestId('photo-placeholder', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
   });
 });

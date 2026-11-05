@@ -147,6 +147,9 @@ export function seedFriendsBackend(options: Options, extra: Record<string, unkno
     clear_my_phone_hash: null,
     get_stories: [],
     get_my_declaration: [],
+    get_post_target: [],
+    get_story_posts: [],
+    get_feed: [],
     ...extra,
   });
   return world;

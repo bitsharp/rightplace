@@ -1,0 +1,28 @@
+{
+  "title": "Tell us about the night",
+  "label": "THE DAY AFTER",
+  "close": "Cancel and go back",
+  "prompt": {
+    "title": "How was last night?",
+    "body": "Reminder: post a photo or write a couple of lines."
+  },
+  "venue": "Night out: {{venue}}",
+  "photo": {
+    "add": "ADD A PHOTO",
+    "remove": "Remove the photo",
+    "preview": "Preview of the chosen photo"
+  },
+  "caption": {
+    "label": "Description",
+    "placeholder": "Write something about the night",
+    "counter": "{{count}}/{{max}}"
+  },
+  "note": "The photo shows up in the night chat right away, visible only to your followers. It reaches the feed the day after and disappears after a week.",
+  "publish": "Post to your profile",
+  "noTarget": {
+    "title": "Declare a night out to post",
+    "body": "You can post after declaring a night out, up to 24 hours after it ends.",
+    "cta": "Back to the map"
+  },
+  "loadError": "We couldn't check your night out. Try again shortly."
+}

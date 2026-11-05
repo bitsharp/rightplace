@@ -6,10 +6,10 @@ import { createQueryWrapper } from '@/test/queryWrapper';
 
 import type { ChatMessage } from './domain/messages';
 import { roomMessagesKey } from './keys';
-import { uploadChatPhoto } from './photos';
+import { uploadPhoto } from '@/lib/photos/photos';
 import { useSendMessage } from './useSendMessage';
 
-jest.mock('./photos', () => ({ uploadChatPhoto: jest.fn() }));
+jest.mock('@/lib/photos/photos', () => ({ uploadPhoto: jest.fn() }));
 
 const me = { userId: 'me', handle: 'lince.rosso' };
 
@@ -83,14 +83,14 @@ describe('useSendMessage', () => {
   });
 
   it('una foto viene caricata e poi inviata con il path ottenuto', async () => {
-    jest.mocked(uploadChatPhoto).mockResolvedValue('me/abc.jpg');
+    jest.mocked(uploadPhoto).mockResolvedValue('me/abc.jpg');
     setFakeRpc({
       send_chat_message: [{ message_id: 'real-3', created_at: '2026-11-07T22:03:00Z' }],
     });
     const { result, client } = await setup();
     result.current.send({ cleanUri: 'file:///clean.jpg' });
     await waitFor(() => expect(cached(client)[0]?.id).toBe('real-3'));
-    expect(uploadChatPhoto).toHaveBeenCalledWith('me', 'file:///clean.jpg');
+    expect(uploadPhoto).toHaveBeenCalledWith('chat-photos', 'me', 'file:///clean.jpg');
     expect(rpcCalls('send_chat_message')[0]?.[1]).toEqual({
       p_room_id: 'r1',
       p_text: null,
@@ -100,7 +100,7 @@ describe('useSendMessage', () => {
   });
 
   it('se il caricamento della foto fallisce non invia nessun messaggio', async () => {
-    jest.mocked(uploadChatPhoto).mockRejectedValue(new Error('upload'));
+    jest.mocked(uploadPhoto).mockRejectedValue(new Error('upload'));
     const { result, client } = await setup();
     result.current.send({ cleanUri: 'file:///clean.jpg' });
     await waitFor(() => expect(cached(client)[0]?.failed).toBe(true));

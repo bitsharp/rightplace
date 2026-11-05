@@ -88,6 +88,7 @@ function PostDemo() {
       liked={liked}
       commentCount={3}
       onToggleLike={() => setLiked(!liked)}
+      onOpenComments={noop}
     />
   );
 }

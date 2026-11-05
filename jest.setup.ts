@@ -62,6 +62,14 @@ beforeEach(() =>
     .resetMapStore(),
 );
 
+beforeEach(() =>
+  jest
+    .requireActual<typeof import('@/features/posts/store/seenStories')>(
+      '@/features/posts/store/seenStories',
+    )
+    .resetSeenStories(),
+);
+
 // react-native-maps is a native module: map and markers render as plain Views that show their
 // children, so tests can find (and press) the markers the app places on the map.
 jest.mock('react-native-maps', () => {

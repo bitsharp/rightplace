@@ -14,7 +14,7 @@ type Props = {
   seen: boolean;
 };
 
-// Story ring from TopBar.dc.html: violet→cyan gradient for new posts, plain border for your own.
+// Story ring from TopBar.dc.html: violet→cyan gradient while there is something new, plain border once seen.
 export function StoryAvatar({ initial, tone, seen }: Props) {
   const gradientId = `ring${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
@@ -27,6 +27,7 @@ export function StoryAvatar({ initial, tone, seen }: Props) {
           </LinearGradient>
         </Defs>
         <Circle
+          testID={seen ? 'story-ring-seen' : 'story-ring-new'}
           cx={SIZE / 2}
           cy={SIZE / 2}
           r={SIZE / 2 - RING / 2}

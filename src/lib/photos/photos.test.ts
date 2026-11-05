@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { RpcError } from '@/lib/rpcError';
 import { fakeStorageUpload, fakeSupabase } from '@/test/fakeSupabase';
 
-import { pickChatPhoto, preparePhoto, uploadChatPhoto } from './photos';
+import { pickPhoto, preparePhoto, uploadPhoto } from './photos';
 
 jest.mock('expo-image-picker', () => ({
   requestCameraPermissionsAsync: jest.fn(),
@@ -39,11 +39,11 @@ function stubManipulator(rendered = { width: 1280, height: 960 }) {
   return { saveAsync, resize, renderAsync };
 }
 
-describe('pickChatPhoto', () => {
+describe('pickPhoto', () => {
   it("dalla fotocamera chiede il permesso solo ora, e senza leggere l'EXIF", async () => {
     picker.requestCameraPermissionsAsync.mockResolvedValue({ granted: true } as never);
     picker.launchCameraAsync.mockResolvedValue({ canceled: false, assets: [asset()] } as never);
-    await expect(pickChatPhoto('camera')).resolves.toEqual({
+    await expect(pickPhoto('camera')).resolves.toEqual({
       status: 'picked',
       photo: { uri: 'file:///original.heic', width: 4032, height: 3024 },
     });
@@ -54,7 +54,7 @@ describe('pickChatPhoto', () => {
 
   it('permesso fotocamera negato: non apre la fotocamera', async () => {
     picker.requestCameraPermissionsAsync.mockResolvedValue({ granted: false } as never);
-    await expect(pickChatPhoto('camera')).resolves.toEqual({ status: 'denied' });
+    await expect(pickPhoto('camera')).resolves.toEqual({ status: 'denied' });
     expect(picker.launchCameraAsync).not.toHaveBeenCalled();
   });
 
@@ -63,7 +63,7 @@ describe('pickChatPhoto', () => {
       canceled: false,
       assets: [asset()],
     } as never);
-    const result = await pickChatPhoto('library');
+    const result = await pickPhoto('library');
     expect(result.status).toBe('picked');
     expect(picker.launchImageLibraryAsync).toHaveBeenCalledWith(
       expect.objectContaining({ exif: false }),
@@ -72,7 +72,7 @@ describe('pickChatPhoto', () => {
 
   it("se l'utente annulla non restituisce nessuna foto", async () => {
     picker.launchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: null } as never);
-    await expect(pickChatPhoto('library')).resolves.toEqual({ status: 'cancelled' });
+    await expect(pickPhoto('library')).resolves.toEqual({ status: 'cancelled' });
   });
 });
 
@@ -100,7 +100,7 @@ describe('preparePhoto', () => {
   });
 });
 
-describe('uploadChatPhoto', () => {
+describe('uploadPhoto', () => {
   beforeEach(() => {
     jest.mocked(Crypto.randomUUID).mockReturnValue('11111111-2222-4333-8444-555555555555');
     global.fetch = jest.fn(async () => ({
@@ -108,20 +108,23 @@ describe('uploadChatPhoto', () => {
     })) as unknown as typeof fetch;
   });
 
-  it('carica il file ripulito in chat-photos/<userId>/<uuid>.jpg come JPEG, senza sovrascrivere', async () => {
-    const path = await uploadChatPhoto('user-1', 'file:///clean.jpg');
-    expect(path).toBe('user-1/11111111-2222-4333-8444-555555555555.jpg');
-    expect(fakeSupabase.storage.from).toHaveBeenCalledWith('chat-photos');
-    expect(fakeStorageUpload).toHaveBeenCalledWith(path, expect.any(ArrayBuffer), {
-      contentType: 'image/jpeg',
-      upsert: false,
-    });
-    expect(global.fetch).toHaveBeenCalledWith('file:///clean.jpg');
-  });
+  it.each(['chat-photos', 'posts'] as const)(
+    'carica il file ripulito in %s/<userId>/<uuid>.jpg come JPEG, senza sovrascrivere',
+    async (bucket) => {
+      const path = await uploadPhoto(bucket, 'user-1', 'file:///clean.jpg');
+      expect(path).toBe('user-1/11111111-2222-4333-8444-555555555555.jpg');
+      expect(fakeSupabase.storage.from).toHaveBeenCalledWith(bucket);
+      expect(fakeStorageUpload).toHaveBeenCalledWith(path, expect.any(ArrayBuffer), {
+        contentType: 'image/jpeg',
+        upsert: false,
+      });
+      expect(global.fetch).toHaveBeenCalledWith('file:///clean.jpg');
+    },
+  );
 
   it('un errore di Storage diventa un errore tipizzato e non restituisce nessun path', async () => {
     fakeStorageUpload.mockResolvedValueOnce({ data: null, error: { message: 'denied' } });
-    await expect(uploadChatPhoto('user-1', 'file:///clean.jpg')).rejects.toEqual(
+    await expect(uploadPhoto('posts', 'user-1', 'file:///clean.jpg')).rejects.toEqual(
       new RpcError('UNKNOWN'),
     );
   });

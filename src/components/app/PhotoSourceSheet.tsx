@@ -6,7 +6,7 @@ import { Sheet } from '@/components/ui/Sheet';
 import { Text } from '@/components/ui/Text';
 import { spacing } from '@/theme/tokens';
 
-import type { PhotoSource } from '../photos';
+import type { PhotoSource } from '@/lib/photos/photos';
 
 type Props = {
   visible: boolean;
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export function PhotoSourceSheet({ visible, onPick, onClose, onDismiss }: Props) {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('ui');
   return (
     <Sheet visible={visible} onClose={onClose} onDismiss={onDismiss}>
       <View style={styles.body}>

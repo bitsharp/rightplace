@@ -1,4 +1,59 @@
 {
   "title": "Feed",
-  "newPost": "The day after"
+  "banner": "You only see people you follow. Last night's photos arrive today and disappear after a week.",
+  "loadError": "We couldn't load the feed. Pull down to try again.",
+  "loading": "Loading the feed…",
+  "empty": {
+    "title": "Nothing to see yet",
+    "body": "Your friends' photos from last night show up here from 06:00."
+  },
+  "meta": {
+    "tonight": "{{venue}} · tonight",
+    "lastNight": "{{venue}} · last night",
+    "daysAgo_one": "{{venue}} · {{count}} day ago",
+    "daysAgo_other": "{{venue}} · {{count}} days ago",
+    "venueOnly": "{{venue}}",
+    "unknown": "Night out"
+  },
+  "comments": {
+    "title": "Comments",
+    "placeholder": "Write a comment",
+    "send": "Send",
+    "empty": "No comments yet. Be the first.",
+    "older": "Show earlier comments",
+    "counter": "{{count}}/{{max}}",
+    "loadError": "We couldn't load the comments. Try again.",
+    "close": "Close",
+    "delete": "Delete comment",
+    "a11yMine": "Your comment",
+    "hint": "Long press to report"
+  },
+  "actions": {
+    "postTitle": "Actions on {{handle}}'s post",
+    "commentTitle": "Actions on {{handle}}'s comment",
+    "reportPost": "Report post",
+    "reportComment": "Report comment",
+    "block": "Block author",
+    "deletePost": "Delete post",
+    "deleteComment": "Delete comment",
+    "cancel": "Cancel",
+    "blockTitle": "Block {{handle}}?",
+    "blockBody": "You won't see each other any more: you stop following each other and their posts leave your feed.",
+    "blockConfirm": "Block",
+    "deleteTitle": "Delete this post?",
+    "deleteBody": "It disappears from the feed, along with likes and comments. This can't be undone.",
+    "deleteConfirm": "Delete",
+    "reported": "Report sent. Thank you.",
+    "blocked": "User blocked.",
+    "deleted": "Post deleted."
+  },
+  "story": {
+    "title": "{{handle}}'s story",
+    "mine": "Your story",
+    "close": "Close",
+    "empty": "No posts to show.",
+    "position": "{{current}} of {{total}}",
+    "a11yPhoto": "Photo by {{handle}}"
+  },
+  "followMore": "Follow more people to see more photos"
 }

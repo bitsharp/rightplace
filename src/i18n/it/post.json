@@ -1,0 +1,28 @@
+{
+  "title": "Racconta la serata",
+  "label": "IL GIORNO DOPO",
+  "close": "Annulla e torna indietro",
+  "prompt": {
+    "title": "Com'è andata ieri sera?",
+    "body": "Promemoria: posta una foto o scrivi due righe."
+  },
+  "venue": "Serata: {{venue}}",
+  "photo": {
+    "add": "AGGIUNGI UNA FOTO",
+    "remove": "Rimuovi la foto",
+    "preview": "Anteprima della foto scelta"
+  },
+  "caption": {
+    "label": "Descrizione",
+    "placeholder": "Scrivi qualcosa sulla serata",
+    "counter": "{{count}}/{{max}}"
+  },
+  "note": "La foto compare subito nella chat della serata, visibile solo ai tuoi follower. Nel feed arriva il giorno dopo e si cancella dopo una settimana.",
+  "publish": "Pubblica sul profilo",
+  "noTarget": {
+    "title": "Dichiara una serata per pubblicare",
+    "body": "Puoi postare dopo aver dichiarato una serata, fino a 24 ore dopo la sua fine.",
+    "cta": "Torna alla mappa"
+  },
+  "loadError": "Non riusciamo a controllare la tua serata. Riprova tra poco."
+}

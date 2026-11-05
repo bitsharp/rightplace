@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { RpcError, toRpcErrorCode } from '@/lib/rpcError';
 import { supabase } from '@/lib/supabase';
 
-import { resizeTarget } from './domain/photoSize';
+import { resizeTarget } from './photoSize';
 
 export type PhotoSource = 'camera' | 'library';
 export type PickedPhoto = { uri: string; width: number; height: number };
@@ -29,7 +29,7 @@ function toResult(result: ImagePicker.ImagePickerResult): PickResult {
 
 // Permissions are asked only now, at the tap on the camera. The gallery uses the system picker,
 // which needs no permission: the app never sees photos the user did not choose.
-export async function pickChatPhoto(source: PhotoSource): Promise<PickResult> {
+export async function pickPhoto(source: PhotoSource): Promise<PickResult> {
   if (source === 'library')
     return toResult(await ImagePicker.launchImageLibraryAsync(PICKER_OPTIONS));
   const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -55,12 +55,19 @@ export async function preparePhoto(photo: PickedPhoto): Promise<string> {
   return saved.uri;
 }
 
+export type PhotoBucket = 'chat-photos' | 'posts';
+
 // `cleanUri` must be the output of preparePhoto: the original file is never uploaded.
-export async function uploadChatPhoto(userId: string, cleanUri: string): Promise<string> {
+// The path is always <user id>/<uuid>.jpg: it is the only shape the RPCs accept.
+export async function uploadPhoto(
+  bucket: PhotoBucket,
+  userId: string,
+  cleanUri: string,
+): Promise<string> {
   const path = `${userId}/${Crypto.randomUUID()}.jpg`;
   const body = await (await fetch(cleanUri)).arrayBuffer();
   const { error } = await supabase.storage
-    .from('chat-photos')
+    .from(bucket)
     .upload(path, body, { contentType: 'image/jpeg', upsert: false });
   if (error) throw new RpcError(toRpcErrorCode(error));
   return path;

@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef } from 'react';
 
 import { useSession } from '@/features/auth/useSession';
 import { useCoarsePositionStore } from '@/features/profile/location';
+import { useTopBar } from '@/features/posts/useTopBar';
 import { useActiveCities } from '@/features/venues/hooks';
 
 import {
@@ -12,8 +13,7 @@ import {
   type FriendVenue,
   type MapVenue,
 } from './domain/mapLayers';
-import { buildTopBarStories } from './domain/stories';
-import { useCityMap, useMyDeclaration, useRecommendedVenue, useStories } from './hooks';
+import { useCityMap, useMyDeclaration, useRecommendedVenue } from './hooks';
 import { useMapStore, type MapViewMode } from './store/mapStore';
 
 const NO_ROWS: readonly MapVenue[] = [];
@@ -61,10 +61,8 @@ export function useMapScreen() {
   const cities = useActiveCities();
   const { layers, generalRows, loaded, loadFailed } = useMapLayers(citySlug, view);
   const declaration = useMyDeclaration();
-  const stories = useStories();
   const recommended = useRecommendedVenue(citySlug);
   const coarseCell = useCoarsePositionStore((state) => state.cell);
-  const handle = profile?.handle ?? '';
   const openVenue = useOpenVenue();
 
   return {
@@ -80,16 +78,8 @@ export function useMapScreen() {
     sponsored: generalRows.find((row) => row.isSponsored) ?? null,
     recommended: recommended.data ?? null,
     declaration: declaration.data ?? null,
-    topBar: {
-      handle,
-      canPost: declaration.data != null,
-      hasNews: (stories.data ?? []).length > 0,
-      stories: buildTopBarStories(handle, stories.data ?? []),
-    },
+    topBar: useTopBar(),
     openVenue,
-    openPost: () => router.push('/post/new'),
-    openProfile: () => router.push('/profile'),
-    openFeed: () => router.push('/feed'),
     openSearch: () => router.push('/search'),
   };
 }

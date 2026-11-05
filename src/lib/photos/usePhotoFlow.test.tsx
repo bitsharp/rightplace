@@ -6,7 +6,7 @@ import { usePhotoFlow } from './usePhotoFlow';
 const mockPick = jest.fn();
 const mockPrepare = jest.fn();
 jest.mock('./photos', () => ({
-  pickChatPhoto: (source: string) => mockPick(source),
+  pickPhoto: (source: string) => mockPick(source),
   preparePhoto: (photo: unknown) => mockPrepare(photo),
 }));
 

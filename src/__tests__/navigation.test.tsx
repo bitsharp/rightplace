@@ -48,7 +48,7 @@ describe('tab bar e route', () => {
     ['/venue/abc', 'venue:title'],
     ['/event/abc', 'venue:eventTitle'],
     ['/night/abc/chat', 'chat:nightTitle'],
-    ['/post/new', 'feed:newPost'],
+    ['/post/new', 'post:title'],
     ['/creator', 'creator:title'],
     ['/creator/new-event', 'creator:newEvent'],
     ['/creator/billing', 'creator:billing'],

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import type { SessionStatus } from '@/features/auth/domain/sessionStatus';
 import { useAuthListener } from '@/features/auth/store/authStore';
 import { useSession } from '@/features/auth/useSession';
+import { resetSeenStories } from '@/features/posts/store/seenStories';
 import { useCoarseLocationSync } from '@/features/profile/location';
 import { useDeviceLanguageSync } from '@/i18n/useDeviceLanguageSync';
 import { colors } from '@/theme/tokens';
@@ -63,6 +64,7 @@ const READY_SCREENS = [
   { name: 'event/[id]' },
   { name: 'night/[id]/chat' },
   { name: 'post/new', options: MODAL },
+  { name: 'story/[userId]', options: { presentation: 'fullScreenModal' } as const },
   { name: 'creator/index' },
   { name: 'creator/new-event' },
   { name: 'creator/billing', options: MODAL },
@@ -72,6 +74,9 @@ const READY_SCREENS = [
 function useClearCacheOnSignOut(userId: string | null) {
   const queryClient = useQueryClient();
   useEffect(() => {
-    if (userId === null) queryClient.clear();
+    if (userId === null) {
+      queryClient.clear();
+      resetSeenStories();
+    }
   }, [userId, queryClient]);
 }

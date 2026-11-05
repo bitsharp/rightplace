@@ -20,8 +20,12 @@ type Props = {
   liked: boolean;
   commentCount: number;
   onToggleLike: () => void;
+  onOpenComments: () => void;
+  // Long press: report / block / delete (principle 7).
+  onLongPress?: () => void;
   caption?: string;
   photoUri?: string;
+  photoCacheKey?: string;
   scene?: number;
 };
 
@@ -32,12 +36,14 @@ export function PostCard({
   daysLeft,
   caption,
   photoUri,
+  photoCacheKey,
   scene,
+  onLongPress,
   ...social
 }: Props) {
   const { t } = useTranslation('ui');
   return (
-    <View style={styles.card}>
+    <Pressable testID="post-card" accessible={false} onLongPress={onLongPress} style={styles.card}>
       <View style={styles.header}>
         <Avatar intent={tone} size={36} />
         <View style={styles.headerTexts}>
@@ -49,7 +55,13 @@ export function PostCard({
         {/* Posts are deleted server-side after 7 days (CLAUDE.md principle 5). */}
         <MonoLabel>{t('post.expires', { count: daysLeft })}</MonoLabel>
       </View>
-      <PhotoFrame height={210} uri={photoUri} scene={scene} accessibilityLabel={caption} />
+      <PhotoFrame
+        height={210}
+        uri={photoUri}
+        scene={scene}
+        accessibilityLabel={caption}
+        cacheKey={photoCacheKey}
+      />
       <View style={styles.footer}>
         {caption ? (
           <Text testID="post-caption" variant="body14">
@@ -58,7 +70,7 @@ export function PostCard({
         ) : null}
         <SocialActions {...social} />
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -67,7 +79,8 @@ function SocialActions({
   liked,
   commentCount,
   onToggleLike,
-}: Pick<Props, 'likeCount' | 'liked' | 'commentCount' | 'onToggleLike'>) {
+  onOpenComments,
+}: Pick<Props, 'likeCount' | 'liked' | 'commentCount' | 'onToggleLike' | 'onOpenComments'>) {
   const { t } = useTranslation('ui');
   const toggle = () => {
     confirmFeedback();
@@ -88,12 +101,18 @@ function SocialActions({
           {String(likeCount)}
         </Text>
       </Pressable>
-      <View style={styles.action}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('post.comments')}
+        hitSlop={12}
+        onPress={onOpenComments}
+        style={styles.action}
+      >
         <Icon name="chat" color="textSecondary" />
         <Text variant="body14" color="textSecondary">
           {String(commentCount)}
         </Text>
-      </View>
+      </Pressable>
     </View>
   );
 }

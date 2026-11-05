@@ -79,6 +79,8 @@ function invalidateAfterChange(queryClient: QueryClient, venueId?: string): Prom
     queryClient.invalidateQueries({ queryKey: ['cityMap'] }),
     queryClient.invalidateQueries({ queryKey: venueId ? ['venueStats', venueId] : ['venueStats'] }),
     queryClient.invalidateQueries({ queryKey: ['stories'] }),
+    // "+" in the TopBar follows the declaration (active or ended < 24 h ago).
+    queryClient.invalidateQueries({ queryKey: ['postTarget'] }),
   ]);
 }
 

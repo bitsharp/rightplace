@@ -15,6 +15,8 @@ export type Story = {
   initial: string;
   tone: AvatarIntent;
   mine?: boolean;
+  // Local only (see the seen-stories store): false = something new to watch.
+  seen?: boolean;
 };
 
 type Props = {
@@ -109,7 +111,7 @@ function StoryStrip({ stories, onOpenStory }: Pick<Props, 'stories' | 'onOpenSto
           onPress={() => onOpenStory(story.id)}
           style={styles.story}
         >
-          <StoryAvatar initial={story.initial} tone={story.tone} seen={story.mine === true} />
+          <StoryAvatar initial={story.initial} tone={story.tone} seen={story.seen === true} />
           <Text variant="body11Medium" color="textSecondary" numberOfLines={1}>
             {story.mine ? t('topBar.myStory') : story.handle.replace(/^@/, '')}
           </Text>

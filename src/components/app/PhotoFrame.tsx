@@ -10,13 +10,17 @@ type Props = {
   uri?: string;
   scene?: number;
   accessibilityLabel?: string;
+  // Signed URLs change on every request and photos must not outlive their 7 days (principle 5):
+  // with a cache key the picture is kept in memory only, under a stable key.
+  cacheKey?: string;
 };
 
-export function PhotoFrame({ height, uri, scene = 0, accessibilityLabel }: Props) {
+export function PhotoFrame({ height, uri, scene = 0, accessibilityLabel, cacheKey }: Props) {
   if (uri) {
     return (
       <Image
-        source={{ uri }}
+        source={cacheKey ? { uri, cacheKey } : { uri }}
+        cachePolicy={cacheKey ? 'memory' : undefined}
         accessible
         accessibilityLabel={accessibilityLabel}
         contentFit="cover"

@@ -5,12 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useFollowing } from '@/features/friends/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
+import { usePhotoFlow } from '@/lib/photos/usePhotoFlow';
 
 import { chatExpiryHours } from './domain/ttl';
 import { visibleMessages } from './domain/visibleMessages';
 import type { ChatMessage } from './domain/messages';
 import { usePhotoUrls, useMyChatRooms, useRoomMessages, useSendMessage } from './hooks';
-import { usePhotoFlow } from './usePhotoFlow';
 import { useFollowByHandle } from './useFollowByHandle';
 import { useRoomRealtime } from './useRoomRealtime';
 

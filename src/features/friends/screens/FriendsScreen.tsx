@@ -18,7 +18,7 @@ import { SearchResults } from '../components/SearchResults';
 import { isSearchable } from '../domain/searchQuery';
 import { useFollowing } from '../hooks';
 import { useFollowActions } from '../useFollowActions';
-import { useFriendsTopBar } from '../useFriendsTopBar';
+import { useTopBar } from '@/features/posts/useTopBar';
 
 const NOTICE_MS = 4000;
 
@@ -33,7 +33,7 @@ function useNotice() {
 }
 
 export function FriendsScreen() {
-  const topBar = useFriendsTopBar();
+  const topBar = useTopBar();
   const actions = useFollowActions();
   const [text, setText] = useState('');
   const [selected, setSelected] = useState<Person | null>(null);

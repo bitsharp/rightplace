@@ -15,13 +15,7 @@ export function MapScreen() {
   const { topBar } = map;
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
-      <TopBar
-        {...topBar}
-        onPost={map.openPost}
-        onOpenProfile={map.openProfile}
-        onOpenNews={map.openFeed}
-        onOpenStory={map.openFeed}
-      />
+      <TopBar {...topBar} />
       <View style={styles.controls}>
         <MapSearchEntry onPress={map.openSearch} />
         <MapViewSwitch view={map.view} onChange={map.setView} />

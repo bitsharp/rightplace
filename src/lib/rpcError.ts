@@ -20,6 +20,10 @@ const SERVER_ERROR_CODES = [
   'NOT_ROOM_MEMBER',
   'INVALID_MESSAGE',
   'INVALID_PHOTO_PATH',
+  'NO_RECENT_DECLARATION',
+  'INVALID_POST',
+  'INVALID_COMMENT',
+  'POST_NOT_FOUND',
 ] as const;
 
 export const RPC_ERROR_CODES = [...SERVER_ERROR_CODES, 'NETWORK', 'UNKNOWN'] as const;
@@ -39,4 +43,10 @@ export class RpcError extends Error {
     super(code);
     this.name = 'RpcError';
   }
+}
+
+// For screens that show `errors:rpc.<code>` under a form: null while there is no error.
+export function rpcErrorCodeOf(error: unknown): RpcErrorCode | null {
+  if (error == null) return null;
+  return error instanceof RpcError ? error.code : 'UNKNOWN';
 }

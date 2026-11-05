@@ -3,8 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { TopBar, type Story } from './TopBar';
 
 const STORIES: Story[] = [
-  { id: 'me', handle: 'lince.rosso', initial: 'L', tone: 'neutral', mine: true },
-  { id: 's1', handle: 'volpe.viola', initial: 'V', tone: 'going' },
+  { id: 'me', handle: 'lince.rosso', initial: 'L', tone: 'neutral', mine: true, seen: true },
+  { id: 's1', handle: 'volpe.viola', initial: 'V', tone: 'going', seen: false },
+  { id: 's2', handle: 'orso.verde', initial: 'O', tone: 'going', seen: true },
 ];
 
 const baseProps = {
@@ -53,5 +54,11 @@ describe('TopBar', () => {
       screen.getByRole('button', { name: 'ui:topBar.storyA11y({"handle":"@volpe.viola"})' }),
     );
     expect(onOpenStory).toHaveBeenCalledWith('s1');
+  });
+
+  it('distingue le storie non viste (anello sfumato) da quelle viste (anello grigio)', async () => {
+    await render(<TopBar {...baseProps} canPost={false} />);
+    expect(screen.getAllByTestId('story-ring-new')).toHaveLength(1);
+    expect(screen.getAllByTestId('story-ring-seen')).toHaveLength(2);
   });
 });
