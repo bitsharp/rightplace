@@ -69,6 +69,10 @@ describe('app.config', () => {
     expect(config.ios?.infoPlist?.UIBackgroundModes).toBeUndefined();
   });
 
+  it('dichiara su iOS che usa solo la crittografia esente (HTTPS) per saltare la domanda export a ogni build', () => {
+    expect(config.ios?.infoPlist?.ITSAppUsesNonExemptEncryption).toBe(false);
+  });
+
   it('blocca su Android i permessi aggiunti dalle librerie che il prodotto non usa', () => {
     expect(config.android?.blockedPermissions).toEqual(
       expect.arrayContaining([

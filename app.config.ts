@@ -35,7 +35,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: APP_ID,
     supportsTablet: false,
-    infoPlist: { CFBundleAllowMixedLocalizations: true },
+    // Perché false: usiamo solo HTTPS (esente); senza, App Store Connect chiede la conformità export a ogni build
+    infoPlist: { CFBundleAllowMixedLocalizations: true, ITSAppUsesNonExemptEncryption: false },
   },
   android: {
     package: APP_ID,
