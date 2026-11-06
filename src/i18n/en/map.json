@@ -11,7 +11,8 @@
   },
   "legend": {
     "tonight": "Tonight",
-    "usually": "Usually"
+    "usually": "Usually",
+    "event": "Event"
   },
   "banner": {
     "typicalOnly": "No one has declared tonight yet: the grey dots show the usual crowd. Declare yours and invite friends.",

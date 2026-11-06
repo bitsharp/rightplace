@@ -1,0 +1,9 @@
+{
+  "cancelledBanner": "Event cancelled",
+  "cancelledBody": "The creator cancelled this event: you can no longer declare it.",
+  "by": "Event by {{handle}}",
+  "target": "Who it's for: {{target}}",
+  "venueSection": "The venue",
+  "openVenue": "Open the venue {{venue}}",
+  "loadError": "We can't load the event. Try again soon."
+}

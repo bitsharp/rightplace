@@ -11,7 +11,8 @@
   },
   "legend": {
     "tonight": "Stasera",
-    "usually": "Di solito"
+    "usually": "Di solito",
+    "event": "Serata"
   },
   "banner": {
     "typicalOnly": "Ancora nessuna dichiarazione stasera: i punti grigi sono l'affluenza abituale. Dichiara la tua e invita amici.",

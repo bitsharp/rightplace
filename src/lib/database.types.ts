@@ -289,6 +289,7 @@ export type Database = {
       };
       events: {
         Row: {
+          cancelled_at: string | null;
           created_at: string;
           creator_id: string;
           description: string | null;
@@ -305,6 +306,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          cancelled_at?: string | null;
           created_at?: string;
           creator_id: string;
           description?: string | null;
@@ -320,6 +322,7 @@ export type Database = {
           venue_id: string;
         };
         Update: {
+          cancelled_at?: string | null;
           created_at?: string;
           creator_id?: string;
           description?: string | null;
@@ -1068,6 +1071,7 @@ export type Database = {
       age_band: { Args: { p_birth_date: string }; Returns: string };
       attendance_band: { Args: { p_count: number }; Returns: string };
       block_user: { Args: { p_user_id: string }; Returns: undefined };
+      cancel_event: { Args: { p_event_id: string }; Returns: undefined };
       cancel_follow_request: { Args: { p_user_id: string }; Returns: undefined };
       claim_storage_deletions: {
         Args: { p_limit?: number };
@@ -1149,6 +1153,24 @@ export type Database = {
           photo_path: string;
         }[];
       };
+      get_city_events: {
+        Args: { p_city_slug: string; p_days?: number; p_query?: string };
+        Returns: {
+          ends_at: string;
+          event_id: string;
+          going_band: string;
+          is_sponsored: boolean;
+          lat: number;
+          lng: number;
+          maybe_band: string;
+          name: string;
+          starts_at: string;
+          timezone: string;
+          venue_id: string;
+          venue_kind: string;
+          venue_name: string;
+        }[];
+      };
       get_city_map: {
         Args: { p_city_slug: string; p_view?: string };
         Returns: {
@@ -1181,10 +1203,43 @@ export type Database = {
       get_event_attendance: {
         Args: { p_event_id: string };
         Returns: {
+          avg_age: number;
+          female_pct: number;
           going_band: string;
+          male_pct: number;
           maybe_band: string;
+          other_pct: number;
+        }[];
+      };
+      get_event_detail: {
+        Args: { p_event_id: string };
+        Returns: {
+          address: string;
+          avg_age: number;
+          cancelled_at: string;
+          city_slug: string;
+          creator_handle: string;
+          description: string;
+          ends_at: string;
+          event_id: string;
+          female_pct: number;
+          friends: Json;
+          going_band: string;
+          is_mine: boolean;
+          lat: number;
+          lng: number;
+          male_pct: number;
+          maybe_band: string;
+          name: string;
+          other_pct: number;
+          starts_at: string;
           target_age_bands: string[];
           target_genders: string[];
+          taxi_number: string;
+          timezone: string;
+          venue_id: string;
+          venue_kind: string;
+          venue_name: string;
         }[];
       };
       get_feed: {
@@ -1260,8 +1315,11 @@ export type Database = {
         }[];
       };
       get_my_creator_events: {
-        Args: Record<PropertyKey, never>;
+        Args: { p_scope?: string };
         Returns: {
+          can_edit: boolean;
+          cancelled_at: string;
+          description: string;
           ends_at: string;
           event_id: string;
           going_band: string;
@@ -1271,6 +1329,9 @@ export type Database = {
           starts_at: string;
           target_age_bands: string[];
           target_genders: string[];
+          timezone: string;
+          venue_id: string;
+          venue_kind: string;
           venue_name: string;
         }[];
       };
@@ -1476,6 +1537,18 @@ export type Database = {
       undeclare: { Args: Record<PropertyKey, never>; Returns: undefined };
       unfollow: { Args: { p_user_id: string }; Returns: undefined };
       update_coarse_location: { Args: { p_lat: number; p_lng: number }; Returns: undefined };
+      update_event: {
+        Args: {
+          p_description: string;
+          p_ends_at: string;
+          p_event_id: string;
+          p_name: string;
+          p_starts_at: string;
+          p_target_age_bands?: string[];
+          p_target_genders?: string[];
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;

@@ -33,6 +33,12 @@
     "NO_RECENT_DECLARATION": "Per pubblicare devi aver dichiarato una serata nelle ultime 24 ore.",
     "INVALID_POST": "Aggiungi una foto o scrivi qualcosa (massimo 500 caratteri).",
     "INVALID_COMMENT": "Il commento deve avere da 1 a 300 caratteri.",
-    "POST_NOT_FOUND": "Questo post non è più disponibile."
+    "POST_NOT_FOUND": "Questo post non è più disponibile.",
+    "INVALID_NAME": "Il nome della serata deve avere da 1 a 80 caratteri.",
+    "INVALID_DESCRIPTION": "La descrizione può avere al massimo 500 caratteri.",
+    "INVALID_TARGET": "Il pubblico scelto non è valido.",
+    "INVALID_SCHEDULE": "Orario non valido: la serata deve iniziare nel futuro (entro 60 giorni) e finire entro le 06:00 del giorno dopo.",
+    "TOO_MANY_ACTIVE_EVENTS": "Hai già 10 serate attive. Annullane una o aspetta che finisca.",
+    "EVENT_STARTED": "La serata è già iniziata: non si può più modificare."
   }
 }

@@ -13,6 +13,13 @@ describe('MapLegend', () => {
     expect(screen.getByText('map:legend.usually')).toBeOnTheScreen();
   });
 
+  it('nello strato "stasera" c’è anche la voce Serata, col pallino tratteggiato', async () => {
+    await render(<MapLegend />);
+    expect(screen.getByText('map:legend.event')).toBeOnTheScreen();
+    const dot = StyleSheet.flatten(screen.getByTestId('legend-event-dot').props.style);
+    expect(dot.borderStyle).toBe('dashed');
+  });
+
   it('descrive lo strato grigio a parole: tranquillo · animato · pieno', async () => {
     await render(<MapLegend />);
     expect(screen.getByText('ui:typical.quiet')).toBeOnTheScreen();

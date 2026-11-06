@@ -7,6 +7,7 @@ import { Icon } from '@/components/ui/Icon';
 import { afterModalDismiss } from '@/lib/afterModalDismiss';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
 
+import type { EventSpotPlacement } from '../domain/eventSpots';
 import type { MapLayers } from '../domain/mapLayers';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
@@ -27,6 +28,8 @@ type Props = {
   onRegionChange: (region: MapRegion) => void;
   onClose: () => void;
   onOpenVenue: (venueId: string) => void;
+  events?: readonly EventSpotPlacement[];
+  onOpenEvent?: (eventId: string) => void;
 };
 
 type BarProps = Pick<Props, 'view' | 'onChangeView' | 'onClose'>;
@@ -51,9 +54,7 @@ function FullScreenBar({ view, onChangeView, onClose }: BarProps) {
   );
 }
 
-type ContentProps = Omit<Props, 'visible' | 'onOpenVenue'> & {
-  onOpenVenue: (venueId: string) => void;
-};
+type ContentProps = Omit<Props, 'visible'>;
 
 function FullScreenContent(props: ContentProps) {
   const { bottom } = useSafeAreaInsets();
@@ -69,6 +70,8 @@ function FullScreenContent(props: ContentProps) {
           initialRegion={props.initialRegion}
           onRegionChange={props.onRegionChange}
           onOpenVenue={props.onOpenVenue}
+          events={props.events}
+          onOpenEvent={props.onOpenEvent}
         />
         <View testID="map-hint-overlay" pointerEvents="none" style={styles.hint}>
           <MapHint view={props.view} />
@@ -85,16 +88,21 @@ function FullScreenContent(props: ContentProps) {
   );
 }
 
+type Destination = { kind: 'venue' | 'event'; id: string };
+
 // The only place where hint and legend are drawn over the map.
-export function MapFullScreen({ visible, onOpenVenue, ...content }: Props) {
+export function MapFullScreen({ visible, onOpenVenue, onOpenEvent, ...content }: Props) {
   const { onClose } = content;
   const deferred = useMemo(
-    () => afterModalDismiss<string>(Platform.OS, onOpenVenue),
-    [onOpenVenue],
+    () =>
+      afterModalDismiss<Destination>(Platform.OS, ({ kind, id }) =>
+        kind === 'venue' ? onOpenVenue(id) : onOpenEvent?.(id),
+      ),
+    [onOpenVenue, onOpenEvent],
   );
-  const openAfterClose = (venueId: string) => {
+  const openAfterClose = (kind: Destination['kind']) => (id: string) => {
     onClose();
-    deferred.request(venueId);
+    deferred.request({ kind, id });
   };
   return (
     <Modal
@@ -107,7 +115,11 @@ export function MapFullScreen({ visible, onOpenVenue, ...content }: Props) {
     >
       {/* A Modal is a separate native root: without its own provider the insets read as zero. */}
       <SafeAreaProvider>
-        <FullScreenContent {...content} onOpenVenue={openAfterClose} />
+        <FullScreenContent
+          {...content}
+          onOpenVenue={openAfterClose('venue')}
+          onOpenEvent={openAfterClose('event')}
+        />
       </SafeAreaProvider>
     </Modal>
   );

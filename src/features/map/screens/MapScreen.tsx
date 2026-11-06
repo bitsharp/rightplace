@@ -23,10 +23,12 @@ export function MapScreen() {
       <MapStage
         city={map.city}
         layers={map.layers}
+        events={map.eventSpots}
         view={map.view}
         you={map.you}
         onChangeView={map.setView}
         onOpenVenue={map.openVenue}
+        onOpenEvent={map.openEvent}
       />
       <MapBottomPanel
         view={map.view}

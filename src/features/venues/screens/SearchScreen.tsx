@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { VenueRow } from '@/components/app/VenueRow';
+import { EventSearchRow } from '@/features/events/components/EventSearchRow';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { MonoLabel } from '@/components/ui/MonoLabel';
@@ -45,6 +46,7 @@ export function SearchScreen() {
         onKind={search.setKind}
       />
       <RecentChips recents={search.recents} onOpen={search.openVenue} />
+      <EventsSection rows={search.eventRows} onOpen={search.openEvent} />
       <Text variant="body13" color="textSecondary">
         {t('count', { count: search.rows.length })}
       </Text>
@@ -66,6 +68,30 @@ export function SearchScreen() {
       </View>
       <MonoLabel>{t('googleAttribution')}</MonoLabel>
     </Screen>
+  );
+}
+
+type EventRows = ReturnType<typeof useVenueSearch>['eventRows'];
+
+function EventsSection({ rows, onOpen }: { rows: EventRows; onOpen: (eventId: string) => void }) {
+  const { t } = useTranslation('venues');
+  if (rows.length === 0) return null;
+  return (
+    <View style={styles.list}>
+      <Text variant="display17">{t('events.title')}</Text>
+      {rows.map((event) => (
+        <EventSearchRow
+          key={event.eventId}
+          name={event.name}
+          venueName={event.venueName}
+          whenLabel={event.whenLabel}
+          goingBand={event.goingBand}
+          maybeBand={event.maybeBand}
+          sponsored={event.isSponsored}
+          onPress={() => onOpen(event.eventId)}
+        />
+      ))}
+    </View>
   );
 }
 

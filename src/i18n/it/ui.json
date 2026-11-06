@@ -87,5 +87,30 @@
     "cancel": "Annulla",
     "denied": "Permesso negato: puoi attivare la fotocamera dalle impostazioni del telefono.",
     "failed": "Non siamo riusciti a preparare la foto. Riprova."
+  },
+  "event": {
+    "cancelled": "Annullata"
+  },
+  "eventWhen": {
+    "tonight": "Stasera · {{time}}–{{endTime}}",
+    "tomorrow": "Domani · {{time}}–{{endTime}}",
+    "date": "{{date}} · {{time}}–{{endTime}}"
+  },
+  "eventSpot": {
+    "a11y": "Serata {{event}}: Ci vado {{going}}, Forse {{maybe}}. Apri la serata"
+  },
+  "target": {
+    "allAges": "Tutte le età",
+    "genderTitle": "Genere",
+    "age": {
+      "18-24": "18–24",
+      "25-34": "25–34",
+      "35+": "35+"
+    },
+    "gender": {
+      "all": "Tutti",
+      "female": "Donne",
+      "male": "Uomini"
+    }
   }
 }

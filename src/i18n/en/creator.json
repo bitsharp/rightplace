@@ -1,5 +1,91 @@
 {
   "title": "Creator profile",
   "newEvent": "Create event",
-  "billing": "Subscription"
+  "editEvent": "Edit event",
+  "attendanceTitle": "Sign-ups",
+  "billing": "Subscription",
+  "profile": {
+    "label": "Creator profile"
+  },
+  "notCreator": {
+    "title": "Become a creator",
+    "body": "To publish events, turn on “I'm a creator” in your profile.",
+    "cta": "Go to profile"
+  },
+  "events": {
+    "title": "Your events",
+    "new": "New event",
+    "note": "Sign-ups are ranges, not individual people.",
+    "emptyUpcoming": "No upcoming events. Create one.",
+    "emptyPast": "No past events.",
+    "loadError": "We can't load your events. Try again soon."
+  },
+  "scope": {
+    "upcoming": "Upcoming",
+    "past": "Past"
+  },
+  "form": {
+    "label": "Creator · new event",
+    "editLabel": "Creator · edit event",
+    "title": "Create an event",
+    "editTitle": "Edit the event",
+    "venue": {
+      "label": "Venue",
+      "searchLabel": "Search the venue",
+      "searchPlaceholder": "Venue name",
+      "empty": "No venue found.",
+      "change": "Change",
+      "locked": "The venue can't be changed after publishing"
+    },
+    "name": {
+      "label": "Event name",
+      "placeholder": "E.g. Techno Night"
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Music, guests, dress code…",
+      "counter": "{{count}}/{{max}}"
+    },
+    "time": {
+      "label": "Time",
+      "startDay": "Day",
+      "start": "Start",
+      "end": "End",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "startEarlier": "Start earlier",
+      "startLater": "Start later",
+      "endEarlier": "End earlier",
+      "endLater": "End later",
+      "endNextDay": "{{time}} (next day)"
+    },
+    "target": {
+      "label": "Who it's for"
+    },
+    "submit": "Publish the event",
+    "save": "Save changes",
+    "notEditable": "This event can no longer be edited.",
+    "errors": {
+      "venueRequired": "Choose the venue.",
+      "nameRequired": "Give the event a name.",
+      "nameTooLong": "The name can be 80 characters at most.",
+      "descriptionTooLong": "The description can be 500 characters at most.",
+      "startInPast": "The start must be in the future.",
+      "startTooFar": "You can publish events up to 60 days ahead.",
+      "endBeforeStart": "The end must be after the start.",
+      "endAfterNight": "The event must end by 06:00 the next day."
+    }
+  },
+  "attendance": {
+    "bands": "Sign-ups",
+    "note": "Sign-ups are ranges, not individual people. You will never see who signed up.",
+    "edit": "Edit",
+    "cancel": "Cancel the event",
+    "cancelConfirm": "Cancel the event? Declarations and the chat close right away.",
+    "confirmYes": "Yes, cancel the event",
+    "confirmNo": "Keep it",
+    "cancelled": "Event cancelled",
+    "notFound": "This event isn't yours or no longer exists.",
+    "loadError": "We can't load the sign-ups. Try again soon."
+  }
 }

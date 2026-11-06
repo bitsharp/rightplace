@@ -67,6 +67,8 @@ const READY_SCREENS = [
   { name: 'story/[userId]', options: { presentation: 'fullScreenModal' } as const },
   { name: 'creator/index' },
   { name: 'creator/new-event' },
+  { name: 'creator/event/[id]' },
+  { name: 'creator/edit-event/[id]' },
   { name: 'creator/billing', options: MODAL },
 ];
 

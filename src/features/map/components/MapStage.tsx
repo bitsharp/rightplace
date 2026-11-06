@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Icon } from '@/components/ui/Icon';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
 
+import type { EventSpotPlacement } from '../domain/eventSpots';
 import type { MapLayers } from '../domain/mapLayers';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
@@ -19,6 +20,8 @@ type Props = {
   you: { lat: number; lng: number } | null;
   onChangeView: (view: MapViewMode) => void;
   onOpenVenue: (venueId: string) => void;
+  events?: readonly EventSpotPlacement[];
+  onOpenEvent?: (eventId: string) => void;
 };
 
 function ExpandButton({ onPress }: { onPress: () => void }) {
@@ -36,7 +39,15 @@ function ExpandButton({ onPress }: { onPress: () => void }) {
 }
 
 // Compact map: markers only and one icon button. Hint and legend live in full screen.
-export function MapStage({ city, layers, view, you, onChangeView, onOpenVenue }: Props) {
+export function MapStage({
+  city,
+  layers,
+  view,
+  you,
+  onChangeView,
+  onOpenVenue,
+  ...eventProps
+}: Props) {
   const [fullScreen, setFullScreen] = useState(false);
   // Local framing only (never persisted), shared by both maps: whichever moved last wins.
   const [region, setRegion] = useState<MapRegion | undefined>(undefined);
@@ -55,6 +66,7 @@ export function MapStage({ city, layers, view, you, onChangeView, onOpenVenue }:
               initialRegion={region}
               onRegionChange={setRegion}
               onOpenVenue={onOpenVenue}
+              {...eventProps}
             />
           )}
           <MapFullScreen
@@ -68,6 +80,7 @@ export function MapStage({ city, layers, view, you, onChangeView, onOpenVenue }:
             onRegionChange={setRegion}
             onClose={() => setFullScreen(false)}
             onOpenVenue={onOpenVenue}
+            {...eventProps}
           />
           <ExpandButton onPress={() => setFullScreen(true)} />
         </>

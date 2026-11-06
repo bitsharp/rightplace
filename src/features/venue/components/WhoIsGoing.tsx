@@ -46,7 +46,8 @@ export function WhoIsGoing({ segment, onSegment, view }: Props) {
   );
 }
 
-function Breakdown({ view }: { view: StatsView | null }) {
+// Also used by the creator's attendance page, which has a single "all" group.
+export function Breakdown({ view }: { view: StatsView | null }) {
   const { t } = useTranslation('venue');
   if (!view) return null;
   if (view.kind === 'hidden') return <EmptyState message={t(`who.hidden.${view.segment}`)} />;

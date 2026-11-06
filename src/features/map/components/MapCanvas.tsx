@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
+import { EventSpot } from '@/components/app/EventSpot';
 import { HotSpot } from '@/components/app/HotSpot';
 import { TypicalDot } from '@/components/app/TypicalDot';
 import { YouMarker } from '@/components/app/YouMarker';
 import type { LatLng } from '@/features/profile/domain/coarsen';
 
 import { isVisibleTypical } from '../domain/typical';
+import type { EventSpotPlacement } from '../domain/eventSpots';
 import type { MapLayers, MapVenue } from '../domain/mapLayers';
 import { cityRegion, type CityCenter, type MapRegion } from '../domain/region';
 import { mapAppearance } from '../mapStyle';
@@ -26,10 +28,13 @@ type Props = {
   initialRegion?: MapRegion;
   onRegionChange?: (region: MapRegion) => void;
   onOpenVenue: (venueId: string) => void;
+  // Creators' nights tonight ("stasera" layer), already placed so they never overlap a hot spot.
+  events?: readonly EventSpotPlacement[];
+  onOpenEvent?: (eventId: string) => void;
 };
 
 // Grey "di solito" dots under the coloured "stasera" hot spots, "Tu" above everything.
-const Z_INDEX = { typical: 1, hotSpot: 2, you: 3 } as const;
+const Z_INDEX = { typical: 1, event: 2, hotSpot: 3, you: 4 } as const;
 
 type MarkerProps = {
   testID: string;
@@ -40,6 +45,8 @@ type MarkerProps = {
   onPress?: () => void;
   children: ReactNode;
 };
+
+const NO_EVENTS: readonly EventSpotPlacement[] = [];
 
 // Time for layout and fonts to settle before the marker bitmap is frozen.
 const FIRST_RENDER_MS = 250;
@@ -129,6 +136,32 @@ function HotSpotMarkers({
   ));
 }
 
+function EventMarkers({
+  events,
+  onOpenEvent,
+}: {
+  events: readonly EventSpotPlacement[];
+  onOpenEvent?: (eventId: string) => void;
+}) {
+  return events.map(({ event, lat, lng }) => (
+    <MapMarker
+      key={event.eventId}
+      contentKey={[event.eventId, event.goingBand, event.maybeBand].join(':')}
+      testID={`marker-event-${event.eventId}`}
+      coordinate={{ lat, lng }}
+      zIndex={Z_INDEX.event}
+      onPress={() => onOpenEvent?.(event.eventId)}
+    >
+      <EventSpot
+        name={event.name}
+        goingBand={event.goingBand}
+        maybeBand={event.maybeBand}
+        onPress={() => onOpenEvent?.(event.eventId)}
+      />
+    </MapMarker>
+  ));
+}
+
 export function MapCanvas({
   city,
   layers,
@@ -137,6 +170,8 @@ export function MapCanvas({
   initialRegion,
   onRegionChange,
   onOpenVenue,
+  events = NO_EVENTS,
+  onOpenEvent,
 }: Props) {
   const { t } = useTranslation('map');
   return (
@@ -152,6 +187,7 @@ export function MapCanvas({
       {...mapAppearance}
     >
       <TypicalMarkers dots={layers.typicalDots} onOpenVenue={onOpenVenue} />
+      <EventMarkers events={events} onOpenEvent={onOpenEvent} />
       <HotSpotMarkers hotSpots={layers.hotSpots} view={view} onOpenVenue={onOpenVenue} />
       {you ? (
         <MapMarker

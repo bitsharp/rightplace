@@ -87,5 +87,30 @@
     "cancel": "Cancel",
     "denied": "Permission denied: you can enable the camera in your phone settings.",
     "failed": "We couldn't prepare the photo. Try again."
+  },
+  "event": {
+    "cancelled": "Cancelled"
+  },
+  "eventWhen": {
+    "tonight": "Tonight · {{time}}–{{endTime}}",
+    "tomorrow": "Tomorrow · {{time}}–{{endTime}}",
+    "date": "{{date}} · {{time}}–{{endTime}}"
+  },
+  "eventSpot": {
+    "a11y": "Event {{event}}: Going {{going}}, Maybe {{maybe}}. Open the event"
+  },
+  "target": {
+    "allAges": "All ages",
+    "genderTitle": "Gender",
+    "age": {
+      "18-24": "18–24",
+      "25-34": "25–34",
+      "35+": "35+"
+    },
+    "gender": {
+      "all": "Everyone",
+      "female": "Women",
+      "male": "Men"
+    }
   }
 }

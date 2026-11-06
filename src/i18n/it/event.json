@@ -1,0 +1,9 @@
+{
+  "cancelledBanner": "Serata annullata",
+  "cancelledBody": "Il creator ha annullato questa serata: non si può più dichiarare.",
+  "by": "Serata di {{handle}}",
+  "target": "Per chi: {{target}}",
+  "venueSection": "Il locale",
+  "openVenue": "Apri il locale {{venue}}",
+  "loadError": "Non riusciamo a caricare la serata. Riprova tra poco."
+}

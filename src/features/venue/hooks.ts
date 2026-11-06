@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { useIsFocused } from 'expo-router';
 
+import { CHAT_ROOMS_KEY } from '@/features/chat/keys';
 import type { MyDeclaration } from '@/features/map/api';
 import { MY_DECLARATION_KEY } from '@/features/map/hooks';
 import type { Intent } from '@/features/nights/domain/band';
@@ -27,10 +28,11 @@ const retryUnlessMissing = (failures: number, error: unknown) =>
   !(error instanceof RpcError && error.code === 'NOT_FOUND') && failures < 3;
 
 // The catalog changes rarely: cached (and persisted) for an hour.
-export function useVenueDetail(venueId: string) {
+export function useVenueDetail(venueId: string, enabled = true) {
   return useQuery({
     queryKey: ['venueDetail', venueId],
     queryFn: () => fetchVenueDetail(venueId),
+    enabled,
     staleTime: ONE_HOUR_MS,
     retry: retryUnlessMissing,
   });
@@ -81,6 +83,10 @@ function invalidateAfterChange(queryClient: QueryClient, venueId?: string): Prom
     queryClient.invalidateQueries({ queryKey: ['stories'] }),
     // "+" in the TopBar follows the declaration (active or ended < 24 h ago).
     queryClient.invalidateQueries({ queryKey: ['postTarget'] }),
+    // Creator events show the same turnout, and the chat room appears with the first declaration.
+    queryClient.invalidateQueries({ queryKey: ['cityEvents'] }),
+    queryClient.invalidateQueries({ queryKey: ['eventDetail'] }),
+    queryClient.invalidateQueries({ queryKey: CHAT_ROOMS_KEY }),
   ]);
 }
 

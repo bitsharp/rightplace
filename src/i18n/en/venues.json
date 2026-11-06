@@ -19,5 +19,8 @@
   "empty": "No venues found. Try a different city or type.",
   "loadError": "We could not load the venues. Please try again shortly.",
   "googleAttribution": "Information from Google Maps",
-  "openInGoogleMaps": "Open in Google Maps"
+  "openInGoogleMaps": "Open in Google Maps",
+  "events": {
+    "title": "Events"
+  }
 }

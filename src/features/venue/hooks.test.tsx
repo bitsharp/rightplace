@@ -168,6 +168,25 @@ describe('useDeclare', () => {
     );
   });
 
+  it('a successo ricarica anche serate, dettaglio serata, bacheca post e stanze di chat', async () => {
+    setFakeRpc({});
+    const { Wrapper, client } = createQueryWrapper();
+    const invalidate = jest.spyOn(client, 'invalidateQueries');
+    const { result } = await renderHook(() => useDeclare(), { wrapper: Wrapper });
+    await act(async () => {
+      result.current.mutate({
+        target: { kind: 'event', id: 'e1' },
+        intent: 'going',
+        venue: { id: 'arena', name: 'Arena Club' },
+      });
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
+    expect(keys).toEqual(
+      expect.arrayContaining([['cityEvents'], ['eventDetail'], ['postTarget'], ['chatRooms']]),
+    );
+  });
+
   it('per un evento aggiorna la dichiarazione con l’evento', async () => {
     const release = holdRpc('declare');
     const { Wrapper, client } = createQueryWrapper();

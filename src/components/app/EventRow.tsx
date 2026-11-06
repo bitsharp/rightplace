@@ -1,4 +1,5 @@
-import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Card } from '@/components/ui/Card';
 import { MonoLabel } from '@/components/ui/MonoLabel';
@@ -15,14 +16,36 @@ type Props = {
   goingBand: Band;
   maybeBand: Band;
   targetLabel: string;
+  cancelled?: boolean;
+  onPress?: () => void;
 };
 
 // Creators see turnout as bands too, never single people (CreatorProfilo.dc.html).
-export function EventRow({ name, meta, whenLabel, goingBand, maybeBand, targetLabel }: Props) {
+export function EventRow({ onPress, name, ...rest }: Props) {
+  const content = <EventCard name={name} {...rest} />;
+  if (!onPress) return content;
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={name} onPress={onPress}>
+      {content}
+    </Pressable>
+  );
+}
+
+function EventCard({
+  name,
+  meta,
+  whenLabel,
+  goingBand,
+  maybeBand,
+  targetLabel,
+  cancelled = false,
+}: Omit<Props, 'onPress'>) {
+  const { t } = useTranslation('ui');
   return (
     <Card style={styles.card}>
       <View style={styles.header}>
         <View style={styles.texts}>
+          {cancelled ? <MonoLabel tone="muted">{t('event.cancelled')}</MonoLabel> : null}
           <Text variant="body15Strong">{name}</Text>
           <Text variant="body12" color="textSecondary">
             {meta}

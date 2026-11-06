@@ -6,7 +6,7 @@ import { Text } from '@/components/ui/Text';
 import { colors, heights, spacing } from '@/theme/tokens';
 
 // Always on screen, even while the venue loads or fails: the way back must never disappear.
-export function VenueTopBar({ onBack }: { onBack: () => void }) {
+export function VenueTopBar({ onBack, title }: { onBack: () => void; title?: string }) {
   const { t } = useTranslation('venue');
   return (
     <View style={styles.bar}>
@@ -19,7 +19,7 @@ export function VenueTopBar({ onBack }: { onBack: () => void }) {
         <Icon name="chevronLeft" />
       </Pressable>
       <Text accessibilityRole="header" variant="label12" color="textSecondary" style={styles.title}>
-        {t('title')}
+        {title ?? t('title')}
       </Text>
     </View>
   );

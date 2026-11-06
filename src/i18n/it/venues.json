@@ -19,5 +19,8 @@
   "empty": "Nessun locale trovato. Prova a cambiare città o tipo.",
   "loadError": "Non riusciamo a caricare i locali. Riprova tra poco.",
   "googleAttribution": "Informazioni da Google Maps",
-  "openInGoogleMaps": "Apri in Google Maps"
+  "openInGoogleMaps": "Apri in Google Maps",
+  "events": {
+    "title": "Serate"
+  }
 }

@@ -53,6 +53,30 @@ describe('DeclarationSheet', () => {
       expect(screen.getByText('venue:declare.expiresGeneric')).toBeOnTheScreen();
     });
 
+    it('per una serata di un creator titola con il nome della serata e dichiara su event_id', async () => {
+      const { Wrapper } = createQueryWrapper();
+      setFakeRpc({});
+      await render(
+        <DeclarationSheet
+          visible
+          onClose={jest.fn()}
+          target={{ kind: 'event', id: 'e1' }}
+          venue={{ ...venue, title: 'Notte Techno' }}
+          state={none}
+        />,
+        { wrapper: Wrapper },
+      );
+      expect(screen.getByText('Notte Techno')).toBeOnTheScreen();
+      expect(screen.queryByText('Arena Club')).toBeNull();
+      await fireEvent.press(screen.getByRole('button', { name: 'venue:declare.going' }));
+      await waitFor(() =>
+        expect(fakeSupabase.rpc).toHaveBeenCalledWith('declare', {
+          p_intent: 'going',
+          p_event_id: 'e1',
+        }),
+      );
+    });
+
     it('"Ci vado" dichiara la serata del locale e chiude lo sheet', async () => {
       const onClose = await renderSheet(none);
       await fireEvent.press(screen.getByRole('button', { name: 'venue:declare.going' }));

@@ -12,7 +12,7 @@ import { statsView, type StatsSegment } from './domain/statsState';
 import { buildTransportLinks, type TransportDirection } from './domain/transport';
 import { useVenueDetail, useVenueStats } from './hooks';
 
-function linksFor(venue: VenueDetail, direction: TransportDirection) {
+export function linksFor(venue: VenueDetail, direction: TransportDirection) {
   return buildTransportLinks({
     direction,
     venue: {

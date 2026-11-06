@@ -6,7 +6,11 @@ import { colors, radius, spacing, type ColorToken } from '@/theme/tokens';
 
 import { typicalLabelKey, type VisibleTypicalLevel } from '../domain/typical';
 
-type Entry = { key: string; label: string; dot: { color?: ColorToken; size?: number } };
+type Entry = {
+  key: string;
+  label: string;
+  dot: { color?: ColorToken; size?: number; dashed?: boolean };
+};
 
 const TONIGHT: { labelKey: 'intent.going' | 'intent.maybe' | 'you'; color: ColorToken }[] = [
   { labelKey: 'intent.going', color: 'going' },
@@ -20,6 +24,11 @@ const USUALLY_LEVELS: { level: VisibleTypicalLevel; size: number }[] = [
   { level: 3, size: 13 },
 ];
 
+function dotTestId(dot: Entry['dot']): string | undefined {
+  if (dot.dashed) return 'legend-event-dot';
+  return dot.color ? undefined : 'legend-typical-dot';
+}
+
 function LegendBlock({ title, entries }: { title: string; entries: Entry[] }) {
   return (
     <View style={styles.block}>
@@ -30,11 +39,12 @@ function LegendBlock({ title, entries }: { title: string; entries: Entry[] }) {
         {entries.map(({ key, label, dot }) => (
           <View key={key} style={styles.item}>
             <View
-              testID={dot.color ? undefined : 'legend-typical-dot'}
+              testID={dotTestId(dot)}
               style={[
                 styles.dot,
                 dot.color ? { backgroundColor: colors[dot.color] } : styles.typical,
                 dot.size ? { width: dot.size, height: dot.size } : null,
+                dot.dashed ? styles.dashed : null,
               ]}
             />
             <Text variant="label11" color="textSecondary" numberOfLines={1}>
@@ -56,6 +66,11 @@ export function MapLegend() {
     label: t(`ui:${labelKey}`),
     dot: { color },
   }));
+  // A creator's night: the same "stasera" colours, with the dashed outline used on the map.
+  const withEvent: Entry[] = [
+    ...tonight,
+    { key: 'event', label: t('legend.event'), dot: { dashed: true } },
+  ];
   const usually = USUALLY_LEVELS.map(({ level, size }) => ({
     key: String(level),
     label: t(`ui:typical.${typicalLabelKey(level)}`),
@@ -63,7 +78,7 @@ export function MapLegend() {
   }));
   return (
     <View testID="map-legend" style={styles.box}>
-      <LegendBlock title={t('legend.tonight')} entries={tonight} />
+      <LegendBlock title={t('legend.tonight')} entries={withEvent} />
       <LegendBlock title={t('legend.usually')} entries={usually} />
     </View>
   );
@@ -86,4 +101,10 @@ const styles = StyleSheet.create({
   item: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2, flexShrink: 1 },
   dot: { width: 10, height: 10, borderRadius: 999 },
   typical: { backgroundColor: colors.typicalDot },
+  dashed: {
+    backgroundColor: colors.goingTint,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: colors.going,
+  },
 });

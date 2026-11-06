@@ -1,6 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 
+import { filterEvents } from '@/features/events/domain/eventList';
+import { useCityEvents } from '@/features/events/hooks';
+import { useWhenLabel } from '@/features/events/useEventLabels';
 import { useMapStore } from '@/features/map/store/mapStore';
 
 import {
@@ -20,6 +23,16 @@ import {
 
 const NO_BANDS: ReadonlyMap<string, VenueBands> = new Map();
 
+// Creators' nights shown above the venues, filtered by the same city, type and text.
+function useEventRows(citySlug: string, kind: VenueKind | null, query: string) {
+  const events = useCityEvents(citySlug, '');
+  const whenLabel = useWhenLabel();
+  return filterEvents(events.data ?? [], { kind, query }).map((event) => ({
+    ...event,
+    whenLabel: whenLabel(event.startsAt, event.endsAt, event.timezone),
+  }));
+}
+
 export function useVenueSearch() {
   const router = useRouter();
   // Same city as the map: one source of truth in the persisted map store.
@@ -32,6 +45,7 @@ export function useVenueSearch() {
   const recents = useRecentVenues();
   const remember = useRememberVenue();
 
+  const eventRows = useEventRows(citySlug, kind, query);
   const rows = useMemo(
     () =>
       sortVenues(
@@ -44,6 +58,8 @@ export function useVenueSearch() {
     remember.mutate(venueId);
     router.push({ pathname: '/venue/[id]', params: { id: venueId } });
   };
+  const openEvent = (eventId: string) =>
+    router.push({ pathname: '/event/[id]', params: { id: eventId } });
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/map'));
 
   return {
@@ -55,6 +71,8 @@ export function useVenueSearch() {
     query,
     setQuery,
     rows,
+    eventRows,
+    openEvent,
     recents: recents.data ?? [],
     loadFailed: venues.isError,
     openVenue,

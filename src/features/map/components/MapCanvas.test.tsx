@@ -205,4 +205,66 @@ describe('MapCanvas', () => {
       expect(onRegionChange).toHaveBeenCalledWith(region);
     });
   });
+
+  describe('serate dei creator', () => {
+    const placement = (eventId: string, lat = 45.47, lng = 9.2) => ({
+      lat,
+      lng,
+      event: {
+        eventId,
+        name: `Serata ${eventId}`,
+        venueId: 'v1',
+        venueName: 'Arena Club',
+        venueKind: 'club' as const,
+        lat: 45.46,
+        lng: 9.19,
+        startsAt: '2026-11-06T21:00:00Z',
+        endsAt: '2026-11-07T03:00:00Z',
+        goingBand: '3–10' as const,
+        maybeBand: 'pochi' as const,
+        isSponsored: false,
+        timezone: 'Europe/Rome',
+      },
+    });
+
+    it('le disegna dove le ha collocate il dominio, sopra i punti grigi e sotto i punti caldi', async () => {
+      await render(
+        <MapCanvas
+          {...baseProps}
+          layers={{
+            hotSpots: [venue({ venueId: 'hot' })],
+            typicalDots: [venue({ venueId: 'dot', isHotSpot: false, typicalLevel: 2 })],
+          }}
+          events={[placement('e1')]}
+          onOpenEvent={jest.fn()}
+        />,
+      );
+      expect(marker('event-e1').props.coordinate).toEqual({ latitude: 45.47, longitude: 9.2 });
+      const z = (id: string) => Number(marker(id).props.zIndex);
+      expect(z('typical-dot')).toBeLessThan(z('event-e1'));
+      expect(z('event-e1')).toBeLessThan(z('hot-hot'));
+    });
+
+    it('il tap apre la serata, non il locale', async () => {
+      const onOpenEvent = jest.fn();
+      const onOpenVenue = jest.fn();
+      await render(
+        <MapCanvas
+          {...baseProps}
+          onOpenVenue={onOpenVenue}
+          layers={{ hotSpots: [], typicalDots: [] }}
+          events={[placement('e1')]}
+          onOpenEvent={onOpenEvent}
+        />,
+      );
+      await fireEvent.press(marker('event-e1'));
+      expect(onOpenEvent).toHaveBeenCalledWith('e1');
+      expect(onOpenVenue).not.toHaveBeenCalled();
+    });
+
+    it('senza serate non disegna nulla in più', async () => {
+      await render(<MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [] }} />);
+      expect(screen.queryByTestId(/^marker-event-/, { includeHiddenElements: true })).toBeNull();
+    });
+  });
 });

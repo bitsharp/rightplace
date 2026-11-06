@@ -1,11 +1,14 @@
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef } from 'react';
 
+import { isTonight } from '@/features/creator/domain/eventRow';
+import { useCityEvents } from '@/features/events/hooks';
 import { useSession } from '@/features/auth/useSession';
 import { useCoarsePositionStore } from '@/features/profile/location';
 import { useTopBar } from '@/features/posts/useTopBar';
 import { useActiveCities } from '@/features/venues/hooks';
 
+import { placeEventSpots, type EventSpotPlacement } from './domain/eventSpots';
 import {
   buildFriendsLayers,
   buildGeneralLayers,
@@ -35,6 +38,20 @@ function useOpenVenue() {
   );
 }
 
+const NO_SPOTS: EventSpotPlacement[] = [];
+
+// Creators' nights of the current night, only on the general map ("stasera" layer, principle 11):
+// the friends map is about where friends go, which an event alone does not say.
+function useEventSpots(citySlug: string, view: MapViewMode, hotSpots: readonly MapVenue[]) {
+  const events = useCityEvents(citySlug, '', 1);
+  return useMemo(() => {
+    if (view !== 'general' || !events.data) return NO_SPOTS;
+    const now = new Date();
+    const tonight = events.data.filter((event) => isTonight(event.startsAt, now, event.timezone));
+    return placeEventSpots(tonight, new Set(hotSpots.map((spot) => spot.venueId)));
+  }, [view, events.data, hotSpots]);
+}
+
 function useMapLayers(citySlug: string, view: MapViewMode) {
   const general = useCityMap(citySlug, 'general');
   const friends = useCityMap(citySlug, 'friends', view === 'friends');
@@ -60,6 +77,7 @@ export function useMapScreen() {
   const { view, setView, citySlug } = useMapStore();
   const cities = useActiveCities();
   const { layers, generalRows, loaded, loadFailed } = useMapLayers(citySlug, view);
+  const eventSpots = useEventSpots(citySlug, view, layers.hotSpots);
   const declaration = useMyDeclaration();
   const recommended = useRecommendedVenue(citySlug);
   const coarseCell = useCoarsePositionStore((state) => state.cell);
@@ -70,6 +88,7 @@ export function useMapScreen() {
     setView,
     city: cities.data?.find((city) => city.slug === citySlug) ?? null,
     layers,
+    eventSpots,
     loaded,
     loadFailed,
     // Only a user who turned the toggle on ever has a cell; it is already ~500 m coarse.
@@ -80,6 +99,8 @@ export function useMapScreen() {
     declaration: declaration.data ?? null,
     topBar: useTopBar(),
     openVenue,
+    openEvent: (eventId: string) =>
+      router.push({ pathname: '/event/[id]', params: { id: eventId } }),
     openSearch: () => router.push('/search'),
   };
 }

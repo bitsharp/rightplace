@@ -1,8 +1,8 @@
-import { useTranslation } from 'react-i18next';
+import { useLocalSearchParams } from 'expo-router';
 
-import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
+import { EventScreen } from '@/features/events/screens/EventScreen';
 
-export default function EventScreen() {
-  const { t } = useTranslation('venue');
-  return <PlaceholderScreen title={t('eventTitle')} />;
+export default function EventRoute() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <EventScreen eventId={id} />;
 }

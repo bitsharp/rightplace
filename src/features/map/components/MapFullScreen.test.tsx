@@ -106,6 +106,42 @@ describe('MapFullScreen', () => {
       expect(calls).toEqual(['close', 'open:hot']);
     });
 
+    it('anche una serata si apre dopo aver chiuso la mappa a schermo intero', async () => {
+      jest.replaceProperty(Platform, 'OS', 'android');
+      const calls: string[] = [];
+      await render(
+        <MapFullScreen
+          {...baseProps}
+          onClose={() => calls.push('close')}
+          onOpenVenue={(id) => calls.push(`venue:${id}`)}
+          onOpenEvent={(id) => calls.push(`event:${id}`)}
+          events={[
+            {
+              lat: 45.47,
+              lng: 9.2,
+              event: {
+                eventId: 'e1',
+                name: 'Notte Techno',
+                venueId: 'hot',
+                venueName: 'Arena Club',
+                venueKind: 'club',
+                lat: 45.46,
+                lng: 9.19,
+                startsAt: '2026-11-06T21:00:00Z',
+                endsAt: '2026-11-07T03:00:00Z',
+                goingBand: '3–10',
+                maybeBand: 'pochi',
+                isSponsored: false,
+                timezone: 'Europe/Rome',
+              },
+            },
+          ]}
+        />,
+      );
+      await fireEvent.press(screen.getByTestId('marker-event-e1', { includeHiddenElements: true }));
+      expect(calls).toEqual(['close', 'event:e1']);
+    });
+
     it('su iOS chiude subito ma apre il locale solo a onDismiss, una volta', async () => {
       jest.replaceProperty(Platform, 'OS', 'ios');
       const calls: string[] = [];

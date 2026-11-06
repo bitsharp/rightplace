@@ -4,6 +4,7 @@ import enCommon from './en/common.json';
 import enCreator from './en/creator.json';
 import enDev from './en/dev.json';
 import enErrors from './en/errors.json';
+import enEvent from './en/event.json';
 import enFeed from './en/feed.json';
 import enFriends from './en/friends.json';
 import enLegal from './en/legal.json';
@@ -19,6 +20,7 @@ import itCommon from './it/common.json';
 import itCreator from './it/creator.json';
 import itDev from './it/dev.json';
 import itErrors from './it/errors.json';
+import itEvent from './it/event.json';
 import itFeed from './it/feed.json';
 import itFriends from './it/friends.json';
 import itLegal from './it/legal.json';
@@ -42,6 +44,7 @@ export const resources = {
     venue: itVenue,
     venues: itVenues,
     creator: itCreator,
+    event: itEvent,
     ui: itUi,
     dev: itDev,
     errors: itErrors,
@@ -59,6 +62,7 @@ export const resources = {
     venue: enVenue,
     venues: enVenues,
     creator: enCreator,
+    event: enEvent,
     ui: enUi,
     dev: enDev,
     errors: enErrors,

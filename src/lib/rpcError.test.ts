@@ -25,6 +25,19 @@ describe('toRpcErrorCode', () => {
     }
   });
 
+  it('riconosce i codici delle serate dei creator', () => {
+    for (const code of [
+      'INVALID_NAME',
+      'INVALID_DESCRIPTION',
+      'INVALID_TARGET',
+      'INVALID_SCHEDULE',
+      'TOO_MANY_ACTIVE_EVENTS',
+      'EVENT_STARTED',
+    ]) {
+      expect(toRpcErrorCode({ message: code, code: 'P0001' })).toBe(code);
+    }
+  });
+
   it('distingue gli errori di rete', () => {
     expect(toRpcErrorCode(new TypeError('Network request failed'))).toBe('NETWORK');
   });

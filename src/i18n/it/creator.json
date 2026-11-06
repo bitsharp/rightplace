@@ -1,5 +1,91 @@
 {
   "title": "Profilo creator",
   "newEvent": "Crea serata",
-  "billing": "Abbonamento"
+  "editEvent": "Modifica serata",
+  "attendanceTitle": "Adesioni",
+  "billing": "Abbonamento",
+  "profile": {
+    "label": "Profilo creator"
+  },
+  "notCreator": {
+    "title": "Diventa creator",
+    "body": "Per pubblicare serate attiva «Sono un creator» nel tuo profilo.",
+    "cta": "Vai al profilo"
+  },
+  "events": {
+    "title": "Le tue serate",
+    "new": "Nuova serata",
+    "note": "Le adesioni sono fasce, non singole persone.",
+    "emptyUpcoming": "Nessuna serata in programma. Creane una.",
+    "emptyPast": "Nessuna serata passata.",
+    "loadError": "Non riusciamo a caricare le tue serate. Riprova tra poco."
+  },
+  "scope": {
+    "upcoming": "In programma",
+    "past": "Passate"
+  },
+  "form": {
+    "label": "Creator · nuova serata",
+    "editLabel": "Creator · modifica serata",
+    "title": "Crea una serata",
+    "editTitle": "Modifica la serata",
+    "venue": {
+      "label": "Luogo",
+      "searchLabel": "Cerca il locale",
+      "searchPlaceholder": "Nome del locale",
+      "empty": "Nessun locale trovato.",
+      "change": "Cambia",
+      "locked": "Il locale non si cambia dopo la pubblicazione"
+    },
+    "name": {
+      "label": "Nome della serata",
+      "placeholder": "Es. Notte Techno"
+    },
+    "description": {
+      "label": "Descrizione",
+      "placeholder": "Musica, ospiti, dress code…",
+      "counter": "{{count}}/{{max}}"
+    },
+    "time": {
+      "label": "Orario",
+      "startDay": "Giorno",
+      "start": "Inizio",
+      "end": "Fine",
+      "previousDay": "Giorno precedente",
+      "nextDay": "Giorno successivo",
+      "startEarlier": "Inizio più presto",
+      "startLater": "Inizio più tardi",
+      "endEarlier": "Fine più presto",
+      "endLater": "Fine più tardi",
+      "endNextDay": "{{time}} (giorno dopo)"
+    },
+    "target": {
+      "label": "Per chi"
+    },
+    "submit": "Pubblica la serata",
+    "save": "Salva le modifiche",
+    "notEditable": "Questa serata non si può più modificare.",
+    "errors": {
+      "venueRequired": "Scegli il locale.",
+      "nameRequired": "Dai un nome alla serata.",
+      "nameTooLong": "Il nome può avere al massimo 80 caratteri.",
+      "descriptionTooLong": "La descrizione può avere al massimo 500 caratteri.",
+      "startInPast": "L'inizio deve essere nel futuro.",
+      "startTooFar": "Puoi pubblicare serate fino a 60 giorni in anticipo.",
+      "endBeforeStart": "La fine deve essere dopo l'inizio.",
+      "endAfterNight": "La serata deve finire entro le 06:00 del giorno dopo."
+    }
+  },
+  "attendance": {
+    "bands": "Adesioni",
+    "note": "Le adesioni sono fasce, non singole persone. Non vedrai mai chi ha aderito.",
+    "edit": "Modifica",
+    "cancel": "Annulla la serata",
+    "cancelConfirm": "Annullare la serata? Le dichiarazioni e la chat si chiudono subito.",
+    "confirmYes": "Sì, annulla la serata",
+    "confirmNo": "Mantieni",
+    "cancelled": "Serata annullata",
+    "notFound": "Questa serata non è tua o non esiste più.",
+    "loadError": "Non riusciamo a caricare le adesioni. Riprova tra poco."
+  }
 }

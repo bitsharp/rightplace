@@ -18,6 +18,8 @@ import { useDeclarationActions } from './useDeclarationActions';
 type SheetVenue = {
   id: string;
   name: string;
+  // Heading of the sheet when it is not the venue's name (a creator's night).
+  title?: string;
   timezone: string;
   goingBand: Band;
   maybeBand: Band;
@@ -48,7 +50,7 @@ function SheetBody({ onClose, target, venue, state }: Omit<Props, 'visible'>) {
   return (
     <ScrollView style={{ maxHeight: height * 0.75 }} contentContainerStyle={styles.content}>
       <MonoLabel tone="going">{t('declare.label')}</MonoLabel>
-      <Text variant="display22">{venue.name}</Text>
+      <Text variant="display22">{venue.title ?? venue.name}</Text>
       <View style={styles.bands}>
         <RangeStat intent="going" band={venue.goingBand} />
         <RangeStat intent="maybe" band={venue.maybeBand} />
