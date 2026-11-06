@@ -46,14 +46,16 @@ export function FriendRow({
       style={rowStyles.row}
     >
       <Avatar intent={avatarIntent(handle)} initial={publicHandle.charAt(1)} />
-      <View style={styles.texts}>
-        <Text variant="body15Strong">{publicHandle}</Text>
-        <Text variant="body12" color="textSecondary">
+      <View style={rowStyles.texts}>
+        <Text variant="body15Strong" numberOfLines={1} ellipsizeMode="tail">
+          {publicHandle}
+        </Text>
+        <Text variant="body12" color="textSecondary" numberOfLines={1} ellipsizeMode="tail">
           {meta}
         </Text>
         {/* Defence in depth: the server already withholds the venue until the follow is accepted. */}
         {venueLine && followState === 'accepted' ? (
-          <Text variant="label11" color="maybe">
+          <Text variant="label11" color="maybe" numberOfLines={1} ellipsizeMode="tail">
             {venueLine}
           </Text>
         ) : null}
@@ -101,6 +103,7 @@ function FollowButton({ publicHandle, button, onAction }: FollowButtonProps) {
         <Text
           variant={isCallToAction ? 'body13Medium' : 'body13'}
           color={isCallToAction ? 'onAccent' : 'textSecondary'}
+          numberOfLines={1}
         >
           {t(button.labelKey)}
         </Text>
@@ -110,8 +113,7 @@ function FollowButton({ publicHandle, button, onAction }: FollowButtonProps) {
 }
 
 const styles = StyleSheet.create({
-  texts: { flex: 1, gap: 3 },
-  actions: { alignItems: 'flex-end', gap: spacing.xs },
+  actions: { alignItems: 'flex-end', gap: spacing.xs, flexShrink: 0 },
   button: {
     height: 36,
     paddingHorizontal: spacing.md + 2,

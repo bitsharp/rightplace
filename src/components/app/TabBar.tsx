@@ -21,6 +21,7 @@ type Props = {
 };
 
 const MAX_BADGE = 9;
+const BADGE_SIZE = 18;
 
 // Pressable is the one accessible element: the pending count is read as part of its label.
 const tabLabel = (name: string, badge: string, count: number) =>
@@ -59,7 +60,7 @@ function TabItem({ name, selected, count, onSelect }: TabItemProps) {
       onPress={() => onSelect(name)}
       style={styles.item}
     >
-      <View>
+      <View style={styles.iconBox}>
         <Icon name={name} size={22} color={color} />
         {count > 0 ? <TabBadge name={name} count={count} /> : null}
       </View>
@@ -100,17 +101,19 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.xs },
+  // Anchor of the badge: nothing up to the bar may clip it, so overflow is explicitly visible.
+  iconBox: { overflow: 'visible' },
   badge: {
     position: 'absolute',
-    top: -4,
+    top: -6,
     right: -10,
-    minWidth: 16,
-    height: 16,
+    minWidth: BADGE_SIZE,
+    height: BADGE_SIZE,
     paddingHorizontal: 4,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
   },
-  badgeText: { letterSpacing: 0 },
+  badgeText: { letterSpacing: 0, lineHeight: BADGE_SIZE - 2, textAlign: 'center' },
 });

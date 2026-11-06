@@ -10,6 +10,7 @@ import { colors, heights, spacing } from '@/theme/tokens';
 
 import { PhotoSourceSheet } from '@/components/app/PhotoSourceSheet';
 import { ChatComposer } from '../components/ChatComposer';
+import { ComposerDock } from '../components/ComposerDock';
 import { ExpiryBanner } from '../components/ExpiryBanner';
 import { MessageActionsSheet } from '../components/MessageActionsSheet';
 import { MessageList } from '../components/MessageList';
@@ -21,7 +22,7 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
   const { t } = useTranslation('chat');
   const screen = useNightChatScreen(roomId);
   return (
-    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
       <ChatHeader title={screen.title} onBack={screen.goBack} />
       <View style={styles.top}>
         <ExpiryBanner hours={screen.expiryHours} />
@@ -40,14 +41,16 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
           onRetry={screen.retry}
           onLongPress={screen.select}
         />
-        <ChatComposer
-          followingHandles={screen.followingHandles}
-          myHandle={screen.myHandle}
-          requestedHandles={screen.requestedHandles}
-          onSend={screen.send}
-          onPhoto={screen.photoFlow.openSheet}
-          onFollow={screen.follow}
-        />
+        <ComposerDock>
+          <ChatComposer
+            followingHandles={screen.followingHandles}
+            myHandle={screen.myHandle}
+            requestedHandles={screen.requestedHandles}
+            onSend={screen.send}
+            onPhoto={screen.photoFlow.openSheet}
+            onFollow={screen.follow}
+          />
+        </ComposerDock>
       </KeyboardAvoidingView>
       <ChatOverlays screen={screen} />
     </SafeAreaView>

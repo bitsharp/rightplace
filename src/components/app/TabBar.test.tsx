@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 import { colors, heights } from '@/theme/tokens';
 
@@ -66,5 +67,35 @@ describe('isTabName', () => {
     const { isTabName } = jest.requireActual<typeof import('./TabBar')>('./TabBar');
     expect(isTabName('feed')).toBe(true);
     expect(isTabName('venue')).toBe(false);
+  });
+});
+
+describe('TabBar badge', () => {
+  describe('layout', () => {
+    it('è grande almeno 18 e centra il testo', async () => {
+      await render(<TabBar active="map" onSelect={jest.fn()} badges={{ friends: 3 }} />);
+      const badge = StyleSheet.flatten(screen.getByTestId('tab-badge-friends').props.style);
+      expect(badge.minWidth).toBeGreaterThanOrEqual(18);
+      expect(badge.height).toBeGreaterThanOrEqual(18);
+      expect(badge).toMatchObject({ alignItems: 'center', justifyContent: 'center' });
+      const text = StyleSheet.flatten(screen.getByText('3').props.style);
+      expect(text.lineHeight).toBeLessThanOrEqual(badge.height as number);
+      expect(text.textAlign).toBe('center');
+    });
+
+    it('nessun contenitore fino alla barra ritaglia il badge', async () => {
+      await render(<TabBar active="map" onSelect={jest.fn()} badges={{ friends: 3 }} />);
+      let node = screen.getByTestId('tab-badge-friends').parent;
+      while (node) {
+        expect(StyleSheet.flatten(node.props.style)?.overflow).not.toBe('hidden');
+        node = node.parent;
+      }
+    });
+
+    it('è ancorato al riquadro dell’icona, non alla voce', async () => {
+      await render(<TabBar active="map" onSelect={jest.fn()} badges={{ friends: 3 }} />);
+      const anchor = screen.getByTestId('tab-badge-friends').parent;
+      expect(StyleSheet.flatten(anchor?.props.style)).toMatchObject({ overflow: 'visible' });
+    });
   });
 });

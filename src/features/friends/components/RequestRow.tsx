@@ -24,15 +24,20 @@ export function RequestRow({ request, onAccept, onDecline }: Props) {
   const meta = usePersonMeta();
   const handle = formatHandle(request.handle);
   return (
-    <View style={rowStyles.row}>
-      <Avatar intent={avatarIntent(request.handle)} initial={handle.charAt(1)} />
-      <View style={styles.texts}>
-        <Text variant="body15Strong">{handle}</Text>
-        <Text variant="body12" color="textSecondary">
-          {meta(request)}
-        </Text>
+    // Two buttons do not fit beside the name on a 320 pt phone: they get their own full-width row.
+    <View testID="request-row" style={[rowStyles.row, styles.stacked]}>
+      <View style={styles.identity}>
+        <Avatar intent={avatarIntent(request.handle)} initial={handle.charAt(1)} />
+        <View style={rowStyles.texts}>
+          <Text variant="body15Strong" numberOfLines={1} ellipsizeMode="tail">
+            {handle}
+          </Text>
+          <Text variant="body12" color="textSecondary" numberOfLines={1} ellipsizeMode="tail">
+            {meta(request)}
+          </Text>
+        </View>
       </View>
-      <View style={styles.actions}>
+      <View testID="request-actions" style={styles.actions}>
         <Button
           label={t('requests.decline')}
           accessibilityLabel={t('requests.a11yDecline', { handle })}
@@ -54,7 +59,8 @@ export function RequestRow({ request, onAccept, onDecline }: Props) {
 }
 
 const styles = StyleSheet.create({
-  texts: { flex: 1, gap: 3 },
+  stacked: { flexDirection: 'column', alignItems: 'stretch', gap: spacing.md },
+  identity: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   actions: { flexDirection: 'row', gap: spacing.sm },
-  button: { paddingHorizontal: spacing.md },
+  button: { flex: 1 },
 });

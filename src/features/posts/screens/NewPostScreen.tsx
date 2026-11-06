@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { PhotoFrame } from '@/components/app/PhotoFrame';
 import { PhotoSourceSheet } from '@/components/app/PhotoSourceSheet';
@@ -21,29 +21,24 @@ export function NewPostScreen() {
   const { t } = useTranslation('post');
   const post = useNewPost();
   return (
-    <Screen>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.fill}
-      >
-        <View style={styles.top}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('close')}
-            onPress={post.close}
-            style={styles.close}
-          >
-            <Icon name="close" />
-          </Pressable>
-        </View>
-        <MonoLabel tone="going" size="large">
-          {t('label')}
-        </MonoLabel>
-        <Text accessibilityRole="header" variant="display24">
-          {t('title')}
-        </Text>
-        <Body post={post} />
-      </KeyboardAvoidingView>
+    <Screen scroll>
+      <View style={styles.top}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('close')}
+          onPress={post.close}
+          style={styles.close}
+        >
+          <Icon name="close" />
+        </Pressable>
+      </View>
+      <MonoLabel tone="going" size="large">
+        {t('label')}
+      </MonoLabel>
+      <Text accessibilityRole="header" variant="display24">
+        {t('title')}
+      </Text>
+      <Body post={post} />
     </Screen>
   );
 }
@@ -162,7 +157,6 @@ function PhotoArea({ post }: { post: State }) {
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1, gap: spacing.md },
   top: { flexDirection: 'row' },
   close: {
     width: heights.buttonMedium,

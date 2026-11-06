@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PhotoFrame } from '@/components/app/PhotoFrame';
 import { Icon } from '@/components/ui/Icon';
@@ -19,9 +19,11 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
   const { t } = useTranslation('feed');
   const viewer = useStoryViewer(userId);
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right', 'bottom']}>
-      <StoryHeader first={viewer.posts[0]} onClose={viewer.close} />
+    // A fullScreenModal draws under the status bar and the home indicator: insets are applied here.
+    <View style={[styles.screen, { paddingBottom: insets.bottom }]}>
+      <StoryHeader top={insets.top} first={viewer.posts[0]} onClose={viewer.close} />
       {viewer.posts.length === 0 && !viewer.isLoading ? (
         <Text color="textSecondary" style={styles.empty}>
           {t('story.empty')}
@@ -43,25 +45,34 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
           />
         )}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
-function StoryHeader({ first, onClose }: { first?: FeedPost; onClose: () => void }) {
+type HeaderProps = { top: number; first?: FeedPost; onClose: () => void };
+
+function StoryHeader({ top, first, onClose }: HeaderProps) {
   const { t } = useTranslation('feed');
   const title =
     first && !first.isMine
       ? t('story.title', { handle: formatHandle(first.authorHandle) })
       : t('story.mine');
   return (
-    <View style={styles.header}>
-      <Text accessibilityRole="header" variant="display17" numberOfLines={1} style={styles.title}>
+    <View testID="story-header" style={[styles.header, { paddingTop: top + spacing.sm }]}>
+      <Text
+        accessibilityRole="header"
+        variant="display17"
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        style={styles.title}
+      >
         {title}
       </Text>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t('story.close')}
         onPress={onClose}
+        hitSlop={spacing.sm}
         style={styles.close}
       >
         <Icon name="close" />
@@ -105,10 +116,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
+    paddingBottom: spacing.md,
   },
-  title: { flex: 1 },
+  title: { flex: 1, minWidth: 0 },
   close: {
+    flexShrink: 0,
     width: heights.buttonMedium,
     height: heights.buttonMedium,
     borderRadius: heights.buttonMedium / 2,

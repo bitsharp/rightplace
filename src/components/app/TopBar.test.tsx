@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
+import { STORY_RING_SIZE } from './StoryAvatar';
 import { TopBar, type Story } from './TopBar';
 
 const STORIES: Story[] = [
@@ -60,5 +62,18 @@ describe('TopBar', () => {
     await render(<TopBar {...baseProps} canPost={false} />);
     expect(screen.getAllByTestId('story-ring-new')).toHaveLength(1);
     expect(screen.getAllByTestId('story-ring-seen')).toHaveLength(2);
+  });
+
+  it('il nome sotto la storia ha spazio largo almeno quanto l’anello e va su una riga', async () => {
+    const stories: Story[] = [
+      { id: 's1', handle: 'demo.milano2', initial: 'D', tone: 'going', seen: false },
+    ];
+    await render(<TopBar {...baseProps} canPost={false} stories={stories} />);
+    const name = screen.getByText('demo.milano2');
+    expect(name.props.numberOfLines).toBe(1);
+    expect(name.props.ellipsizeMode).toBe('tail');
+    const label = StyleSheet.flatten(name.props.style);
+    expect(label.width).toBeGreaterThanOrEqual(STORY_RING_SIZE + 8);
+    expect(label.textAlign).toBe('center');
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TopBar } from '@/components/app/TopBar';
@@ -43,7 +43,11 @@ export function FriendsScreen() {
     <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
       <TopBar {...topBar} />
       <SearchHeader text={text} onChangeText={setText} />
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+      >
         {isSearchable(text) ? (
           <SearchResults text={text} onAction={actions.run} onLongPress={setSelected} />
         ) : (

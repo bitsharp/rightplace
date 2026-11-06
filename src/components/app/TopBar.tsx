@@ -7,7 +7,10 @@ import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { colors, heights, spacing } from '@/theme/tokens';
 
-import { StoryAvatar } from './StoryAvatar';
+import { STORY_RING_SIZE, StoryAvatar } from './StoryAvatar';
+
+// Wider than the ring so handles like "demo.milano2" stay readable before the ellipsis.
+const STORY_WIDTH = STORY_RING_SIZE + 16;
 
 export type Story = {
   id: string;
@@ -112,7 +115,13 @@ function StoryStrip({ stories, onOpenStory }: Pick<Props, 'stories' | 'onOpenSto
           style={styles.story}
         >
           <StoryAvatar initial={story.initial} tone={story.tone} seen={story.seen === true} />
-          <Text variant="body11Medium" color="textSecondary" numberOfLines={1}>
+          <Text
+            variant="body11Medium"
+            color="textSecondary"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={styles.storyName}
+          >
             {story.mine ? t('topBar.myStory') : story.handle.replace(/^@/, '')}
           </Text>
         </Pressable>
@@ -157,5 +166,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm + 2,
     paddingBottom: spacing.md,
   },
-  story: { width: 64, alignItems: 'center', gap: 5 },
+  story: { width: STORY_WIDTH, alignItems: 'center', gap: 5 },
+  storyName: { width: STORY_WIDTH, textAlign: 'center' },
 });

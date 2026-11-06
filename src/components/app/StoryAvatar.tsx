@@ -6,6 +6,7 @@ import { Avatar, type AvatarIntent } from '@/components/ui/Avatar';
 import { colors } from '@/theme/tokens';
 
 const SIZE = 64;
+export const STORY_RING_SIZE = SIZE;
 const RING = 3;
 
 type Props = {

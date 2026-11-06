@@ -1,9 +1,20 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 
 import { Sheet } from './Sheet';
 
 describe('Sheet', () => {
+  it('su iOS sale sopra la tastiera, perché il Modal ha una finestra propria', async () => {
+    jest.replaceProperty(Platform, 'OS', 'ios');
+    await render(
+      <Sheet visible onClose={jest.fn()}>
+        <Text>contenuto</Text>
+      </Sheet>,
+    );
+    // In "padding" mode the avoider reserves the keyboard height as paddingBottom (0 while hidden).
+    expect(screen.getByTestId('sheet-keyboard-avoider')).toHaveStyle({ paddingBottom: 0 });
+  });
+
   it('non mostra nulla quando è chiuso', async () => {
     await render(
       <Sheet visible={false} onClose={jest.fn()}>

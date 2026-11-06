@@ -1,11 +1,21 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Animated, Modal, PanResponder, Pressable, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  KeyboardAvoidingView,
+  Modal,
+  PanResponder,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import { shouldDismissSheet } from './sheetGesture';
+import { useKeyboardVisible } from './useKeyboardVisible';
 
 type Props = {
   visible: boolean;
@@ -37,6 +47,8 @@ function useDragToDismiss(onClose: () => void) {
 export function Sheet({ visible, onClose, onDismiss, children }: Props) {
   const insets = useSafeAreaInsets();
   const { translateY, responder, setHeight } = useDragToDismiss(onClose);
+  const keyboardVisible = useKeyboardVisible();
+  const bottomPadding = (keyboardVisible ? 0 : insets.bottom) + spacing.lg;
 
   useEffect(() => {
     if (visible) translateY.setValue(0);
@@ -51,22 +63,24 @@ export function Sheet({ visible, onClose, onDismiss, children }: Props) {
       onDismiss={onDismiss}
       statusBarTranslucent
     >
-      <View style={styles.root}>
+      {/* A Modal is its own native window: the screen's keyboard handling does not reach it. */}
+      <KeyboardAvoidingView
+        testID="sheet-keyboard-avoider"
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.root}
+      >
         <Backdrop onClose={onClose} />
         <View testID="sheet-panel" accessibilityViewIsModal onAccessibilityEscape={onClose}>
           <Animated.View
             onLayout={(event) => setHeight(event.nativeEvent.layout.height)}
-            style={[
-              styles.panel,
-              { paddingBottom: insets.bottom + spacing.lg, transform: [{ translateY }] },
-            ]}
+            style={[styles.panel, { paddingBottom: bottomPadding, transform: [{ translateY }] }]}
             {...responder.panHandlers}
           >
             <View testID="sheet-handle" style={styles.handle} />
             {children}
           </Animated.View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

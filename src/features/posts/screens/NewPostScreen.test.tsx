@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
 
@@ -53,5 +53,14 @@ describe('NewPostScreen', () => {
     seedFeedBackend({ target: { venue_name: 'Arena Club' } });
     await render(<NewPostScreen />, { wrapper: createQueryWrapper().Wrapper });
     expect(await screen.findByText('post:venue({"venue":"Arena Club"})')).toBeOnTheScreen();
+  });
+
+  it('Pubblica sta dentro l’area scorrevole che gestisce la tastiera', async () => {
+    seedFeedBackend({ target: {} });
+    await render(<NewPostScreen />, { wrapper: createQueryWrapper().Wrapper });
+    const publish = await screen.findByRole('button', { name: 'post:publish' });
+    const scroll = screen.getByTestId('screen-scroll');
+    expect(scroll.props.automaticallyAdjustKeyboardInsets).toBe(true);
+    expect(within(scroll).getByRole('button', { name: 'post:publish' })).toBe(publish);
   });
 });

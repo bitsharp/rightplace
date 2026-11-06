@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 
 import { avatarIntent } from '@/features/friends/domain/avatarColor';
 import { colors } from '@/theme/tokens';
@@ -13,6 +13,24 @@ const AVATAR_BORDER = {
 };
 
 describe('FriendRow', () => {
+  it('handle, fascia e locale restano su una riga e il blocco testo si restringe', async () => {
+    await render(
+      <FriendRow
+        handle="demo.milano2"
+        meta="18–24 · Donna"
+        venueLine="Stasera: Arena Club"
+        followState="accepted"
+        onAction={jest.fn()}
+      />,
+    );
+    const handle = screen.getByText('@demo.milano2');
+    expect(handle.props.numberOfLines).toBe(1);
+    expect(handle.props.ellipsizeMode).toBe('tail');
+    expect(screen.getByText('18–24 · Donna').props.numberOfLines).toBe(1);
+    expect(screen.getByText('Stasera: Arena Club').props.numberOfLines).toBe(1);
+    expect(StyleSheet.flatten(handle.parent?.props.style)).toMatchObject({ flex: 1, minWidth: 0 });
+  });
+
   beforeEach(() => jest.clearAllMocks());
 
   it('mostra handle, fascia e dove va stasera quando il follow è accettato', async () => {

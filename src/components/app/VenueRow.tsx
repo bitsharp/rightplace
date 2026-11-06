@@ -39,6 +39,9 @@ export function VenueRow({ name, meta, goingBand, maybeBand, onPress, sponsored 
 }
 
 export const rowStyles = StyleSheet.create({
+  // Text block of a card row: minWidth 0 lets it shrink so long handles ellipsize instead of
+  // wrapping character by character next to buttons.
+  texts: { flex: 1, minWidth: 0, gap: 3 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

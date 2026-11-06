@@ -47,8 +47,10 @@ export function PostCard({
       <View style={styles.header}>
         <Avatar intent={tone} size={36} />
         <View style={styles.headerTexts}>
-          <Text variant="body14Medium">{formatHandle(handle)}</Text>
-          <Text variant="body12" color="textSecondary">
+          <Text variant="body14Medium" numberOfLines={1} ellipsizeMode="tail">
+            {formatHandle(handle)}
+          </Text>
+          <Text variant="body12" color="textSecondary" numberOfLines={1} ellipsizeMode="tail">
             {meta}
           </Text>
         </View>
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md + 2,
   },
-  headerTexts: { flex: 1, gap: 2 },
+  headerTexts: { flex: 1, minWidth: 0, gap: 2 },
   footer: {
     paddingHorizontal: spacing.md + 2,
     paddingTop: spacing.sm + 2,

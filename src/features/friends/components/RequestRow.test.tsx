@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 import type { FollowRequest } from '../api';
 
@@ -42,5 +43,30 @@ describe('RequestRow', () => {
     );
     expect(onDecline).toHaveBeenCalledWith('u1');
     expect(onAccept).not.toHaveBeenCalled();
+  });
+
+  describe('layout a 320 pt', () => {
+    it('l’handle e la meta restano su una riga con ellissi', async () => {
+      await render(<RequestRow request={request} onAccept={jest.fn()} onDecline={jest.fn()} />);
+      const handle = screen.getByText('@volpe.viola');
+      expect(handle.props.numberOfLines).toBe(1);
+      expect(handle.props.ellipsizeMode).toBe('tail');
+      expect(screen.getByText(/friends:meta/).props.numberOfLines).toBe(1);
+    });
+
+    it('il blocco testo può restringersi (flex 1, minWidth 0)', async () => {
+      await render(<RequestRow request={request} onAccept={jest.fn()} onDecline={jest.fn()} />);
+      const texts = screen.getByText('@volpe.viola').parent;
+      expect(StyleSheet.flatten(texts?.props.style)).toMatchObject({ flex: 1, minWidth: 0 });
+    });
+
+    it('i bottoni stanno sotto il testo, non nella sua riga', async () => {
+      await render(<RequestRow request={request} onAccept={jest.fn()} onDecline={jest.fn()} />);
+      const actions = screen.getByTestId('request-actions');
+      expect(StyleSheet.flatten(actions.props.style)).toMatchObject({ flexDirection: 'row' });
+      const textRow = screen.getByText('@volpe.viola').parent?.parent;
+      expect(actions.parent).not.toBe(textRow);
+      expect(screen.getByTestId('request-row')).toHaveStyle({ flexDirection: 'column' });
+    });
   });
 });
