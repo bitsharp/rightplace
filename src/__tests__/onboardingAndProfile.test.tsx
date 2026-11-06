@@ -4,6 +4,9 @@ import { useOnboardingStore } from '@/features/profile/store/onboardingStore';
 import { renderApp } from '@/test/appFlows';
 import { fakeProfileRow, fakeSupabase, setFakeTable } from '@/test/fakeSupabase';
 
+// Creator area on: these flows cover it; the flag-off behaviour is in creatorFlagOff.test.tsx.
+process.env.EXPO_PUBLIC_CREATOR_ENABLED = 'true';
+
 jest.mock('expo-location', () => ({
   requestForegroundPermissionsAsync: jest.fn(),
   getForegroundPermissionsAsync: jest.fn(async () => ({ granted: false })),

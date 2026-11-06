@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Text } from '@/components/ui/Text';
 import { Toggle } from '@/components/ui/Toggle';
+import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import type { Language } from '@/i18n/domain/pickLanguage';
 import { spacing } from '@/theme/tokens';
 
@@ -65,6 +66,7 @@ function ProfileFields({
   onLanguageChange,
 }: FieldsProps) {
   const { t } = useTranslation('profile');
+  const { showCreatorToggle } = useCreatorUi();
   const changeLanguage = (locale: Language) => {
     setters.setLocale(locale);
     onLanguageChange?.(locale);
@@ -83,11 +85,13 @@ function ProfileFields({
         value={values.contactsOptIn}
         onValueChange={setters.setContactsOptIn}
       />
-      <Checkbox
-        label={t('form.creator')}
-        checked={values.isCreator}
-        onChange={setters.setIsCreator}
-      />
+      {showCreatorToggle ? (
+        <Checkbox
+          label={t('form.creator')}
+          checked={values.isCreator}
+          onChange={setters.setIsCreator}
+        />
+      ) : null}
       <LanguagePicker value={values.locale} onChange={changeLanguage} />
     </>
   );

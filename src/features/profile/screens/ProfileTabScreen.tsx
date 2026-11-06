@@ -8,6 +8,7 @@ import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
 import { Toast } from '@/components/ui/Toast';
 import { useSession } from '@/features/auth/useSession';
+import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { UiKitLink } from '@/features/dev/UiKitLink';
 import type { RpcErrorCode } from '@/lib/rpcError';
 import { colors, spacing } from '@/theme/tokens';
@@ -26,6 +27,7 @@ export function ProfileTabScreen() {
   const { t } = useTranslation('profile');
   const { profile, email } = useSession();
   const save = useSaveProfile();
+  const { showCreatorProfileLink } = useCreatorUi();
   const [result, setResult] = useState<'saved' | RpcErrorCode | null>(null);
   if (!profile) return null;
 
@@ -49,9 +51,11 @@ export function ProfileTabScreen() {
         errorMessage={result && result !== 'saved' ? t(`errors:rpc.${result}`) : undefined}
       />
       {result === 'saved' ? <Toast tone="success" message={t('app.saved')} /> : null}
-      <Link href="/creator" style={styles.link}>
-        {profile.isCreator ? t('app.creatorProfile') : t('app.becomeCreator')}
-      </Link>
+      {showCreatorProfileLink ? (
+        <Link href="/creator" style={styles.link}>
+          {profile.isCreator ? t('app.creatorProfile') : t('app.becomeCreator')}
+        </Link>
+      ) : null}
       <ShareHandleButton handle={profile.handle} />
       {profile.contactsOptIn ? <FindMeByPhone /> : null}
       <FollowersSection />

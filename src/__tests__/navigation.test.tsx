@@ -2,6 +2,9 @@ import { fireEvent, screen } from '@testing-library/react-native';
 
 import { renderApp } from '@/test/appFlows';
 
+// Creator area on: these flows cover it; the flag-off behaviour is in creatorFlagOff.test.tsx.
+process.env.EXPO_PUBLIC_CREATOR_ENABLED = 'true';
+
 describe('guard di sessione', () => {
   it('senza account apre la registrazione', async () => {
     await renderApp('signedOut');

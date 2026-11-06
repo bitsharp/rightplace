@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import type { SessionStatus } from '@/features/auth/domain/sessionStatus';
 import { useAuthListener } from '@/features/auth/store/authStore';
 import { useSession } from '@/features/auth/useSession';
+import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { resetSeenStories } from '@/features/posts/store/seenStories';
 import { useCoarseLocationSync } from '@/features/profile/location';
 import { useDeviceLanguageSync } from '@/i18n/useDeviceLanguageSync';
@@ -26,6 +27,7 @@ export function RootNavigator() {
 }
 
 function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
+  const { canOpenCreatorRoutes } = useCreatorUi();
   return (
     <Stack
       screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}
@@ -47,6 +49,11 @@ function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
           <Stack.Screen key={screen.name} name={screen.name} options={screen.options} />
         ))}
       </Stack.Protected>
+      <Stack.Protected guard={status === 'ready' && canOpenCreatorRoutes}>
+        {CREATOR_SCREENS.map((screen) => (
+          <Stack.Screen key={screen.name} name={screen.name} options={screen.options} />
+        ))}
+      </Stack.Protected>
       <Stack.Protected guard={__DEV__}>
         <Stack.Screen name="(dev)/ui-kit" />
       </Stack.Protected>
@@ -65,6 +72,10 @@ const READY_SCREENS = [
   { name: 'night/[id]/chat' },
   { name: 'post/new', options: MODAL },
   { name: 'story/[userId]', options: { presentation: 'fullScreenModal' } as const },
+];
+
+// Hidden in tester builds (EXPO_PUBLIC_CREATOR_ENABLED off): direct URLs are redirected by the router.
+const CREATOR_SCREENS = [
   { name: 'creator/index' },
   { name: 'creator/new-event' },
   { name: 'creator/event/[id]' },

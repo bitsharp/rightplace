@@ -11,7 +11,27 @@ describe('parseEnv', () => {
       supabaseUrl: 'https://abcd.supabase.co',
       supabaseAnonKey: 'anon-key',
       turnstileSiteKey: null,
+      creatorEnabled: false,
     });
+  });
+
+  it.each([
+    [undefined, false],
+    ['', false],
+    ['true', true],
+    ['1', true],
+    ['false', false],
+    ['0', false],
+  ])('legge il flag creator %p come %p', (raw, expected) => {
+    expect(parseEnv({ ...validRaw, EXPO_PUBLIC_CREATOR_ENABLED: raw }).creatorEnabled).toBe(
+      expected,
+    );
+  });
+
+  it('rifiuta un valore non valido del flag creator', () => {
+    expect(() => parseEnv({ ...validRaw, EXPO_PUBLIC_CREATOR_ENABLED: 'yes' })).toThrow(
+      /EXPO_PUBLIC_CREATOR_ENABLED/,
+    );
   });
 
   it('legge la site key di Turnstile quando c’è', () => {

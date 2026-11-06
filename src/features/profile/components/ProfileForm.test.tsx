@@ -3,6 +3,9 @@ import * as Location from 'expo-location';
 
 import { ProfileForm } from './ProfileForm';
 
+// Creator area on: these flows cover it; the flag-off behaviour is in creatorFlagOff.test.tsx.
+process.env.EXPO_PUBLIC_CREATOR_ENABLED = 'true';
+
 jest.mock('expo-location', () => ({ requestForegroundPermissionsAsync: jest.fn() }));
 jest.mock('@/i18n', () => ({
   changeLanguage: jest.fn(() => Promise.resolve()),
@@ -102,5 +105,25 @@ describe('ProfileForm', () => {
       />,
     );
     expect(screen.getByText('errors:NETWORK')).toBeOnTheScreen();
+  });
+});
+
+describe('ProfileForm con area creator spenta', () => {
+  beforeEach(() => {
+    process.env.EXPO_PUBLIC_CREATOR_ENABLED = 'false';
+  });
+  afterEach(() => {
+    process.env.EXPO_PUBLIC_CREATOR_ENABLED = 'true';
+  });
+
+  it('nasconde il toggle creator e invia is_creator invariato', async () => {
+    const onSubmit = jest.fn(() => Promise.resolve());
+    await render(
+      <ProfileForm initial={{ ...EMPTY, isCreator: true }} submitLabel="cta" onSubmit={onSubmit} />,
+    );
+    await fillValidProfile();
+    expect(screen.queryByRole('checkbox', { name: 'profile:form.creator' })).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'cta' }));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ isCreator: true }));
   });
 });
