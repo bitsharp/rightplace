@@ -46,8 +46,15 @@ roadmap/
 ├── 15-notifications.md           ← promemoria locali, push chat/feed/adesioni
 ├── 16-moderation-qa-privacy.md   ← moderazione UGC, audit privacy/GDPR, QA
 ├── 17-release-eas.md             ← EAS, TestFlight, Play, OTA
-└── 18-backlog.md                 ← fuori perimetro e v2
+├── 18-backlog.md                 ← fuori perimetro e v2
+├── 19-chat-friends-of-friends.md ← chat visibile agli amici di amici presenti (cambio regola)
+├── 20-search-and-spots.md        ← ricerca stile Google Maps, pressione lunga, spot dichiarabili
+└── fix-01-tester-feedback.md     ← pacchetto di fix dal feedback dei tester (13 nov 2026)
 ```
+
+### Ordine di esecuzione dopo il prompt 12 (deciso il 13 nov 2026)
+
+`fix-01` → `15` → `19` → `20` → `13` → `14` → `16` → `17`. Le notifiche, la chat allargata e gli spot valgono di più per i tester dell'abbonamento creator, che resta nascosto (`EXPO_PUBLIC_CREATOR_ENABLED` spento) finché non esistono gli account RevenueCat/Apple/Google. Il prompt 13 aggiunge una dipendenza nativa: va fatto subito prima di una nuova build.
 
 ## Milestone
 
@@ -58,6 +65,7 @@ roadmap/
 | **B — Social** | 09 → 11 | amici, chat di serata, foto e feed | 2 settimane |
 | **C — Creator & AI** | 12 → 14 | serate dei creator, abbonamento, sponsorizzate, Chiedi all'AI | 1,5 settimane |
 | **D — Rilascio** | 15 → 17 | notifiche, moderazione, audit, TestFlight + Play | 1,5–2 settimane |
+| **E — Feedback tester** | fix-01, 19, 20 | fix, chat amici di amici, ricerca Google e spot (si eseguono tra 15 e 13, vedi ordine sopra) | 1,5 settimane |
 
 Dopo il Milestone A conviene già una build `preview` per 5–10 amici a Milano: il valore del prodotto si misura lì, prima di costruire il social.
 

@@ -8,6 +8,13 @@ Leggi `CLAUDE.md`. Mock-up: "Promemoria: posta una foto o scrivi due righe" in `
 
 Poche notifiche, tutte utili: promemoria del weekend (locale), "com'è andata ieri sera?" (locale), nuovi messaggi nella chat di serata, post dei seguiti, adesioni per i creator (push). Tutto disattivabile per categoria.
 
+### Precisazioni dal feedback dei tester (board Miro, 13 nov 2026)
+
+- **Promemoria serata alle 18:00** (non 19:00), ogni giorno in cui l'utente non ha ancora dichiarato; il testo invita a **dichiarare la serata** ("Dove vai stasera? Dichiaralo e vedi chi c'è"). Giorni e ora restano configurabili nelle preferenze; 18:00 è il default.
+- **Notifiche anche con l'app aperta**: in primo piano le push e i promemoria si mostrano come banner (`setNotificationHandler` con `shouldShowBanner`/`shouldPlaySound`), tranne quando l'utente è già nella schermata a cui la notifica porterebbe (es. già nella chat di quella room).
+- **Indicatori in-app**, indipendenti dal permesso push: badge sulla tab **Chat** con i messaggi non letti (per room: `last_read_at` locale vs. ultimo messaggio visibile); pallino sulla **campanella** per like e commenti ricevuti sui miei post e per richieste di follow; lista "Novità" dietro la campanella (like, commenti, richieste, accettazioni) con stato "visto" locale. Un tester ha scritto: "non vedo se qualcuno ha scritto un messaggio o messo un cuore da nessuna parte".
+- Chat: "messaggio da uno che seguo" significa, dopo il prompt 19, "messaggio da un autore che posso vedere nella room" (stessa funzione SQL).
+
 ## Istruzioni
 
 1. **Permesso**: non all'onboarding ma alla **prima dichiarazione**, con sheet pre-permission "Vuoi sapere quando i tuoi amici scrivono nella chat della serata?" → Sì / Non ora (non richiedere più di una volta a settimana).
