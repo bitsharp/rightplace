@@ -11,6 +11,7 @@ import { SearchField } from '@/components/ui/SearchField';
 import { Text } from '@/components/ui/Text';
 import { colors, heights, spacing } from '@/theme/tokens';
 
+import { GoogleResults } from '../components/GoogleResults';
 import { RecentChips } from '../components/RecentChips';
 import { SearchFilters } from '../components/SearchFilters';
 import { useVenueSearch } from '../useVenueSearch';
@@ -66,6 +67,13 @@ export function SearchScreen() {
           <EmptyState message={search.loadFailed ? t('loadError') : t('empty')} />
         ) : null}
       </View>
+      <GoogleResults
+        status={search.google.status}
+        suggestions={search.google.rows}
+        selectError={search.google.selectError}
+        selecting={search.google.selecting}
+        onSelect={search.google.open}
+      />
       <MonoLabel>{t('googleAttribution')}</MonoLabel>
     </Screen>
   );

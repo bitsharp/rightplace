@@ -7,6 +7,12 @@ process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY = '1x00000000000000000000AA';
 
 jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 
+// Search session tokens: the native module has no implementation in Jest.
+jest.mock('expo-crypto', () => ({
+  ...jest.requireActual('expo-crypto'),
+  randomUUID: () => jest.requireActual<typeof import('crypto')>('crypto').randomUUID(),
+}));
+
 jest.mock('expo-haptics', () => ({
   selectionAsync: jest.fn(() => Promise.resolve()),
   notificationAsync: jest.fn(() => Promise.resolve()),
@@ -73,10 +79,19 @@ beforeEach(() =>
 // react-native-maps is a native module: map and markers render as plain Views that show their
 // children, so tests can find (and press) the markers the app places on the map.
 jest.mock('react-native-maps', () => {
-  const { createElement } = jest.requireActual<typeof import('react')>('react');
+  const { createElement, useImperativeHandle } =
+    jest.requireActual<typeof import('react')>('react');
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
-  const MapView = ({ children, ...props }: Record<string, unknown>) =>
-    createElement(View, { testID: 'map-view', ...props }, children as never);
+  // A point (x, y) inside the map maps to a fixed, easy-to-assert coordinate: 45 + y / 1000, 9 + x / 1000.
+  const MapView = ({ children, ref, ...props }: Record<string, unknown>) => {
+    useImperativeHandle(ref as never, () => ({
+      coordinateForPoint: jest.fn(async (point: { x: number; y: number }) => ({
+        latitude: 45 + point.y / 1000,
+        longitude: 9 + point.x / 1000,
+      })),
+    }));
+    return createElement(View, { testID: 'map-view', ...props }, children as never);
+  };
   const Marker = ({ children, ...props }: Record<string, unknown>) =>
     createElement(View, { testID: 'map-marker', ...props }, children as never);
   return { __esModule: true, default: MapView, Marker };

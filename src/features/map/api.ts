@@ -16,15 +16,17 @@ const mapRowSchema = z.object({
   lat: z.number(),
   lng: z.number(),
   typical_level: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
-  going_band: bandSchema,
-  maybe_band: bandSchema,
+  going_band: bandSchema.nullable(),
+  maybe_band: bandSchema.nullable(),
   is_hot_spot: z.boolean(),
   is_sponsored: z.boolean(),
   friends_going: z.array(z.string()).nullable(),
   friends_count: z.number().int().nullable(),
+  is_spot: z.boolean().default(false),
 });
 
 // Bands and typical levels only: k-anonymity is enforced inside get_city_map (principles 2, 11).
+// A spot below k arrives with null bands; the creator of a spot is never part of the row.
 export async function fetchCityMap(citySlug: string, view: MapViewMode): Promise<MapVenue[]> {
   const data = await callRpc<unknown>('get_city_map', { p_city_slug: citySlug, p_view: view });
   return z
@@ -43,6 +45,7 @@ export async function fetchCityMap(citySlug: string, view: MapViewMode): Promise
       isSponsored: row.is_sponsored,
       friendsGoing: row.friends_going,
       friendsCount: row.friends_count,
+      isSpot: row.is_spot,
     }));
 }
 

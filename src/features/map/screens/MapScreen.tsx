@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TopBar } from '@/components/app/TopBar';
+import { SpotSheet } from '@/features/spots/components/SpotSheet';
 import { colors, spacing } from '@/theme/tokens';
 
 import { MapBottomPanel } from '../components/MapBottomPanel';
@@ -30,6 +31,7 @@ export function MapScreen() {
         onChangeView={map.setView}
         onOpenVenue={map.openVenue}
         onOpenEvent={map.openEvent}
+        onPickSpot={map.pickSpot}
       />
       <MapBottomPanel
         view={map.view}
@@ -42,6 +44,7 @@ export function MapScreen() {
         declaration={map.declaration}
         onOpenVenue={map.openVenue}
       />
+      <SpotSheet point={map.spotPoint} onClose={map.closeSpot} />
     </SafeAreaView>
   );
 }

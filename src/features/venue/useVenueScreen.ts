@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { useMyChatRooms } from '@/features/chat/hooks';
 import { useMyDeclaration } from '@/features/map/hooks';
+import { isGooglePlaceId } from '@/features/venues/domain/googleMaps';
 
 import type { VenueDetail } from './api';
 import { declarationFor } from './domain/declarationState';
@@ -45,6 +46,9 @@ export function useVenueScreen(venueId: string) {
 
   return {
     venue,
+    isSpot: venue?.kind === 'spot',
+    // Only spots named by users carry UGC (their name): that is what can be reported.
+    isUserSpot: venue ? venue.kind === 'spot' && !isGooglePlaceId(venue.googlePlaceId) : false,
     loadFailed: detail.isError,
     bands: stats.data ?? null,
     statsView: current ? statsView(current, segment) : null,

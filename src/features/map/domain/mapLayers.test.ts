@@ -1,4 +1,10 @@
-import { buildFriendsLayers, buildGeneralLayers, mapBanner, type MapVenue } from './mapLayers';
+import {
+  buildFriendsLayers,
+  buildGeneralLayers,
+  mapBanner,
+  type HotSpotVenue,
+  type MapVenue,
+} from './mapLayers';
 
 const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => ({
   name: `Locale ${overrides.venueId}`,
@@ -12,6 +18,7 @@ const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => 
   isSponsored: false,
   friendsGoing: null,
   friendsCount: null,
+  isSpot: false,
   ...overrides,
 });
 
@@ -43,12 +50,12 @@ describe('buildGeneralLayers', () => {
 
   it('2 dichiarati con typical 0 → il locale non compare in nessuno strato', () => {
     const layers = buildGeneralLayers([venue({ venueId: 'empty', typicalLevel: 0 })]);
-    expect(layers).toEqual({ hotSpots: [], typicalDots: [] });
+    expect(layers).toEqual({ hotSpots: [], spots: [], typicalDots: [] });
   });
 
   it('un locale sponsorizzato senza affluenza né typical non disegna nulla sulla mappa', () => {
     const layers = buildGeneralLayers([venue({ venueId: 'ad', isSponsored: true })]);
-    expect(layers).toEqual({ hotSpots: [], typicalDots: [] });
+    expect(layers).toEqual({ hotSpots: [], spots: [], typicalDots: [] });
   });
 
   it('mantiene l’ordine ricevuto dal server', () => {
@@ -106,19 +113,69 @@ describe('buildFriendsLayers', () => {
 });
 
 describe('mapBanner', () => {
-  const hot = venue({ venueId: 'h', isHotSpot: true });
+  const hot = venue({ venueId: 'h', isHotSpot: true }) as HotSpotVenue;
   const dot = venue({ venueId: 'd', typicalLevel: 1 });
 
   it('nessun banner quando c’è almeno un punto caldo', () => {
-    expect(mapBanner({ hotSpots: [hot], typicalDots: [dot] })).toBe('none');
-    expect(mapBanner({ hotSpots: [hot], typicalDots: [] })).toBe('none');
+    expect(mapBanner({ hotSpots: [hot], spots: [], typicalDots: [dot] })).toBe('none');
+    expect(mapBanner({ hotSpots: [hot], spots: [], typicalDots: [] })).toBe('none');
   });
 
   it('"solo di solito" quando ci sono solo typical dot', () => {
-    expect(mapBanner({ hotSpots: [], typicalDots: [dot] })).toBe('typicalOnly');
+    expect(mapBanner({ hotSpots: [], spots: [], typicalDots: [dot] })).toBe('typicalOnly');
   });
 
   it('"vuoto" quando non c’è né uno né l’altro', () => {
-    expect(mapBanner({ hotSpots: [], typicalDots: [] })).toBe('empty');
+    expect(mapBanner({ hotSpots: [], spots: [], typicalDots: [] })).toBe('empty');
+  });
+});
+
+describe('spot (strato "stasera", mai con numeri sotto k)', () => {
+  const spot = (id: string, overrides: Partial<MapVenue> = {}) =>
+    venue({
+      venueId: id,
+      kind: 'spot',
+      isSpot: true,
+      goingBand: null,
+      maybeBand: null,
+      ...overrides,
+    });
+
+  it('uno spot sotto k va nello strato spot, non tra punti caldi né typical dot', () => {
+    const layers = buildGeneralLayers([spot('s1'), venue({ venueId: 'v', typicalLevel: 2 })]);
+    expect(ids(layers.spots)).toEqual(['s1']);
+    expect(layers.hotSpots).toEqual([]);
+    expect(ids(layers.typicalDots)).toEqual(['v']);
+  });
+
+  it('a 3 dichiarazioni lo spot è un punto caldo normale, non più uno spot', () => {
+    const layers = buildGeneralLayers([
+      spot('s1', { isHotSpot: true, goingBand: '3–10', maybeBand: 'pochi' }),
+    ]);
+    expect(ids(layers.hotSpots)).toEqual(['s1']);
+    expect(layers.spots).toEqual([]);
+  });
+
+  it('un punto caldo senza fasce non esiste: non si disegna con un "pochi" inventato', () => {
+    const layers = buildGeneralLayers([spot('odd', { isHotSpot: true })]);
+    expect(layers.hotSpots).toEqual([]);
+  });
+
+  it('la mappa amici disegna come spot quelli sotto k con amici, con il loro conteggio', () => {
+    const layers = buildFriendsLayers(
+      [
+        spot('s1', { friendsCount: 1, friendsGoing: ['volpe.viola'] }),
+        spot('s2', { friendsCount: 0, friendsGoing: [] }),
+        venue({ venueId: 'v', friendsCount: 2, friendsGoing: ['a.b', 'c.d'] }),
+      ],
+      [],
+    );
+    expect(ids(layers.spots)).toEqual(['s1']);
+    expect(ids(layers.hotSpots)).toEqual(['v']);
+    expect(layers.friendVenues.map((row) => row.venueId)).toEqual(['v', 's1']);
+  });
+
+  it('un banner "nessuna dichiarazione" non appare se c\'è almeno uno spot', () => {
+    expect(mapBanner({ hotSpots: [], spots: [spot('s1')], typicalDots: [] })).toBe('none');
   });
 });

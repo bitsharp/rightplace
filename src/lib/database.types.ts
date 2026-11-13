@@ -937,7 +937,9 @@ export type Database = {
           address: string | null;
           city_id: string;
           created_at: string;
+          created_by: string | null;
           google_place_id: string;
+          hidden_at: string | null;
           id: string;
           is_active: boolean;
           kind: string;
@@ -945,6 +947,8 @@ export type Database = {
           name: string;
           opening_hours: Json | null;
           places_synced_at: string | null;
+          source: string;
+          spot_expires_at: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -952,7 +956,9 @@ export type Database = {
           address?: string | null;
           city_id: string;
           created_at?: string;
+          created_by?: string | null;
           google_place_id: string;
+          hidden_at?: string | null;
           id?: string;
           is_active?: boolean;
           kind: string;
@@ -960,13 +966,17 @@ export type Database = {
           name: string;
           opening_hours?: Json | null;
           places_synced_at?: string | null;
+          source?: string;
+          spot_expires_at?: string | null;
           updated_at?: string;
         };
         Update: {
           address?: string | null;
           city_id?: string;
           created_at?: string;
+          created_by?: string | null;
           google_place_id?: string;
+          hidden_at?: string | null;
           id?: string;
           is_active?: boolean;
           kind?: string;
@@ -974,6 +984,8 @@ export type Database = {
           name?: string;
           opening_hours?: Json | null;
           places_synced_at?: string | null;
+          source?: string;
+          spot_expires_at?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -982,6 +994,20 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'cities';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'venues_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'venues_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'public_profiles';
             referencedColumns: ['id'];
           },
         ];
@@ -1099,6 +1125,10 @@ export type Database = {
         Returns: undefined;
       };
       complete_storage_deletions: { Args: { p_ids: number[] }; Returns: number };
+      consume_places_search_session: {
+        Args: { p_session_token: string; p_user_id: string };
+        Returns: boolean;
+      };
       count_follow_requests: { Args: Record<PropertyKey, never>; Returns: number };
       create_event: {
         Args: {
@@ -1124,6 +1154,14 @@ export type Database = {
       declare: {
         Args: { p_event_id?: string; p_intent: string; p_venue_id?: string };
         Returns: string;
+      };
+      declare_at_place: { Args: { p_google_place_id: string; p_intent: string }; Returns: string };
+      declare_at_spot: {
+        Args: { p_intent: string; p_lat: number; p_lng: number; p_name: string };
+        Returns: {
+          declaration_id: string;
+          venue_id: string;
+        }[];
       };
       decline_follow: { Args: { p_follower_id: string }; Returns: undefined };
       delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
@@ -1180,8 +1218,10 @@ export type Database = {
           friends_count: number;
           friends_going: string[];
           going_band: string;
+          is_declarable: boolean;
           is_hot_spot: boolean;
           is_sponsored: boolean;
+          is_spot: boolean;
           kind: string;
           lat: number;
           lng: number;
@@ -1566,6 +1606,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      upsert_search_place: { Args: { p_city_slug: string; p_row: Json }; Returns: string };
     };
     Enums: {
       [_ in never]: never;

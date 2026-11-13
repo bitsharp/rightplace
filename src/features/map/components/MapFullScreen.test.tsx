@@ -1,9 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Platform, StyleSheet } from 'react-native';
 
 import { spacing } from '@/theme/tokens';
 
-import type { MapVenue } from '../domain/mapLayers';
+import type { HotSpotVenue } from '../domain/mapLayers';
 
 import { MapFullScreen } from './MapFullScreen';
 
@@ -23,7 +23,7 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
-const hot: MapVenue = {
+const hot: HotSpotVenue = {
   venueId: 'hot',
   name: 'Arena Club',
   kind: 'club',
@@ -36,12 +36,13 @@ const hot: MapVenue = {
   isSponsored: false,
   friendsGoing: null,
   friendsCount: null,
+  isSpot: false,
 };
 
 const baseProps = {
   visible: true,
   city: { slug: 'milano', name: 'Milano', lat: 45.4642, lng: 9.19, defaultZoom: 13 },
-  layers: { hotSpots: [hot], typicalDots: [] },
+  layers: { hotSpots: [hot], typicalDots: [], spots: [] },
   view: 'general' as const,
   you: null,
   initialRegion: undefined,
@@ -169,6 +170,58 @@ describe('MapFullScreen', () => {
       await fireEvent(screen.getByTestId('map-fullscreen'), 'dismiss');
       await fireEvent(screen.getByTestId('map-fullscreen'), 'dismiss');
       expect(calls).toEqual(['close', 'open:hot']);
+    });
+  });
+
+  describe('pressione lunga per uno spot', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+      jest.useRealTimers();
+    });
+
+    async function pressLongOnMap() {
+      jest.useFakeTimers();
+      const surface = screen.getByTestId('map-press-surface');
+      const touch = { nativeEvent: { pageX: 200, pageY: 300, touches: [{}] } };
+      await act(async () => fireEvent(surface, 'touchStart', touch));
+      await act(async () => void jest.advanceTimersByTime(3100));
+      await act(async () => fireEvent(surface, 'touchEnd'));
+    }
+
+    it('a schermo intero chiude la mappa e poi passa il punto (Android: subito)', async () => {
+      jest.replaceProperty(Platform, 'OS', 'android');
+      const calls: string[] = [];
+      await render(
+        <MapFullScreen
+          {...baseProps}
+          onClose={() => calls.push('close')}
+          onPickSpot={(point) => calls.push(`spot:${point.lat},${point.lng}`)}
+        />,
+      );
+      await pressLongOnMap();
+      expect(calls).toEqual(['close', 'spot:45.3,9.2']);
+    });
+
+    it('su iOS apre lo sheet solo quando il Modal è sparito, una volta', async () => {
+      jest.replaceProperty(Platform, 'OS', 'ios');
+      const calls: string[] = [];
+      await render(
+        <MapFullScreen
+          {...baseProps}
+          onClose={() => calls.push('close')}
+          onPickSpot={(point) => calls.push(`spot:${point.lat}`)}
+        />,
+      );
+      await pressLongOnMap();
+      expect(calls).toEqual(['close']);
+      await fireEvent(screen.getByTestId('map-fullscreen'), 'dismiss');
+      await fireEvent(screen.getByTestId('map-fullscreen'), 'dismiss');
+      expect(calls).toEqual(['close', 'spot:45.3']);
+    });
+
+    it('senza onPickSpot la mappa a schermo intero non ascolta la pressione', async () => {
+      await render(<MapFullScreen {...baseProps} />);
+      expect(screen.queryByTestId('map-press-surface')).toBeNull();
     });
   });
 

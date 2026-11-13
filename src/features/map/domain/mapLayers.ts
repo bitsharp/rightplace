@@ -11,27 +11,41 @@ export type MapVenue = {
   lat: number;
   lng: number;
   typicalLevel: TypicalLevel;
-  goingBand: Band;
-  maybeBand: Band;
+  // null only for a spot below k = 3: no number at all, not even "pochi" (principle 2).
+  goingBand: Band | null;
+  maybeBand: Band | null;
   isHotSpot: boolean;
   isSponsored: boolean;
   friendsGoing: string[] | null;
   friendsCount: number | null;
+  isSpot: boolean;
 };
+
+// A hot spot always has bands: the type says so, so no marker can print a made-up "pochi".
+export type HotSpotVenue = MapVenue & { goingBand: Band; maybeBand: Band };
 
 export type FriendVenue = { venueId: string; name: string; handles: string[]; count: number };
 
-export type MapLayers = { hotSpots: MapVenue[]; typicalDots: MapVenue[] };
+export type MapLayers = { hotSpots: HotSpotVenue[]; spots: MapVenue[]; typicalDots: MapVenue[] };
 export type FriendsMapLayers = MapLayers & { friendVenues: FriendVenue[] };
 export type MapBanner = 'none' | 'typicalOnly' | 'empty';
 
 const hasTypical = (row: MapVenue) => row.typicalLevel >= 1;
 
-// "Stasera" covers "di solito": a venue is a hot spot or a grey dot, never both (principle 11).
+const hasBands = (row: MapVenue): row is HotSpotVenue =>
+  row.goingBand !== null && row.maybeBand !== null;
+
+const isHotSpotRow = (row: MapVenue): row is HotSpotVenue => row.isHotSpot && hasBands(row);
+
+// A spot below k is a "stasera" marker without numbers; from k on it is a normal hot spot.
+const isBareSpot = (row: MapVenue) => row.isSpot && !isHotSpotRow(row);
+
+// "Stasera" covers "di solito": a venue is a hot spot, a bare spot or a grey dot, never two (principle 11).
 export function buildGeneralLayers(rows: readonly MapVenue[]): MapLayers {
   return {
-    hotSpots: rows.filter((row) => row.isHotSpot),
-    typicalDots: rows.filter((row) => !row.isHotSpot && hasTypical(row)),
+    hotSpots: rows.filter(isHotSpotRow),
+    spots: rows.filter(isBareSpot),
+    typicalDots: rows.filter((row) => !row.isHotSpot && !row.isSpot && hasTypical(row)),
   };
 }
 
@@ -50,18 +64,21 @@ export function buildFriendsLayers(
   friendRows: readonly MapVenue[],
   generalRows: readonly MapVenue[],
 ): FriendsMapLayers {
-  const hotSpots = friendRows.filter((row) => friendsOf(row) > 0);
-  const hotSpotIds = new Set(hotSpots.map((row) => row.venueId));
+  const withFriends = friendRows.filter((row) => friendsOf(row) > 0);
+  const hotSpots = withFriends.filter(hasBands);
+  const spots = withFriends.filter((row) => !hasBands(row));
+  const shown = new Set(withFriends.map((row) => row.venueId));
   return {
     hotSpots,
-    typicalDots: generalRows.filter((row) => hasTypical(row) && !hotSpotIds.has(row.venueId)),
-    friendVenues: hotSpots
+    spots,
+    typicalDots: generalRows.filter((row) => hasTypical(row) && !shown.has(row.venueId)),
+    friendVenues: withFriends
       .map(toFriendVenue)
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'it')),
   };
 }
 
 export function mapBanner(layers: MapLayers): MapBanner {
-  if (layers.hotSpots.length > 0) return 'none';
+  if (layers.hotSpots.length > 0 || layers.spots.length > 0) return 'none';
   return layers.typicalDots.length > 0 ? 'typicalOnly' : 'empty';
 }

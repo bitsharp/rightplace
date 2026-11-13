@@ -12,6 +12,7 @@ import enMap from './en/map.json';
 import enNotifications from './en/notifications.json';
 import enPost from './en/post.json';
 import enProfile from './en/profile.json';
+import enSpots from './en/spots.json';
 import enUi from './en/ui.json';
 import enVenue from './en/venue.json';
 import enVenues from './en/venues.json';
@@ -29,6 +30,7 @@ import itMap from './it/map.json';
 import itNotifications from './it/notifications.json';
 import itPost from './it/post.json';
 import itProfile from './it/profile.json';
+import itSpots from './it/spots.json';
 import itUi from './it/ui.json';
 import itVenue from './it/venue.json';
 import itVenues from './it/venues.json';
@@ -44,6 +46,7 @@ export const resources = {
     notifications: itNotifications,
     post: itPost,
     profile: itProfile,
+    spots: itSpots,
     venue: itVenue,
     venues: itVenues,
     creator: itCreator,
@@ -63,6 +66,7 @@ export const resources = {
     notifications: enNotifications,
     post: enPost,
     profile: enProfile,
+    spots: enSpots,
     venue: enVenue,
     venues: enVenues,
     creator: enCreator,

@@ -101,5 +101,13 @@
     "dress": "C'è un dress code?",
     "arrive": "A che ora conviene arrivare?",
     "soon": "In arrivo: presto potrai chiedere all'AI."
+  },
+  "spot": {
+    "belowK": "Serata dichiarata da qualcuno della città. Le statistiche compaiono da 3 persone.",
+    "report": "Segnala questo spot",
+    "reportBody": "Segnali il nome di questo spot ai moderatori. Chi l'ha creato non saprà che sei stato tu.",
+    "reportConfirm": "Sì, segnala",
+    "reportCancel": "Annulla",
+    "reported": "Segnalazione inviata. Grazie."
   }
 }

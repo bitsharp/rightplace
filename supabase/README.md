@@ -58,7 +58,7 @@ Gli errori sono codici tipizzati nel messaggio dell'eccezione: `NOT_AUTHENTICATE
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Profilo        | `complete_profile(birth_date, gender, city_slug, locale, location_opt_in, contacts_opt_in, is_creator)`, `set_locale`, `update_coarse_location(lat, lng)`, `regenerate_handle()` (una sola volta), `delete_my_account()`                                                                                      |
 | Serata         | `declare(intent, venue_id?, event_id?)` (una sola dichiarazione attiva), `undeclare()`, `get_my_declaration()`                                                                                                                                                                                                |
-| Mappa e locali | `get_city_map(city_slug, 'general'\|'friends')`, `get_venue_stats(venue_id, 'going'\|'maybe'\|'all')`, `search_venues(city_slug, kind?, query?)`, `get_recommended_venue(city_slug)`, `remember_venue(venue_id)`                                                                                              |
+| Mappa e locali | `declare_at_spot`, `declare_at_place` (prompt 20), `get_city_map(city_slug, 'general'\|'friends')`, `get_venue_stats(venue_id, 'going'\|'maybe'\|'all')`, `search_venues(city_slug, kind?, query?)`, `get_recommended_venue(city_slug)`, `remember_venue(venue_id)`                                           |
 | Persone        | `search_users(query)`, `request_follow`, `cancel_follow_request`, `accept_follow`, `decline_follow`, `unfollow`, `remove_follower`, `get_follow_requests()`, `count_follow_requests()`, `get_following()` (solo follow accettati, con il locale di stasera), `get_followers()`, `get_blocked_users()`         |
 | Contatti       | `match_contacts(hashes[])`, `set_my_phone_hash(hash)`, `clear_my_phone_hash()`, `has_phone_hash()` (solo un boolean sul proprio stato, mai l'hash)                                                                                                                                                            |
 | Feed           | `get_feed(before_visible?, before_id?, limit?)`, `get_stories()`, `get_story_posts(user_id)`, `get_post_target()`, `create_post(caption?, photo_path?, chat_photo_path?)`, `set_post_like`, `get_post_comments`, `add_post_comment`, `delete_post_comment`, `delete_post`, `get_post_photo_paths(post_ids[])` |
@@ -120,6 +120,18 @@ Regole complete in `docs/places-terms.md`, passi operativi in `docs/places-sync.
 - **RPC solo `service_role`** (revocate ad `anon` e `authenticated`): `sync_places_venues(city_slug, rows)` (upsert su `google_place_id`; disattiva i demo della sola città quando ha almeno 10 locali reali attivi), `get_city_sync_info(city_slug)`, `import_typical_manual(city_slug, rows)` (atomica; rimpiazza solo le righe `manual`, errori `UNKNOWN_VENUE` / `INVALID_ARGUMENT` / `NOT_FOUND`).
 - **RPC per gli utenti**: `remember_venue(venue_id)` scrive solo nella cronologia ricerche propria.
 - **Job**: `expire-stale-places` (tabella sopra).
+
+## Ricerca Google e spot (prompt 20)
+
+Migration `20261116000100_spots.sql` (applicare con `npx supabase db push`). Modello, regole e privacy in `docs/spots.md`; costi in `docs/places-costs.md`; termini in `docs/places-terms.md`.
+
+- **RPC nuove**: `declare_at_spot(lat, lng, name, intent)`, `declare_at_place(google_place_id, intent)` (authenticated); `upsert_search_place(city_slug, row)` e `consume_places_search_session(user_id, session_token)` (**solo service_role**, usate dalle Edge Function). `get_city_map` ha due colonne in più (`is_spot`, `is_declarable`); `report` accetta `spot`.
+- **Errori**: `INVALID_SPOT_NAME`, `SPOT_LIMIT`, `OUT_OF_CITY`, `PLACE_NOT_CACHED`.
+- **Privilegi**: `authenticated` perde il `select` su tutte le colonne di `venues` e riceve un grant per colonna senza `created_by` e `hidden_at`; `select *` su `venues` è quindi negata. Le query esistenti del client elencano le colonne.
+- **Job**: `purge-expired-spots` (ogni 10 minuti), `purge-places-search-usage` (04:15 UTC).
+- **Quota di ricerca**: `private.places_search_sessions` (user, token, data). Il server conta una sessione quando vede un token nuovo per l'utente: 30 sessioni nelle ultime 24 ore, poi `places-search` risponde 429.
+- **Edge Function**: `places-search` (nuova) e `places-detail` (estesa con `{ place_id, session_token, city_slug, language? }`). Deploy: `npx supabase functions deploy places-search places-detail`. Entrambe con `verify_jwt` attivo (default). **Nessun secret nuovo**: usano `GOOGLE_PLACES_API_KEY` già presente; Autocomplete (New) è incluso in "Places API (New)", già abilitata.
+- **Azioni manuali per Luca**: (1) `supabase db push` e deploy delle due funzioni; (2) in Google Cloud, sulla chiave Places, impostare una **quota giornaliera di richieste** per Places API (New) (ultima difesa contro l'abuso, vedi `docs/places-costs.md`); (3) rigenerare i tipi (`npm run db:types`) se il progetto locale cambia.
 
 ## Chat di amici di amici (prompt 19)
 

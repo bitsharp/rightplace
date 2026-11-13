@@ -75,7 +75,10 @@ function restoreMyDeclaration(queryClient: QueryClient, snapshot: Snapshot | und
 }
 
 // Everything a declaration changes: the pill, the map layers, the venue numbers, the stories bar.
-function invalidateAfterChange(queryClient: QueryClient, venueId?: string): Promise<unknown> {
+export function invalidateAfterChange(
+  queryClient: QueryClient,
+  venueId?: string,
+): Promise<unknown> {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: MY_DECLARATION_KEY }),
     queryClient.invalidateQueries({ queryKey: ['cityMap'] }),

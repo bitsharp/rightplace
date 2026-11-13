@@ -24,6 +24,7 @@ type Props = {
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;
+  onPickSpot?: (point: { lat: number; lng: number }) => void;
 };
 
 function ExpandButton({ onPress }: { onPress: () => void }) {

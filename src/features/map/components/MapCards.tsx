@@ -29,7 +29,9 @@ function useSponsoredMeta() {
       const level = t(`ui:typical.${typicalLabelKey(venue.typicalLevel)}`);
       parts.push(t('ui:typical.usually', { level }));
     }
-    if (venue.isHotSpot) parts.push(t('cards.tonightBand', { band: bandLabel(venue.goingBand) }));
+    if (venue.isHotSpot && venue.goingBand !== null) {
+      parts.push(t('cards.tonightBand', { band: bandLabel(venue.goingBand) }));
+    }
     return parts.join(' · ');
   };
 }

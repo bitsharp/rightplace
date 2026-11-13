@@ -1,10 +1,10 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
-import type { MapVenue } from '../domain/mapLayers';
+import type { HotSpotVenue, MapVenue } from '../domain/mapLayers';
 
 import { MapCanvas } from './MapCanvas';
 
-const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => ({
+const venue = (overrides: Partial<HotSpotVenue> & { venueId: string }): HotSpotVenue => ({
   name: `Locale ${overrides.venueId}`,
   kind: 'club',
   lat: 45.46,
@@ -16,6 +16,7 @@ const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => 
   isSponsored: false,
   friendsGoing: null,
   friendsCount: null,
+  isSpot: false,
   ...overrides,
 });
 
@@ -32,7 +33,9 @@ const marker = (id: string) => screen.getByTestId(`marker-${id}`, { includeHidde
 
 describe('MapCanvas', () => {
   it('non usa la posizione nativa, né POI né traffico: il "Tu" lo disegniamo noi', async () => {
-    await render(<MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [] }} />);
+    await render(
+      <MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [], spots: [] }} />,
+    );
     expect(screen.getByTestId('map-view')).toHaveProp('showsUserLocation', false);
     expect(screen.getByTestId('map-view')).toHaveProp('showsPointsOfInterests', false);
     expect(screen.getByTestId('map-view')).toHaveProp('showsTraffic', false);
@@ -40,7 +43,9 @@ describe('MapCanvas', () => {
   });
 
   it('parte dal centro della città', async () => {
-    await render(<MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [] }} />);
+    await render(
+      <MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [], spots: [] }} />,
+    );
     expect(screen.getByTestId('map-view').props.initialRegion).toMatchObject({
       latitude: 45.4642,
       longitude: 9.19,
@@ -54,6 +59,7 @@ describe('MapCanvas', () => {
         you={{ lat: 45.4625, lng: 9.1925 }}
         layers={{
           hotSpots: [venue({ venueId: 'hot' })],
+          spots: [],
           typicalDots: [venue({ venueId: 'dot', isHotSpot: false, typicalLevel: 2 })],
         }}
       />,
@@ -65,14 +71,14 @@ describe('MapCanvas', () => {
 
   it('mette il marker "Tu" solo se c’è una posizione grossolana', async () => {
     const { rerender } = await render(
-      <MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [] }} />,
+      <MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [], spots: [] }} />,
     );
     expect(screen.queryByTestId('marker-you', { includeHiddenElements: true })).toBeNull();
     await rerender(
       <MapCanvas
         {...baseProps}
         you={{ lat: 45.4625, lng: 9.1925 }}
-        layers={{ hotSpots: [], typicalDots: [] }}
+        layers={{ hotSpots: [], typicalDots: [], spots: [] }}
       />,
     );
     expect(marker('you').props.coordinate).toEqual({ latitude: 45.4625, longitude: 9.1925 });
@@ -82,7 +88,7 @@ describe('MapCanvas', () => {
     await render(
       <MapCanvas
         {...baseProps}
-        layers={{ hotSpots: [venue({ venueId: 'hot' })], typicalDots: [] }}
+        layers={{ hotSpots: [venue({ venueId: 'hot' })], typicalDots: [], spots: [] }}
       />,
     );
     expect(marker('hot-hot')).toHaveProp('tracksViewChanges', true);
@@ -97,6 +103,7 @@ describe('MapCanvas', () => {
         onOpenVenue={onOpenVenue}
         layers={{
           hotSpots: [venue({ venueId: 'hot' })],
+          spots: [],
           typicalDots: [venue({ venueId: 'dot', isHotSpot: false, typicalLevel: 1 })],
         }}
       />,
@@ -114,6 +121,7 @@ describe('MapCanvas', () => {
         layers={{
           hotSpots: ['a', 'b', 'c'].map((venueId) => venue({ venueId, lat: 45.46, lng: 9.19 })),
           typicalDots: [],
+          spots: [],
         }}
       />,
     );
@@ -131,7 +139,7 @@ describe('MapCanvas', () => {
       lat: 45.47,
       lng: 9.2,
     };
-    const noLayers = { hotSpots: [], typicalDots: [] };
+    const noLayers = { hotSpots: [], typicalDots: [], spots: [] };
 
     it('segna il locale dichiarato con "Ci vai" anche se non è né punto caldo né typical dot', async () => {
       await render(<MapCanvas {...baseProps} layers={noLayers} ownSpot={ownSpot} />);
@@ -156,7 +164,7 @@ describe('MapCanvas', () => {
         <MapCanvas
           {...baseProps}
           you={{ lat: 45.4625, lng: 9.1925 }}
-          layers={{ hotSpots: [venue({ venueId: 'mine' })], typicalDots: [] }}
+          layers={{ hotSpots: [venue({ venueId: 'mine' })], typicalDots: [], spots: [] }}
           ownSpot={ownSpot}
         />,
       );
@@ -184,7 +192,11 @@ describe('MapCanvas', () => {
     await render(
       <MapCanvas
         {...baseProps}
-        layers={{ hotSpots: [venue({ venueId: 'hot', goingBand: '10–20' })], typicalDots: [] }}
+        layers={{
+          hotSpots: [venue({ venueId: 'hot', goingBand: '10–20' })],
+          typicalDots: [],
+          spots: [],
+        }}
       />,
     );
     expect(screen.getByText('10–20', { includeHiddenElements: true })).toBeOnTheScreen();
@@ -198,6 +210,7 @@ describe('MapCanvas', () => {
         layers={{
           hotSpots: [venue({ venueId: 'hot', goingBand: '10–20', friendsCount: 2 })],
           typicalDots: [],
+          spots: [],
         }}
       />,
     );
@@ -215,6 +228,7 @@ describe('MapCanvas', () => {
     it('cambiando il typical_level il marker torna a ridisegnarsi, poi si ferma', async () => {
       const dot = (typicalLevel: 1 | 2) => ({
         hotSpots: [],
+        spots: [],
         typicalDots: [venue({ venueId: 'dot', isHotSpot: false, typicalLevel })],
       });
       const { rerender } = await render(<MapCanvas {...baseProps} layers={dot(1)} />);
@@ -230,6 +244,7 @@ describe('MapCanvas', () => {
       const spot = (friendsCount: number) => ({
         hotSpots: [venue({ venueId: 'hot', friendsCount })],
         typicalDots: [],
+        spots: [],
       });
       const { rerender } = await render(
         <MapCanvas {...baseProps} view="friends" layers={spot(1)} />,
@@ -243,7 +258,7 @@ describe('MapCanvas', () => {
     });
 
     it('con dati identici resta fermo', async () => {
-      const layers = () => ({ hotSpots: [venue({ venueId: 'hot' })], typicalDots: [] });
+      const layers = () => ({ hotSpots: [venue({ venueId: 'hot' })], typicalDots: [], spots: [] });
       const { rerender } = await render(<MapCanvas {...baseProps} layers={layers()} />);
       await settle();
       await rerender(<MapCanvas {...baseProps} layers={layers()} />);
@@ -259,7 +274,7 @@ describe('MapCanvas', () => {
         <MapCanvas
           {...baseProps}
           initialRegion={region}
-          layers={{ hotSpots: [], typicalDots: [] }}
+          layers={{ hotSpots: [], typicalDots: [], spots: [] }}
         />,
       );
       expect(screen.getByTestId('map-view').props.initialRegion).toEqual(region);
@@ -271,7 +286,7 @@ describe('MapCanvas', () => {
         <MapCanvas
           {...baseProps}
           onRegionChange={onRegionChange}
-          layers={{ hotSpots: [], typicalDots: [] }}
+          layers={{ hotSpots: [], typicalDots: [], spots: [] }}
         />,
       );
       await fireEvent(screen.getByTestId('map-view'), 'regionChangeComplete', region);
@@ -306,6 +321,7 @@ describe('MapCanvas', () => {
           {...baseProps}
           layers={{
             hotSpots: [venue({ venueId: 'hot' })],
+            spots: [],
             typicalDots: [venue({ venueId: 'dot', isHotSpot: false, typicalLevel: 2 })],
           }}
           events={[placement('e1')]}
@@ -325,7 +341,7 @@ describe('MapCanvas', () => {
         <MapCanvas
           {...baseProps}
           onOpenVenue={onOpenVenue}
-          layers={{ hotSpots: [], typicalDots: [] }}
+          layers={{ hotSpots: [], typicalDots: [], spots: [] }}
           events={[placement('e1')]}
           onOpenEvent={onOpenEvent}
         />,
@@ -336,8 +352,103 @@ describe('MapCanvas', () => {
     });
 
     it('senza serate non disegna nulla in più', async () => {
-      await render(<MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [] }} />);
+      await render(
+        <MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [], spots: [] }} />,
+      );
       expect(screen.queryByTestId(/^marker-event-/, { includeHiddenElements: true })).toBeNull();
     });
+  });
+
+  describe('spot dichiarabili', () => {
+    const spot = (venueId: string): MapVenue => ({
+      ...venue({ venueId }),
+      kind: 'spot',
+      isSpot: true,
+      isHotSpot: false,
+      goingBand: null,
+      maybeBand: null,
+    });
+
+    it('disegna uno SpotMarker per ogni spot, tra typical dot e punti caldi', async () => {
+      await render(
+        <MapCanvas
+          {...baseProps}
+          layers={{
+            hotSpots: [venue({ venueId: 'hot' })],
+            spots: [spot('s1'), spot('s2')],
+            typicalDots: [venue({ venueId: 'dot', isHotSpot: false, typicalLevel: 2 })],
+          }}
+        />,
+      );
+      expect(screen.getAllByTestId('spot-marker', { includeHiddenElements: true })).toHaveLength(2);
+      const z = (id: string) => Number(marker(id).props.zIndex);
+      expect(z('typical-dot')).toBeLessThan(z('spot-s1'));
+      expect(z('spot-s1')).toBeLessThan(z('hot-hot'));
+    });
+
+    it('un tap sullo spot apre la sua scheda', async () => {
+      const onOpenVenue = jest.fn();
+      await render(
+        <MapCanvas
+          {...baseProps}
+          onOpenVenue={onOpenVenue}
+          layers={{ hotSpots: [], spots: [spot('s1')], typicalDots: [] }}
+        />,
+      );
+      await fireEvent.press(marker('spot-s1'));
+      expect(onOpenVenue).toHaveBeenLastCalledWith('s1');
+    });
+
+    it('lo spot non porta numeri né fasce', async () => {
+      await render(
+        <MapCanvas
+          {...baseProps}
+          layers={{ hotSpots: [], spots: [spot('s1')], typicalDots: [] }}
+        />,
+      );
+      expect(screen.queryByText(/pochi|3–10/)).toBeNull();
+    });
+
+    it('nella mappa amici lo spot mostra il numero di amici', async () => {
+      await render(
+        <MapCanvas
+          {...baseProps}
+          view="friends"
+          layers={{
+            hotSpots: [],
+            spots: [{ ...spot('s1'), friendsCount: 2, friendsGoing: ['a.b', 'c.d'] }],
+            typicalDots: [],
+          }}
+        />,
+      );
+      expect(screen.getByText('2')).toBeOnTheScreen();
+    });
+  });
+});
+
+describe('MapCanvas: pressione lunga per uno spot', () => {
+  const touch = (pageX: number, pageY: number) => ({
+    nativeEvent: { pageX, pageY, touches: [{}] },
+  });
+  const noLayers = { hotSpots: [], spots: [], typicalDots: [] };
+
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  it('senza onPickSpot la mappa non ascolta nessuna pressione', async () => {
+    await render(<MapCanvas {...baseProps} layers={noLayers} />);
+    expect(screen.queryByTestId('map-press-surface')).toBeNull();
+  });
+
+  it('con onPickSpot, 3 secondi di pressione e il rilascio danno la coordinata del punto', async () => {
+    const onPickSpot = jest.fn();
+    await render(<MapCanvas {...baseProps} layers={noLayers} onPickSpot={onPickSpot} />);
+    const surface = screen.getByTestId('map-press-surface');
+    await act(async () => fireEvent(surface, 'touchStart', touch(200, 300)));
+    expect(screen.getByTestId('spot-press-ring')).toBeOnTheScreen();
+    await act(async () => void jest.advanceTimersByTime(3100));
+    expect(onPickSpot).not.toHaveBeenCalled();
+    await act(async () => fireEvent(surface, 'touchEnd'));
+    expect(onPickSpot).toHaveBeenCalledWith({ lat: 45.3, lng: 9.2 });
   });
 });

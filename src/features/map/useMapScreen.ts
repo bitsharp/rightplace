@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { isTonight } from '@/features/creator/domain/eventRow';
 import { useCityEvents } from '@/features/events/hooks';
 import { useSession } from '@/features/auth/useSession';
+import type { LatLng } from '@/features/profile/domain/coarsen';
 import { useCoarsePositionStore } from '@/features/profile/location';
 import { useTopBar } from '@/features/posts/useTopBar';
 import { useVenueDetail } from '@/features/venue/hooks';
@@ -99,6 +100,8 @@ export function useMapScreen() {
   const ownSpot = useOwnSpot(declaration.data, generalRows);
   const coarseCell = useCoarsePositionStore((state) => state.cell);
   const openVenue = useOpenVenue();
+  // The point chosen with a 3 s press: while set, the "serata in questo punto" sheet is open.
+  const [spotPoint, setSpotPoint] = useState<LatLng | null>(null);
 
   return {
     view,
@@ -117,6 +120,9 @@ export function useMapScreen() {
     declaration: declaration.data ?? null,
     topBar: useTopBar(),
     openVenue,
+    spotPoint,
+    pickSpot: setSpotPoint,
+    closeSpot: () => setSpotPoint(null),
     openEvent: (eventId: string) =>
       router.push({ pathname: '/event/[id]', params: { id: eventId } }),
     openSearch: () => router.push('/search'),

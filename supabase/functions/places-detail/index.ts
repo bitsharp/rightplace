@@ -1,7 +1,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { buildDetailsRequest } from '../_shared/places/details.ts';
-import type { VenueKind, VenueRow } from '../_shared/places/types.ts';
-import { handleDetail, type VenueRecord } from './handler.ts';
+import { buildDetailsRequest, buildSelectionDetailsRequest } from '../_shared/places/details.ts';
+import { requireApiKey } from '../_shared/places/search.ts';
+import type { SearchLanguage, SelectionRow, VenueKind, VenueRow } from '../_shared/places/types.ts';
+import { type CachedPlace, handleDetail, type VenueRecord } from './handler.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
@@ -39,12 +40,48 @@ async function getVenue(venueId: string): Promise<VenueRecord | null> {
   };
 }
 
-async function fetchDetails(placeId: string): Promise<unknown> {
-  if (placesKey === '') throw new Error('MISSING_GOOGLE_PLACES_API_KEY');
-  const { url, init } = buildDetailsRequest(placeId, placesKey);
+async function callPlaces({ url, init }: { url: string; init: RequestInit }): Promise<unknown> {
   const response = await fetch(url, init);
   if (!response.ok) throw new Error(`PLACES_HTTP_${response.status}`);
   return response.json();
+}
+
+function fetchDetails(placeId: string): Promise<unknown> {
+  return callPlaces(buildDetailsRequest(placeId, requireApiKey(placesKey)));
+}
+
+function fetchSelection(
+  placeId: string,
+  sessionToken: string,
+  language: SearchLanguage,
+): Promise<unknown> {
+  return callPlaces(
+    buildSelectionDetailsRequest(placeId, requireApiKey(placesKey), sessionToken, language),
+  );
+}
+
+async function getCachedPlace(placeId: string): Promise<CachedPlace | null> {
+  const { data } = await admin
+    .from('venues')
+    .select('id, places_synced_at')
+    .eq('google_place_id', placeId)
+    .eq('is_active', true)
+    .maybeSingle();
+  if (!data) return null;
+  return {
+    venueId: data.id,
+    placesSyncedAt: data.places_synced_at ? new Date(data.places_synced_at) : null,
+  };
+}
+
+async function saveSelection(citySlug: string, row: SelectionRow): Promise<string> {
+  const { data, error } = await admin.rpc('upsert_search_place', {
+    p_city_slug: citySlug,
+    p_row: row,
+  });
+  if (error?.message === 'OUT_OF_CITY') throw new Error('OUT_OF_CITY');
+  if (error || typeof data !== 'string') throw new Error('UPSERT_FAILED');
+  return data;
 }
 
 async function saveRow(citySlug: string, row: VenueRow): Promise<void> {
@@ -53,5 +90,14 @@ async function saveRow(citySlug: string, row: VenueRow): Promise<void> {
 }
 
 Deno.serve((request) =>
-  handleDetail(request, { getUserId, getVenue, fetchDetails, saveRow, now: () => new Date() }),
+  handleDetail(request, {
+    getUserId,
+    getVenue,
+    fetchDetails,
+    saveRow,
+    getCachedPlace,
+    fetchSelection,
+    saveSelection,
+    now: () => new Date(),
+  }),
 );

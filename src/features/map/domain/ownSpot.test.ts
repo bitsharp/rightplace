@@ -15,6 +15,7 @@ const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => 
   isSponsored: false,
   friendsGoing: null,
   friendsCount: null,
+  isSpot: false,
   ...overrides,
 });
 

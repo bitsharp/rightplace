@@ -22,8 +22,9 @@ type SheetVenue = {
   // Heading of the sheet when it is not the venue's name (a creator's night).
   title?: string;
   timezone: string;
-  goingBand: Band;
-  maybeBand: Band;
+  // null for a spot below k = 3: the sheet then shows no numbers at all.
+  goingBand: Band | null;
+  maybeBand: Band | null;
 };
 
 type Props = {
@@ -52,10 +53,12 @@ function SheetBody({ onClose, target, venue, state }: Omit<Props, 'visible'>) {
     <ScrollView style={{ maxHeight: height * 0.75 }} contentContainerStyle={styles.content}>
       <MonoLabel tone="going">{t('declare.label')}</MonoLabel>
       <Text variant="display22">{venue.title ?? venue.name}</Text>
-      <View style={styles.bands}>
-        <RangeStat intent="going" band={venue.goingBand} />
-        <RangeStat intent="maybe" band={venue.maybeBand} />
-      </View>
+      {venue.goingBand !== null && venue.maybeBand !== null ? (
+        <View style={styles.bands}>
+          <RangeStat intent="going" band={venue.goingBand} />
+          <RangeStat intent="maybe" band={venue.maybeBand} />
+        </View>
+      ) : null}
       {state.kind === 'here' ? (
         <DeclaredCard
           intent={state.intent}

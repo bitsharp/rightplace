@@ -12,7 +12,8 @@
   "legend": {
     "tonight": "Stasera",
     "usually": "Di solito",
-    "event": "Serata"
+    "event": "Serata",
+    "spot": "Spot"
   },
   "banner": {
     "typicalOnly": "Ancora nessuna dichiarazione stasera: i punti grigi sono l'affluenza abituale. Dichiara la tua e invita amici.",
@@ -42,5 +43,9 @@
     "going": "Ci vai",
     "maybe": "Forse",
     "a11y": "La tua serata: {{venue}}, {{intent}}. Apri il locale"
+  },
+  "spot": {
+    "label": "SPOT",
+    "a11y": "Spot dichiarato: {{name}}. Apri la scheda"
   }
 }

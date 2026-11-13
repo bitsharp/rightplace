@@ -74,8 +74,9 @@ const friendSchema = z.object({
 });
 
 const statsRowSchema = z.object({
-  going_band: bandSchema,
-  maybe_band: bandSchema,
+  // null only for a spot below k = 3 (the server hides even "pochi" there).
+  going_band: bandSchema.nullable(),
+  maybe_band: bandSchema.nullable(),
   avg_age: z.number().nullable(),
   female_pct: z.number().nullable(),
   male_pct: z.number().nullable(),
@@ -90,8 +91,8 @@ export type VenueFriend = {
 };
 
 export type VenueStats = {
-  goingBand: Band;
-  maybeBand: Band;
+  goingBand: Band | null;
+  maybeBand: Band | null;
   avgAge: number | null;
   femalePct: number | null;
   malePct: number | null;

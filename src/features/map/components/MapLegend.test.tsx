@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
+import { colors } from '@/theme/tokens';
+
 import { MapLegend } from './MapLegend';
 
 describe('MapLegend', () => {
@@ -18,6 +20,14 @@ describe('MapLegend', () => {
     expect(screen.getByText('map:legend.event')).toBeOnTheScreen();
     const dot = StyleSheet.flatten(screen.getByTestId('legend-event-dot').props.style);
     expect(dot.borderStyle).toBe('dashed');
+  });
+
+  it('nello strato "stasera" c’è la voce Spot: ciano, quadrato arrotondato, non un cerchio', async () => {
+    await render(<MapLegend />);
+    expect(screen.getByText('map:legend.spot')).toBeOnTheScreen();
+    const dot = StyleSheet.flatten(screen.getByTestId('legend-spot-dot').props.style);
+    expect(dot.backgroundColor).toBe(colors.maybe);
+    expect(dot.borderRadius).not.toBe(999);
   });
 
   it('descrive lo strato grigio a parole: tranquillo · animato · pieno', async () => {

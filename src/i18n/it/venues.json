@@ -10,7 +10,8 @@
     "rooftop": "Rooftop",
     "bar": "Bar",
     "live": "Live",
-    "other": "Altro"
+    "other": "Altro",
+    "spot": "Spot"
   },
   "recent": "Recenti",
   "recentA11y": "Apri {{name}}",
@@ -22,5 +23,15 @@
   "openInGoogleMaps": "Apri in Google Maps",
   "events": {
     "title": "Serate"
+  },
+  "google": {
+    "title": "Risultati da Google",
+    "attribution": "Google Maps",
+    "loading": "Cerco su Google Maps…",
+    "error": "Non riusciamo a cercare su Google Maps. Riprova tra poco.",
+    "limit": "Hai raggiunto il limite di ricerche su Google per oggi. Il catalogo resta disponibile.",
+    "selectError": "Non riusciamo ad aprire questo luogo. Riprova.",
+    "outOfCity": "Questo luogo è fuori dalla città scelta.",
+    "rowA11y": "Apri {{name}}, {{place}}"
   }
 }

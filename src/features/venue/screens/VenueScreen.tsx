@@ -5,12 +5,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OpenChatButton } from '@/features/chat/components/OpenChatButton';
 import { RangeStat } from '@/components/ui/RangeStat';
+import { Text } from '@/components/ui/Text';
+import type { Band } from '@/features/nights/domain/band';
 import { colors, spacing } from '@/theme/tokens';
 
 import { DeclarationSheet } from '../components/DeclarationSheet';
 import { DeclareCta } from '../components/DeclareCta';
 import { FriendsGoing } from '../components/FriendsGoing';
 import { GettingThere } from '../components/GettingThere';
+import { ReportSpot } from '../components/ReportSpot';
 import { VenueHeader } from '../components/VenueHeader';
 import { VenueTopBar } from '../components/VenueTopBar';
 import { WhoIsGoing } from '../components/WhoIsGoing';
@@ -38,8 +41,8 @@ export function VenueScreen({ venueId }: { venueId: string }) {
               id: venue.venueId,
               name: venue.name,
               timezone: venue.timezone,
-              goingBand: screen.bands?.goingBand ?? 'pochi',
-              maybeBand: screen.bands?.maybeBand ?? 'pochi',
+              goingBand: bandOrDefault(screen.bands?.goingBand, screen.isSpot),
+              maybeBand: bandOrDefault(screen.bands?.maybeBand, screen.isSpot),
             }}
             state={screen.declaration}
           />
@@ -49,18 +52,42 @@ export function VenueScreen({ venueId }: { venueId: string }) {
   );
 }
 
-type BodyProps = { screen: ReturnType<typeof useVenueScreen> };
+type Screen = ReturnType<typeof useVenueScreen>;
+type BodyProps = { screen: Screen };
+
+// Until the answer arrives a venue honestly reads "pochi"; a spot reads nothing (it has no such number).
+function bandOrDefault(band: Band | null | undefined, isSpot: boolean): Band | null {
+  if (band) return band;
+  return isSpot ? null : 'pochi';
+}
+
+function Bands({ screen }: { screen: Screen }) {
+  const { t } = useTranslation('venue');
+  const going = bandOrDefault(screen.bands?.goingBand, screen.isSpot);
+  const maybe = bandOrDefault(screen.bands?.maybeBand, screen.isSpot);
+  if (going && maybe) {
+    return (
+      <View style={styles.bands}>
+        <RangeStat intent="going" band={going} />
+        <RangeStat intent="maybe" band={maybe} />
+      </View>
+    );
+  }
+  // Below k = 3 a spot shows no number, not even "pochi": only that someone declared it.
+  return screen.bands ? (
+    <Text variant="body13" color="textSecondary">
+      {t('spot.belowK')}
+    </Text>
+  ) : null;
+}
 
 function VenueBody({ screen }: BodyProps) {
-  const { venue, bands } = screen;
+  const { venue } = screen;
   if (!venue) return null;
   return (
     <View style={styles.body}>
       <VenueHeader detail={venue} closingTime={screen.closingTime} />
-      <View style={styles.bands}>
-        <RangeStat intent="going" band={bands?.goingBand ?? 'pochi'} />
-        <RangeStat intent="maybe" band={bands?.maybeBand ?? 'pochi'} />
-      </View>
+      <Bands screen={screen} />
       <WhoIsGoing segment={screen.segment} onSegment={screen.setSegment} view={screen.statsView} />
       <FriendsGoing friends={screen.friends} />
       {screen.chatRoomId ? <OpenChatButton onPress={screen.openChat} /> : null}
@@ -73,6 +100,7 @@ function VenueBody({ screen }: BodyProps) {
         links={screen.links}
         onOpen={screen.openLink}
       />
+      {screen.isUserSpot ? <ReportSpot venueId={venue.venueId} /> : null}
     </View>
   );
 }

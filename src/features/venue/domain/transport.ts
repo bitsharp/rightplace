@@ -1,3 +1,5 @@
+import { isGooglePlaceId } from '@/features/venues/domain/googleMaps';
+
 export type TransportProvider = 'taxi' | 'uber' | 'freenow' | 'cabify' | 'transit';
 export type TransportLink = {
   provider: TransportProvider;
@@ -29,7 +31,11 @@ function uberLink(direction: TransportDirection, venue: Venue): TransportLink {
 
 function transitLink(direction: TransportDirection, venue: Venue): TransportLink {
   const end = direction === 'there' ? 'destination' : 'origin';
-  const place = `${end}=${venue.lat},${venue.lng}&${end}_place_id=${encodeURIComponent(venue.googlePlaceId)}`;
+  const coordinates = `${end}=${venue.lat},${venue.lng}`;
+  const placeId = isGooglePlaceId(venue.googlePlaceId)
+    ? `&${end}_place_id=${encodeURIComponent(venue.googlePlaceId)}`
+    : '';
+  const place = `${coordinates}${placeId}`;
   return { provider: 'transit', primaryUrl: `${MAPS_DIRECTIONS}&${place}` };
 }
 

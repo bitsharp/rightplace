@@ -1,22 +1,28 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView from 'react-native-maps';
 
-import { EventSpot } from '@/components/app/EventSpot';
-import { HotSpot } from '@/components/app/HotSpot';
-import { OwnSpot } from '@/components/app/OwnSpot';
-import { TypicalDot } from '@/components/app/TypicalDot';
 import { YouMarker } from '@/components/app/YouMarker';
 import type { LatLng } from '@/features/profile/domain/coarsen';
+import { SpotPressSurface } from '@/features/spots/components/SpotPressSurface';
 
-import { isVisibleTypical } from '../domain/typical';
 import type { EventSpotPlacement } from '../domain/eventSpots';
-import type { MapLayers, MapVenue } from '../domain/mapLayers';
+import type { MapLayers } from '../domain/mapLayers';
 import type { OwnSpot as OwnSpotData } from '../domain/ownSpot';
 import { cityRegion, type CityCenter, type MapRegion } from '../domain/region';
 import { mapAppearance } from '../mapStyle';
 import type { MapViewMode } from '../store/mapStore';
+
+import {
+  EventMarkers,
+  HotSpotMarkers,
+  MapMarker,
+  OwnMarker,
+  SpotMarkers,
+  TypicalMarkers,
+  Z_INDEX,
+} from './MapMarkers';
 
 export type MapCity = CityCenter & { slug: string; name: string };
 
@@ -35,165 +41,11 @@ type Props = {
   onOpenEvent?: (eventId: string) => void;
   // My own declaration tonight, drawn whatever the turnout ("stasera" layer); null when I have none.
   ownSpot?: OwnSpotData | null;
-};
-
-// Grey "di solito" dots under the coloured "stasera" hot spots, "Tu" above everything.
-const Z_INDEX = { typical: 1, event: 2, hotSpot: 3, own: 4, you: 5 } as const;
-
-type MarkerProps = {
-  testID: string;
-  // Describes what the marker draws: when it changes the bitmap must be captured again.
-  contentKey: string;
-  coordinate: LatLng;
-  zIndex: number;
-  anchor?: { x: number; y: number };
-  onPress?: () => void;
-  children: ReactNode;
+  // A 3 s press on the map picked this point: the caller opens the "serata in questo punto" sheet.
+  onPickSpot?: (point: LatLng) => void;
 };
 
 const NO_EVENTS: readonly EventSpotPlacement[] = [];
-
-// Time for layout and fonts to settle before the marker bitmap is frozen.
-const FIRST_RENDER_MS = 250;
-
-// The bitmap is frozen shortly after each content change: tracking all the time slows 30 markers.
-function MapMarker({ coordinate, contentKey, children, ...props }: MarkerProps) {
-  const [settledKey, setSettledKey] = useState<string | null>(null);
-  useEffect(() => {
-    const timer = setTimeout(() => setSettledKey(contentKey), FIRST_RENDER_MS);
-    return () => clearTimeout(timer);
-  }, [contentKey]);
-  return (
-    <Marker
-      coordinate={{ latitude: coordinate.lat, longitude: coordinate.lng }}
-      anchor={{ x: 0.5, y: 0.5 }}
-      tracksViewChanges={settledKey !== contentKey}
-      {...props}
-    >
-      {children}
-    </Marker>
-  );
-}
-
-function hotSpotCaption(venue: MapVenue, view: MapViewMode): string | undefined {
-  return view === 'friends' ? String(venue.friendsCount ?? 0) : undefined;
-}
-
-function TypicalMarkers({
-  dots,
-  onOpenVenue,
-}: {
-  dots: MapVenue[];
-  onOpenVenue: (venueId: string) => void;
-}) {
-  return dots.map((venue) =>
-    isVisibleTypical(venue.typicalLevel) ? (
-      <MapMarker
-        key={venue.venueId}
-        contentKey={`${venue.venueId}:${venue.typicalLevel}`}
-        testID={`marker-typical-${venue.venueId}`}
-        coordinate={venue}
-        zIndex={Z_INDEX.typical}
-        onPress={() => onOpenVenue(venue.venueId)}
-      >
-        <TypicalDot
-          venueName={venue.name}
-          level={venue.typicalLevel}
-          onPress={() => onOpenVenue(venue.venueId)}
-        />
-      </MapMarker>
-    ) : null,
-  );
-}
-
-function HotSpotMarkers({
-  hotSpots,
-  view,
-  onOpenVenue,
-}: {
-  hotSpots: MapVenue[];
-  view: MapViewMode;
-  onOpenVenue: (venueId: string) => void;
-}) {
-  return hotSpots.map((venue) => (
-    <MapMarker
-      key={venue.venueId}
-      contentKey={[
-        venue.venueId,
-        venue.goingBand,
-        venue.maybeBand,
-        view,
-        venue.friendsCount ?? '',
-      ].join(':')}
-      testID={`marker-hot-${venue.venueId}`}
-      coordinate={venue}
-      zIndex={Z_INDEX.hotSpot}
-      onPress={() => onOpenVenue(venue.venueId)}
-    >
-      <HotSpot
-        venueName={venue.name}
-        goingBand={venue.goingBand}
-        maybeBand={venue.maybeBand}
-        caption={hotSpotCaption(venue, view)}
-        onPress={() => onOpenVenue(venue.venueId)}
-      />
-    </MapMarker>
-  ));
-}
-
-function EventMarkers({
-  events,
-  onOpenEvent,
-}: {
-  events: readonly EventSpotPlacement[];
-  onOpenEvent?: (eventId: string) => void;
-}) {
-  return events.map(({ event, lat, lng }) => (
-    <MapMarker
-      key={event.eventId}
-      contentKey={[event.eventId, event.goingBand, event.maybeBand].join(':')}
-      testID={`marker-event-${event.eventId}`}
-      coordinate={{ lat, lng }}
-      zIndex={Z_INDEX.event}
-      onPress={() => onOpenEvent?.(event.eventId)}
-    >
-      <EventSpot
-        name={event.name}
-        goingBand={event.goingBand}
-        maybeBand={event.maybeBand}
-        onPress={() => onOpenEvent?.(event.eventId)}
-      />
-    </MapMarker>
-  ));
-}
-
-// The label sits just above the venue so it does not hide the hot spot circle under it.
-const OWN_ANCHOR = { x: 0.5, y: 1 } as const;
-
-function OwnMarker({
-  spot,
-  onOpenVenue,
-}: {
-  spot: OwnSpotData;
-  onOpenVenue: (venueId: string) => void;
-}) {
-  return (
-    <MapMarker
-      testID="marker-own"
-      contentKey={`${spot.venueId}:${spot.intent}`}
-      coordinate={spot}
-      zIndex={Z_INDEX.own}
-      anchor={OWN_ANCHOR}
-      onPress={() => onOpenVenue(spot.venueId)}
-    >
-      <OwnSpot
-        venueName={spot.name}
-        intent={spot.intent}
-        onPress={() => onOpenVenue(spot.venueId)}
-      />
-    </MapMarker>
-  );
-}
 
 export function MapCanvas({
   city,
@@ -206,10 +58,13 @@ export function MapCanvas({
   events = NO_EVENTS,
   onOpenEvent,
   ownSpot = null,
+  onPickSpot,
 }: Props) {
   const { t } = useTranslation('map');
-  return (
+  const mapRef = useRef<MapView>(null);
+  const map = (
     <MapView
+      ref={mapRef}
       style={styles.map}
       accessibilityLabel={t('mapA11y', { city: city.name })}
       initialRegion={initialRegion ?? cityRegion(city)}
@@ -221,6 +76,7 @@ export function MapCanvas({
       {...mapAppearance}
     >
       <TypicalMarkers dots={layers.typicalDots} onOpenVenue={onOpenVenue} />
+      <SpotMarkers spots={layers.spots} view={view} onOpenVenue={onOpenVenue} />
       <EventMarkers events={events} onOpenEvent={onOpenEvent} />
       <HotSpotMarkers hotSpots={layers.hotSpots} view={view} onOpenVenue={onOpenVenue} />
       {ownSpot ? <OwnMarker spot={ownSpot} onOpenVenue={onOpenVenue} /> : null}
@@ -235,6 +91,12 @@ export function MapCanvas({
         </MapMarker>
       ) : null}
     </MapView>
+  );
+  if (!onPickSpot) return map;
+  return (
+    <SpotPressSurface mapRef={mapRef} onPick={onPickSpot}>
+      {map}
+    </SpotPressSurface>
   );
 }
 

@@ -16,6 +16,8 @@ const mapRow = (overrides: Record<string, unknown> = {}) => ({
   is_sponsored: false,
   friends_going: null,
   friends_count: null,
+  is_spot: false,
+  is_declarable: false,
   ...overrides,
 });
 
@@ -39,12 +41,29 @@ describe('fetchCityMap', () => {
         isSponsored: false,
         friendsGoing: ['volpe.viola'],
         friendsCount: 1,
+        isSpot: false,
       },
     ]);
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_city_map', {
       p_city_slug: 'milano',
       p_view: 'friends',
     });
+  });
+
+  it('uno spot sotto k arriva con fasce null e kind spot', async () => {
+    respondWith([
+      mapRow({
+        kind: 'spot',
+        going_band: null,
+        maybe_band: null,
+        is_hot_spot: false,
+        typical_level: 0,
+        is_spot: true,
+        is_declarable: true,
+      }),
+    ]);
+    const [row] = await fetchCityMap('milano', 'general');
+    expect(row).toMatchObject({ kind: 'spot', goingBand: null, maybeBand: null, isSpot: true });
   });
 
   it('rifiuta una fascia che non esiste: il numero esatto non entra mai nel client', async () => {

@@ -39,6 +39,10 @@
     "INVALID_TARGET": "Il pubblico scelto non è valido.",
     "INVALID_SCHEDULE": "Orario non valido: la serata deve iniziare nel futuro (entro 60 giorni) e finire entro le 06:00 del giorno dopo.",
     "TOO_MANY_ACTIVE_EVENTS": "Hai già 10 serate attive. Annullane una o aspetta che finisca.",
-    "EVENT_STARTED": "La serata è già iniziata: non si può più modificare."
+    "EVENT_STARTED": "La serata è già iniziata: non si può più modificare.",
+    "INVALID_SPOT_NAME": "Il nome dello spot deve avere da 3 a 40 caratteri, senza @ né link.",
+    "SPOT_LIMIT": "Puoi creare un solo spot per serata. Dichiara uno di quelli già sulla mappa.",
+    "OUT_OF_CITY": "Questo punto è fuori dalle città disponibili.",
+    "PLACE_NOT_CACHED": "Questo luogo non è ancora disponibile. Cercalo di nuovo."
   }
 }

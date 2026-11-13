@@ -1,6 +1,7 @@
 import { type Band, bandRank } from '@/features/nights/domain/band';
 
-export const VENUE_KINDS = ['club', 'rooftop', 'bar', 'live', 'other'] as const;
+// 'spot' is a declarable point (user-named or a Google address), not a catalog venue: filters never offer it.
+export const VENUE_KINDS = ['club', 'rooftop', 'bar', 'live', 'other', 'spot'] as const;
 export type VenueKind = (typeof VENUE_KINDS)[number];
 
 export type CityVenue = { id: string; name: string; kind: VenueKind; cityName: string };

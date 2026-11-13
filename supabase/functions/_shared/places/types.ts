@@ -26,3 +26,25 @@ export type SyncCity = {
 export type UpsertCounts = { inserted: number; updated: number; demoDeactivated: number };
 
 export type SyncResult = UpsertCounts & { calls: number };
+
+// Row accepted by the SQL function public.upsert_search_place (search selection, Details Pro).
+export type SelectionRow = {
+  google_place_id: string;
+  name: string;
+  kind: VenueKind;
+  lat: number;
+  lng: number;
+  address: string | null;
+  types: string[];
+};
+
+export type SearchLanguage = 'it' | 'en';
+
+export type SearchCity = { center: LatLng; radiusM: number; country: string };
+
+export type PlaceSuggestion = {
+  placeId: string;
+  primaryText: string;
+  secondaryText: string;
+  types: string[];
+};

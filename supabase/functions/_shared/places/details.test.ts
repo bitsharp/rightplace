@@ -1,9 +1,13 @@
 import { assertEquals } from 'jsr:@std/assert@1';
 import {
   buildDetailsRequest,
+  buildSelectionDetailsRequest,
   DETAILS_FIELD_MASK,
   detailsToRow,
   isRealPlaceId,
+  parseSelectionInput,
+  SELECTION_FIELD_MASK,
+  selectionToRow,
   shouldRefresh,
 } from './details.ts';
 
@@ -25,6 +29,10 @@ Deno.test('shouldRefresh: sincronizzato 30 giorni fa o più → aggiorna', () =>
 Deno.test('isRealPlaceId esclude i locali demo', () => {
   assertEquals(isRealPlaceId('demo-01'), false);
   assertEquals(isRealPlaceId('ChIJxxxx'), true);
+});
+
+Deno.test('isRealPlaceId esclude gli spot degli utenti (id sintetico)', () => {
+  assertEquals(isRealPlaceId('spot:3f1c8a52-7d0e-4a56-9b1f-2c6d8e4a1b90'), false);
 });
 
 Deno.test('la richiesta Place Details è una GET con field mask minima', () => {
@@ -50,4 +58,74 @@ Deno.test('detailsToRow mantiene il tipo già salvato del locale', () => {
   assertEquals(row?.kind, 'rooftop');
   assertEquals(row?.address, 'Via X');
   assertEquals(detailsToRow({ id: 'abc' }, 'bar'), null);
+});
+
+const SESSION = '3f1c8a52-7d0e-4a56-9b1f-2c6d8e4a1b90';
+
+Deno.test('la selezione usa Place Details Pro: field mask esatta, senza orari', () => {
+  assertEquals(SELECTION_FIELD_MASK, 'id,displayName,formattedAddress,location,types,primaryType');
+  const { url, init } = buildSelectionDetailsRequest('abc', 'chiave', SESSION, 'en');
+  assertEquals(
+    url,
+    `https://places.googleapis.com/v1/places/abc?languageCode=en&sessionToken=${SESSION}`,
+  );
+  assertEquals(init.method, 'GET');
+  const headers = init.headers as Record<string, string>;
+  assertEquals(headers['X-Goog-FieldMask'], SELECTION_FIELD_MASK);
+  assertEquals(headers['X-Goog-FieldMask'].includes('regularOpeningHours'), false);
+  assertEquals(headers['X-Goog-Api-Key'], 'chiave');
+});
+
+Deno.test('parseSelectionInput valida place_id, session_token e città', () => {
+  const ok = { place_id: 'ChIJabc', session_token: SESSION, city_slug: 'milano', language: 'en' };
+  assertEquals(parseSelectionInput(ok), {
+    placeId: 'ChIJabc',
+    sessionToken: SESSION,
+    citySlug: 'milano',
+    language: 'en',
+  });
+  assertEquals(parseSelectionInput({ ...ok, language: undefined })?.language, 'it');
+  assertEquals(parseSelectionInput({ ...ok, session_token: 'x' }), null);
+  assertEquals(parseSelectionInput({ ...ok, place_id: '' }), null);
+  assertEquals(parseSelectionInput({ ...ok, place_id: 'spot:abc' }), null);
+  assertEquals(parseSelectionInput({ ...ok, place_id: 'demo-01' }), null);
+  assertEquals(parseSelectionInput({ ...ok, city_slug: '' }), null);
+  assertEquals(parseSelectionInput({ ...ok, language: 'fr' }), null);
+});
+
+Deno.test('selectionToRow: un esercizio passa kind mappato e types', () => {
+  const row = selectionToRow({
+    id: 'abc',
+    displayName: { text: 'Magazzini Generali' },
+    formattedAddress: 'Via Pietrasanta 14, Milano',
+    location: { latitude: 45.45, longitude: 9.2 },
+    types: ['night_club', 'establishment', 'point_of_interest'],
+    primaryType: 'night_club',
+  });
+  assertEquals(row, {
+    google_place_id: 'abc',
+    name: 'Magazzini Generali',
+    kind: 'club',
+    lat: 45.45,
+    lng: 9.2,
+    address: 'Via Pietrasanta 14, Milano',
+    types: ['night_club', 'establishment', 'point_of_interest'],
+  });
+});
+
+Deno.test('selectionToRow: un indirizzo passa i suoi types e kind other (il DB lo fa spot)', () => {
+  const row = selectionToRow({
+    id: 'addr',
+    displayName: { text: 'Via Torino 20' },
+    formattedAddress: 'Via Torino 20, 20123 Milano MI',
+    location: { latitude: 45.4642, longitude: 9.19 },
+    types: ['street_address'],
+  });
+  assertEquals(row?.kind, 'other');
+  assertEquals(row?.types, ['street_address']);
+});
+
+Deno.test('selectionToRow: senza id, nome o coordinate è null', () => {
+  assertEquals(selectionToRow({ id: 'a' }), null);
+  assertEquals(selectionToRow(null), null);
 });

@@ -9,7 +9,7 @@ import { typicalLabelKey, type VisibleTypicalLevel } from '../domain/typical';
 type Entry = {
   key: string;
   label: string;
-  dot: { color?: ColorToken; size?: number; dashed?: boolean };
+  dot: { color?: ColorToken; size?: number; dashed?: boolean; square?: boolean };
 };
 
 const TONIGHT: { labelKey: 'intent.going' | 'intent.maybe' | 'you'; color: ColorToken }[] = [
@@ -26,6 +26,7 @@ const USUALLY_LEVELS: { level: VisibleTypicalLevel; size: number }[] = [
 
 function dotTestId(dot: Entry['dot']): string | undefined {
   if (dot.dashed) return 'legend-event-dot';
+  if (dot.square) return 'legend-spot-dot';
   return dot.color ? undefined : 'legend-typical-dot';
 }
 
@@ -45,6 +46,7 @@ function LegendBlock({ title, entries }: { title: string; entries: Entry[] }) {
                 dot.color ? { backgroundColor: colors[dot.color] } : styles.typical,
                 dot.size ? { width: dot.size, height: dot.size } : null,
                 dot.dashed ? styles.dashed : null,
+                dot.square ? styles.square : null,
               ]}
             />
             <Text variant="label11" color="textSecondary" numberOfLines={1}>
@@ -70,6 +72,8 @@ export function MapLegend() {
   const withEvent: Entry[] = [
     ...tonight,
     { key: 'event', label: t('legend.event'), dot: { dashed: true } },
+    // A declared point that is not a hot spot yet: cyan rounded square, the shape of its marker.
+    { key: 'spot', label: t('legend.spot'), dot: { color: 'maybe', square: true } },
   ];
   const usually = USUALLY_LEVELS.map(({ level, size }) => ({
     key: String(level),
@@ -100,6 +104,7 @@ const styles = StyleSheet.create({
   items: { flexDirection: 'row', flexWrap: 'wrap', columnGap: spacing.md, rowGap: spacing.xs },
   item: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2, flexShrink: 1 },
   dot: { width: 10, height: 10, borderRadius: 999 },
+  square: { borderRadius: 3 },
   typical: { backgroundColor: colors.typicalDot },
   dashed: {
     backgroundColor: colors.goingTint,

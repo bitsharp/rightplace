@@ -17,6 +17,7 @@ const sponsored: MapVenue = {
   isSponsored: true,
   friendsGoing: null,
   friendsCount: null,
+  isSpot: false,
 };
 
 const recommended = {

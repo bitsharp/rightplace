@@ -259,3 +259,101 @@ describe('dettaglio locale e dichiarazione', () => {
     expect(screen.getByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
   });
 });
+
+describe('scheda di uno spot', () => {
+  const SPOT_DETAIL = {
+    ...DETAIL,
+    venue_id: 'spot-1',
+    name: 'Casa di Anna',
+    kind: 'spot',
+    address: null,
+    google_place_id: 'spot:3f1c8a52-7d0e-4a56-9b1f-2c6d8e4a1b90',
+  };
+  const spotStats = (overrides: Record<string, unknown> = {}) =>
+    stats({ going_band: null, maybe_band: null, ...overrides });
+
+  function seedSpot(statsRow: unknown = spotStats()) {
+    setFakeRpc({
+      get_venue_detail: [SPOT_DETAIL],
+      get_venue_stats: [statsRow],
+      get_my_declaration: [],
+      get_post_target: [],
+      get_story_posts: [],
+      get_active_cities: [
+        { slug: 'milano', name: 'Milano', country: 'IT', lat: 45.46, lng: 9.19, default_zoom: 13 },
+      ],
+      get_city_map: [],
+      get_stories: [],
+      get_recommended_venue: [],
+      report: null,
+    });
+  }
+
+  beforeEach(() => {
+    jest
+      .mocked(Location.getForegroundPermissionsAsync)
+      .mockResolvedValue({ granted: false } as never);
+  });
+
+  it('sotto k: nome e nota, nessuna fascia, nemmeno "pochi"', async () => {
+    seedSpot();
+    await renderApp('ready', '/venue/spot-1');
+    expect(await screen.findByText('Casa di Anna')).toBeOnTheScreen();
+    expect(await screen.findByText('venue:spot.belowK')).toBeOnTheScreen();
+    expect(screen.queryByText('ui:band.few')).toBeNull();
+    expect(screen.queryByText(/3–10/)).toBeNull();
+  });
+
+  it("non mostra l'attribuzione né il link di Google: non è un luogo di Google", async () => {
+    seedSpot();
+    await renderApp('ready', '/venue/spot-1');
+    await screen.findByText('Casa di Anna');
+    expect(screen.queryByText('venues:googleAttribution')).toBeNull();
+    expect(screen.queryByRole('link', { name: 'venues:openInGoogleMaps' })).toBeNull();
+  });
+
+  it('a 3 dichiarazioni compare la fascia e non la nota', async () => {
+    seedSpot(spotStats({ going_band: '3–10', maybe_band: 'pochi', ...SHOWN }));
+    await renderApp('ready', '/venue/spot-1');
+    expect(await screen.findByText('3–10')).toBeOnTheScreen();
+    expect(screen.queryByText('venue:spot.belowK')).toBeNull();
+  });
+
+  it('si può segnalare lo spot, dopo una conferma', async () => {
+    seedSpot();
+    await renderApp('ready', '/venue/spot-1');
+    await fireEvent.press(await screen.findByRole('button', { name: 'venue:spot.report' }));
+    expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('report', expect.anything());
+    await fireEvent.press(await screen.findByRole('button', { name: 'venue:spot.reportConfirm' }));
+    expect(await screen.findByText('venue:spot.reported')).toBeOnTheScreen();
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('report', {
+      p_target_kind: 'spot',
+      p_target_id: 'spot-1',
+      p_reason: null,
+    });
+  });
+
+  it('un locale normale non ha il pulsante Segnala', async () => {
+    seedBackend();
+    await renderApp('ready', '/venue/arena');
+    await screen.findByText('Arena Club');
+    expect(screen.queryByRole('button', { name: 'venue:spot.report' })).toBeNull();
+  });
+
+  it('"Ci vai": la dichiarazione sullo spot si vede come su ogni locale', async () => {
+    seedSpot();
+    setFakeRpc({
+      get_venue_detail: [SPOT_DETAIL],
+      get_venue_stats: [spotStats()],
+      get_my_declaration: [
+        { ...declarationRow('going'), venue_id: 'spot-1', venue_name: 'Casa di Anna' },
+      ],
+      get_post_target: [],
+      get_story_posts: [],
+      get_chat_rooms: [],
+    });
+    await renderApp('ready', '/venue/spot-1');
+    await fireEvent.press(await screen.findByRole('button', { name: 'venue:cta' }));
+    expect(await screen.findByText('venue:declare.edit')).toBeOnTheScreen();
+  });
+});

@@ -90,4 +90,13 @@ describe('buildTransportLinks', () => {
     const links = buildTransportLinks({ direction: 'there', venue, city: milan });
     expect(links.map((item) => item.provider)).toEqual(['taxi', 'uber', 'freenow', 'transit']);
   });
+
+  it('uno spot degli utenti non ha un place_id Google: il link di Maps usa solo le coordinate', () => {
+    const spot = { ...venue, googlePlaceId: 'spot:3f1c8a52-7d0e-4a56-9b1f-2c6d8e4a1b90' };
+    const links = buildTransportLinks({ direction: 'there', venue: spot, city: milan });
+    const transit = link(links, 'transit')?.primaryUrl ?? '';
+    expect(transit).toContain('destination=45.4642,9.19');
+    expect(transit).not.toContain('place_id');
+    expect(transit).not.toContain('spot');
+  });
 });

@@ -101,5 +101,13 @@
     "dress": "Is there a dress code?",
     "arrive": "What time is best to arrive?",
     "soon": "Coming soon: you'll be able to ask the AI."
+  },
+  "spot": {
+    "belowK": "A night declared by someone in the city. Statistics appear from 3 people.",
+    "report": "Report this spot",
+    "reportBody": "You are reporting this spot's name to moderators. Whoever created it will not know it was you.",
+    "reportConfirm": "Yes, report",
+    "reportCancel": "Cancel",
+    "reported": "Report sent. Thank you."
   }
 }

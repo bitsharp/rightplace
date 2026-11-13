@@ -1,0 +1,22 @@
+{
+  "sheet": {
+    "label": "SERATA IN QUESTO PUNTO",
+    "title": "Serata in questo punto",
+    "nameLabel": "Come si chiama la serata?",
+    "namePlaceholder": "Es. Aperitivo da Marta",
+    "visibility": "Il punto e il nome saranno visibili a tutti gli utenti della città.",
+    "going": "Ci vado",
+    "maybe": "Forse",
+    "close": "Chiudi",
+    "a11y": "Dichiara una serata nel punto scelto sulla mappa"
+  },
+  "nameError": {
+    "tooShort": "Almeno 3 caratteri.",
+    "tooLong": "Al massimo 40 caratteri.",
+    "noMentions": "Niente @ nel nome.",
+    "noLinks": "Niente link nel nome."
+  },
+  "ring": {
+    "a11y": "Tieni premuto per creare una serata in questo punto"
+  }
+}

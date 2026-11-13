@@ -4,6 +4,7 @@ import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/Icon';
+import type { LatLng } from '@/features/profile/domain/coarsen';
 import { afterModalDismiss } from '@/lib/afterModalDismiss';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
 
@@ -32,6 +33,7 @@ type Props = {
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;
+  onPickSpot?: (point: LatLng) => void;
 };
 
 type BarProps = Pick<Props, 'view' | 'onChangeView' | 'onClose'>;
@@ -75,6 +77,7 @@ function FullScreenContent(props: ContentProps) {
           events={props.events}
           onOpenEvent={props.onOpenEvent}
           ownSpot={props.ownSpot}
+          onPickSpot={props.onPickSpot}
         />
         <View testID="map-hint-overlay" pointerEvents="none" style={styles.hint}>
           <MapHint view={props.view} />
@@ -91,21 +94,34 @@ function FullScreenContent(props: ContentProps) {
   );
 }
 
-type Destination = { kind: 'venue' | 'event'; id: string };
+type Destination = { kind: 'venue' | 'event'; id: string } | { kind: 'spot'; point: LatLng };
 
 // The only place where hint and legend are drawn over the map.
-export function MapFullScreen({ visible, onOpenVenue, onOpenEvent, ...content }: Props) {
+export function MapFullScreen({
+  visible,
+  onOpenVenue,
+  onOpenEvent,
+  onPickSpot,
+  ...content
+}: Props) {
   const { onClose } = content;
   const deferred = useMemo(
     () =>
-      afterModalDismiss<Destination>(Platform.OS, ({ kind, id }) =>
-        kind === 'venue' ? onOpenVenue(id) : onOpenEvent?.(id),
-      ),
-    [onOpenVenue, onOpenEvent],
+      afterModalDismiss<Destination>(Platform.OS, (destination) => {
+        if (destination.kind === 'spot') return onPickSpot?.(destination.point);
+        if (destination.kind === 'venue') return onOpenVenue(destination.id);
+        onOpenEvent?.(destination.id);
+      }),
+    [onOpenVenue, onOpenEvent, onPickSpot],
   );
-  const openAfterClose = (kind: Destination['kind']) => (id: string) => {
+  const openAfterClose = (kind: 'venue' | 'event') => (id: string) => {
     onClose();
     deferred.request({ kind, id });
+  };
+  // The sheet is another Modal: it opens only once this one is gone (iOS drops it otherwise).
+  const pickAfterClose = (point: LatLng) => {
+    onClose();
+    deferred.request({ kind: 'spot', point });
   };
   return (
     <Modal
@@ -122,6 +138,7 @@ export function MapFullScreen({ visible, onOpenVenue, onOpenEvent, ...content }:
           {...content}
           onOpenVenue={openAfterClose('venue')}
           onOpenEvent={openAfterClose('event')}
+          onPickSpot={onPickSpot ? pickAfterClose : undefined}
         />
       </SafeAreaProvider>
     </Modal>

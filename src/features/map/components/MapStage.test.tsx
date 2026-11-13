@@ -4,7 +4,7 @@ import { MapStage } from './MapStage';
 
 const baseProps = {
   city: { slug: 'milano', name: 'Milano', lat: 45.4642, lng: 9.19, defaultZoom: 13 },
-  layers: { hotSpots: [], typicalDots: [] },
+  layers: { hotSpots: [], typicalDots: [], spots: [] },
   view: 'general' as const,
   you: null,
   onChangeView: jest.fn(),

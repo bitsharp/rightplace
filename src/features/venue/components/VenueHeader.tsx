@@ -3,7 +3,7 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
-import { googleMapsPlaceUrl } from '@/features/venues/domain/googleMaps';
+import { googleMapsPlaceUrl, isGooglePlaceId } from '@/features/venues/domain/googleMaps';
 import { heights, spacing } from '@/theme/tokens';
 
 import type { VenueDetail } from '../api';
@@ -23,7 +23,9 @@ export function VenueHeader({ detail, closingTime }: Props) {
       <Text variant="body14" color="maybe">
         {typeLine}
       </Text>
-      <AddressLines address={detail.address} googlePlaceId={detail.googlePlaceId} />
+      {isGooglePlaceId(detail.googlePlaceId) ? (
+        <AddressLines address={detail.address} googlePlaceId={detail.googlePlaceId} />
+      ) : null}
     </View>
   );
 }

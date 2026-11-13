@@ -10,7 +10,8 @@
     "rooftop": "Rooftop",
     "bar": "Bar",
     "live": "Live",
-    "other": "Other"
+    "other": "Other",
+    "spot": "Spot"
   },
   "recent": "Recent",
   "recentA11y": "Open {{name}}",
@@ -22,5 +23,15 @@
   "openInGoogleMaps": "Open in Google Maps",
   "events": {
     "title": "Events"
+  },
+  "google": {
+    "title": "Results from Google",
+    "attribution": "Google Maps",
+    "loading": "Searching Google Maps…",
+    "error": "We can't search Google Maps right now. Try again soon.",
+    "limit": "You have reached today's Google search limit. The catalog is still available.",
+    "selectError": "We couldn't open this place. Try again.",
+    "outOfCity": "This place is outside the selected city.",
+    "rowA11y": "Open {{name}}, {{place}}"
   }
 }

@@ -39,6 +39,10 @@
     "INVALID_TARGET": "The audience you picked is not valid.",
     "INVALID_SCHEDULE": "Invalid time: the event must start in the future (within 60 days) and end by 06:00 the next day.",
     "TOO_MANY_ACTIVE_EVENTS": "You already have 10 active events. Cancel one or wait for it to end.",
-    "EVENT_STARTED": "The event has already started: it can no longer be edited."
+    "EVENT_STARTED": "The event has already started: it can no longer be edited.",
+    "INVALID_SPOT_NAME": "The spot name must be 3 to 40 characters, with no @ or links.",
+    "SPOT_LIMIT": "You can create only one spot per night. Declare one of those already on the map.",
+    "OUT_OF_CITY": "This point is outside the available cities.",
+    "PLACE_NOT_CACHED": "This place is not available yet. Search for it again."
   }
 }

@@ -17,7 +17,7 @@ type Props = {
 };
 
 // "Altro" is a valid kind in the data but not a filter in the mock-up.
-const FILTER_KINDS = VENUE_KINDS.filter((kind) => kind !== 'other');
+const FILTER_KINDS = VENUE_KINDS.filter((kind) => kind !== 'other' && kind !== 'spot');
 
 export function SearchFilters({ cities, citySlug, onCity, kind, onKind }: Props) {
   const { t } = useTranslation('venues');

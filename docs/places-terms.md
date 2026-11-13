@@ -14,7 +14,15 @@ Il job `expire-stale-places` (ogni giorno, 04:30 UTC) applica la regola dei 30 g
 
 ## Field mask minimo
 
-Chiediamo a Google **solo i campi che salviamo**: `id, displayName, location, formattedAddress, primaryType` e `regularOpeningHours` (Text Search); `id, displayName, location, formattedAddress, regularOpeningHours` (Place Details). Niente recensioni, foto, rating, telefono o sito. Un test Deno verifica la maschera esatta.
+Chiediamo a Google **solo i campi che salviamo**: `id, displayName, location, formattedAddress, primaryType` e `regularOpeningHours` (Text Search); `id, displayName, location, formattedAddress, regularOpeningHours` (Place Details del dettaglio locale); `id, displayName, formattedAddress, location, types, primaryType` (Place Details Pro della selezione dalla ricerca). Niente recensioni, foto, rating, telefono o sito. Un test Deno verifica la maschera esatta.
+
+## Ricerca come su Google Maps (prompt 20)
+
+- **Autocomplete (New)** (`places-search`): il testo digitato va solo a Google tramite la Edge Function, con `sessionToken`, `locationRestriction` = cerchio della città, `includedRegionCodes` = paese, `languageCode` = lingua dell'utente. Non viene salvato né scritto nei log. Nessuna field mask: la risposta è fissa.
+- **Place Details Pro** alla selezione (`places-detail` con `place_id`): field mask `id,displayName,formattedAddress,location,types,primaryType`, con lo stesso `sessionToken` che chiude la sessione. Niente orari di apertura (cambierebbero SKU).
+- **Cache**: il luogo scelto entra in `venues` con `places_synced_at`, quindi le stesse regole dei 30 giorni (`expire_stale_places`). Un indirizzo (senza `establishment`/`point_of_interest`) diventa uno spot `source = 'places'` con nome = indirizzo formattato e scade con gli stessi 30 giorni. Gli spot creati dagli utenti non hanno dati Google (id sintetico `spot:<uuid>`) e non passano mai da Places.
+- **Attribuzione**: sotto i "Risultati da Google" c'è la dicitura **"Google Maps"**, richiesta quando i risultati non sono mostrati su una mappa Google.
+- Costi e quote: `docs/places-costs.md`.
 
 ## Tetto richieste e dry run
 

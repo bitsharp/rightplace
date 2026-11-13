@@ -80,6 +80,24 @@ describe('fetchVenueDetail', () => {
   });
 });
 
+describe('fetchVenueStats: spot sotto k', () => {
+  it('le fasce null di uno spot restano null: mai un "pochi" inventato', async () => {
+    respondWith([
+      statsRow({
+        going_band: null,
+        maybe_band: null,
+        avg_age: null,
+        female_pct: null,
+        male_pct: null,
+      }),
+    ]);
+    await expect(fetchVenueStats('s1', 'all')).resolves.toMatchObject({
+      goingBand: null,
+      maybeBand: null,
+    });
+  });
+});
+
 describe('fetchVenueStats', () => {
   it('chiede il segmento al server e converte fasce, statistiche e amici', async () => {
     respondWith([statsRow()]);

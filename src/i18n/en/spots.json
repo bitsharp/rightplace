@@ -1,0 +1,22 @@
+{
+  "sheet": {
+    "label": "NIGHT AT THIS POINT",
+    "title": "Night at this point",
+    "nameLabel": "What is the night called?",
+    "namePlaceholder": "E.g. Drinks at Marta's",
+    "visibility": "The point and the name will be visible to all users in the city.",
+    "going": "I'm going",
+    "maybe": "Maybe",
+    "close": "Close",
+    "a11y": "Declare a night at the point you chose on the map"
+  },
+  "nameError": {
+    "tooShort": "At least 3 characters.",
+    "tooLong": "At most 40 characters.",
+    "noMentions": "No @ in the name.",
+    "noLinks": "No links in the name."
+  },
+  "ring": {
+    "a11y": "Press and hold to create a night at this point"
+  }
+}

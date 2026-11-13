@@ -6,6 +6,9 @@ import { useCityEvents } from '@/features/events/hooks';
 import { useWhenLabel } from '@/features/events/useEventLabels';
 import { useMapStore } from '@/features/map/store/mapStore';
 
+import { withoutCatalogDuplicates } from './domain/googleResults';
+import type { GoogleSuggestion } from './googleApi';
+import { useGoogleSearch } from './useGoogleSearch';
 import {
   filterVenues,
   mergeVenueBands,
@@ -54,9 +57,21 @@ export function useVenueSearch() {
     [venues.data, bands.data, kind, query],
   );
 
+  // Google results come after the catalog rows; a place that is already a shown row is not repeated.
+  const google = useGoogleSearch(query, citySlug);
+  const shownIds = new Set(rows.map((row) => row.id));
+  const googleRows = withoutCatalogDuplicates(
+    google.suggestions,
+    (venues.data ?? []).filter((venue) => shownIds.has(venue.id)),
+  );
+
   const openVenue = (venueId: string) => {
     remember.mutate(venueId);
     router.push({ pathname: '/venue/[id]', params: { id: venueId } });
+  };
+  const openGoogle = async (suggestion: GoogleSuggestion) => {
+    const venueId = await google.select(suggestion);
+    if (venueId) router.push({ pathname: '/venue/[id]', params: { id: venueId } });
   };
   const openEvent = (eventId: string) =>
     router.push({ pathname: '/event/[id]', params: { id: eventId } });
@@ -71,6 +86,13 @@ export function useVenueSearch() {
     query,
     setQuery,
     rows,
+    google: {
+      status: google.status,
+      rows: googleRows,
+      selectError: google.selectError,
+      selecting: google.selecting,
+      open: openGoogle,
+    },
     eventRows,
     openEvent,
     recents: recents.data ?? [],
