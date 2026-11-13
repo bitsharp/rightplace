@@ -19,6 +19,7 @@ type Options = {
   followers?: string[];
   blocked?: string[];
   contactMatches?: string[];
+  phoneRegistered?: boolean;
 };
 
 type World = {
@@ -28,6 +29,7 @@ type World = {
   followers: Set<string>;
   blocked: Set<string>;
   reports: { id: string; reason: string | null }[];
+  phoneRegistered: boolean;
 };
 
 type Args = Record<string, string>;
@@ -137,14 +139,20 @@ export function seedFriendsBackend(options: Options, extra: Record<string, unkno
     followers: new Set(options.followers ?? []),
     blocked: new Set(options.blocked ?? []),
     reports: [],
+    phoneRegistered: options.phoneRegistered ?? false,
   };
   setFakeRpc({
     ...searchRpcs(world),
     ...listRpcs(world),
     ...answerRpcs(world),
     match_contacts: () => visible(world, options.contactMatches ?? []).map(person),
-    set_my_phone_hash: null,
-    clear_my_phone_hash: null,
+    has_phone_hash: () => world.phoneRegistered,
+    set_my_phone_hash: () => {
+      world.phoneRegistered = true;
+    },
+    clear_my_phone_hash: () => {
+      world.phoneRegistered = false;
+    },
     get_stories: [],
     get_my_declaration: [],
     get_post_target: [],

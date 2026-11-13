@@ -95,7 +95,8 @@
     "save": "Save",
     "saved": "Done: friends with your number in their address book can now find you.",
     "invalid": "Invalid number.",
-    "clear": "Stop letting people find me",
+    "registered": "Number registered",
+    "remove": "Remove",
     "cleared": "People can no longer find you by number."
   },
   "handleSection": {

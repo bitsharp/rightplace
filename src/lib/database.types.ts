@@ -1453,6 +1453,7 @@ export type Database = {
           other_pct: number;
         }[];
       };
+      has_phone_hash: { Args: Record<PropertyKey, never>; Returns: boolean };
       import_typical_manual: {
         Args: { p_city_slug: string; p_rows: Json };
         Returns: {

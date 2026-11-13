@@ -167,3 +167,8 @@ export async function setMyPhoneHash(hash: string): Promise<void> {
 export async function clearMyPhoneHash(): Promise<void> {
   await callRpc<unknown>('clear_my_phone_hash');
 }
+
+// Only whether I registered a hash, never the hash itself: the number is not kept anywhere (principle 4).
+export async function hasPhoneHash(): Promise<boolean> {
+  return z.boolean().parse(await callRpc<unknown>('has_phone_hash'));
+}

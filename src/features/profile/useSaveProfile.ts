@@ -4,7 +4,7 @@ import { useSession } from '@/features/auth/useSession';
 import { RpcError, type RpcErrorCode } from '@/lib/rpcError';
 
 import { clearMyPhoneHash } from '@/features/friends/api';
-import { invalidateKeys } from '@/features/friends/keys';
+import { invalidateKeys, PHONE_HASH_STATUS_KEY } from '@/features/friends/keys';
 
 import { completeProfile, type ProfileInput } from './api';
 import { myProfileKey } from './hooks';
@@ -17,7 +17,11 @@ export function useSaveProfile() {
     try {
       await completeProfile(input);
       // Turning contacts off also withdraws the hash of my number, so nobody can find me by it.
-      if (!input.contactsOptIn) await clearMyPhoneHash();
+      if (!input.contactsOptIn) {
+        await clearMyPhoneHash();
+        await queryClient.cancelQueries({ queryKey: PHONE_HASH_STATUS_KEY });
+        queryClient.setQueryData(PHONE_HASH_STATUS_KEY, false);
+      }
       // The "recommended for you" venue is picked by my age band and gender.
       await invalidateKeys(queryClient, [myProfileKey(userId ?? undefined), ['recommendedVenue']]);
       return null;

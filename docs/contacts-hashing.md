@@ -7,7 +7,8 @@ Il principio 4 di `CLAUDE.md` in pratica. Vale per "Trova amici dai contatti" (`
 - **Solo hash SHA-256 in esadecimale minuscolo (64 caratteri)**, mai numeri né nomi. Il server rifiuta qualsiasi altra forma (`INVALID_HASH`) e `match_contacts` richiede `contacts_opt_in` attivo.
 - L'input dell'hash è `salt + ':' + numero E.164` (esempio: `rightplace.contacts.v1:+393451234567`). Il numero è normalizzato da `toE164` (`src/features/friends/domain/phone.ts`) senza librerie esterne: IT e ES con regole proprie, altri paesi solo con prefisso internazionale esplicito.
 - Le chiamate sono a blocchi da 500 hash (`CONTACTS_BATCH_SIZE`), deduplicate. Il server cancella gli hash inviati prima di rispondere e non li conserva dopo il matching.
-- "Farsi trovare" invia **un solo hash**, quello del proprio numero, con `set_my_phone_hash`. Disattivare il toggle contatti nel profilo (e salvare) o toccare "Non farmi più trovare" lo cancella (`clear_my_phone_hash`).
+- "Farsi trovare" invia **un solo hash**, quello del proprio numero, con `set_my_phone_hash`. Disattivare il toggle contatti nel profilo (e salvare) o toccare "Rimuovi" lo cancella (`clear_my_phone_hash`).
+- Il profilo mostra "Numero registrato" (con "Rimuovi") al posto del campo quando l'hash esiste. Lo stato viene da `has_phone_hash()`, che restituisce solo un boolean sul chiamante: non rilegge né l'hash né il numero, e la query non è persistita sul telefono. Per questo lo stato è corretto anche dopo un riavvio.
 
 ## Cosa resta sul telefono
 

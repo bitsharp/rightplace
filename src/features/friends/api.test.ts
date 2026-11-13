@@ -12,6 +12,7 @@ import {
   fetchFollowing,
   fetchFollowRequests,
   fetchFollowRequestsCount,
+  hasPhoneHash,
   matchContacts,
   removeFollower,
   reportUser,
@@ -187,5 +188,18 @@ describe('contatti', () => {
     expect(lastCall()).toEqual(['set_my_phone_hash', { p_hash: 'b'.repeat(64) }]);
     await clearMyPhoneHash();
     expect(lastCall()?.[0]).toBe('clear_my_phone_hash');
+  });
+
+  it('hasPhoneHash legge solo il boolean di has_phone_hash', async () => {
+    respondWith(true);
+    expect(await hasPhoneHash()).toBe(true);
+    expect(lastCall()?.[0]).toBe('has_phone_hash');
+    respondWith(false);
+    expect(await hasPhoneHash()).toBe(false);
+  });
+
+  it('hasPhoneHash rifiuta una risposta che non è un boolean', async () => {
+    respondWith('b'.repeat(64));
+    await expect(hasPhoneHash()).rejects.toThrow();
   });
 });

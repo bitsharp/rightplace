@@ -95,7 +95,8 @@
     "save": "Salva",
     "saved": "Fatto: ora gli amici con il tuo numero in rubrica possono trovarti.",
     "invalid": "Numero non valido.",
-    "clear": "Non farmi più trovare",
+    "registered": "Numero registrato",
+    "remove": "Rimuovi",
     "cleared": "Non ti troveranno più dal numero."
   },
   "handleSection": {

@@ -132,12 +132,28 @@ describe('profilo: farsi trovare dal numero', () => {
     expect(rpcCalls('set_my_phone_hash')).toHaveLength(0);
   });
 
-  it('"Non farmi più trovare" cancella l’hash dal server', async () => {
-    seedFriendsBackend({ users: [] });
+  it('"Rimuovi" cancella l’hash dal server', async () => {
+    seedFriendsBackend({ users: [], phoneRegistered: true });
     await renderApp('ready', '/profile', { contacts_opt_in: true });
-    await fireEvent.press(await screen.findByRole('button', { name: 'profile:findMe.clear' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'profile:findMe.remove' }));
     await waitFor(() => expect(rpcCalls('clear_my_phone_hash')).toHaveLength(1));
     expect(await screen.findByText('profile:findMe.cleared')).toBeOnTheScreen();
+  });
+
+  it('dopo il salvataggio la sezione mostra "Numero registrato" al posto del campo', async () => {
+    seedFriendsBackend({ users: [] });
+    await renderApp('ready', '/profile', { contacts_opt_in: true });
+    await fireEvent.changeText(await screen.findByLabelText(NUMBER_FIELD), '345 123 4567');
+    await fireEvent.press(screen.getByRole('button', { name: 'profile:findMe.save' }));
+    expect(await screen.findByText('profile:findMe.registered')).toBeOnTheScreen();
+    expect(screen.queryByLabelText(NUMBER_FIELD)).toBeNull();
+  });
+
+  it('un numero già registrato sul server risulta registrato anche dopo un riavvio', async () => {
+    seedFriendsBackend({ users: [], phoneRegistered: true });
+    await renderApp('ready', '/profile', { contacts_opt_in: true });
+    expect(await screen.findByText('profile:findMe.registered')).toBeOnTheScreen();
+    expect(JSON.stringify(fakeSupabase.rpc.mock.calls)).not.toContain('set_my_phone_hash');
   });
 
   it('disattivare il toggle contatti e salvare cancella anche l’hash del numero', async () => {

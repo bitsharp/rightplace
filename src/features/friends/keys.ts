@@ -8,6 +8,7 @@ export const FOLLOW_REQUESTS_ROOT_KEY = ['followRequests'] as const;
 export const FOLLOW_REQUESTS_KEY = [...FOLLOW_REQUESTS_ROOT_KEY, 'list'] as const;
 export const FOLLOW_REQUESTS_COUNT_KEY = [...FOLLOW_REQUESTS_ROOT_KEY, 'count'] as const;
 export const BLOCKED_KEY = ['blocked'] as const;
+export const PHONE_HASH_STATUS_KEY = ['phoneHashStatus'] as const;
 
 // Everything that is visible only through an accepted follow: when the set of followed people
 // changes, the map of friends, the feed, the stories bar and the venue friends must be reloaded.

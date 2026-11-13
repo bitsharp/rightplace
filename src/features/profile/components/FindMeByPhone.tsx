@@ -28,29 +28,46 @@ export function FindMeByPhone() {
       <Text variant="body13" color="textSecondary">
         {t('findMe.body')}
       </Text>
-      <TextField
-        label={t('findMe.label')}
-        placeholder={t('findMe.placeholder')}
-        value={findMe.number}
-        onChangeText={findMe.setNumber}
-        keyboardType="phone-pad"
-        autoComplete="off"
-        textContentType="none"
-      />
+      {findMe.registered ? (
+        <View style={styles.registered}>
+          <Text variant="body13" color="maybe" accessibilityElementsHidden>
+            ✓
+          </Text>
+          <Text variant="body13" color="maybe">
+            {t('findMe.registered')}
+          </Text>
+        </View>
+      ) : (
+        <TextField
+          label={t('findMe.label')}
+          placeholder={t('findMe.placeholder')}
+          value={findMe.number}
+          onChangeText={findMe.setNumber}
+          keyboardType="phone-pad"
+          autoComplete="off"
+          textContentType="none"
+        />
+      )}
       {message ? (
         <Text variant="body13" color={isError ? 'error' : 'maybe'}>
           {message}
         </Text>
       ) : null}
-      <Button label={t('findMe.save')} size="md" onPress={() => void findMe.save()} />
-      <Button
-        label={t('findMe.clear')}
-        variant="ghost"
-        size="md"
-        onPress={() => void findMe.clear()}
-      />
+      {findMe.registered ? (
+        <Button
+          label={t('findMe.remove')}
+          variant="ghost"
+          size="md"
+          onPress={() => void findMe.clear()}
+        />
+      ) : (
+        <Button label={t('findMe.save')} size="md" onPress={() => void findMe.save()} />
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({ section: { gap: spacing.md } });
+const styles = StyleSheet.create({
+  section: { gap: spacing.md },
+  registered: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+});
