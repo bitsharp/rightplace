@@ -67,8 +67,10 @@
       }
     },
     "action": {
-      "call": "CALL",
       "open": "OPEN"
+    },
+    "a11y": {
+      "call": "Call {{name}}, {{number}}"
     }
   },
   "cta": "Declare your night",

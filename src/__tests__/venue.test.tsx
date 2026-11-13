@@ -179,6 +179,19 @@ describe('dettaglio locale e dichiarazione', () => {
       expect(open).toHaveBeenLastCalledWith(expect.stringContaining('pickup[latitude]=45.4642'));
     });
 
+    it('il taxi ha la cornetta al posto della parola "Chiama" e lo dice a voce', async () => {
+      seedBackend();
+      await renderApp('ready', '/venue/arena');
+      await screen.findByText('venue:transport.badge.taxi');
+      expect(screen.getByTestId('icon-phone', { includeHiddenElements: true })).toBeOnTheScreen();
+      expect(screen.queryByText('venue:transport.action.call')).toBeNull();
+      expect(
+        screen.getByRole('link', {
+          name: 'venue:transport.a11y.call({"name":"venue:transport.name.taxi({\\"city\\":\\"Milano\\"})","number":"+39 02 8585"})',
+        }),
+      ).toBeOnTheScreen();
+    });
+
     it('il taxi chiama il numero della città', async () => {
       seedBackend();
       const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);

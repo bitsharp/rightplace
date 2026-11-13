@@ -14,10 +14,11 @@ import type { RpcErrorCode } from '@/lib/rpcError';
 import { colors, spacing } from '@/theme/tokens';
 import { typography } from '@/theme/typography';
 
-import { setLocale, type ProfileInput } from '../api';
+import { setLocale, type MyProfile, type ProfileInput } from '../api';
 import { AccountSection } from '../components/AccountSection';
 import { BlockedSection } from '../components/BlockedSection';
 import { FindMeByPhone } from '../components/FindMeByPhone';
+import { HandleSection } from '../components/HandleSection';
 import { FollowersSection } from '../components/FollowersSection';
 import { ProfileForm } from '../components/ProfileForm';
 import { ShareHandleButton } from '../components/ShareHandleButton';
@@ -29,7 +30,6 @@ export function ProfileTabScreen() {
   const { profile, email } = useSession();
   const save = useSaveProfile();
   const { showCreatorProfileLink } = useCreatorUi();
-  const { showShareHandle } = useShareUi();
   const [result, setResult] = useState<'saved' | RpcErrorCode | null>(null);
   if (!profile) return null;
 
@@ -44,6 +44,7 @@ export function ProfileTabScreen() {
         {t('setup.title')}
       </Text>
       <Text color="textSecondary">{t('setup.body')}</Text>
+      <HandleSection handle={profile.handle} alreadyChanged={profile.handleChangedAt !== null} />
       <ProfileForm
         initial={profile}
         submitLabel={t('app.save')}
@@ -58,13 +59,22 @@ export function ProfileTabScreen() {
           {profile.isCreator ? t('app.creatorProfile') : t('app.becomeCreator')}
         </Link>
       ) : null}
+      <ProfileSections profile={profile} email={email ?? ''} />
+    </Screen>
+  );
+}
+
+function ProfileSections({ profile, email }: { profile: MyProfile; email: string }) {
+  const { showShareHandle } = useShareUi();
+  return (
+    <>
       {showShareHandle ? <ShareHandleButton handle={profile.handle} /> : null}
       {profile.contactsOptIn ? <FindMeByPhone /> : null}
       <FollowersSection />
       <BlockedSection />
-      <AccountSection email={email ?? ''} />
+      <AccountSection email={email} />
       <UiKitLink />
-    </Screen>
+    </>
   );
 }
 

@@ -64,6 +64,71 @@ describe('profilo privato e handle', () => {
   });
 });
 
+describe('tab Profilo: cambio del @tag', () => {
+  const CHANGE = 'profile:handleSection.change';
+  const YES = 'profile:handleSection.confirmYes';
+
+  function seedRegenerate() {
+    fakeSupabase.rpc.mockImplementation(async (name: string) => {
+      if (name !== 'regenerate_handle') return { data: null, error: null };
+      setFakeTable('profiles', [
+        fakeProfileRow({ handle: 'volpe.oro', handle_changed_at: '2026-11-13T10:00:00Z' }),
+      ]);
+      return { data: 'volpe.oro', error: null };
+    });
+  }
+
+  it('mostra il @tag e dice che si può cambiare una sola volta', async () => {
+    await renderApp('ready', '/profile');
+    expect(await screen.findByText('profile:handleSection.once')).toBeOnTheScreen();
+    expect(screen.getAllByText('@lince.rosso').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: CHANGE })).toBeOnTheScreen();
+  });
+
+  it('chiede conferma prima di estrarre un altro @tag e "Annulla" non cambia nulla', async () => {
+    seedRegenerate();
+    await renderApp('ready', '/profile');
+    await fireEvent.press(await screen.findByRole('button', { name: CHANGE }));
+    expect(screen.getByText('profile:handleSection.confirm')).toBeOnTheScreen();
+    expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('regenerate_handle', undefined);
+    await fireEvent.press(screen.getByRole('button', { name: 'profile:handleSection.confirmNo' }));
+    expect(screen.queryByText('profile:handleSection.confirm')).toBeNull();
+    expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('regenerate_handle', undefined);
+  });
+
+  it('confermando estrae un altro @tag, lo mostra subito e poi non è più disponibile', async () => {
+    seedRegenerate();
+    await renderApp('ready', '/profile');
+    await fireEvent.press(await screen.findByRole('button', { name: CHANGE }));
+    await fireEvent.press(screen.getByRole('button', { name: YES }));
+    await waitFor(() =>
+      expect(fakeSupabase.rpc).toHaveBeenCalledWith('regenerate_handle', undefined),
+    );
+    expect((await screen.findAllByText('@volpe.oro')).length).toBeGreaterThan(0);
+    expect(await screen.findByText('profile:handleSection.used')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: CHANGE })).toBeNull();
+    expect(screen.queryByText('profile:handleSection.once')).toBeNull();
+  });
+
+  it('se il @tag è già stato cambiato indica che non è più disponibile', async () => {
+    await renderApp('ready', '/profile', { handle_changed_at: '2026-11-01T10:00:00Z' });
+    expect(await screen.findByText('profile:handleSection.used')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: CHANGE })).toBeNull();
+  });
+
+  it("se il server rifiuta mostra l'errore tradotto", async () => {
+    fakeSupabase.rpc.mockImplementation(async (name: string) =>
+      name === 'regenerate_handle'
+        ? { data: null, error: { message: 'HANDLE_ALREADY_CHANGED' } }
+        : { data: null, error: null },
+    );
+    await renderApp('ready', '/profile');
+    await fireEvent.press(await screen.findByRole('button', { name: CHANGE }));
+    await fireEvent.press(screen.getByRole('button', { name: YES }));
+    expect(await screen.findByText('errors:rpc.HANDLE_ALREADY_CHANGED')).toBeOnTheScreen();
+  });
+});
+
 describe('tab Profilo', () => {
   it('mostra l’email solo in lettura e permette di uscire', async () => {
     await renderApp('ready', '/profile');

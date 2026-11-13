@@ -44,16 +44,21 @@ type LineProps = { link: TransportLink; context: Props; onOpen: (link: Transport
 function TransportLine({ link, context, onOpen }: LineProps) {
   const { t } = useTranslation('venue');
   const { provider } = link;
-  const detail =
-    provider === 'taxi'
-      ? (context.taxiNumber ?? '')
-      : t(`transport.detail.${provider}.${context.direction}`, { venue: context.venueName });
+  const name = t(`transport.name.${provider}`, { city: context.cityName });
+  const number = context.taxiNumber ?? '';
+  const call = provider === 'taxi';
   return (
     <TransportRow
       badge={t(`transport.badge.${provider}`)}
-      name={t(`transport.name.${provider}`, { city: context.cityName })}
-      detail={detail}
-      action={t(provider === 'taxi' ? 'transport.action.call' : 'transport.action.open')}
+      name={name}
+      detail={
+        call
+          ? number
+          : t(`transport.detail.${provider}.${context.direction}`, { venue: context.venueName })
+      }
+      // A phone icon replaces the word "Chiama": the label says what the tap calls.
+      action={call ? { icon: 'phone' } : t('transport.action.open')}
+      accessibilityLabel={call ? t('transport.a11y.call', { name, number }) : undefined}
       onPress={() => onOpen(link)}
     />
   );

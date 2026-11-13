@@ -25,7 +25,8 @@ describe('GettingThere', () => {
     expect(screen.getByText('venue:transport.badge.uber')).toBeOnTheScreen();
     expect(screen.getByText('venue:transport.badge.transit')).toBeOnTheScreen();
     expect(screen.getAllByText('venue:transport.action.open')).toHaveLength(2);
-    expect(screen.getByText('venue:transport.action.call')).toBeOnTheScreen();
+    expect(screen.queryByText('venue:transport.action.call')).toBeNull();
+    expect(screen.getByTestId('icon-phone', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   it('il taxi mostra il numero della città', async () => {

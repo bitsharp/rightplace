@@ -97,5 +97,14 @@
     "invalid": "Invalid number.",
     "clear": "Stop letting people find me",
     "cleared": "People can no longer find you by number."
+  },
+  "handleSection": {
+    "title": "Your name",
+    "once": "You can change it only once",
+    "used": "You've already used your change: your @tag can't be changed again.",
+    "change": "Change my @tag",
+    "confirm": "Another random @tag will be drawn and you won't be able to change it again. Continue?",
+    "confirmYes": "Yes, draw another @tag",
+    "confirmNo": "Cancel"
   }
 }

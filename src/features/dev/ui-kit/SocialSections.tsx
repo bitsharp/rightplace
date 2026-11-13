@@ -101,7 +101,8 @@ function TransportDemo() {
         badge="TAXI"
         name={t('sample.taxi')}
         detail={t('sample.taxiDetail')}
-        action={t('sample.call')}
+        action={{ icon: 'phone' }}
+        accessibilityLabel={`${t('sample.taxi')}, ${t('sample.taxiDetail')}`}
         onPress={noop}
       />
       <TransportRow

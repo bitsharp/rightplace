@@ -67,8 +67,10 @@
       }
     },
     "action": {
-      "call": "CHIAMA",
       "open": "APRI"
+    },
+    "a11y": {
+      "call": "Chiama {{name}}, {{number}}"
     }
   },
   "cta": "Dichiara la tua serata",

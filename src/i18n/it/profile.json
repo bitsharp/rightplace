@@ -97,5 +97,14 @@
     "invalid": "Numero non valido.",
     "clear": "Non farmi più trovare",
     "cleared": "Non ti troveranno più dal numero."
+  },
+  "handleSection": {
+    "title": "Il tuo nome",
+    "once": "Puoi cambiarlo una sola volta",
+    "used": "Hai già usato il cambio: il tuo @tag non si può più cambiare.",
+    "change": "Cambia il mio @tag",
+    "confirm": "Verrà estratto un altro @tag a caso e non potrai più cambiarlo. Vuoi procedere?",
+    "confirmYes": "Sì, estrai un altro @tag",
+    "confirmNo": "Annulla"
   }
 }
