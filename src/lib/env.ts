@@ -5,6 +5,7 @@ const envSchema = z.object({
   EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   EXPO_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
   EXPO_PUBLIC_CREATOR_ENABLED: z.enum(['true', 'false', '1', '0', '']).optional(),
+  EXPO_PUBLIC_SHARE_ENABLED: z.enum(['true', 'false', '1', '0', '']).optional(),
 });
 
 export type Env = {
@@ -14,6 +15,8 @@ export type Env = {
   turnstileSiteKey: string | null;
   // UI-only switch: off in tester builds to hide the creator area (the backend is untouched)
   creatorEnabled: boolean;
+  // UI-only switch: off until rightplace.app/u/<handle> and the app association files are live
+  shareEnabled: boolean;
 };
 
 export function parseEnv(raw: Record<string, string | undefined>): Env {
@@ -27,6 +30,7 @@ export function parseEnv(raw: Record<string, string | undefined>): Env {
     supabaseAnonKey: result.data.EXPO_PUBLIC_SUPABASE_ANON_KEY,
     turnstileSiteKey: result.data.EXPO_PUBLIC_TURNSTILE_SITE_KEY || null,
     creatorEnabled: ['true', '1'].includes(result.data.EXPO_PUBLIC_CREATOR_ENABLED ?? ''),
+    shareEnabled: ['true', '1'].includes(result.data.EXPO_PUBLIC_SHARE_ENABLED ?? ''),
   };
 }
 
@@ -37,4 +41,5 @@ export const loadEnv = (): Env =>
     EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
     EXPO_PUBLIC_TURNSTILE_SITE_KEY: process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY,
     EXPO_PUBLIC_CREATOR_ENABLED: process.env.EXPO_PUBLIC_CREATOR_ENABLED,
+    EXPO_PUBLIC_SHARE_ENABLED: process.env.EXPO_PUBLIC_SHARE_ENABLED,
   });

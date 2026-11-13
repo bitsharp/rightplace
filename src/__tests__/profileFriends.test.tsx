@@ -59,7 +59,30 @@ describe('profilo: follower e bloccati', () => {
 });
 
 describe('profilo: condividi il mio @tag', () => {
-  it('apre la condivisione con il link dell’app e quello web, solo l’handle', async () => {
+  const originalFlag = process.env.EXPO_PUBLIC_SHARE_ENABLED;
+  afterEach(() => {
+    if (originalFlag === undefined) delete process.env.EXPO_PUBLIC_SHARE_ENABLED;
+    else process.env.EXPO_PUBLIC_SHARE_ENABLED = originalFlag;
+  });
+
+  it('senza EXPO_PUBLIC_SHARE_ENABLED il bottone di condivisione non esiste', async () => {
+    delete process.env.EXPO_PUBLIC_SHARE_ENABLED;
+    seedFriendsBackend({ users: [] });
+    await renderApp('ready', '/profile');
+    await screen.findByText('profile:followers.title');
+    expect(screen.queryByRole('button', { name: 'profile:share.cta' })).toBeNull();
+  });
+
+  it('con il flag a "false" il bottone non esiste', async () => {
+    process.env.EXPO_PUBLIC_SHARE_ENABLED = 'false';
+    seedFriendsBackend({ users: [] });
+    await renderApp('ready', '/profile');
+    await screen.findByText('profile:followers.title');
+    expect(screen.queryByRole('button', { name: 'profile:share.cta' })).toBeNull();
+  });
+
+  it('con il flag acceso apre la condivisione con il link dell’app e quello web, solo l’handle', async () => {
+    process.env.EXPO_PUBLIC_SHARE_ENABLED = 'true';
     seedFriendsBackend({ users: [] });
     const share = jest
       .spyOn(Share, 'share')

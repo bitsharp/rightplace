@@ -21,6 +21,7 @@ import { FindMeByPhone } from '../components/FindMeByPhone';
 import { FollowersSection } from '../components/FollowersSection';
 import { ProfileForm } from '../components/ProfileForm';
 import { ShareHandleButton } from '../components/ShareHandleButton';
+import { useShareUi } from '../useShareUi';
 import { useSaveProfile } from '../useSaveProfile';
 
 export function ProfileTabScreen() {
@@ -28,6 +29,7 @@ export function ProfileTabScreen() {
   const { profile, email } = useSession();
   const save = useSaveProfile();
   const { showCreatorProfileLink } = useCreatorUi();
+  const { showShareHandle } = useShareUi();
   const [result, setResult] = useState<'saved' | RpcErrorCode | null>(null);
   if (!profile) return null;
 
@@ -56,7 +58,7 @@ export function ProfileTabScreen() {
           {profile.isCreator ? t('app.creatorProfile') : t('app.becomeCreator')}
         </Link>
       ) : null}
-      <ShareHandleButton handle={profile.handle} />
+      {showShareHandle ? <ShareHandleButton handle={profile.handle} /> : null}
       {profile.contactsOptIn ? <FindMeByPhone /> : null}
       <FollowersSection />
       <BlockedSection />

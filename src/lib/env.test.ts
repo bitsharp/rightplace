@@ -12,6 +12,7 @@ describe('parseEnv', () => {
       supabaseAnonKey: 'anon-key',
       turnstileSiteKey: null,
       creatorEnabled: false,
+      shareEnabled: false,
     });
   });
 
@@ -31,6 +32,23 @@ describe('parseEnv', () => {
   it('rifiuta un valore non valido del flag creator', () => {
     expect(() => parseEnv({ ...validRaw, EXPO_PUBLIC_CREATOR_ENABLED: 'yes' })).toThrow(
       /EXPO_PUBLIC_CREATOR_ENABLED/,
+    );
+  });
+
+  it.each([
+    [undefined, false],
+    ['', false],
+    ['true', true],
+    ['1', true],
+    ['false', false],
+    ['0', false],
+  ])('legge il flag condivisione %p come %p', (raw, expected) => {
+    expect(parseEnv({ ...validRaw, EXPO_PUBLIC_SHARE_ENABLED: raw }).shareEnabled).toBe(expected);
+  });
+
+  it('rifiuta un valore non valido del flag condivisione', () => {
+    expect(() => parseEnv({ ...validRaw, EXPO_PUBLIC_SHARE_ENABLED: 'yes' })).toThrow(
+      /EXPO_PUBLIC_SHARE_ENABLED/,
     );
   });
 
