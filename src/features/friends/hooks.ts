@@ -31,6 +31,10 @@ export const FOLLOWING_REFETCH_MS = 60 * 1000;
 
 const PRIVATE = { persist: false } as const;
 
+// Who follows whom changes on the other person's phone: coming back to the app always reloads it,
+// even inside the default staleTime ("true" would skip data fetched less than 30 s ago).
+const RELOAD_ON_RETURN = 'always' as const;
+
 function useDebounced(value: string, delayMs: number): string {
   // Starts empty: even the first typed text waits for the pause, so no request leaves per keystroke.
   const [debounced, setDebounced] = useState('');
@@ -48,6 +52,7 @@ export function useUserSearch(text: string) {
     queryKey: userSearchKey(query),
     queryFn: () => searchUsers(query),
     enabled: isSearchable(query),
+    refetchOnWindowFocus: RELOAD_ON_RETURN,
     meta: PRIVATE,
   });
 }
@@ -70,7 +75,7 @@ export function useFollowing() {
       return next;
     },
     refetchInterval: focused ? FOLLOWING_REFETCH_MS : false,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: RELOAD_ON_RETURN,
     meta: PRIVATE,
   });
 }
@@ -93,7 +98,12 @@ export function useFollowers() {
 }
 
 export function useFollowRequests() {
-  return useQuery({ queryKey: FOLLOW_REQUESTS_KEY, queryFn: fetchFollowRequests, meta: PRIVATE });
+  return useQuery({
+    queryKey: FOLLOW_REQUESTS_KEY,
+    queryFn: fetchFollowRequests,
+    refetchOnWindowFocus: RELOAD_ON_RETURN,
+    meta: PRIVATE,
+  });
 }
 
 export function useFollowRequestsCount() {
@@ -101,7 +111,7 @@ export function useFollowRequestsCount() {
     queryKey: FOLLOW_REQUESTS_COUNT_KEY,
     queryFn: fetchFollowRequestsCount,
     refetchInterval: FOLLOWING_REFETCH_MS,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: RELOAD_ON_RETURN,
     meta: PRIVATE,
   });
 }

@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,27 +7,21 @@ import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
 import { AuthHeader } from '@/features/auth/components/AuthHeader';
 import { useSession } from '@/features/auth/useSession';
-import { RpcError, type RpcErrorCode } from '@/lib/rpcError';
+import type { RpcErrorCode } from '@/lib/rpcError';
 
-import { regenerateHandle } from '../api';
 import { HandleReveal } from '../components/HandleReveal';
-import { myProfileKey } from '../hooks';
 import { useOnboardingStore } from '../store/onboardingStore';
+import { useRegenerateHandle } from '../useRegenerateHandle';
 
 export function HandleScreen() {
   const { t } = useTranslation('profile');
-  const { profile, userId } = useSession();
-  const queryClient = useQueryClient();
+  const { profile } = useSession();
+  const regenerate = useRegenerateHandle();
   const finishHandleReveal = useOnboardingStore((state) => state.finishHandleReveal);
   const [error, setError] = useState<RpcErrorCode | null>(null);
 
   const change = async () => {
-    try {
-      await regenerateHandle();
-      await queryClient.invalidateQueries({ queryKey: myProfileKey(userId ?? undefined) });
-    } catch (caught) {
-      setError(caught instanceof RpcError ? caught.code : 'UNKNOWN');
-    }
+    setError(await regenerate());
   };
 
   const enter = () => {

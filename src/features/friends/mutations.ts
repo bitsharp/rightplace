@@ -82,7 +82,10 @@ function useSearchFollowMutation(
       return setSearchFollowState(queryClient, userId, nextState);
     },
     onError: (_error, _userId, snapshot) => restore(queryClient, snapshot),
-    onSettled: () => invalidateKeys(queryClient, [USER_SEARCH_KEY, FOLLOWING_KEY]),
+    onSettled: async () => {
+      await invalidateKeys(queryClient, [USER_SEARCH_KEY, FOLLOWING_KEY]);
+      await invalidateFollowDependents(queryClient);
+    },
   });
 }
 
@@ -105,7 +108,12 @@ function useRequestAnswer(
     },
     onError: (_error, _userId, snapshot) => restore(queryClient, snapshot),
     onSettled: () =>
-      invalidateKeys(queryClient, [FOLLOW_REQUESTS_ROOT_KEY, USER_SEARCH_KEY, ...alsoInvalidate]),
+      invalidateKeys(queryClient, [
+        FOLLOW_REQUESTS_ROOT_KEY,
+        USER_SEARCH_KEY,
+        FOLLOWING_KEY,
+        ...alsoInvalidate,
+      ]),
   });
 }
 

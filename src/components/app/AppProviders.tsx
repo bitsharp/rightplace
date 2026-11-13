@@ -1,6 +1,6 @@
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, ThemeProvider, type Theme } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import {
   createQueryClient,
@@ -8,6 +8,7 @@ import {
   queryPersister,
   shouldPersistQuery,
 } from '@/lib/queryClient';
+import { setupQueryFocus } from '@/lib/queryFocus';
 import { colors } from '@/theme/tokens';
 
 const navigationTheme: Theme = {
@@ -24,6 +25,7 @@ const navigationTheme: Theme = {
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
+  useEffect(() => setupQueryFocus(), []);
   return (
     <PersistQueryClientProvider
       client={queryClient}

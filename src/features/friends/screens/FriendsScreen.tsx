@@ -17,6 +17,7 @@ import { RequestsSection } from '../components/RequestsSection';
 import { SearchResults } from '../components/SearchResults';
 import { isSearchable } from '../domain/searchQuery';
 import { useFollowing } from '../hooks';
+import { useRefreshOnTabFocus } from '../useRefreshOnTabFocus';
 import { useFollowActions } from '../useFollowActions';
 import { useTopBar } from '@/features/posts/useTopBar';
 
@@ -34,6 +35,7 @@ function useNotice() {
 
 export function FriendsScreen() {
   const topBar = useTopBar();
+  useRefreshOnTabFocus();
   const actions = useFollowActions();
   const [text, setText] = useState('');
   const [selected, setSelected] = useState<Person | null>(null);

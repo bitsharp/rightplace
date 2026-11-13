@@ -251,3 +251,30 @@ describe('profilo pubblico da link', () => {
     expect(screen.queryByText('@volpe.viola2')).toBeNull();
   });
 });
+
+describe('amici: dati aggiornati quando si riapre la tab', () => {
+  it('A invia la richiesta, B accetta: riaprendo la tab Amici A vede B tra i seguiti', async () => {
+    const world = seedFriendsBackend({ users: USERS });
+    await renderApp('ready', '/friends');
+    expect(await screen.findByText('friends:followingCount({"count":0})')).toBeOnTheScreen();
+
+    world.follow.set('u-gatto', 'accepted'); // B accepts on his own phone
+    await fireEvent.press(screen.getByText('common:tabs.map'));
+    await fireEvent.press(await screen.findByText('common:tabs.friends'));
+
+    expect(await screen.findByText('friends:followingCount({"count":1})')).toBeOnTheScreen();
+  });
+
+  it('riaprendo la tab ricarica anche le richieste ricevute', async () => {
+    const world = seedFriendsBackend({ users: USERS });
+    await renderApp('ready', '/friends');
+    await waitFor(() => expect(rpcCalls('get_follow_requests').length).toBeGreaterThan(0));
+    const before = rpcCalls('get_follow_requests').length;
+
+    world.requests.add('u-lupo');
+    await fireEvent.press(screen.getByText('common:tabs.map'));
+    await fireEvent.press(await screen.findByText('common:tabs.friends'));
+
+    await waitFor(() => expect(rpcCalls('get_follow_requests').length).toBeGreaterThan(before));
+  });
+});

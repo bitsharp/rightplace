@@ -2,7 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { requestFollow, searchUsers } from '@/features/friends/api';
-import { FOLLOWING_KEY, USER_SEARCH_KEY } from '@/features/friends/keys';
+import {
+  FOLLOWING_KEY,
+  invalidateFollowDependents,
+  invalidateKeys,
+  USER_SEARCH_KEY,
+} from '@/features/friends/keys';
 import { RpcError } from '@/lib/rpcError';
 
 // The follow request for a handle typed in the composer: the handle is resolved with the same search
@@ -19,8 +24,8 @@ export function useFollowByHandle() {
     },
     onSuccess: (_result, handle) => setRequested((list) => [...list, handle]),
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: USER_SEARCH_KEY });
-      await queryClient.invalidateQueries({ queryKey: FOLLOWING_KEY });
+      await invalidateKeys(queryClient, [USER_SEARCH_KEY, FOLLOWING_KEY]);
+      await invalidateFollowDependents(queryClient);
     },
   });
   return { requested, follow: (handle: string) => mutation.mutate(handle) };

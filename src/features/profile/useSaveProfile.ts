@@ -4,6 +4,7 @@ import { useSession } from '@/features/auth/useSession';
 import { RpcError, type RpcErrorCode } from '@/lib/rpcError';
 
 import { clearMyPhoneHash } from '@/features/friends/api';
+import { invalidateKeys } from '@/features/friends/keys';
 
 import { completeProfile, type ProfileInput } from './api';
 import { myProfileKey } from './hooks';
@@ -17,7 +18,8 @@ export function useSaveProfile() {
       await completeProfile(input);
       // Turning contacts off also withdraws the hash of my number, so nobody can find me by it.
       if (!input.contactsOptIn) await clearMyPhoneHash();
-      await queryClient.invalidateQueries({ queryKey: myProfileKey(userId ?? undefined) });
+      // The "recommended for you" venue is picked by my age band and gender.
+      await invalidateKeys(queryClient, [myProfileKey(userId ?? undefined), ['recommendedVenue']]);
       return null;
     } catch (error) {
       return error instanceof RpcError ? error.code : 'UNKNOWN';
