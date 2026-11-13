@@ -46,6 +46,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     blockedPermissions: BLOCKED_ANDROID_PERMISSIONS,
     config: { googleMaps: { apiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY } },
+    // Push FCM: il file non è nel repo; su EAS arriva dalla variabile file GOOGLE_SERVICES_JSON
+    googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
   },
   plugins: [
     'expo-router',

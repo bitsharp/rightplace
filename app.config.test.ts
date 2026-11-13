@@ -73,6 +73,15 @@ describe('app.config', () => {
     expect(config.ios?.infoPlist?.ITSAppUsesNonExemptEncryption).toBe(false);
   });
 
+  it('legge google-services.json dalla variabile file EAS GOOGLE_SERVICES_JSON, con fallback locale', () => {
+    expect(config.android?.googleServicesFile).toBe('./google-services.json');
+    process.env.GOOGLE_SERVICES_JSON = '/tmp/eas/google-services.json';
+    expect(buildConfig({ config: {} } as ConfigContext).android?.googleServicesFile).toBe(
+      '/tmp/eas/google-services.json',
+    );
+    delete process.env.GOOGLE_SERVICES_JSON;
+  });
+
   it('blocca su Android i permessi aggiunti dalle librerie che il prodotto non usa', () => {
     expect(config.android?.blockedPermissions).toEqual(
       expect.arrayContaining([

@@ -47,3 +47,6 @@ yarn-error.log*
 
 # Sincronizzazione mock-up (file di stato del task orario)
 design/.sync-version
+
+# Firebase: arriva dalla variabile file EAS GOOGLE_SERVICES_JSON
+google-services.json
