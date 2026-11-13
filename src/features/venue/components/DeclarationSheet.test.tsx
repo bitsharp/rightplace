@@ -1,5 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
+import { Platform } from 'react-native';
+
+import { usePrePermissionStore } from '@/features/notifications/prePermission';
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
@@ -75,6 +78,15 @@ describe('DeclarationSheet', () => {
           p_event_id: 'e1',
         }),
       );
+    });
+
+    it('alla prima dichiarazione propone le notifiche (dopo la chiusura dello sheet)', async () => {
+      jest.replaceProperty(Platform, 'OS', 'android');
+      usePrePermissionStore.setState({ open: false, permissionVersion: 0 });
+      const onClose = await renderSheet(none);
+      await fireEvent.press(screen.getByRole('button', { name: 'venue:declare.going' }));
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      await waitFor(() => expect(usePrePermissionStore.getState().open).toBe(true));
     });
 
     it('"Ci vado" dichiara la serata del locale e chiude lo sheet', async () => {

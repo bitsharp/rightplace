@@ -679,6 +679,7 @@ export type Database = {
           is_creator: boolean;
           locale: string;
           location_opt_in: boolean;
+          notification_prefs: NonNullable<Json>;
           updated_at: string;
         };
         ComputedFields: never;
@@ -697,6 +698,7 @@ export type Database = {
           is_creator?: boolean;
           locale?: string;
           location_opt_in?: boolean;
+          notification_prefs?: NonNullable<Json>;
           updated_at?: string;
         };
         Update: {
@@ -714,6 +716,7 @@ export type Database = {
           is_creator?: boolean;
           locale?: string;
           location_opt_in?: boolean;
+          notification_prefs?: NonNullable<Json>;
           updated_at?: string;
         };
         Relationships: [
@@ -1297,6 +1300,15 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_my_activity: {
+        Args: { p_since?: string };
+        Returns: {
+          actor_handle: string;
+          created_at: string;
+          kind: string;
+          post_id: string;
+        }[];
+      };
       get_my_chat_rooms: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1346,6 +1358,7 @@ export type Database = {
           venue_name: string;
         }[];
       };
+      get_my_notification_prefs: { Args: Record<PropertyKey, never>; Returns: Json };
       get_post_comments: {
         Args: { p_before?: string; p_limit?: number; p_post_id: string };
         Returns: {
@@ -1476,6 +1489,7 @@ export type Database = {
       night_date_at: { Args: { p_at: string; p_city_id: string }; Returns: string };
       night_end: { Args: { p_night_date: string; p_timezone: string }; Returns: string };
       regenerate_handle: { Args: Record<PropertyKey, never>; Returns: string };
+      register_push_token: { Args: { p_platform: string; p_token: string }; Returns: undefined };
       remember_venue: { Args: { p_venue_id: string }; Returns: undefined };
       remove_follower: { Args: { p_follower_id: string }; Returns: undefined };
       report: {
@@ -1517,6 +1531,7 @@ export type Database = {
         }[];
       };
       set_locale: { Args: { p_locale: string }; Returns: undefined };
+      set_my_notification_prefs: { Args: { p_prefs: Json }; Returns: Json };
       set_my_phone_hash: { Args: { p_hash: string }; Returns: undefined };
       set_post_like: {
         Args: { p_liked: boolean; p_post_id: string };
@@ -1537,6 +1552,7 @@ export type Database = {
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       undeclare: { Args: Record<PropertyKey, never>; Returns: undefined };
       unfollow: { Args: { p_user_id: string }; Returns: undefined };
+      unregister_push_token: { Args: { p_token: string }; Returns: undefined };
       update_coarse_location: { Args: { p_lat: number; p_lng: number }; Returns: undefined };
       update_event: {
         Args: {

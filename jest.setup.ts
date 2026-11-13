@@ -81,3 +81,51 @@ jest.mock('react-native-maps', () => {
     createElement(View, { testID: 'map-marker', ...props }, children as never);
   return { __esModule: true, default: MapView, Marker };
 });
+
+// expo-notifications is a native module: every call is a jest.fn() (calls are cleared before each test,
+// implementations stay) so tests assert on what the app scheduled, requested and registered.
+jest.mock('expo-notifications', () => ({
+  setNotificationHandler: jest.fn(),
+  setNotificationChannelAsync: jest.fn(async () => null),
+  scheduleNotificationAsync: jest.fn(
+    async (request: { identifier?: string }) => request.identifier ?? 'id',
+  ),
+  cancelScheduledNotificationAsync: jest.fn(async () => undefined),
+  getAllScheduledNotificationsAsync: jest.fn(async () => []),
+  getPermissionsAsync: jest.fn(async () => ({
+    status: 'undetermined',
+    granted: false,
+    canAskAgain: true,
+  })),
+  requestPermissionsAsync: jest.fn(async () => ({
+    status: 'granted',
+    granted: true,
+    canAskAgain: true,
+  })),
+  getExpoPushTokenAsync: jest.fn(async () => ({
+    type: 'expo',
+    data: 'ExponentPushToken[test-token]',
+  })),
+  addNotificationResponseReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
+  getLastNotificationResponseAsync: jest.fn(async () => null),
+  clearLastNotificationResponseAsync: jest.fn(async () => undefined),
+  AndroidImportance: { DEFAULT: 3, HIGH: 4 },
+  SchedulableTriggerInputTypes: { DATE: 'date' },
+}));
+beforeEach(() => {
+  const notifications = jest.requireMock<Record<string, unknown>>('expo-notifications');
+  Object.values(notifications).forEach((member) => {
+    if (jest.isMockFunction(member)) member.mockClear();
+  });
+});
+
+// Suites in src/__tests__ mount the whole app (real router): the first render can exceed 5 s on slow machines.
+if (/[\\/]src[\\/]__tests__[\\/]/.test(expect.getState().testPath ?? '')) jest.setTimeout(30_000);
+
+beforeEach(() =>
+  jest
+    .requireActual<typeof import('@/features/notifications/store/notificationStore')>(
+      '@/features/notifications/store/notificationStore',
+    )
+    .resetNotificationState(),
+);

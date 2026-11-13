@@ -1,0 +1,26 @@
+import { routeForNotification } from './deepLink';
+
+describe('routeForNotification', () => {
+  it.each([
+    ['rightplace://night/abc-123/chat', '/night/abc-123/chat'],
+    ['rightplace://post/new', '/post/new'],
+    ['rightplace://feed', '/feed'],
+    ['rightplace://creator', '/creator'],
+    ['rightplace://friends/requests', '/friends'],
+    ['rightplace://u/volpe.viola', '/u/volpe.viola'],
+    ['rightplace://chat', '/chat'],
+    ['rightplace://map', '/map'],
+  ])('%s apre %s', (url, route) => {
+    expect(routeForNotification(url)).toBe(route);
+  });
+
+  it('un URL sconosciuto o malformato apre la mappa', () => {
+    expect(routeForNotification('rightplace://boh/boh')).toBe('/map');
+    expect(routeForNotification('https://example.com/feed')).toBe('/map');
+    expect(routeForNotification('rightplace://night/../chat')).toBe('/map');
+    expect(routeForNotification('rightplace://u/NON VALIDO')).toBe('/map');
+    expect(routeForNotification('')).toBe('/map');
+    expect(routeForNotification(null)).toBe('/map');
+    expect(routeForNotification(undefined)).toBe('/map');
+  });
+});

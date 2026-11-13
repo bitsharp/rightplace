@@ -1,3 +1,4 @@
+import { prepareForSignOut } from '@/features/notifications/signOutCleanup';
 import type { Language } from '@/i18n/domain/pickLanguage';
 import { authCallbackUrl } from '@/lib/deepLinks';
 import { supabase } from '@/lib/supabase';
@@ -49,7 +50,8 @@ export function signIn({ email, password, captchaToken }: Credentials) {
   );
 }
 
-export function signOut() {
+export async function signOut() {
+  await prepareForSignOut();
   return outcome(() => supabase.auth.signOut());
 }
 

@@ -8,6 +8,7 @@ import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
 import { Toast } from '@/components/ui/Toast';
 import { useSession } from '@/features/auth/useSession';
+import { NotificationSettings } from '@/features/notifications/components/NotificationSettings';
 import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { UiKitLink } from '@/features/dev/UiKitLink';
 import type { RpcErrorCode } from '@/lib/rpcError';
@@ -70,6 +71,7 @@ function ProfileSections({ profile, email }: { profile: MyProfile; email: string
     <>
       {showShareHandle ? <ShareHandleButton handle={profile.handle} /> : null}
       {profile.contactsOptIn ? <FindMeByPhone /> : null}
+      <NotificationSettings />
       <FollowersSection />
       <BlockedSection />
       <AccountSection email={email} />

@@ -2,6 +2,7 @@ import { Tabs, type BottomTabBarProps } from 'expo-router/js-tabs';
 
 import { isTabName, TAB_NAMES, TabBar } from '@/components/app/TabBar';
 import { useFollowRequestsCount } from '@/features/friends/hooks';
+import { useUnreadChatCount } from '@/features/notifications/hooks';
 
 function RouterTabBar({ state, navigateToTab }: BottomTabBarProps) {
   const current = state.routes[state.index]?.name ?? 'map';
@@ -10,11 +11,12 @@ function RouterTabBar({ state, navigateToTab }: BottomTabBarProps) {
     if (route) navigateToTab(route.key);
   };
   const requests = useFollowRequestsCount();
+  const unreadChats = useUnreadChatCount();
   return (
     <TabBar
       active={isTabName(current) ? current : 'map'}
       onSelect={select}
-      badges={{ friends: requests.data ?? 0 }}
+      badges={{ friends: requests.data ?? 0, chat: unreadChats }}
     />
   );
 }

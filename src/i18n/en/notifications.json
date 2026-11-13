@@ -1,0 +1,104 @@
+{
+  "reminder": {
+    "title": "RightPlace",
+    "pool": {
+      "0": "Where are you going tonight? Declare it and see who's there.",
+      "1": "What's the plan for tonight? See where people are heading.",
+      "2": "Going out tonight? Declare your night.",
+      "3": "Pick your spot for tonight and find out who will be there."
+    }
+  },
+  "dayAfter": {
+    "body": "How was last night? Post a photo or write a couple of lines."
+  },
+  "channels": {
+    "promemoria": "Reminders",
+    "amici": "Friends",
+    "chat": "Chats and nights",
+    "feed": "Feed",
+    "creator": "Creator"
+  },
+  "prePermission": {
+    "label": "NOTIFICATIONS",
+    "title": "Want to know when something happens?",
+    "body": "Want to know when your friends write in tonight's chat? We also let you know about requests, friends' posts and reminders. You can choose what to receive from your profile.",
+    "yes": "Yes, notify me",
+    "no": "Not now"
+  },
+  "settings": {
+    "title": "Notifications",
+    "categories": {
+      "reminder": {
+        "title": "Evening reminder",
+        "description": "We remind you to declare your night if you haven't yet."
+      },
+      "dayAfter": {
+        "title": "The day after",
+        "description": "At 11:00, to post photos from your night."
+      },
+      "friends": {
+        "title": "Friends",
+        "description": "Follow requests and accepted requests."
+      },
+      "chat": {
+        "title": "Chats and nights",
+        "description": "Messages in chats and cancelled nights."
+      },
+      "feed": {
+        "title": "Feed",
+        "description": "One daily summary of your friends' posts."
+      },
+      "creator": {
+        "title": "Creator",
+        "description": "Sign-ups to your nights, never about a single person."
+      }
+    },
+    "days": {
+      "label": "REMINDER DAYS",
+      "short": {
+        "0": "S",
+        "1": "M",
+        "2": "T",
+        "3": "W",
+        "4": "T",
+        "5": "F",
+        "6": "S"
+      },
+      "long": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
+    },
+    "time": {
+      "label": "Reminder time",
+      "earlier": "15 minutes earlier",
+      "later": "15 minutes later"
+    },
+    "permission": {
+      "granted": "Notifications are on for this phone.",
+      "undetermined": "Notifications are not on yet for this phone.",
+      "denied": "Notifications are turned off in the phone settings.",
+      "enable": "Turn on notifications",
+      "openSettings": "Open settings"
+    },
+    "loadError": "We can't load your preferences.",
+    "saveError": "We couldn't save."
+  },
+  "activity": {
+    "title": "News",
+    "empty": "Nothing new yet. Likes, comments and requests show up here.",
+    "loadError": "We can't load the news.",
+    "back": "Back",
+    "items": {
+      "like": "{{handle}} liked your post",
+      "comment": "{{handle}} commented on your post",
+      "follow_request": "{{handle}} wants to follow you",
+      "follow_accepted": "{{handle}} accepted your request"
+    }
+  }
+}

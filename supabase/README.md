@@ -166,3 +166,28 @@ Dettagli e verifiche in `docs/posts-feed.md`.
 2. Ripubblica anche `chat-photo-urls`, perché ora usa il modulo condiviso:
    `npx supabase functions deploy chat-photo-urls`
 3. Rigenera i tipi con il progetto locale acceso: `npm run db:types` (in questo ambiente `src/lib/database.types.ts` è stato aggiornato a mano, in ordine alfabetico; la rigenerazione deve dare lo stesso risultato).
+
+## Notifiche (prompt 15)
+
+Vedi `docs/notifications.md` per il flusso completo. Oggetti nuovi (migration `20261114000100_notifications.sql`):
+
+- `profiles.notification_prefs` (jsonb) con `get_my_notification_prefs()` / `set_my_notification_prefs(jsonb)` (errore `INVALID_PREFS`).
+- `register_push_token(token, platform)` (riassegna il token al chiamante), `unregister_push_token(token)`; nessuna RPC restituisce token.
+- `get_my_activity(since)`: novità in-app (like, commenti, richieste, accettazioni), solo handle.
+- `private.notification_queue`, `private.push_log`, `private.event_band_notified`; trigger su `follows`, `chat_messages`, `declarations`, `events`; `private.can_see_chat_author_for(viewer, author)` (la regola di visibilità della chat vive qui, `can_see_chat_author` la richiama).
+- Job pg_cron: `dispatch-notifications` (ogni minuto), `queue-feed-digests` (`5 * * * *`).
+- Edge Function `send-push` (`verify_jwt = false`, credenziale `x-push-key`).
+
+### Azioni manuali per Luca
+
+1. Secret dell'Edge Function: `npx supabase secrets set SEND_PUSH_KEY=<valore lungo casuale>`.
+2. Deploy: `npx supabase functions deploy send-push --no-verify-jwt`.
+3. Segreti in Vault (SQL editor del progetto):
+   ```sql
+   select vault.create_secret('https://<project-ref>.supabase.co/functions/v1/send-push', 'send_push_url');
+   select vault.create_secret('<stesso valore di SEND_PUSH_KEY>', 'send_push_key');
+   ```
+   Finché mancano, il dispatcher non chiama nulla (notice) e le righe restano in coda per 2 giorni.
+4. Credenziali push per le build (una tantum, caricate su EAS): **Android** chiave FCM V1 (service account Firebase) e **iOS** chiave APNs (`eas credentials`). Senza, le push remote non arrivano; i promemoria locali sì.
+5. Le push remote non funzionano in Expo Go su Android: servono il dev client o una build.
+6. Applicare la migration al progetto remoto (`supabase db push`) quando Luca lo decide.

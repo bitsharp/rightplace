@@ -1,3 +1,4 @@
+import { useNotificationStore } from '@/features/notifications/store/notificationStore';
 import { fakeSupabase } from '@/test/fakeSupabase';
 
 import {
@@ -5,6 +6,7 @@ import {
   resendConfirmation,
   sendPasswordReset,
   signIn,
+  signOut,
   signUp,
   updatePassword,
 } from './api';
@@ -87,5 +89,18 @@ describe('auth api', () => {
     expect(fakeSupabase.auth.updateUser).toHaveBeenCalledWith({ password: 'Nuova-password-1' });
     await expect(exchangeAuthCode('abc')).resolves.toEqual({ ok: true });
     expect(fakeSupabase.auth.exchangeCodeForSession).toHaveBeenCalledWith('abc');
+  });
+});
+
+describe('signOut', () => {
+  it('prima di uscire toglie il token push del dispositivo, poi chiude la sessione', async () => {
+    useNotificationStore.getState().setPushToken('ExponentPushToken[abc]');
+    await expect(signOut()).resolves.toEqual({ ok: true });
+    const unregisterOrder = fakeSupabase.rpc.mock.invocationCallOrder[0];
+    const signOutOrder = fakeSupabase.auth.signOut.mock.invocationCallOrder[0];
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('unregister_push_token', {
+      p_token: 'ExponentPushToken[abc]',
+    });
+    expect(unregisterOrder).toBeLessThan(signOutOrder ?? 0);
   });
 });

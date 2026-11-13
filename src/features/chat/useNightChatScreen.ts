@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useFollowing } from '@/features/friends/hooks';
+import { useMarkRoomRead } from '@/features/notifications/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import { usePhotoFlow } from '@/lib/photos/usePhotoFlow';
 
@@ -36,6 +37,8 @@ export function useNightChatScreen(roomId: string) {
     me.userId,
     people.map((p) => p.userId),
   );
+  // newest first: reading is up to date while the room is open, also for messages arriving live
+  useMarkRoomRead(roomId, messages[0]?.createdAt ?? null);
   const sender = useSendMessage(roomId, me);
   const photoFlow = usePhotoFlow((cleanUri) => sender.send({ cleanUri }));
   const photos = messages.filter((m) => m.kind === 'photo' && !m.pending && !m.failed);

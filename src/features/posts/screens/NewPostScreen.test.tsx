@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import { seedFeedBackend } from '@/test/feedBackend';
@@ -62,5 +63,17 @@ describe('NewPostScreen', () => {
     const scroll = screen.getByTestId('screen-scroll');
     expect(scroll.props.automaticallyAdjustKeyboardInsets).toBe(true);
     expect(within(scroll).getByRole('button', { name: 'post:publish' })).toBe(publish);
+  });
+
+  it('dopo aver pubblicato cancella il promemoria "giorno dopo" di quella serata', async () => {
+    seedFeedBackend({ target: { night_date: '2026-11-13' } });
+    await render(<NewPostScreen />, { wrapper: createQueryWrapper().Wrapper });
+    await fireEvent.changeText(await screen.findByLabelText('post:caption.label'), 'ciao');
+    await fireEvent.press(screen.getByRole('button', { name: 'post:publish' }));
+    await waitFor(() =>
+      expect(Notifications.cancelScheduledNotificationAsync).toHaveBeenCalledWith(
+        'dayafter:2026-11-13',
+      ),
+    );
   });
 });

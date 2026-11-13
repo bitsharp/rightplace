@@ -9,6 +9,7 @@ import enFeed from './en/feed.json';
 import enFriends from './en/friends.json';
 import enLegal from './en/legal.json';
 import enMap from './en/map.json';
+import enNotifications from './en/notifications.json';
 import enPost from './en/post.json';
 import enProfile from './en/profile.json';
 import enUi from './en/ui.json';
@@ -25,6 +26,7 @@ import itFeed from './it/feed.json';
 import itFriends from './it/friends.json';
 import itLegal from './it/legal.json';
 import itMap from './it/map.json';
+import itNotifications from './it/notifications.json';
 import itPost from './it/post.json';
 import itProfile from './it/profile.json';
 import itUi from './it/ui.json';
@@ -39,6 +41,7 @@ export const resources = {
     friends: itFriends,
     chat: itChat,
     feed: itFeed,
+    notifications: itNotifications,
     post: itPost,
     profile: itProfile,
     venue: itVenue,
@@ -57,6 +60,7 @@ export const resources = {
     friends: enFriends,
     chat: enChat,
     feed: enFeed,
+    notifications: enNotifications,
     post: enPost,
     profile: enProfile,
     venue: enVenue,

@@ -1,0 +1,104 @@
+{
+  "reminder": {
+    "title": "RightPlace",
+    "pool": {
+      "0": "Dove vai stasera? Dichiaralo e vedi chi c'è.",
+      "1": "Che programma hai per stasera? Guarda dove va la gente.",
+      "2": "Stasera si esce? Dichiara la tua serata.",
+      "3": "Scegli il tuo posto per stasera e scopri chi ci sarà."
+    }
+  },
+  "dayAfter": {
+    "body": "Com'è andata ieri sera? Posta una foto o scrivi due righe."
+  },
+  "channels": {
+    "promemoria": "Promemoria",
+    "amici": "Amici",
+    "chat": "Chat e serate",
+    "feed": "Feed",
+    "creator": "Creator"
+  },
+  "prePermission": {
+    "label": "NOTIFICHE",
+    "title": "Vuoi sapere quando succede qualcosa?",
+    "body": "Vuoi sapere quando i tuoi amici scrivono nella chat della serata? Ti avvisiamo anche per richieste, post degli amici e promemoria. Puoi scegliere cosa ricevere dal profilo.",
+    "yes": "Sì, avvisami",
+    "no": "Non ora"
+  },
+  "settings": {
+    "title": "Notifiche",
+    "categories": {
+      "reminder": {
+        "title": "Promemoria serata",
+        "description": "Ti ricordiamo di dichiarare la serata se non l'hai ancora fatto."
+      },
+      "dayAfter": {
+        "title": "Il giorno dopo",
+        "description": "Alle 11:00, per postare le foto della serata."
+      },
+      "friends": {
+        "title": "Amici",
+        "description": "Richieste di follow e richieste accettate."
+      },
+      "chat": {
+        "title": "Chat e serate",
+        "description": "Messaggi nelle chat e serate annullate."
+      },
+      "feed": {
+        "title": "Feed",
+        "description": "Un riepilogo al giorno dei post dei tuoi amici."
+      },
+      "creator": {
+        "title": "Creator",
+        "description": "Adesioni alle tue serate, mai per singola persona."
+      }
+    },
+    "days": {
+      "label": "GIORNI DEL PROMEMORIA",
+      "short": {
+        "0": "D",
+        "1": "L",
+        "2": "M",
+        "3": "M",
+        "4": "G",
+        "5": "V",
+        "6": "S"
+      },
+      "long": {
+        "0": "domenica",
+        "1": "lunedì",
+        "2": "martedì",
+        "3": "mercoledì",
+        "4": "giovedì",
+        "5": "venerdì",
+        "6": "sabato"
+      }
+    },
+    "time": {
+      "label": "Ora del promemoria",
+      "earlier": "15 minuti prima",
+      "later": "15 minuti dopo"
+    },
+    "permission": {
+      "granted": "Notifiche attive su questo telefono.",
+      "undetermined": "Le notifiche non sono ancora attive su questo telefono.",
+      "denied": "Le notifiche sono disattivate nelle impostazioni del telefono.",
+      "enable": "Attiva le notifiche",
+      "openSettings": "Apri le impostazioni"
+    },
+    "loadError": "Non riusciamo a caricare le preferenze.",
+    "saveError": "Non siamo riusciti a salvare."
+  },
+  "activity": {
+    "title": "Novità",
+    "empty": "Ancora niente di nuovo. Qui compaiono mi piace, commenti e richieste.",
+    "loadError": "Non riusciamo a caricare le novità.",
+    "back": "Indietro",
+    "items": {
+      "like": "{{handle}} ha messo mi piace al tuo post",
+      "comment": "{{handle}} ha commentato il tuo post",
+      "follow_request": "{{handle}} vuole seguirti",
+      "follow_accepted": "{{handle}} ha accettato la tua richiesta"
+    }
+  }
+}

@@ -5,6 +5,7 @@ import { MonoLabel } from '@/components/ui/MonoLabel';
 import { RangeStat } from '@/components/ui/RangeStat';
 import { Sheet } from '@/components/ui/Sheet';
 import { Text } from '@/components/ui/Text';
+import { onDeclarationSheetDismiss } from '@/features/notifications/prePermission';
 import type { Band } from '@/features/nights/domain/band';
 import type { RpcErrorCode } from '@/lib/rpcError';
 import { spacing } from '@/theme/tokens';
@@ -36,7 +37,7 @@ type Props = {
 // Same body for a venue night and, from prompt 12, for a creator's event: only `target` differs.
 export function DeclarationSheet({ visible, onClose, ...body }: Props) {
   return (
-    <Sheet visible={visible} onClose={onClose}>
+    <Sheet visible={visible} onClose={onClose} onDismiss={onDeclarationSheetDismiss}>
       <SheetBody onClose={onClose} {...body} />
     </Sheet>
   );

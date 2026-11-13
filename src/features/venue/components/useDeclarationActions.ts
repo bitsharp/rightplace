@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { requestPrePermission } from '@/features/notifications/prePermission';
 import type { Intent } from '@/features/nights/domain/band';
 import { RpcError, type RpcErrorCode } from '@/lib/rpcError';
 
@@ -28,7 +29,16 @@ export function useDeclarationActions({ target, venue, state, onClose }: Params)
   const [confirming, setConfirming] = useState<PendingConfirm>(null);
 
   const choose = (intent: Intent) =>
-    declare.mutate({ target, intent, venue }, { onSuccess: onClose });
+    declare.mutate(
+      { target, intent, venue },
+      {
+        onSuccess: () => {
+          onClose();
+          // notifications: first declaration asks for permission once the sheet is gone
+          requestPrePermission();
+        },
+      },
+    );
   const edit = () => {
     if (state.kind === 'here') choose(state.intent === 'going' ? 'maybe' : 'going');
   };

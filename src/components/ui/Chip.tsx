@@ -11,6 +11,8 @@ type Props = {
   selected: boolean;
   onPress: () => void;
   tone?: Tone;
+  // For short visible labels (a single letter) that need a spoken name
+  accessibilityLabel?: string;
 };
 
 const SELECTED = {
@@ -21,11 +23,11 @@ const SELECTED = {
 // 36 pt tall like the mock-up; hitSlop brings the touch area to 44.
 const HIT_SLOP = { top: 4, bottom: 4 };
 
-export function Chip({ label, selected, onPress, tone = 'going' }: Props) {
+export function Chip({ label, selected, onPress, tone = 'going', accessibilityLabel }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ selected }}
       hitSlop={HIT_SLOP}
       onPress={onPress}

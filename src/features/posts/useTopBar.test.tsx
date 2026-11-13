@@ -1,7 +1,9 @@
-import { renderHook, waitFor } from '@testing-library/react-native';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import { setFakeRpc } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
+
+import { useNotificationStore } from '@/features/notifications/store/notificationStore';
 
 import { storyKey } from './domain/stories';
 import { useSeenStories } from './store/seenStories';
@@ -78,7 +80,25 @@ describe('useTopBar', () => {
     expect(result.current.stories[0]).toMatchObject({ id: 'u2', seen: true });
   });
 
-  it('apre il post, il profilo, il feed e il viewer della storia giusta', async () => {
+  it('il pallino si accende anche per like, commenti e richieste non ancora visti', async () => {
+    seed({
+      get_my_activity: [
+        {
+          kind: 'like',
+          actor_handle: 'volpe.viola',
+          post_id: 'p1',
+          created_at: '2026-11-13T10:00:00Z',
+        },
+      ],
+    });
+    const { Wrapper } = createQueryWrapper();
+    const { result } = await renderHook(() => useTopBar(), { wrapper: Wrapper });
+    await waitFor(() => expect(result.current.hasNews).toBe(true));
+    await act(async () => useNotificationStore.getState().markActivitySeen('2026-11-13T10:00:00Z'));
+    await waitFor(() => expect(result.current.hasNews).toBe(false));
+  });
+
+  it('apre il post, il profilo, la schermata Novità e il viewer della storia giusta', async () => {
     seed({});
     const { Wrapper } = createQueryWrapper();
     const { result } = await renderHook(() => useTopBar(), { wrapper: Wrapper });
@@ -87,7 +107,7 @@ describe('useTopBar', () => {
     result.current.onOpenProfile();
     expect(mockPush).toHaveBeenLastCalledWith('/profile');
     result.current.onOpenNews();
-    expect(mockPush).toHaveBeenLastCalledWith('/feed');
+    expect(mockPush).toHaveBeenLastCalledWith('/activity');
     result.current.onOpenStory('u2');
     expect(mockPush).toHaveBeenLastCalledWith({
       pathname: '/story/[userId]',

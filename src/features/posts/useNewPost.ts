@@ -1,6 +1,13 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import type { MyDeclaration } from '@/features/map/api';
+import { MY_DECLARATION_KEY } from '@/features/map/hooks';
+import { useMapStore } from '@/features/map/store/mapStore';
+import { FALLBACK_TIMEZONE } from '@/features/notifications/api';
+import { stopDayAfterReminder } from '@/features/notifications/dayAfter';
+import { cityTimezoneKey } from '@/features/notifications/hooks';
 import { useSession } from '@/features/auth/useSession';
 import { rpcErrorCodeOf } from '@/lib/rpcError';
 import { usePhotoFlow } from '@/lib/photos/usePhotoFlow';
@@ -14,6 +21,8 @@ export function useNewPost() {
   const { userId } = useSession();
   const target = usePostTarget();
   const create = useCreatePost();
+  const queryClient = useQueryClient();
+  const citySlug = useMapStore((state) => state.citySlug);
   const [caption, setCaption] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const photoFlow = usePhotoFlow(setPhotoUri);
@@ -24,7 +33,19 @@ export function useNewPost() {
     if (!userId || !hasContent) return;
     create.mutate(
       { userId, caption, cleanUri: photoUri, roomId: target.data?.roomId ?? null },
-      { onSuccess: leave },
+      {
+        onSuccess: () => {
+          // cache reads only: no extra query is started (or awaited) by publishing
+          const declaration = queryClient.getQueryData<MyDeclaration | null>(MY_DECLARATION_KEY);
+          const timezone = queryClient.getQueryData<string>(cityTimezoneKey(citySlug));
+          stopDayAfterReminder({
+            nightDate: target.data?.nightDate ?? null,
+            declarationExpiresAt: declaration?.expiresAt ?? null,
+            timezone: timezone ?? FALLBACK_TIMEZONE,
+          });
+          leave();
+        },
+      },
     );
   };
 

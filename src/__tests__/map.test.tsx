@@ -274,7 +274,7 @@ describe('mappa', () => {
       expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
     });
 
-    it('la campanella ha il pallino solo se ci sono storie e porta al feed', async () => {
+    it('la campanella ha il pallino solo se ci sono novità e porta a "Novità"', async () => {
       await renderApp('ready', '/map');
       await screen.findByText('@lince.rosso');
       expect(screen.queryByTestId('news-dot')).toBeNull();
@@ -291,7 +291,9 @@ describe('mappa', () => {
       expect(screen.queryByText('ui:topBar.myStory')).toBeNull();
       expect(screen.getByText('volpe.viola')).toBeOnTheScreen();
       await fireEvent.press(screen.getByRole('button', { name: 'ui:topBar.news' }));
-      expect(await screen.findByRole('header', { name: 'feed:title' })).toBeOnTheScreen();
+      expect(
+        await screen.findByRole('header', { name: 'notifications:activity.title' }),
+      ).toBeOnTheScreen();
     });
 
     it('"La tua storia" compare quando ho un post delle ultime 24 ore', async () => {

@@ -384,6 +384,11 @@ allow_dynamic_registration = false
 [functions.storage-gc]
 verify_jwt = false
 
+# send-push is called by private.dispatch_notifications (pg_cron → pg_net), also without a user JWT: its only
+# credential is the x-push-key header (secret SEND_PUSH_KEY, constant-time comparison, fail closed).
+[functions.send-push]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

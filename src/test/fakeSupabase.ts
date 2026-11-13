@@ -162,9 +162,17 @@ export const fakeSupabase = {
 type RpcResponse = unknown | ((args: unknown) => unknown);
 
 // Answers each RPC by name; names not listed return no data (like the default fake).
+// Always-mounted observers (tab badges, bell dot, reminder planning) call these on every screen: an empty
+// answer keeps a test that does not care about them from waiting on a failing query's retries.
+const BACKGROUND_RPC_DEFAULTS: Record<string, RpcResponse> = {
+  get_my_chat_rooms: [],
+  get_my_activity: [],
+  get_my_declaration: [],
+};
+
 export function setFakeRpc(responses: Record<string, RpcResponse>): void {
   fakeSupabase.rpc.mockImplementation(async (name: string, args?: unknown): Promise<Result> => {
-    const response = responses[name];
+    const response = { ...BACKGROUND_RPC_DEFAULTS, ...responses }[name];
     const data = typeof response === 'function' ? response(args) : response;
     return { data: data ?? null, error: null };
   });

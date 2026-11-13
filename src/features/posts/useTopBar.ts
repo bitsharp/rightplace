@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 
 import { useSession } from '@/features/auth/useSession';
+import { useUnseenActivityCount } from '@/features/notifications/hooks';
 import { useStories } from '@/features/map/hooks';
 
 import { canPost } from './domain/canPost';
@@ -24,13 +25,15 @@ export function useTopBar() {
   const stories = useStories();
   const mine = useStoryPosts(userId ?? '');
   const seenKeys = useSeenStories((state) => state.seen);
+  const unseenActivity = useUnseenActivityCount();
   const handle = profile?.handle ?? '';
   const entries = stories.data ?? [];
 
   return {
     handle,
     canPost: canPost(target.data),
-    hasNews: entries.some((entry) => isUnseen(entry, seenKeys)),
+    // the bell: new stories, or likes, comments and follow requests I have not opened yet
+    hasNews: unseenActivity > 0 || entries.some((entry) => isUnseen(entry, seenKeys)),
     stories: buildTopBarStories({
       me: { userId: userId ?? '', handle },
       myLatestPostAt: latestVisibleFrom(mine.data),
@@ -39,7 +42,7 @@ export function useTopBar() {
     }),
     onPost: () => router.push('/post/new'),
     onOpenProfile: () => router.push('/profile'),
-    onOpenNews: () => router.push('/feed'),
+    onOpenNews: () => router.push('/activity'),
     onOpenStory: (id: string) =>
       router.push({
         pathname: '/story/[userId]',

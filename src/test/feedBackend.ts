@@ -33,7 +33,7 @@ type Options = {
   posts?: FakePost[];
   stories?: { user_id: string; handle: string; latest_post_at: string }[];
   storyPosts?: Record<string, FakePost[]>;
-  target?: { room_id?: string | null; venue_name?: string } | null;
+  target?: { room_id?: string | null; venue_name?: string; night_date?: string | null } | null;
   comments?: FakeComment[];
   users?: FakeUser[];
   accepted?: string[];

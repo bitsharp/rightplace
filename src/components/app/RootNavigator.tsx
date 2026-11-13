@@ -7,6 +7,8 @@ import { useAuthListener } from '@/features/auth/store/authStore';
 import { useSession } from '@/features/auth/useSession';
 import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { resetSeenStories } from '@/features/posts/store/seenStories';
+import { PrePermissionSheet } from '@/features/notifications/components/PrePermissionSheet';
+import { useNotificationRuntime } from '@/features/notifications/useNotificationRuntime';
 import { useCoarseLocationSync } from '@/features/profile/location';
 import { useDeviceLanguageSync } from '@/i18n/useDeviceLanguageSync';
 import { colors } from '@/theme/tokens';
@@ -21,6 +23,7 @@ export function RootNavigator() {
   const { status, userId, profile, profileError, retryProfile } = useSession();
   useCoarseLocationSync(status === 'ready' && profile?.locationOptIn === true);
   useClearCacheOnSignOut(userId);
+  useNotificationRuntime(status === 'ready');
   if (status === 'loading')
     return <BootScreen error={profileError} onRetry={() => void retryProfile()} />;
   return <AppStack status={status} />;
@@ -28,6 +31,21 @@ export function RootNavigator() {
 
 function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
   const { canOpenCreatorRoutes } = useCreatorUi();
+  return (
+    <>
+      <PrePermissionSheet />
+      <AppScreens status={status} canOpenCreatorRoutes={canOpenCreatorRoutes} />
+    </>
+  );
+}
+
+function AppScreens({
+  status,
+  canOpenCreatorRoutes,
+}: {
+  status: Exclude<SessionStatus, 'loading'>;
+  canOpenCreatorRoutes: boolean;
+}) {
   return (
     <Stack
       screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}
@@ -66,6 +84,8 @@ const READY_SCREENS = [
   { name: 'handle' },
   { name: '(tabs)' },
   { name: 'search' },
+  { name: 'activity' },
+  { name: 'friends/requests' },
   { name: 'u/[handle]' },
   { name: 'venue/[id]' },
   { name: 'event/[id]' },
