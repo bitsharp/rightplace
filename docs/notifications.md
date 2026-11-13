@@ -4,14 +4,14 @@ Poche notifiche, tutte utili e tutte disattivabili per categoria dal profilo (`p
 
 ## Categorie
 
-| Categoria (pref)         | Cosa                                                                                                  | Dove nasce                                         |
-| ------------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `reminder`               | promemoria serata, ogni giorno scelto alle 18:00 (default) della città, saltato se hai già dichiarato | locale (`expo-notifications`)                      |
-| `day_after`              | "Com'è andata ieri sera?" alle 11:00 del giorno dopo, finché non posti                                | locale                                             |
-| `friends`                | richiesta di follow ricevuta, richiesta accettata (mai su rifiuto o rimozione)                        | trigger su `follows`                               |
-| `chat` ("Chat e serate") | nuovi messaggi nelle stanze + serata annullata                                                        | trigger su `chat_messages` / `events.cancelled_at` |
-| `feed`                   | digest alle 12:00 locali: "N amici hanno postato le foto di ieri"                                     | job `queue-feed-digests` (ogni ora)                |
-| `creator`                | adesioni a una tua serata, solo a fasce (3–10, 10–20, …), mai per singola persona                     | trigger su `declarations`                          |
+| Categoria (pref)         | Cosa                                                                                                                          | Dove nasce                                         |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `reminder`               | promemoria serata, ogni giorno scelto alle 18:00 (default) della città, saltato se hai già dichiarato                         | locale (`expo-notifications`)                      |
+| `day_after`              | "Com'è andata ieri sera?" alle 11:00 del giorno dopo, finché non posti                                                        | locale                                             |
+| `friends`                | richiesta di follow ricevuta, richiesta accettata (mai su rifiuto o rimozione)                                                | trigger su `follows`                               |
+| `chat` ("Chat e serate") | nuovi messaggi nelle stanze, da un autore che posso vedere in quella room (stessa funzione SQL della chat) + serata annullata | trigger su `chat_messages` / `events.cancelled_at` |
+| `feed`                   | digest alle 12:00 locali: "N amici hanno postato le foto di ieri"                                                             | job `queue-feed-digests` (ogni ora)                |
+| `creator`                | adesioni a una tua serata, solo a fasce (3–10, 10–20, …), mai per singola persona                                             | trigger su `declarations`                          |
 
 ## Dal trigger al telefono
 
@@ -41,7 +41,7 @@ Mai il testo di un messaggio, mai una foto, mai un numero esatto: solo ids, hand
 ## Come verificare la Definition of Done
 
 - **Promemoria locali**: nel dev client, dopo aver accettato il permesso, `Notifications.getAllScheduledNotificationsAsync()` deve elencare `reminder:<data>` (7 giorni) e, dopo una dichiarazione, `dayafter:<data>`. Pubblicando un post `dayafter:<data>` sparisce.
-- **Push chat e coalescing** (SQL editor, con segreti Vault configurati): inserisci 5 righe in `chat_messages` di una stanza dove sei membro e che un tuo seguito può leggere, poi aspetta un minuto e controlla `select * from net._http_response order by created desc limit 5;` (una sola chiamata, "5 nuovi messaggi da @…"). Un secondo messaggio entro 10 minuti non parte subito.
+- **Push chat e coalescing** (SQL editor, con segreti Vault configurati): inserisci 5 righe in `chat_messages` di una stanza dove sei membro, con un autore che puoi vedere in quella room (un seguito, o un amico di un tuo amico dichiarato lì), poi aspetta un minuto e controlla `select * from net._http_response order by created desc limit 5;` (una sola chiamata, "5 nuovi messaggi da @…"). Un secondo messaggio entro 10 minuti non parte subito.
 - **Preferenze**: spegni "Chat e serate" dal profilo e invia un messaggio: `select count(*) from private.notification_queue` non cresce.
 - **Test automatici**: `npm run db:test:local` (pgTAP `23_notifications.sql`), `npm run functions:test` (`send-push`), `npx jest src/features/notifications src/__tests__/notifications.test.tsx`.
 

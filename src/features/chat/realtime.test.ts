@@ -1,7 +1,7 @@
 import { backoffMs, parseInsertedMessage } from './realtime';
 
 const me = { userId: 'me', handle: 'lince.rosso' };
-const following = [{ userId: 'amico', handle: 'volpe.viola' }];
+const known = [{ userId: 'amico', handle: 'volpe.viola' }];
 
 const row = (overrides: Record<string, unknown> = {}) => ({
   id: 'm1',
@@ -15,48 +15,55 @@ const row = (overrides: Record<string, unknown> = {}) => ({
 });
 
 describe('parseInsertedMessage', () => {
-  it('converte il messaggio di un seguito, con il suo handle', () => {
-    expect(parseInsertedMessage(row(), 'r1', me, following)).toEqual({
-      id: 'm1',
-      userId: 'amico',
-      handle: 'volpe.viola',
-      kind: 'text',
-      text: 'ciao',
-      createdAt: '2026-11-07T22:00:00Z',
-      isMine: false,
+  it('converte il messaggio di un autore già noto nella stanza, con il suo handle', () => {
+    expect(parseInsertedMessage(row(), 'r1', me, known)).toEqual({
+      type: 'append',
+      message: {
+        id: 'm1',
+        userId: 'amico',
+        handle: 'volpe.viola',
+        kind: 'text',
+        text: 'ciao',
+        createdAt: '2026-11-07T22:00:00Z',
+        isMine: false,
+      },
     });
   });
 
   it('riconosce i miei messaggi', () => {
-    expect(parseInsertedMessage(row({ user_id: 'me' }), 'r1', me, following)).toMatchObject({
-      handle: 'lince.rosso',
-      isMine: true,
+    expect(parseInsertedMessage(row({ user_id: 'me' }), 'r1', me, known)).toMatchObject({
+      type: 'append',
+      message: { handle: 'lince.rosso', isMine: true },
     });
   });
 
-  it('scarta il messaggio di chi non seguo (principio 6, difesa in profondità)', () => {
-    expect(parseInsertedMessage(row({ user_id: 'sconosciuto' }), 'r1', me, following)).toBeNull();
+  // la visibilità vive in SQL (private.can_see_chat_author_for): ogni INSERT ricevuto è visibile per definizione
+  it("per un autore sconosciuto chiede di ricaricare i messaggi invece di inventare l'handle", () => {
+    expect(parseInsertedMessage(row({ user_id: 'amico.di.amico' }), 'r1', me, known)).toEqual({
+      type: 'refetch',
+    });
   });
 
-  it("scarta i messaggi di un'altra stanza", () => {
-    expect(parseInsertedMessage(row({ room_id: 'r2' }), 'r1', me, following)).toBeNull();
+  it("ignora i messaggi di un'altra stanza", () => {
+    expect(parseInsertedMessage(row({ room_id: 'r2' }), 'r1', me, known)).toEqual({
+      type: 'ignore',
+    });
   });
 
-  it('scarta un payload con forma inattesa', () => {
-    expect(parseInsertedMessage({ id: 'm1' }, 'r1', me, following)).toBeNull();
-    expect(parseInsertedMessage(null, 'r1', me, following)).toBeNull();
+  it('ignora un payload con forma inattesa', () => {
+    expect(parseInsertedMessage({ id: 'm1' }, 'r1', me, known)).toEqual({ type: 'ignore' });
+    expect(parseInsertedMessage(null, 'r1', me, known)).toEqual({ type: 'ignore' });
   });
 
   it('non porta mai con sé il path della foto: la foto si legge solo con URL firmato', () => {
-    const photo = parseInsertedMessage(
+    const result = parseInsertedMessage(
       row({ kind: 'photo', text: null, photo_path: 'amico/x.jpg' }),
       'r1',
       me,
-      following,
+      known,
     );
-    expect(photo).toMatchObject({ kind: 'photo', text: null });
-    expect(photo).not.toHaveProperty('photoPath');
-    expect(photo).not.toHaveProperty('photo_path');
+    expect(result).toMatchObject({ type: 'append', message: { kind: 'photo', text: null } });
+    expect(JSON.stringify(result)).not.toContain('x.jpg');
   });
 });
 

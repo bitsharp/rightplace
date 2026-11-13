@@ -11,6 +11,7 @@ import { MentionSuggestions } from './MentionSuggestions';
 
 type Props = {
   followingHandles: string[];
+  mentionableHandles: string[];
   myHandle: string;
   requestedHandles: string[];
   onSend: (text: string) => void;
@@ -20,13 +21,14 @@ type Props = {
 
 export function ChatComposer({
   followingHandles,
+  mentionableHandles,
   myHandle,
   requestedHandles,
   onSend,
   onPhoto,
   onFollow,
 }: Props) {
-  const composer = useComposer(followingHandles, myHandle);
+  const composer = useComposer(followingHandles, mentionableHandles, myHandle);
   const trimmed = composer.text.trim();
   const send = () => {
     if (trimmed === '') return;

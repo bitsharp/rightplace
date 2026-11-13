@@ -7,7 +7,7 @@ import { spacing } from '@/theme/tokens';
 
 type Props = { handles: string[]; onPick: (handle: string) => void };
 
-// Handles come only from the people I follow (principle 6): the label says so.
+// Handles come only from people visible in this room or followed by me (principle 6): the label says so.
 export function MentionSuggestions({ handles, onPick }: Props) {
   const { t } = useTranslation('chat');
   if (handles.length === 0) return null;

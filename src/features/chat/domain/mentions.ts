@@ -7,12 +7,25 @@ export function activeMentionQuery(text: string, cursor: number): string | null 
   return match ? (match[1] ?? '') : null;
 }
 
-// Tagging is allowed only for people I follow (principle 6): never search the whole user base here.
-export function suggestMentions(query: string, followingHandles: string[], limit = 5): string[] {
+// Who can be tagged: authors visible in this room (the server already filtered them, principle 6) plus the people I
+// follow. Never search the whole user base here.
+export function mentionableHandles(
+  visibleAuthorHandles: string[],
+  followingHandles: string[],
+  myHandle: string,
+): string[] {
+  const seen = new Set([myHandle.toLowerCase()]);
+  return [...visibleAuthorHandles, ...followingHandles].filter((handle) => {
+    const key = handle.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export function suggestMentions(query: string, handles: string[], limit = 5): string[] {
   const prefix = query.toLowerCase();
-  return followingHandles
-    .filter((handle) => handle.toLowerCase().startsWith(prefix))
-    .slice(0, limit);
+  return handles.filter((handle) => handle.toLowerCase().startsWith(prefix)).slice(0, limit);
 }
 
 export function insertMention(
@@ -28,7 +41,7 @@ export function insertMention(
   return { text: head + after, cursor: head.length + (gap === '' ? 1 : 0) };
 }
 
-// Handles tagged in the text that I do not follow: the composer offers a "Segui" chip for each.
+// Handles tagged in the text that I do not follow (visible in the room or not): the composer offers a "Segui" chip for each.
 export function unknownMentions(
   text: string,
   followingHandles: string[],

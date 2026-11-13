@@ -16,27 +16,27 @@ Le migration in `migrations/` sono ordinate e **non si modificano dopo essere st
 
 ## Modello dati
 
-| Tabella                                | Contenuto                                                                                    | Chi la legge                                           |
-| -------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `cities`                               | città (Milano attiva; Las Palmas, Madrid, Barcellona inattive)                               | utenti autenticati                                     |
-| `venues`                               | locali (da Google Places, prompt 06; finché una città non ha 10 locali reali restano i demo) | utenti autenticati                                     |
-| `venue_typical_busyness`               | strato "di solito": livello 0–3 per venue/giorno/ora, `source` `manual` o `history`          | utenti autenticati                                     |
-| `night_hour_stats`                     | medie storiche per venue/giorno/ora, **mai per utente**                                      | nessun client                                          |
-| `profiles`                             | handle, data di nascita, genere, città, lingua, consensi, posizione grossolana               | **solo la propria riga**                               |
-| `public_profiles` (view)               | `id, handle, age_band, gender, is_creator`                                                   | utenti autenticati: **unico accesso ad altri profili** |
-| `follows`                              | A → B con `status` `pending` / `accepted`                                                    | solo le proprie righe (entrambe le direzioni)          |
-| `accepted_follows` (view)              | follow accettati                                                                             | come `follows`                                         |
-| `blocks`                               | blocchi                                                                                      | solo i propri                                          |
-| `events`                               | serate dei creator                                                                           | utenti autenticati                                     |
-| `nights`                               | serata logica di un locale (06:00 → 06:00, fuso della città)                                 | utenti autenticati                                     |
-| `declarations`                         | "Ci vado" / "Forse"                                                                          | solo le proprie (scritture solo via RPC)               |
-| `chat_rooms`, `chat_messages`          | chat della serata                                                                            | membri della serata; messaggi propri o di chi seguo    |
-| `posts`, `post_likes`, `post_comments` | foto del giorno dopo                                                                         | vedi "Visibilità"                                      |
-| `search_history`                       | ultime ricerche (max 20)                                                                     | solo le proprie                                        |
-| `contact_hashes_tmp`, `phone_hashes`   | hash SHA-256 di numeri E.164                                                                 | **nessun client**                                      |
-| `reports`                              | segnalazioni                                                                                 | nessun client (moderatori via service role)            |
-| `subscriptions`, `push_tokens`         | abbonamento creator, token push                                                              | solo i propri                                          |
-| `private.*`                            | liste per gli handle, conteggi per serata, code di cancellazione                             | nessun client                                          |
+| Tabella                                | Contenuto                                                                                    | Chi la legge                                                            |
+| -------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `cities`                               | città (Milano attiva; Las Palmas, Madrid, Barcellona inattive)                               | utenti autenticati                                                      |
+| `venues`                               | locali (da Google Places, prompt 06; finché una città non ha 10 locali reali restano i demo) | utenti autenticati                                                      |
+| `venue_typical_busyness`               | strato "di solito": livello 0–3 per venue/giorno/ora, `source` `manual` o `history`          | utenti autenticati                                                      |
+| `night_hour_stats`                     | medie storiche per venue/giorno/ora, **mai per utente**                                      | nessun client                                                           |
+| `profiles`                             | handle, data di nascita, genere, città, lingua, consensi, posizione grossolana               | **solo la propria riga**                                                |
+| `public_profiles` (view)               | `id, handle, age_band, gender, is_creator`                                                   | utenti autenticati: **unico accesso ad altri profili**                  |
+| `follows`                              | A → B con `status` `pending` / `accepted`                                                    | solo le proprie righe (entrambe le direzioni)                           |
+| `accepted_follows` (view)              | follow accettati                                                                             | come `follows`                                                          |
+| `blocks`                               | blocchi                                                                                      | solo i propri                                                           |
+| `events`                               | serate dei creator                                                                           | utenti autenticati                                                      |
+| `nights`                               | serata logica di un locale (06:00 → 06:00, fuso della città)                                 | utenti autenticati                                                      |
+| `declarations`                         | "Ci vado" / "Forse"                                                                          | solo le proprie (scritture solo via RPC)                                |
+| `chat_rooms`, `chat_messages`          | chat della serata                                                                            | membri della serata; messaggi di autori visibili nella room (prompt 19) |
+| `posts`, `post_likes`, `post_comments` | foto del giorno dopo                                                                         | vedi "Visibilità"                                                       |
+| `search_history`                       | ultime ricerche (max 20)                                                                     | solo le proprie                                                         |
+| `contact_hashes_tmp`, `phone_hashes`   | hash SHA-256 di numeri E.164                                                                 | **nessun client**                                                       |
+| `reports`                              | segnalazioni                                                                                 | nessun client (moderatori via service role)                             |
+| `subscriptions`, `push_tokens`         | abbonamento creator, token push                                                              | solo i propri                                                           |
+| `private.*`                            | liste per gli handle, conteggi per serata, code di cancellazione                             | nessun client                                                           |
 
 ## Garanzie di privacy
 
@@ -98,7 +98,7 @@ I bucket `posts` e `chat-photos` sono privati. Il caricamento è permesso solo n
 
 - `venue_typical_busyness` ha come chiave `(venue_id, weekday, hour, source)`, così la riga `history` prevale senza cancellare quella `manual`.
 - `private.night_attendance` conserva solo i **conteggi per serata**, perché le dichiarazioni vengono cancellate dopo 7 giorni ma lo storico copre 8 settimane. Ogni serata si attribuisce alle ore 21–02 (una dichiarazione non dice l'orario).
-- La chat mostra solo i messaggi propri o di chi segui con follow accettato (principio 6), non tutti quelli dei membri della serata.
+- La chat mostra solo i messaggi degli autori visibili nella room (prompt 19): me, chi ha un follow accettato con me in una direzione o nell'altra, o chi è legato a un amico mio dichiarato nella stessa room; il blocco prevale. Non tutti quelli dei membri della serata.
 - Chat (prompt 10): si entra con qualunque dichiarazione non annullata sulla serata/evento finché la stanza è viva (`expires_at`), non solo con quella attiva; i messaggi si inviano solo con `send_chat_message` (l'insert diretto è revocato).
 - `match_contacts` richiede `contacts_opt_in` anche lato server.
 - Le scritture su `profiles`, `declarations` e `follows.status` sono limitate per colonna. Tutto il resto passa dalle RPC.
@@ -120,6 +120,10 @@ Regole complete in `docs/places-terms.md`, passi operativi in `docs/places-sync.
 - **RPC solo `service_role`** (revocate ad `anon` e `authenticated`): `sync_places_venues(city_slug, rows)` (upsert su `google_place_id`; disattiva i demo della sola città quando ha almeno 10 locali reali attivi), `get_city_sync_info(city_slug)`, `import_typical_manual(city_slug, rows)` (atomica; rimpiazza solo le righe `manual`, errori `UNKNOWN_VENUE` / `INVALID_ARGUMENT` / `NOT_FOUND`).
 - **RPC per gli utenti**: `remember_venue(venue_id)` scrive solo nella cronologia ricerche propria.
 - **Job**: `expire-stale-places` (tabella sopra).
+
+## Chat di amici di amici (prompt 19)
+
+Migration `20261115000100_chat_friends_of_friends.sql`: nessuna azione manuale oltre `supabase db push`. Introduce `private.is_linked(a, b)` e sostituisce `private.can_see_chat_author(uuid)` / `can_see_chat_author_for(uuid, uuid)` con le firme che prendono anche la room (`can_see_chat_author(room, author)`, `can_see_chat_author_for(viewer, room, author)`): visibilità = me, un legame (follow accettato in una direzione o nell'altra) o un amico in comune dichiarato nella stessa room; il blocco prevale. Ricrea `get_room_messages`, `get_my_chat_rooms`, `get_chat_photo_paths`, il trigger delle push di chat e la policy `chat_messages_read` (usata da Realtime). Il wrapper `can_see_chat_author(uuid, uuid)` è eseguibile da `authenticated` perché lo chiama la policy; le altre funzioni restano private. Dettagli in `docs/night-chat.md`.
 
 ## Chat di serata (prompt 10)
 

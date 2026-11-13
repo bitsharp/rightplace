@@ -1,4 +1,10 @@
-import { activeMentionQuery, insertMention, suggestMentions, unknownMentions } from './mentions';
+import {
+  activeMentionQuery,
+  insertMention,
+  mentionableHandles,
+  suggestMentions,
+  unknownMentions,
+} from './mentions';
 
 describe('activeMentionQuery', () => {
   it.each([
@@ -23,12 +29,12 @@ describe('activeMentionQuery', () => {
 describe('suggestMentions', () => {
   const following = ['lince.rosso', 'lupo.nero', 'volpe.viola', 'Lontra.blu'];
 
-  it('propone solo chi seguo, per prefisso e senza badare alle maiuscole', () => {
+  it('propone solo gli handle che gli vengono dati, per prefisso e senza badare alle maiuscole', () => {
     expect(suggestMentions('l', following)).toEqual(['lince.rosso', 'lupo.nero', 'Lontra.blu']);
     expect(suggestMentions('LU', following)).toEqual(['lupo.nero']);
   });
 
-  it('non propone nessuno che non seguo', () => {
+  it("non propone nessuno che non è nell'elenco", () => {
     expect(suggestMentions('orso', following)).toEqual([]);
   });
 
@@ -67,5 +73,21 @@ describe('unknownMentions', () => {
 
   it('non fa differenza tra maiuscole e minuscole', () => {
     expect(unknownMentions('@Lince.Rosso', ['lince.rosso'], 'me.me')).toEqual([]);
+  });
+});
+
+describe('mentionableHandles', () => {
+  it('unisce gli autori visibili nella room e chi seguo, senza doppioni né me stesso', () => {
+    expect(
+      mentionableHandles(
+        ['volpe.viola', 'Lince.Rosso', 'gatto.blu'],
+        ['lince.rosso', 'lupo.nero'],
+        'gatto.blu',
+      ),
+    ).toEqual(['volpe.viola', 'Lince.Rosso', 'lupo.nero']);
+  });
+
+  it("non inventa nessuno: senza autori né seguiti non c'è nulla da proporre", () => {
+    expect(mentionableHandles([], [], 'gatto.blu')).toEqual([]);
   });
 });

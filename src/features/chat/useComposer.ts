@@ -11,13 +11,17 @@ type Selection = { start: number; end: number };
 
 // Text, cursor and everything derived from them (mention suggestions, "Segui" chips).
 // The cursor is unknown until the platform reports it; until then the end of the text is assumed.
-export function useComposer(followingHandles: string[], myHandle: string) {
+export function useComposer(
+  followingHandles: string[],
+  mentionableHandles: string[],
+  myHandle: string,
+) {
   const [text, setText] = useState('');
   const [cursor, setCursor] = useState<number | null>(null);
   const [forced, setForced] = useState<Selection | undefined>(undefined);
 
   const query = activeMentionQuery(text, cursor ?? text.length);
-  const suggestions = query === null ? [] : suggestMentions(query, followingHandles);
+  const suggestions = query === null ? [] : suggestMentions(query, mentionableHandles);
 
   return {
     text,

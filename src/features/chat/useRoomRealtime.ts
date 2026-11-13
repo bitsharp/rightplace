@@ -7,29 +7,30 @@ import { roomMessagesKey } from './keys';
 import { parseInsertedMessage, type RealtimePerson } from './realtime';
 import { startRoomConnection } from './roomConnection';
 
+// Authors whose handle the loaded messages already carry (the server only returned people I may see).
+const authorsIn = (list: ChatMessage[] | undefined): RealtimePerson[] =>
+  (list ?? []).map(({ userId, handle }) => ({ userId, handle }));
+
 // Keeps the cached messages of an open chat live. New rows are appended only to a list that was already
 // loaded: creating a partial cache would make the first real fetch look unnecessary.
-export function useRoomRealtime(roomId: string, me: RealtimePerson, following: RealtimePerson[]) {
+export function useRoomRealtime(roomId: string, me: RealtimePerson) {
   const queryClient = useQueryClient();
-  const latest = useRef({ me, following });
+  const latestMe = useRef(me);
   useEffect(() => {
-    latest.current = { me, following };
-  }, [me, following]);
+    latestMe.current = me;
+  }, [me]);
 
   useEffect(() => {
     const key = roomMessagesKey(roomId);
     const connection = startRoomConnection({
       roomId,
       onInsert: (row) => {
-        const message = parseInsertedMessage(
-          row,
-          roomId,
-          latest.current.me,
-          latest.current.following,
-        );
-        if (!message) return;
+        const cache = queryClient.getQueryData<ChatMessage[]>(key);
+        const outcome = parseInsertedMessage(row, roomId, latestMe.current, authorsIn(cache));
+        if (outcome.type === 'refetch') void queryClient.invalidateQueries({ queryKey: key });
+        if (outcome.type !== 'append') return;
         queryClient.setQueryData<ChatMessage[]>(key, (list) =>
-          list ? appendMessage(list, message) : list,
+          list ? appendMessage(list, outcome.message) : list,
         );
       },
       onRecovered: () => void queryClient.invalidateQueries({ queryKey: key }),

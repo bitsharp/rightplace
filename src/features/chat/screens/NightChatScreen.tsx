@@ -44,6 +44,7 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
         <ComposerDock>
           <ChatComposer
             followingHandles={screen.followingHandles}
+            mentionableHandles={screen.mentionableHandles}
             myHandle={screen.myHandle}
             requestedHandles={screen.requestedHandles}
             onSend={screen.send}

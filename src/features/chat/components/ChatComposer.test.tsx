@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ChatComposer } from './ChatComposer';
 
 const following = ['lince.rosso', 'lupo.nero', 'volpe.viola'];
+const visible = ['lince.rosso', 'lupo.nero', 'volpe.viola', 'lontra.blu'];
 
 async function setup(props: Partial<React.ComponentProps<typeof ChatComposer>> = {}) {
   const onSend = jest.fn();
@@ -11,6 +12,7 @@ async function setup(props: Partial<React.ComponentProps<typeof ChatComposer>> =
   await render(
     <ChatComposer
       followingHandles={following}
+      mentionableHandles={visible}
       myHandle="gatto.blu"
       requestedHandles={[]}
       onSend={onSend}
@@ -23,7 +25,15 @@ async function setup(props: Partial<React.ComponentProps<typeof ChatComposer>> =
 }
 
 describe('ChatComposer', () => {
-  it('scrivendo @ propone solo chi seguo, per prefisso', async () => {
+  it('un autore visibile nella room ma che non seguo è taggabile e mostra il chip Segui', async () => {
+    const { input } = await setup();
+    await fireEvent.changeText(input, '@lon');
+    expect(screen.getByText('@lontra.blu')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByText('@lontra.blu'));
+    expect(screen.getByText('chat:composer.follow')).toBeOnTheScreen();
+  });
+
+  it('scrivendo @ propone gli handle taggabili, per prefisso', async () => {
     const { input } = await setup();
     await fireEvent.changeText(input, 'ciao @l');
     expect(screen.getByText('@lince.rosso')).toBeOnTheScreen();

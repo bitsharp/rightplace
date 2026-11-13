@@ -9,7 +9,7 @@ import { useMyProfile } from '@/features/profile/hooks';
 import { usePhotoFlow } from '@/lib/photos/usePhotoFlow';
 
 import { chatExpiryHours } from './domain/ttl';
-import { visibleMessages } from './domain/visibleMessages';
+import { mentionableHandles } from './domain/mentions';
 import type { ChatMessage } from './domain/messages';
 import { usePhotoUrls, useMyChatRooms, useRoomMessages, useSendMessage } from './hooks';
 import { useFollowByHandle } from './useFollowByHandle';
@@ -31,12 +31,10 @@ export function useNightChatScreen(roomId: string) {
   const room = useMyChatRooms().data?.find((candidate) => candidate.roomId === roomId) ?? null;
 
   const loaded = useRoomMessages(roomId);
-  useRoomRealtime(roomId, me, people);
-  const messages = visibleMessages(
-    loaded.messages,
-    me.userId,
-    people.map((p) => p.userId),
-  );
+  useRoomRealtime(roomId, me);
+  // No visibility filter here: the rule lives in SQL (private.can_see_chat_author_for) and the RPC and Realtime
+  // only deliver what this user may see.
+  const messages = loaded.messages;
   // newest first: reading is up to date while the room is open, also for messages arriving live
   useMarkRoomRead(roomId, messages[0]?.createdAt ?? null);
   const sender = useSendMessage(roomId, me);
@@ -58,6 +56,11 @@ export function useNightChatScreen(roomId: string) {
     hasMore: loaded.hasMore,
     loadOlder: loaded.loadOlder,
     followingHandles: people.map((p) => p.handle),
+    mentionableHandles: mentionableHandles(
+      messages.map((m) => m.handle),
+      people.map((p) => p.handle),
+      me.handle,
+    ),
     myHandle: me.handle,
     expiryHours: room ? chatExpiryHours(room.expiresAt, new Date()) : null,
     send: (text: string) => sender.send({ text }),

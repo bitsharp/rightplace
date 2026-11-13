@@ -19,27 +19,35 @@ const insertSchema = z.object({
 export const backoffMs = (attempt: number): number =>
   Math.min(MIN_BACKOFF_MS * 2 ** attempt, MAX_BACKOFF_MS);
 
-// Realtime applies the table policy per subscriber, so the server only sends what this user may read.
-// This check repeats it on the client (principle 6): a payload from someone I do not follow is dropped.
+export type InsertOutcome =
+  { type: 'append'; message: ChatMessage } | { type: 'refetch' } | { type: 'ignore' };
+
+// Realtime applies the table policy per subscriber (private.can_see_chat_author_for), so every INSERT that arrives is
+// visible to this user by definition: visibility lives in SQL and is not rebuilt here. What the client may lack is the
+// author's handle (a friend of a friend): then it reloads from get_room_messages instead of inventing one.
 // The row's photo_path is deliberately not copied: photos are read only through signed URLs.
 export function parseInsertedMessage(
   payload: unknown,
   roomId: string,
   me: RealtimePerson,
-  following: RealtimePerson[],
-): ChatMessage | null {
+  knownAuthors: RealtimePerson[],
+): InsertOutcome {
   const parsed = insertSchema.safeParse(payload);
-  if (!parsed.success || parsed.data.room_id !== roomId) return null;
+  if (!parsed.success || parsed.data.room_id !== roomId) return { type: 'ignore' };
   const row = parsed.data;
-  const author = row.user_id === me.userId ? me : following.find((p) => p.userId === row.user_id);
-  if (!author) return null;
+  const author =
+    row.user_id === me.userId ? me : knownAuthors.find((person) => person.userId === row.user_id);
+  if (!author) return { type: 'refetch' };
   return {
-    id: row.id,
-    userId: row.user_id,
-    handle: author.handle,
-    kind: row.kind,
-    text: row.text,
-    createdAt: row.created_at,
-    isMine: row.user_id === me.userId,
+    type: 'append',
+    message: {
+      id: row.id,
+      userId: row.user_id,
+      handle: author.handle,
+      kind: row.kind,
+      text: row.text,
+      createdAt: row.created_at,
+      isMine: row.user_id === me.userId,
+    },
   };
 }

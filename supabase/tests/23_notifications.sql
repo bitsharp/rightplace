@@ -82,20 +82,22 @@ select ok(not exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.p
   'nessuna RPC restituisce token');
 
 -- ================================================================ chat author rule with explicit viewer
+-- (prompt 19: the rule now takes the room; a random room has no members, so only the direct cases apply here.
+-- The friends-of-friends cases live in 24_chat_friends_of_friends.sql.)
 
 select tests.follow(:'b', :'a');
 select tests.follow(:'d', :'a');
 select tests.follow(:'f', :'a');
 select tests.follow(:'e', :'a', 'pending');
 insert into blocks (blocker_id, blocked_id) values (:'a', :'d');
-select ok(private.can_see_chat_author_for(:'b', :'a'), 'chi segue l''autore lo vede');
-select ok(private.can_see_chat_author_for(:'a', :'a'), 'l''autore vede se stesso');
-select ok(not private.can_see_chat_author_for(:'c', :'a'), 'chi non segue non lo vede');
-select ok(not private.can_see_chat_author_for(:'e', :'a'), 'una richiesta pending non sblocca nulla');
-select ok(not private.can_see_chat_author_for(:'d', :'a'), 'il blocco prevale');
+select ok(private.can_see_chat_author_for(:'b', gen_random_uuid(), :'a'), 'chi segue l''autore lo vede');
+select ok(private.can_see_chat_author_for(:'a', gen_random_uuid(), :'a'), 'l''autore vede se stesso');
+select ok(not private.can_see_chat_author_for(:'c', gen_random_uuid(), :'a'), 'chi non segue non lo vede');
+select ok(not private.can_see_chat_author_for(:'e', gen_random_uuid(), :'a'), 'una richiesta pending non sblocca nulla');
+select ok(not private.can_see_chat_author_for(:'d', gen_random_uuid(), :'a'), 'il blocco prevale');
 select set_config('request.jwt.claims', json_build_object('sub', :'b'::text, 'role', 'authenticated')::text, true);
-select ok(private.can_see_chat_author(:'a'), 'il wrapper con auth.uid() dà lo stesso risultato');
-select ok(pg_get_functiondef('private.can_see_chat_author(uuid)'::regprocedure) like '%can_see_chat_author_for%',
+select ok(private.can_see_chat_author(gen_random_uuid(), :'a'), 'il wrapper con auth.uid() dà lo stesso risultato');
+select ok(pg_get_functiondef('private.can_see_chat_author(uuid,uuid)'::regprocedure) like '%can_see_chat_author_for%',
   'la regola vive in un solo posto: can_see_chat_author la richiama');
 
 -- ================================================================ follows triggers
@@ -343,7 +345,7 @@ select ok(not has_function_privilege('authenticated', 'private.dispatch_notifica
       and not has_function_privilege('authenticated', 'private.queue_feed_digests(timestamptz)', 'execute')
       and not has_function_privilege('authenticated', 'private.invoke_send_push(jsonb)', 'execute')
       and not has_function_privilege('authenticated', 'private.render_notification(text,text,int,jsonb)', 'execute')
-      and not has_function_privilege('authenticated', 'private.can_see_chat_author_for(uuid,uuid)', 'execute'),
+      and not has_function_privilege('authenticated', 'private.can_see_chat_author_for(uuid,uuid,uuid)', 'execute'),
   'dispatcher, digest, invio e regole private non sono eseguibili dai client');
 select tests.authenticate_as(:'b');
 select throws_ok($$ select * from private.notification_queue $$, '42501', null, 'la coda non è leggibile dai client');

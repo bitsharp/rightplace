@@ -9,7 +9,15 @@ import { roomMessagesKey } from './keys';
 import { useRoomRealtime } from './useRoomRealtime';
 
 const me = { userId: 'me', handle: 'lince.rosso' };
-const following = [{ userId: 'amico', handle: 'volpe.viola' }];
+const knownMessage = (userId: string, handle: string): ChatMessage => ({
+  id: `old-${userId}`,
+  userId,
+  handle,
+  kind: 'text',
+  text: 'prima',
+  createdAt: '2026-11-07T21:00:00Z',
+  isMine: false,
+});
 
 const insertRow = (overrides: Record<string, unknown> = {}) => ({
   id: 'm1',
@@ -38,8 +46,10 @@ afterEach(() => {
 
 async function setup() {
   const wrapper = createQueryWrapper();
-  wrapper.client.setQueryData<ChatMessage[]>(roomMessagesKey('r1'), []);
-  const view = await renderHook(() => useRoomRealtime('r1', me, following), {
+  wrapper.client.setQueryData<ChatMessage[]>(roomMessagesKey('r1'), [
+    knownMessage('amico', 'volpe.viola'),
+  ]);
+  const view = await renderHook(() => useRoomRealtime('r1', me), {
     wrapper: wrapper.Wrapper,
   });
   return { ...wrapper, ...view };
@@ -57,29 +67,39 @@ describe('useRoomRealtime', () => {
     ]);
   });
 
-  it('appende nella cache il messaggio di un seguito', async () => {
+  it("appende nella cache il messaggio di un autore già noto, con l'handle della cache", async () => {
     const { client } = await setup();
     fakeChannels[0]?.emitInsert(insertRow());
-    expect(cached(client).map((m) => m.id)).toEqual(['m1']);
+    expect(cached(client).map((m) => m.id)).toEqual(['m1', 'old-amico']);
     expect(cached(client)[0]).toMatchObject({ handle: 'volpe.viola', isMine: false });
   });
 
-  it('ignora il messaggio di chi non seguo', async () => {
+  it('un autore sconosciuto (amico di amico) fa ricaricare i messaggi e non aggiunge righe senza handle', async () => {
     const { client } = await setup();
-    fakeChannels[0]?.emitInsert(insertRow({ user_id: 'sconosciuto' }));
-    expect(cached(client)).toEqual([]);
+    const invalidate = jest.spyOn(client, 'invalidateQueries');
+    fakeChannels[0]?.emitInsert(insertRow({ id: 'm9', user_id: 'amico.di.amico' }));
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: roomMessagesKey('r1') });
+    expect(cached(client).map((m) => m.id)).toEqual(['old-amico']);
+  });
+
+  it("un messaggio di un'altra stanza non cambia nulla", async () => {
+    const { client } = await setup();
+    const invalidate = jest.spyOn(client, 'invalidateQueries');
+    fakeChannels[0]?.emitInsert(insertRow({ room_id: 'r2' }));
+    expect(invalidate).not.toHaveBeenCalled();
+    expect(cached(client)).toHaveLength(1);
   });
 
   it('lo stesso id consegnato due volte resta una sola riga', async () => {
     const { client } = await setup();
     fakeChannels[0]?.emitInsert(insertRow());
     fakeChannels[0]?.emitInsert(insertRow());
-    expect(cached(client)).toHaveLength(1);
+    expect(cached(client).filter((m) => m.id === 'm1')).toHaveLength(1);
   });
 
   it('se la lista non è ancora stata caricata non crea una cache parziale', async () => {
     const wrapper = createQueryWrapper();
-    await renderHook(() => useRoomRealtime('r1', me, following), { wrapper: wrapper.Wrapper });
+    await renderHook(() => useRoomRealtime('r1', me), { wrapper: wrapper.Wrapper });
     fakeChannels[0]?.emitInsert(insertRow());
     expect(wrapper.client.getQueryData(roomMessagesKey('r1'))).toBeUndefined();
   });

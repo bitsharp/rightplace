@@ -69,12 +69,12 @@ describe('chat di serata', () => {
 
   const open = () => renderApp('ready', '/night/r1/chat');
 
-  it('mostra me e chi seguo, mai chi non seguo, anche se il server lo mandasse', async () => {
+  it('mostra tutto ciò che restituisce la RPC, compreso un amico di amico che non seguo (nessun filtro nel client)', async () => {
     seedChatBackend({
       rooms: [ARENA],
       messages: [
         message('m1', VOLPE, 'ciao da volpe', 1),
-        message('m2', GATTO, 'messaggio di un estraneo', 2),
+        message('m2', GATTO, 'messaggio di un amico di amico', 2),
         {
           ...message('m3', { id: 'user-1', handle: 'lince.rosso' }, 'ciao da me', 3),
           is_mine: true,
@@ -86,7 +86,7 @@ describe('chat di serata', () => {
     await open();
     expect(await screen.findByText('ciao da volpe')).toBeOnTheScreen();
     expect(screen.getByText('ciao da me')).toBeOnTheScreen();
-    expect(screen.queryByText('messaggio di un estraneo')).toBeNull();
+    expect(screen.getByText('messaggio di un amico di amico')).toBeOnTheScreen();
     expect(screen.getByText('chat:created')).toBeOnTheScreen();
   });
 
@@ -236,5 +236,21 @@ describe('chat di serata', () => {
     await open();
     await fireEvent(await screen.findByText('ciao da me'), 'longPress');
     expect(screen.queryByText('chat:actions.report')).toBeNull();
+  });
+});
+
+describe('tag nella chat', () => {
+  it('suggerisce un autore visibile nella room anche se non lo seguo', async () => {
+    seedChatBackend({
+      rooms: [ARENA],
+      messages: [message('m2', GATTO, 'ciao dal gatto', 2)],
+      users: [GATTO],
+      accepted: [],
+    });
+    await renderApp('ready', '/night/r1/chat');
+    await screen.findByText('ciao dal gatto');
+    await fireEvent.changeText(screen.getByLabelText('chat:composer.placeholder'), 'ehi @ga');
+    // once in the message header, once in the suggestions
+    await waitFor(() => expect(screen.getAllByText('@gatto.blu')).toHaveLength(2));
   });
 });
