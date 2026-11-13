@@ -107,6 +107,79 @@ describe('MapCanvas', () => {
     expect(onOpenVenue).toHaveBeenLastCalledWith('dot');
   });
 
+  it('3 punti caldi in ingresso → 3 HotSpot disegnati sulla mappa', async () => {
+    await render(
+      <MapCanvas
+        {...baseProps}
+        layers={{
+          hotSpots: ['a', 'b', 'c'].map((venueId) => venue({ venueId, lat: 45.46, lng: 9.19 })),
+          typicalDots: [],
+        }}
+      />,
+    );
+    expect(screen.getAllByTestId('hot-spot-outer', { includeHiddenElements: true })).toHaveLength(
+      3,
+    );
+    ['a', 'b', 'c'].forEach((id) => expect(marker(`hot-${id}`)).toBeOnTheScreen());
+  });
+
+  describe('la mia serata', () => {
+    const ownSpot = {
+      venueId: 'mine',
+      name: 'Arena Club',
+      intent: 'going' as const,
+      lat: 45.47,
+      lng: 9.2,
+    };
+    const noLayers = { hotSpots: [], typicalDots: [] };
+
+    it('segna il locale dichiarato con "Ci vai" anche se non è né punto caldo né typical dot', async () => {
+      await render(<MapCanvas {...baseProps} layers={noLayers} ownSpot={ownSpot} />);
+      expect(marker('own').props.coordinate).toEqual({ latitude: 45.47, longitude: 9.2 });
+      expect(screen.getByText('map:own.going', { includeHiddenElements: true })).toBeOnTheScreen();
+    });
+
+    it('con "Forse" mostra "Forse"', async () => {
+      await render(
+        <MapCanvas {...baseProps} layers={noLayers} ownSpot={{ ...ownSpot, intent: 'maybe' }} />,
+      );
+      expect(screen.getByText('map:own.maybe', { includeHiddenElements: true })).toBeOnTheScreen();
+    });
+
+    it('è disegnato anche nella vista amici', async () => {
+      await render(<MapCanvas {...baseProps} view="friends" layers={noLayers} ownSpot={ownSpot} />);
+      expect(marker('own')).toBeOnTheScreen();
+    });
+
+    it('sta sopra i punti caldi e sotto il "Tu"', async () => {
+      await render(
+        <MapCanvas
+          {...baseProps}
+          you={{ lat: 45.4625, lng: 9.1925 }}
+          layers={{ hotSpots: [venue({ venueId: 'mine' })], typicalDots: [] }}
+          ownSpot={ownSpot}
+        />,
+      );
+      const z = (id: string) => Number(marker(id).props.zIndex);
+      expect(z('hot-mine')).toBeLessThan(z('own'));
+      expect(z('own')).toBeLessThan(z('you'));
+    });
+
+    it('un tap apre il locale', async () => {
+      const onOpenVenue = jest.fn();
+      await render(
+        <MapCanvas {...baseProps} onOpenVenue={onOpenVenue} layers={noLayers} ownSpot={ownSpot} />,
+      );
+      await fireEvent.press(marker('own'));
+      expect(onOpenVenue).toHaveBeenCalledWith('mine');
+    });
+
+    it('senza dichiarazione non c\'è nessun marker "mia serata"', async () => {
+      await render(<MapCanvas {...baseProps} layers={noLayers} ownSpot={null} />);
+      expect(screen.queryByTestId('marker-own', { includeHiddenElements: true })).toBeNull();
+    });
+  });
+
   it('nella vista generale il punto caldo mostra la fascia dei "Ci vado"', async () => {
     await render(
       <MapCanvas

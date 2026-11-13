@@ -25,7 +25,11 @@
   "cards": {
     "history": "Dalla tua cronologia di ricerca",
     "hot": "Il più caldo stasera",
-    "tonightBand": "stasera {{band}}"
+    "tonightBand": "stasera {{band}}",
+    "own": {
+      "label": "LA TUA SERATA",
+      "a11y": "La tua serata: {{venue}}, {{intent}}"
+    }
   },
   "friendsEmpty": "Nessuno dei tuoi amici ha ancora dichiarato la serata.",
   "loadError": "Non riusciamo a caricare la mappa. Riprova tra poco.",
@@ -33,5 +37,10 @@
   "fullscreen": {
     "open": "Apri la mappa a schermo intero",
     "close": "Chiudi la mappa"
+  },
+  "own": {
+    "going": "Ci vai",
+    "maybe": "Forse",
+    "a11y": "La tua serata: {{venue}}, {{intent}}. Apri il locale"
   }
 }

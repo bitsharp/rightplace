@@ -45,6 +45,7 @@ export function MapBottomPanel(props: Props) {
         <>
           <MapBanner kind={props.banner} />
           <MapCards
+            own={props.declaration}
             sponsored={props.sponsored}
             recommended={props.recommended}
             onOpen={onOpenVenue}

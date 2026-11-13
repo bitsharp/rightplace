@@ -18,6 +18,15 @@ const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => 
 const ids = (rows: MapVenue[]) => rows.map((row) => row.venueId);
 
 describe('buildGeneralLayers', () => {
+  it('3 righe con is_hot_spot = true diventano 3 punti caldi, nello stesso ordine', () => {
+    const layers = buildGeneralLayers([
+      venue({ venueId: 'a', isHotSpot: true, goingBand: '3–10' }),
+      venue({ venueId: 'b', isHotSpot: true, goingBand: '10–20' }),
+      venue({ venueId: 'c', isHotSpot: true, goingBand: '3–10' }),
+    ]);
+    expect(ids(layers.hotSpots)).toEqual(['a', 'b', 'c']);
+  });
+
   it('un locale con fascia visibile è un punto caldo e non anche un typical dot', () => {
     const layers = buildGeneralLayers([
       venue({ venueId: 'hot', isHotSpot: true, goingBand: '3–10', typicalLevel: 2 }),

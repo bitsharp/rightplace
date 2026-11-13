@@ -12,27 +12,33 @@ type CardProps = {
   onPress: () => void;
 };
 
-type Kind = 'sponsored' | 'recommended';
+type BaseProps = CardProps & {
+  label: string;
+  tone: 'going' | 'maybe';
+  borderColor: string;
+  // Defaults to "<label>, <name>"; cards that say more (e.g. my intention) pass their own.
+  accessibilityLabel?: string;
+};
 
-const KINDS = {
-  sponsored: { labelKey: 'labels.sponsored', tone: 'going', borderColor: colors.goingBorder },
-  recommended: { labelKey: 'labels.recommended', tone: 'maybe', borderColor: colors.border },
-} as const;
-
-// The only "ads" in the app are creator-sponsored nights, always labelled (CLAUDE.md principle 9).
-function PromoCard({ kind, name, meta, onPress }: CardProps & { kind: Kind }) {
-  const { t } = useTranslation('ui');
-  const look = KINDS[kind];
-  const label = t(look.labelKey);
+// Shared look of the cards under the map: a mono label, the venue, one line of context.
+export function PromoCard({
+  label,
+  tone,
+  borderColor,
+  name,
+  meta,
+  onPress,
+  accessibilityLabel,
+}: BaseProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${label}, ${name}`}
+      accessibilityLabel={accessibilityLabel ?? `${label}, ${name}`}
       onPress={onPress}
-      style={[styles.card, { borderColor: look.borderColor }]}
+      style={[styles.card, { borderColor }]}
     >
       <View style={styles.texts}>
-        <MonoLabel tone={look.tone}>{label}</MonoLabel>
+        <MonoLabel tone={tone}>{label}</MonoLabel>
         <Text variant="body15Strong">{name}</Text>
         <Text variant="body12" color="textSecondary">
           {meta}
@@ -43,8 +49,30 @@ function PromoCard({ kind, name, meta, onPress }: CardProps & { kind: Kind }) {
   );
 }
 
-export const SponsoredCard = (props: CardProps) => <PromoCard kind="sponsored" {...props} />;
-export const RecommendedCard = (props: CardProps) => <PromoCard kind="recommended" {...props} />;
+// The only "ads" in the app are creator-sponsored nights, always labelled (CLAUDE.md principle 9).
+export function SponsoredCard(props: CardProps) {
+  const { t } = useTranslation('ui');
+  return (
+    <PromoCard
+      label={t('labels.sponsored')}
+      tone="going"
+      borderColor={colors.goingBorder}
+      {...props}
+    />
+  );
+}
+
+export function RecommendedCard(props: CardProps) {
+  const { t } = useTranslation('ui');
+  return (
+    <PromoCard
+      label={t('labels.recommended')}
+      tone="maybe"
+      borderColor={colors.border}
+      {...props}
+    />
+  );
+}
 
 const styles = StyleSheet.create({
   card: {

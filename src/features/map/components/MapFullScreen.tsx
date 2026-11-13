@@ -9,6 +9,7 @@ import { colors, heights, radius, spacing } from '@/theme/tokens';
 
 import type { EventSpotPlacement } from '../domain/eventSpots';
 import type { MapLayers } from '../domain/mapLayers';
+import type { OwnSpot } from '../domain/ownSpot';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
 
@@ -30,6 +31,7 @@ type Props = {
   onOpenVenue: (venueId: string) => void;
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
+  ownSpot?: OwnSpot | null;
 };
 
 type BarProps = Pick<Props, 'view' | 'onChangeView' | 'onClose'>;
@@ -72,6 +74,7 @@ function FullScreenContent(props: ContentProps) {
           onOpenVenue={props.onOpenVenue}
           events={props.events}
           onOpenEvent={props.onOpenEvent}
+          ownSpot={props.ownSpot}
         />
         <View testID="map-hint-overlay" pointerEvents="none" style={styles.hint}>
           <MapHint view={props.view} />

@@ -57,6 +57,18 @@ describe('MapFullScreen', () => {
     mockInsets = { top: 0, bottom: 0, left: 0, right: 0 };
   });
 
+  it('a schermo intero la mia serata resta segnata sulla mappa', async () => {
+    const ownSpot = {
+      venueId: 'mine',
+      name: 'Arena Club',
+      intent: 'going' as const,
+      lat: 45.47,
+      lng: 9.2,
+    };
+    await render(<MapFullScreen {...baseProps} ownSpot={ownSpot} />);
+    expect(screen.getByTestId('marker-own', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+
   it('chiuso non disegna niente', async () => {
     await render(<MapFullScreen {...baseProps} visible={false} />);
     expect(screen.queryByTestId('map-view')).toBeNull();

@@ -6,8 +6,10 @@ import { useCityEvents } from '@/features/events/hooks';
 import { useSession } from '@/features/auth/useSession';
 import { useCoarsePositionStore } from '@/features/profile/location';
 import { useTopBar } from '@/features/posts/useTopBar';
+import { useVenueDetail } from '@/features/venue/hooks';
 import { useActiveCities } from '@/features/venues/hooks';
 
+import type { MyDeclaration } from './api';
 import { placeEventSpots, type EventSpotPlacement } from './domain/eventSpots';
 import {
   buildFriendsLayers,
@@ -16,6 +18,7 @@ import {
   type FriendVenue,
   type MapVenue,
 } from './domain/mapLayers';
+import { buildOwnSpot, coordsOfVenue, type OwnSpot } from './domain/ownSpot';
 import { useCityMap, useMyDeclaration, useRecommendedVenue } from './hooks';
 import { useMapStore, type MapViewMode } from './store/mapStore';
 
@@ -52,6 +55,19 @@ function useEventSpots(citySlug: string, view: MapViewMode, hotSpots: readonly M
   }, [view, events.data, hotSpots]);
 }
 
+// The declared venue is drawn even when get_city_map has no row for it: then its coordinates come
+// from the venue detail (catalog data, cached for an hour), never from other people's data.
+function useOwnSpot(
+  declaration: MyDeclaration | null | undefined,
+  generalRows: readonly MapVenue[],
+): OwnSpot | null {
+  const mine = declaration ?? null;
+  const fromMap = mine ? coordsOfVenue(generalRows, mine.venueId) : null;
+  const detail = useVenueDetail(mine?.venueId ?? '', mine !== null && fromMap === null);
+  const fromDetail = detail.data ? { lat: detail.data.lat, lng: detail.data.lng } : null;
+  return buildOwnSpot(mine, fromMap ?? fromDetail);
+}
+
 function useMapLayers(citySlug: string, view: MapViewMode) {
   const general = useCityMap(citySlug, 'general');
   const friends = useCityMap(citySlug, 'friends', view === 'friends');
@@ -80,6 +96,7 @@ export function useMapScreen() {
   const eventSpots = useEventSpots(citySlug, view, layers.hotSpots);
   const declaration = useMyDeclaration();
   const recommended = useRecommendedVenue(citySlug);
+  const ownSpot = useOwnSpot(declaration.data, generalRows);
   const coarseCell = useCoarsePositionStore((state) => state.cell);
   const openVenue = useOpenVenue();
 
@@ -89,6 +106,7 @@ export function useMapScreen() {
     city: cities.data?.find((city) => city.slug === citySlug) ?? null,
     layers,
     eventSpots,
+    ownSpot,
     loaded,
     loadFailed,
     // Only a user who turned the toggle on ever has a cell; it is already ~500 m coarse.

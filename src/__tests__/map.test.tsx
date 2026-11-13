@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react-native';
 import * as Location from 'expo-location';
 import { Platform } from 'react-native';
 
@@ -128,6 +128,21 @@ describe('mappa', () => {
         screen.getByRole('button', { name: typicalDot('Bar Quieto', 'lively') }),
       ).toBeOnTheScreen();
       expect(screen.queryByRole('button', { name: typicalDot('Arena Club', 'packed') })).toBeNull();
+    });
+
+    it('con 3 righe is_hot_spot dal server disegna 3 punti caldi (dati demo di Milano)', async () => {
+      seedBackend({
+        get_city_map: [
+          mapRow({ venue_id: 'h1', name: 'Uno', going_band: '3–10', is_hot_spot: true }),
+          mapRow({ venue_id: 'h2', name: 'Due', going_band: '10–20', is_hot_spot: true }),
+          mapRow({ venue_id: 'h3', name: 'Tre', going_band: '3–10', is_hot_spot: true }),
+        ],
+      });
+      await renderApp('ready', '/map');
+      await screen.findByRole('button', { name: hotSpot('Uno', '3–10') });
+      expect(screen.getAllByTestId(/^marker-hot-/, { includeHiddenElements: true })).toHaveLength(
+        3,
+      );
     });
 
     it('un locale con typical 0 e fascia non visibile non disegna nulla', async () => {
@@ -301,6 +316,85 @@ describe('mappa', () => {
       });
       await renderApp('ready', '/map');
       expect(await screen.findByText('ui:topBar.myStory')).toBeOnTheScreen();
+    });
+  });
+
+  describe('la mia serata di stasera', () => {
+    const declarationAt = (venueId: string, venueName: string, intent = 'going') => [
+      { ...DECLARATION[0], venue_id: venueId, venue_name: venueName, intent },
+    ];
+    const venueDetail = (venueId: string) => [
+      {
+        venue_id: venueId,
+        name: 'Locale Lontano',
+        kind: 'club',
+        address: null,
+        opening_hours: null,
+        google_place_id: 'p1',
+        lat: 45.5,
+        lng: 9.25,
+        city_slug: 'milano',
+        city_name: 'Milano',
+        country: 'IT',
+        timezone: 'Europe/Rome',
+        taxi_number: null,
+      },
+    ];
+    const ownMarker = () => screen.findByTestId('marker-own', { includeHiddenElements: true });
+    const ownCard = (venue: string, intent: 'going' | 'maybe') =>
+      `map:cards.own.a11y({"venue":"${venue}","intent":"map:own.${intent}"})`;
+
+    it('un locale senza affluenza né typical (fuori dai punti caldi) è marcato "Ci vai"', async () => {
+      seedBackend({ get_my_declaration: declarationAt('hidden', 'Locale Fantasma') });
+      await renderApp('ready', '/map');
+      const marker = await ownMarker();
+      expect(marker.props.coordinate).toEqual({ latitude: 45.46, longitude: 9.19 });
+      expect(
+        within(marker).getByText('map:own.going', { includeHiddenElements: true }),
+      ).toBeOnTheScreen();
+      expect(screen.queryByTestId('marker-hot-hidden', { includeHiddenElements: true })).toBeNull();
+    });
+
+    it('un locale assente dalle righe di get_city_map prende le coordinate dal dettaglio locale', async () => {
+      seedBackend({
+        get_my_declaration: declarationAt('lontano', 'Locale Lontano', 'maybe'),
+        get_venue_detail: venueDetail('lontano'),
+      });
+      await renderApp('ready', '/map');
+      const marker = await ownMarker();
+      expect(marker.props.coordinate).toEqual({ latitude: 45.5, longitude: 9.25 });
+      expect(
+        within(marker).getByText('map:own.maybe', { includeHiddenElements: true }),
+      ).toBeOnTheScreen();
+    });
+
+    it('resta visibile passando alla vista amici', async () => {
+      seedBackend({ get_my_declaration: declarationAt('hidden', 'Locale Fantasma') });
+      await renderApp('ready', '/map');
+      await ownMarker();
+      await fireEvent.press(screen.getByRole('button', { name: 'map:view.friends' }));
+      await screen.findByRole('button', { name: hotSpot('Terrazza', 'ui:band.few') });
+      expect(await ownMarker()).toBeOnTheScreen();
+    });
+
+    it('senza dichiarazione non compare né il marker né la card', async () => {
+      await renderApp('ready', '/map');
+      await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') });
+      expect(screen.queryByTestId('marker-own', { includeHiddenElements: true })).toBeNull();
+      expect(screen.queryByText('map:cards.own.label')).toBeNull();
+    });
+
+    it('la card in basso è la prima e porta al locale dichiarato', async () => {
+      seedBackend({ get_my_declaration: declarationAt('arena', 'Arena Club') });
+      await renderApp('ready', '/map');
+      const own = await screen.findByRole('button', { name: ownCard('Arena Club', 'going') });
+      const sponsored = screen.getByRole('button', { name: 'ui:labels.sponsored, Arena Club' });
+      const order = screen.getAllByRole('button').map((button) => button.props.accessibilityLabel);
+      expect(order.indexOf(own.props.accessibilityLabel)).toBeLessThan(
+        order.indexOf(sponsored.props.accessibilityLabel),
+      );
+      await fireEvent.press(own);
+      expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
     });
   });
 

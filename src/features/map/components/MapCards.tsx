@@ -5,11 +5,15 @@ import { RecommendedCard, SponsoredCard } from '@/components/app/PromoCard';
 import { useBandLabel } from '@/components/ui/useBandLabel';
 import { spacing } from '@/theme/tokens';
 
-import type { RecommendedVenue } from '../api';
+import type { MyDeclaration, RecommendedVenue } from '../api';
 import type { MapVenue } from '../domain/mapLayers';
 import { isVisibleTypical, typicalLabelKey } from '../domain/typical';
 
+import { OwnNightCard } from './OwnNightCard';
+
 type Props = {
+  // My own declaration tonight: always first (it is mine, whatever the turnout).
+  own: MyDeclaration | null;
   sponsored: MapVenue | null;
   recommended: RecommendedVenue | null;
   onOpen: (venueId: string) => void;
@@ -30,16 +34,21 @@ function useSponsoredMeta() {
   };
 }
 
-export function MapCards({ sponsored, recommended, onOpen }: Props) {
+export function MapCards({ own, sponsored, recommended, onOpen }: Props) {
   const { t } = useTranslation('map');
   const sponsoredMeta = useSponsoredMeta();
-  if (!sponsored && !recommended) return null;
+  if (!own && !sponsored && !recommended) return null;
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.cards}
     >
+      {own ? (
+        <View style={styles.slot}>
+          <OwnNightCard declaration={own} onPress={onOpen} />
+        </View>
+      ) : null}
       {sponsored ? (
         <View style={styles.slot}>
           <SponsoredCard

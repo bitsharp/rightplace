@@ -7,6 +7,7 @@ import { colors, heights, radius, spacing } from '@/theme/tokens';
 
 import type { EventSpotPlacement } from '../domain/eventSpots';
 import type { MapLayers } from '../domain/mapLayers';
+import type { OwnSpot } from '../domain/ownSpot';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
 
@@ -22,6 +23,7 @@ type Props = {
   onOpenVenue: (venueId: string) => void;
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
+  ownSpot?: OwnSpot | null;
 };
 
 function ExpandButton({ onPress }: { onPress: () => void }) {
