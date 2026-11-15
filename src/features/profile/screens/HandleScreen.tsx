@@ -37,6 +37,7 @@ export function HandleScreen() {
             key={profile.handle}
             handle={profile.handle}
             handleChangedAt={profile.handleChangedAt}
+            handleFreeChangeUsed={profile.handleFreeChangeUsed}
             phase="onboarding"
           />
         </>

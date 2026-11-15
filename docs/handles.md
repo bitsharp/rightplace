@@ -29,9 +29,17 @@ Gating: il client deriva lo stato di sessione `needsHandle` da `handle_confirmed
 
 Backfill (migration `20261117000200_handle_onboarding.sql`): i profili già oltre l'onboarding, cioè con `birth_date is not null` (lo stesso criterio con cui il client esce da "profilo privato"), ricevono `handle_confirmed_at = coalesce(handle_changed_at, created_at)`, quindi il loro limite attuale non cambia. Chi ha `birth_date` nullo passerà dallo step @tag.
 
+### Un cambio gratuito per tutti (migration `20261117000300_handle_free_change.sql`)
+
+Decisione di Luca: ogni utente, anche già registrato, può cambiare il proprio @tag **almeno una volta** dopo l'onboarding senza attendere i 30 giorni (il backfill aveva fatto partire il limite dalla data di conferma e bloccava gli account esistenti). Colonna `profiles.handle_free_change_used boolean not null default false`: tutti, utenti esistenti inclusi, partono con il cambio gratuito disponibile.
+
+- Dopo la conferma, se `handle_free_change_used = false`, `set_handle` e `regenerate_handle` cambiano l'handle subito (anche entro 30 giorni da `handle_changed_at`), impostano `handle_free_change_used = true` e `handle_changed_at = now()`: da lì il limite di 30 giorni vale come prima.
+- Consumano il gratuito solo i cambi riusciti: i rifiuti (`INVALID_HANDLE`, `HANDLE_NOT_ALLOWED`, `HANDLE_TAKEN`) e il no-op (stesso handle) no. In onboarding (`handle_confirmed_at is null`) nulla cambia e il gratuito non si consuma; nemmeno `confirm_handle()` lo consuma.
+- Il client legge `handle_free_change_used` solo sul proprio profilo (RLS, come `handle_confirmed_at`) e mostra "Puoi cambiarlo subito una volta; poi una volta ogni 30 giorni"; dopo l'uso mostra la data del prossimo cambio.
+
 ## RPC
 
-- `set_handle(p_handle)`: normalizza, poi `INVALID_HANDLE`, `HANDLE_NOT_ALLOWED`, (no-op se uguale al proprio), `HANDLE_CHANGE_TOO_SOON` (solo dopo `confirm_handle`), `HANDLE_TAKEN`.
+- `set_handle(p_handle)`: normalizza, poi `INVALID_HANDLE`, `HANDLE_NOT_ALLOWED`, (no-op se uguale al proprio), `HANDLE_CHANGE_TOO_SOON` (solo dopo `confirm_handle` e dopo aver usato il cambio gratuito), `HANDLE_TAKEN`.
 - `is_handle_available(p_handle)`: `available | invalid | not_allowed | taken`, solo `authenticated`. Rivela solo ciò che la ricerca per handle già rivela.
 - `regenerate_handle()`: nuovo `animale.colore` casuale, stesso limite (libero fino a `confirm_handle`).
 - `confirm_handle()`: fine dell'onboarding dell'handle e inizio del limite di 30 giorni; idempotente, solo `authenticated`, restituisce nulla.

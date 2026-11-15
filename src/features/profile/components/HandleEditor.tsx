@@ -13,7 +13,12 @@ import { useRegenerateHandle, useSetHandle } from '../useHandleChange';
 import { useHandleAvailability, type HandleCheck } from '../useHandleAvailability';
 
 // onboarding: the @tag is free until "Continua" (no limit, no date shown); profile: one change every 30 days.
-type Props = { handle: string; handleChangedAt: string | null; phase: 'onboarding' | 'profile' };
+type Props = {
+  handle: string;
+  handleChangedAt: string | null;
+  handleFreeChangeUsed: boolean;
+  phase: 'onboarding' | 'profile';
+};
 
 type Status = { key: string; tone: 'error' | 'maybe' | 'textSecondary' } | null;
 
@@ -40,7 +45,7 @@ const canSave = (check: HandleCheck) =>
   check.kind === 'error' || (check.kind === 'result' && check.value === 'available');
 
 // Mount it with key={handle}: the field starts from the current @tag and restarts when it changes.
-export function HandleEditor({ handle, handleChangedAt, phase }: Props) {
+export function HandleEditor({ handle, handleChangedAt, handleFreeChangeUsed, phase }: Props) {
   const { t, i18n } = useTranslation('profile');
   const setHandle = useSetHandle();
   const regenerate = useRegenerateHandle();
@@ -48,7 +53,13 @@ export function HandleEditor({ handle, handleChangedAt, phase }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<RpcErrorCode | null>(null);
   const check = useHandleAvailability(typed, handle);
-  const next = phase === 'onboarding' ? null : nextHandleChangeAt(handleChangedAt, new Date());
+  const next =
+    phase === 'onboarding'
+      ? null
+      : nextHandleChangeAt(
+          { changedAt: handleChangedAt, freeChangeUsed: handleFreeChangeUsed },
+          new Date(),
+        );
   const status = statusOf(check);
 
   const run = async (action: () => Promise<RpcErrorCode | null>) => {
@@ -86,7 +97,7 @@ export function HandleEditor({ handle, handleChangedAt, phase }: Props) {
             ? t('handleEditor.nextChange', {
                 date: new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(next),
               })
-            : t('handleEditor.limit')}
+            : t(handleFreeChangeUsed ? 'handleEditor.limit' : 'handleEditor.freeChange')}
         </Text>
       ) : null}
       {error ? <Text color="error">{t(`errors:rpc.${error}`)}</Text> : null}

@@ -76,6 +76,10 @@ select is((select handle from profiles where id = auth.uid()), 'luca_97', 'il pr
 -- the limit starts at confirm_handle(): before it the handle is free (test 27)
 select lives_ok($$ select confirm_handle() $$, 'confirm_handle fa partire il limite');
 select ok((select handle_changed_at is not null from profiles where id = auth.uid()), 'il cambio è registrato');
+-- the free change after onboarding (test 28) is already used here, so the 30-day limit is what this test checks
+reset role;
+update profiles set handle_free_change_used = true where id = :'a';
+select tests.authenticate_as(:'a');
 select is(set_handle('luca_97'), 'luca_97', 'stesso handle: no-op');
 select throws_ok($$ select set_handle('luca_98') $$, 'HANDLE_CHANGE_TOO_SOON', 'un secondo cambio entro 30 giorni è rifiutato');
 select throws_ok($$ select regenerate_handle() $$, 'HANDLE_CHANGE_TOO_SOON', 'anche regenerate_handle rispetta i 30 giorni');

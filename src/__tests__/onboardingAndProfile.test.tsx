@@ -117,11 +117,11 @@ describe('profilo privato e handle', () => {
 });
 
 describe('tab Profilo: scelta del @tag', () => {
-  it('mostra il @tag, l’avviso su nome e cognome e il limite di 30 giorni', async () => {
+  it('mostra il @tag, l’avviso su nome e cognome e il cambio gratuito ancora disponibile', async () => {
     await renderApp('ready', '/profile');
     expect((await screen.findAllByText('@lince.rosso')).length).toBeGreaterThan(0);
     expect(screen.getByText('profile:handleEditor.warning')).toBeOnTheScreen();
-    expect(screen.getByText('profile:handleEditor.limit')).toBeOnTheScreen();
+    expect(screen.getByText('profile:handleEditor.freeChange')).toBeOnTheScreen();
     expect(screen.getByLabelText(FIELD).props.value).toBe('lince.rosso');
   });
 
@@ -165,7 +165,10 @@ describe('tab Profilo: scelta del @tag', () => {
 
   it('se il limite è attivo blocca la modifica e indica quando si potrà rifare', async () => {
     const recent = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
-    await renderApp('ready', '/profile', { handle_changed_at: recent });
+    await renderApp('ready', '/profile', {
+      handle_changed_at: recent,
+      handle_free_change_used: true,
+    });
     expect(
       await screen.findByText(/^profile:handleEditor\.nextChange\(\{"date":"[^"]+"\}\)$/),
     ).toBeOnTheScreen();
@@ -174,9 +177,22 @@ describe('tab Profilo: scelta del @tag', () => {
     expect(screen.getByRole('button', { name: RANDOM })).toBeDisabled();
   });
 
+  it('se il cambio gratuito è ancora disponibile si può cambiare subito, anche entro 30 giorni', async () => {
+    const recent = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString();
+    await renderApp('ready', '/profile', { handle_changed_at: recent });
+    expect(await screen.findByText('profile:handleEditor.freeChange')).toBeOnTheScreen();
+    expect(screen.queryByText('profile:handleEditor.limit')).toBeNull();
+    expect(screen.queryByText(/profile:handleEditor\.nextChange/)).toBeNull();
+    expect(screen.getByLabelText(FIELD).props.editable).not.toBe(false);
+    expect(screen.getByRole('button', { name: RANDOM })).toBeEnabled();
+  });
+
   it('dopo 30 giorni si può cambiare di nuovo', async () => {
     const old = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
-    await renderApp('ready', '/profile', { handle_changed_at: old });
+    await renderApp('ready', '/profile', {
+      handle_changed_at: old,
+      handle_free_change_used: true,
+    });
     expect(await screen.findByText('profile:handleEditor.limit')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: RANDOM })).toBeEnabled();
   });
@@ -185,7 +201,11 @@ describe('tab Profilo: scelta del @tag', () => {
     fakeSupabase.rpc.mockImplementation(async (name: string) => {
       if (name !== 'regenerate_handle') return { data: null, error: null };
       setFakeTable('profiles', [
-        fakeProfileRow({ handle: 'volpe.oro', handle_changed_at: new Date().toISOString() }),
+        fakeProfileRow({
+          handle: 'volpe.oro',
+          handle_changed_at: new Date().toISOString(),
+          handle_free_change_used: true,
+        }),
       ]);
       return { data: 'volpe.oro', error: null };
     });

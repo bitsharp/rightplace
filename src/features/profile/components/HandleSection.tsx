@@ -8,10 +8,10 @@ import { spacing } from '@/theme/tokens';
 import { formatHandle } from '../domain/handle';
 import { HandleEditor } from './HandleEditor';
 
-type Props = { handle: string; handleChangedAt: string | null };
+type Props = { handle: string; handleChangedAt: string | null; handleFreeChangeUsed: boolean };
 
 // The name shown to others is always the @handle: chosen by the user (or drawn), never a real name.
-export function HandleSection({ handle, handleChangedAt }: Props) {
+export function HandleSection({ handle, handleChangedAt, handleFreeChangeUsed }: Props) {
   const { t } = useTranslation('profile');
   return (
     <View style={styles.section}>
@@ -23,6 +23,7 @@ export function HandleSection({ handle, handleChangedAt }: Props) {
         key={handle}
         handle={handle}
         handleChangedAt={handleChangedAt}
+        handleFreeChangeUsed={handleFreeChangeUsed}
         phase="profile"
       />
     </View>

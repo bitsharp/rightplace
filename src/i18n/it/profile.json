@@ -106,6 +106,7 @@
     "warning": "Non usare nome e cognome: il tuo @tag è visibile a tutti.",
     "rules": "Da 3 a 20 caratteri: lettere minuscole, numeri, punto e underscore.",
     "limit": "Puoi cambiarlo una volta ogni 30 giorni.",
+    "freeChange": "Puoi cambiarlo subito una volta; poi una volta ogni 30 giorni.",
     "nextChange": "Potrai cambiarlo di nuovo il {{date}}.",
     "save": "Salva il mio @tag",
     "random": "Generane uno a caso",

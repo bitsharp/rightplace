@@ -205,6 +205,7 @@ export function fakeProfileRow(overrides: Record<string, unknown> = {}): Record<
     handle: 'lince.rosso',
     handle_changed_at: null,
     handle_confirmed_at: '2026-11-01T10:00:00Z',
+    handle_free_change_used: false,
     birth_date: '2000-05-10',
     gender: 'female',
     locale: 'it',

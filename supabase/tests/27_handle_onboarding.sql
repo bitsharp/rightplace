@@ -28,6 +28,10 @@ select throws_ok($$ select set_handle('volpe.blu') $$, 'HANDLE_TAKEN', 'in onboa
 select lives_ok($$ select confirm_handle() $$, 'confirm_handle è eseguibile da authenticated');
 select ok((select handle_confirmed_at is not null from profiles where id = auth.uid()), 'confirm_handle conferma l''handle');
 select ok((select handle_changed_at is not null from profiles where id = auth.uid()), 'confirm_handle fa partire il limite');
+-- the free change after onboarding (test 28) is already used here, so the 30-day limit is what this test checks
+reset role;
+update profiles set handle_free_change_used = true where id = :'a';
+select tests.authenticate_as(:'a');
 select throws_ok($$ select set_handle('luca_100') $$, 'HANDLE_CHANGE_TOO_SOON', 'dopo confirm_handle set_handle ha il limite');
 select throws_ok($$ select regenerate_handle() $$, 'HANDLE_CHANGE_TOO_SOON', 'dopo confirm_handle anche regenerate_handle');
 

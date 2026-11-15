@@ -12,6 +12,7 @@ const profileRowSchema = z.object({
   handle: z.string(),
   handle_changed_at: z.string().nullable(),
   handle_confirmed_at: z.string().nullable(),
+  handle_free_change_used: z.boolean(),
   birth_date: z.string().nullable(),
   gender: z.enum(['female', 'male', 'other']).nullable(),
   locale: z.enum(['it', 'en']),
@@ -29,6 +30,8 @@ export type MyProfile = {
   handleChangedAt: string | null;
   // null = still in the onboarding @tag step: free changes, no 30-day limit yet
   handleConfirmedAt: string | null;
+  // false = the one free change after onboarding (no 30-day wait) is still available
+  handleFreeChangeUsed: boolean;
   birthDate: string | null;
   gender: Gender | null;
   locale: Language;
@@ -44,6 +47,7 @@ function toMyProfile(row: z.infer<typeof profileRowSchema>): MyProfile {
     handle: row.handle,
     handleChangedAt: row.handle_changed_at,
     handleConfirmedAt: row.handle_confirmed_at,
+    handleFreeChangeUsed: row.handle_free_change_used,
     birthDate: row.birth_date,
     gender: row.gender,
     locale: row.locale,

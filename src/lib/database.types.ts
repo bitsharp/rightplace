@@ -676,6 +676,7 @@ export type Database = {
           handle: string;
           handle_changed_at: string | null;
           handle_confirmed_at: string | null;
+          handle_free_change_used: boolean;
           id: string;
           is_creator: boolean;
           locale: string;
@@ -696,6 +697,7 @@ export type Database = {
           handle: string;
           handle_changed_at?: string | null;
           handle_confirmed_at?: string | null;
+          handle_free_change_used?: boolean;
           id: string;
           is_creator?: boolean;
           locale?: string;
@@ -715,6 +717,7 @@ export type Database = {
           handle?: string;
           handle_changed_at?: string | null;
           handle_confirmed_at?: string | null;
+          handle_free_change_used?: boolean;
           id?: string;
           is_creator?: boolean;
           locale?: string;

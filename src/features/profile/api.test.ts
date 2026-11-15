@@ -24,6 +24,7 @@ describe('profile api', () => {
       isCreator: true,
       handleChangedAt: null,
       handleConfirmedAt: '2026-11-01T10:00:00Z',
+      handleFreeChangeUsed: false,
       deleted: false,
     });
   });

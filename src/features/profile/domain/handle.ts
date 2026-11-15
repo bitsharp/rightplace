@@ -35,9 +35,13 @@ export function isHandleShaped(handle: string): boolean {
   return HANDLE_SHAPE.test(handle) && !handle.includes('..');
 }
 
-// null when the handle can be changed now (never changed, or the last change is older than 30 days).
-export function nextHandleChangeAt(changedAt: string | null, now: Date): Date | null {
-  if (changedAt === null) return null;
-  const next = new Date(new Date(changedAt).getTime() + HANDLE_CHANGE_DAYS * DAY_MS);
+// null when the handle can be changed now: the one free change is still available (it ignores the 30 days,
+// mirroring set_handle), or never changed, or the last change is older than 30 days.
+export function nextHandleChangeAt(
+  state: { changedAt: string | null; freeChangeUsed: boolean },
+  now: Date,
+): Date | null {
+  if (!state.freeChangeUsed || state.changedAt === null) return null;
+  const next = new Date(new Date(state.changedAt).getTime() + HANDLE_CHANGE_DAYS * DAY_MS);
   return next > now ? next : null;
 }

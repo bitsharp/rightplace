@@ -106,6 +106,7 @@
     "warning": "Don't use your first and last name: your @tag is visible to everyone.",
     "rules": "3 to 20 characters: lowercase letters, numbers, dot and underscore.",
     "limit": "You can change it once every 30 days.",
+    "freeChange": "You can change it right now, once; after that, once every 30 days.",
     "nextChange": "You will be able to change it again on {{date}}.",
     "save": "Save my @tag",
     "random": "Draw a random one",

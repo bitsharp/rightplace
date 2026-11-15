@@ -74,16 +74,27 @@ describe('nextHandleChangeAt', () => {
   const now = new Date('2026-11-20T10:00:00Z');
 
   it('non c’è limite se non l’hai mai cambiato', () => {
-    expect(nextHandleChangeAt(null, now)).toBeNull();
+    expect(nextHandleChangeAt({ changedAt: null, freeChangeUsed: true }, now)).toBeNull();
   });
 
   it('indica la data in cui si potrà cambiare di nuovo', () => {
-    const next = nextHandleChangeAt('2026-11-10T10:00:00Z', now);
+    const next = nextHandleChangeAt(
+      { changedAt: '2026-11-10T10:00:00Z', freeChangeUsed: true },
+      now,
+    );
     expect(next?.toISOString()).toBe('2026-12-10T10:00:00.000Z');
   });
 
   it('non c’è limite dopo 30 giorni', () => {
-    expect(nextHandleChangeAt('2026-10-20T10:00:00Z', now)).toBeNull();
+    expect(
+      nextHandleChangeAt({ changedAt: '2026-10-20T10:00:00Z', freeChangeUsed: true }, now),
+    ).toBeNull();
     expect(HANDLE_CHANGE_DAYS).toBe(30);
+  });
+
+  it('con il cambio gratuito ancora disponibile non c’è attesa, anche se l’ultimo cambio è recente', () => {
+    expect(
+      nextHandleChangeAt({ changedAt: '2026-11-19T10:00:00Z', freeChangeUsed: false }, now),
+    ).toBeNull();
   });
 });
