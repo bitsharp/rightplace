@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -29,10 +30,8 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
         <PhotoStrip photos={screen.photos} />
       </View>
       {screen.loadFailed ? <EmptyState message={t('loadError')} /> : null}
-      <KeyboardAvoidingView
-        style={styles.body}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      {/* Same strategy on iOS and Android: with edge-to-edge the window never resizes for the keyboard. */}
+      <KeyboardAvoidingView testID="chat-keyboard-avoider" style={styles.body} behavior="padding">
         <MessageList
           messages={screen.messages}
           photoUrls={screen.photoUrls}

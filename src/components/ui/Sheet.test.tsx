@@ -1,20 +1,33 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Platform, Text } from 'react-native';
-
-import { mockKeyboardEvents } from '@/test/keyboardEvents';
 
 import { Sheet } from './Sheet';
 
 describe('Sheet', () => {
-  it('su iOS sale sopra la tastiera, perché il Modal ha una finestra propria', async () => {
-    jest.replaceProperty(Platform, 'OS', 'ios');
+  it('sale sopra la tastiera con una sola strategia su iOS e Android: padding della libreria', async () => {
+    for (const os of ['ios', 'android'] as const) {
+      jest.replaceProperty(Platform, 'OS', os);
+      await render(
+        <Sheet visible onClose={jest.fn()}>
+          <Text>contenuto</Text>
+        </Sheet>,
+      );
+      expect(screen.getByTestId('sheet-keyboard-avoider').props.behavior).toBe('padding');
+      await screen.unmount();
+    }
+  });
+
+  it('il Modal è una finestra nativa a sé: ha il suo KeyboardProvider ed è edge-to-edge', async () => {
     await render(
       <Sheet visible onClose={jest.fn()}>
         <Text>contenuto</Text>
       </Sheet>,
     );
-    // In "padding" mode the avoider reserves the keyboard height as paddingBottom (0 while hidden).
-    expect(screen.getByTestId('sheet-keyboard-avoider')).toHaveStyle({ paddingBottom: 0 });
+    const provider = screen.getByTestId('keyboard-provider');
+    expect(provider.props.statusBarTranslucent).toBe(true);
+    expect(provider.props.navigationBarTranslucent).toBe(true);
+    expect(screen.getByTestId('sheet-modal').props.navigationBarTranslucent).toBe(true);
+    expect(screen.getByTestId('sheet-modal').props.statusBarTranslucent).toBe(true);
   });
 
   it('non mostra nulla quando è chiuso', async () => {
@@ -56,19 +69,5 @@ describe('Sheet', () => {
     await render(<Sheet visible onClose={onClose} />);
     await fireEvent(screen.getByTestId('sheet-panel'), 'accessibilityEscape');
     expect(onClose).toHaveBeenCalled();
-  });
-
-  it('su Android si alza della altezza della tastiera: la finestra edge-to-edge non si ridimensiona', async () => {
-    const keyboard = mockKeyboardEvents();
-    jest.replaceProperty(Platform, 'OS', 'android');
-    await render(
-      <Sheet visible onClose={jest.fn()}>
-        <Text>contenuto</Text>
-      </Sheet>,
-    );
-    await act(async () => keyboard.emit('keyboardDidShow', 310));
-    expect(screen.getByTestId('sheet-keyboard-avoider')).toHaveStyle({ paddingBottom: 310 });
-    await act(async () => keyboard.emit('keyboardDidHide'));
-    expect(screen.getByTestId('sheet-keyboard-avoider')).toHaveStyle({ paddingBottom: 0 });
   });
 });

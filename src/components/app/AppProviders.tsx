@@ -1,6 +1,7 @@
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, ThemeProvider, type Theme } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import {
   createQueryClient,
@@ -35,7 +36,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
         dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
       }}
     >
-      <ThemeProvider value={navigationTheme}>{children}</ThemeProvider>
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+        <ThemeProvider value={navigationTheme}>{children}</ThemeProvider>
+      </KeyboardProvider>
     </PersistQueryClientProvider>
   );
 }

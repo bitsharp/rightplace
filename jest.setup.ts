@@ -13,6 +13,18 @@ jest.mock('expo-crypto', () => ({
   randomUUID: () => jest.requireActual<typeof import('crypto')>('crypto').randomUUID(),
 }));
 
+// Official Jest mock: the primitives render as plain View/ScrollView, so tests assert on props.
+// Only KeyboardProvider is wrapped, in a View, so tests can find it (the official one is a bare string).
+jest.mock('react-native-keyboard-controller', () => {
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
+  const { createElement } = jest.requireActual<typeof import('react')>('react');
+  return {
+    ...jest.requireActual('react-native-keyboard-controller/jest'),
+    KeyboardProvider: (props: object) =>
+      createElement(View, { testID: 'keyboard-provider', ...props }),
+  };
+});
+
 jest.mock('expo-haptics', () => ({
   selectionAsync: jest.fn(() => Promise.resolve()),
   notificationAsync: jest.fn(() => Promise.resolve()),

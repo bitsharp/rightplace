@@ -1,7 +1,5 @@
-import { act, render, screen } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import { Platform, StyleSheet, Text } from 'react-native';
-
-import { mockKeyboardEvents } from '@/test/keyboardEvents';
 
 import { colors, spacing } from '@/theme/tokens';
 
@@ -47,16 +45,21 @@ describe('Screen', () => {
     expect(content.paddingBottom).toBe(34 + spacing.xxl);
   });
 
-  it('gestisce la tastiera con un’unica strategia: inset automatico dello ScrollView', async () => {
-    await render(
-      <Screen scroll>
-        <Text>form</Text>
-      </Screen>,
-    );
-    const scroll = screen.getByTestId('screen-scroll');
-    expect(scroll.props.automaticallyAdjustKeyboardInsets).toBe(true);
-    expect(scroll.props.keyboardShouldPersistTaps).toBe('handled');
-    expect(scroll.props.keyboardDismissMode).toBeDefined();
+  it('gestisce la tastiera con la ScrollView della libreria, per ogni piattaforma', async () => {
+    for (const os of ['ios', 'android'] as const) {
+      jest.replaceProperty(Platform, 'OS', os);
+      await render(
+        <Screen scroll>
+          <Text>form</Text>
+        </Screen>,
+      );
+      const scroll = screen.getByTestId('screen-scroll');
+      // bottomOffset exists only on the library's KeyboardAwareScrollView.
+      expect(scroll.props.bottomOffset).toBeGreaterThan(0);
+      expect(scroll.props.automaticallyAdjustKeyboardInsets).toBeUndefined();
+      expect(scroll.props.keyboardShouldPersistTaps).toBe('handled');
+      await screen.unmount();
+    }
   });
 
   it('senza scroll lascia comunque spazio sotto l’home indicator', async () => {
@@ -65,37 +68,6 @@ describe('Screen', () => {
         <Text>fisso</Text>
       </Screen>,
     );
-    const body = screen.getByText('fisso').parent;
-    expect(StyleSheet.flatten(body?.props.style).paddingBottom).toBe(34 + spacing.xxl);
-  });
-
-  it('su Android con la tastiera aperta lo schermo si accorcia della sua altezza', async () => {
-    const keyboard = mockKeyboardEvents();
-    jest.replaceProperty(Platform, 'OS', 'android');
-    await render(
-      <Screen scroll testID="screen">
-        <Text>lungo</Text>
-      </Screen>,
-    );
-    await act(async () => keyboard.emit('keyboardDidShow', 300));
-    expect(screen.getByTestId('screen')).toHaveStyle({ paddingBottom: 300 });
-    const content = StyleSheet.flatten(
-      screen.getByTestId('screen-scroll').props.contentContainerStyle,
-    );
-    // The home-indicator inset is under the keys now: only the regular gap remains.
-    expect(content.paddingBottom).toBe(spacing.xxl);
-  });
-
-  it('su iOS la tastiera non cambia il padding dello schermo', async () => {
-    const keyboard = mockKeyboardEvents();
-    jest.replaceProperty(Platform, 'OS', 'ios');
-    await render(
-      <Screen testID="screen">
-        <Text>fisso</Text>
-      </Screen>,
-    );
-    await act(async () => keyboard.emit('keyboardWillShow', 300));
-    expect(screen.getByTestId('screen')).not.toHaveStyle({ paddingBottom: 300 });
     const body = screen.getByText('fisso').parent;
     expect(StyleSheet.flatten(body?.props.style).paddingBottom).toBe(34 + spacing.xxl);
   });

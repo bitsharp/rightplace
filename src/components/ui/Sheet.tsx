@@ -1,21 +1,12 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Animated,
-  KeyboardAvoidingView,
-  Modal,
-  PanResponder,
-  Platform,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Animated, Modal, PanResponder, Pressable, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, KeyboardProvider } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import { shouldDismissSheet } from './sheetGesture';
-import { useAndroidKeyboardInset } from './useKeyboardHeight';
 import { useKeyboardVisible } from './useKeyboardVisible';
 
 type Props = {
@@ -49,7 +40,6 @@ export function Sheet({ visible, onClose, onDismiss, children }: Props) {
   const insets = useSafeAreaInsets();
   const { translateY, responder, setHeight } = useDragToDismiss(onClose);
   const keyboardVisible = useKeyboardVisible();
-  const keyboardInset = useAndroidKeyboardInset();
   const bottomPadding = (keyboardVisible ? 0 : insets.bottom) + spacing.lg;
 
   useEffect(() => {
@@ -59,31 +49,36 @@ export function Sheet({ visible, onClose, onDismiss, children }: Props) {
   return (
     <Modal
       visible={visible}
+      testID="sheet-modal"
       transparent
       animationType="slide"
       onRequestClose={onClose}
       onDismiss={onDismiss}
       statusBarTranslucent
+      navigationBarTranslucent
     >
-      {/* A Modal is its own native window: the screen's keyboard handling does not reach it. iOS:
-          KeyboardAvoidingView. Android edge-to-edge: the window never resizes, so lift by hand. */}
-      <KeyboardAvoidingView
-        testID="sheet-keyboard-avoider"
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={[styles.root, { paddingBottom: keyboardInset }]}
-      >
-        <Backdrop onClose={onClose} />
-        <View testID="sheet-panel" accessibilityViewIsModal onAccessibilityEscape={onClose}>
-          <Animated.View
-            onLayout={(event) => setHeight(event.nativeEvent.layout.height)}
-            style={[styles.panel, { paddingBottom: bottomPadding, transform: [{ translateY }] }]}
-            {...responder.panHandlers}
-          >
-            <View testID="sheet-handle" style={styles.handle} />
-            {children}
-          </Animated.View>
-        </View>
-      </KeyboardAvoidingView>
+      {/* A Modal is its own native window (on Android, edge-to-edge: it never resizes for the keyboard),
+          so the app-level KeyboardProvider does not reach it: it gets its own, and one strategy for
+          both platforms, the library's padding. */}
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+        <KeyboardAvoidingView
+          testID="sheet-keyboard-avoider"
+          behavior="padding"
+          style={styles.root}
+        >
+          <Backdrop onClose={onClose} />
+          <View testID="sheet-panel" accessibilityViewIsModal onAccessibilityEscape={onClose}>
+            <Animated.View
+              onLayout={(event) => setHeight(event.nativeEvent.layout.height)}
+              style={[styles.panel, { paddingBottom: bottomPadding, transform: [{ translateY }] }]}
+              {...responder.panHandlers}
+            >
+              <View testID="sheet-handle" style={styles.handle} />
+              {children}
+            </Animated.View>
+          </View>
+        </KeyboardAvoidingView>
+      </KeyboardProvider>
     </Modal>
   );
 }

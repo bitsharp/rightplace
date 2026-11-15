@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import { AppState, Text } from 'react-native';
 
 import { AppProviders } from './AppProviders';
@@ -22,5 +22,17 @@ describe('AppProviders', () => {
     expect(spy).toHaveBeenCalledWith('change', expect.any(Function));
     await view.unmount();
     expect(remove).toHaveBeenCalled();
+  });
+
+  it('monta una sola volta il KeyboardProvider edge-to-edge sopra tutta l’app', async () => {
+    await render(
+      <AppProviders>
+        <Text>child</Text>
+      </AppProviders>,
+    );
+    const provider = screen.getByTestId('keyboard-provider');
+    expect(provider.props.statusBarTranslucent).toBe(true);
+    expect(provider.props.navigationBarTranslucent).toBe(true);
+    expect(screen.getByText('child')).toBeOnTheScreen();
   });
 });

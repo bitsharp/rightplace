@@ -1,7 +1,5 @@
-import { act, render, screen } from '@testing-library/react-native';
-import { Platform, Text } from 'react-native';
-
-import { mockKeyboardEvents } from '@/test/keyboardEvents';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Platform, Pressable, Text } from 'react-native';
 
 import { ComposerDock } from './ComposerDock';
 
@@ -37,29 +35,29 @@ describe('ComposerDock', () => {
     expect(screen.getByTestId('composer-dock')).toHaveStyle({ paddingBottom: 0 });
   });
 
-  it('su Android con la tastiera aperta si alza della sua altezza, sopra i tasti', async () => {
-    const keyboard = mockKeyboardEvents();
-    jest.replaceProperty(Platform, 'OS', 'android');
-    mockKeyboardVisible = true;
-    await render(
-      <ComposerDock>
-        <Text>composer</Text>
-      </ComposerDock>,
-    );
-    await act(async () => keyboard.emit('keyboardDidShow', 320));
-    expect(screen.getByTestId('composer-dock')).toHaveStyle({ paddingBottom: 320 });
+  it('non aggiunge altezza della tastiera: ci pensa il KeyboardAvoidingView della libreria', async () => {
+    for (const os of ['ios', 'android'] as const) {
+      jest.replaceProperty(Platform, 'OS', os);
+      mockKeyboardVisible = true;
+      await render(
+        <ComposerDock>
+          <Text>composer</Text>
+        </ComposerDock>,
+      );
+      expect(screen.getByTestId('composer-dock')).toHaveStyle({ paddingBottom: 0 });
+      await screen.unmount();
+    }
   });
 
-  it('su iOS con la tastiera aperta non aggiunge altezza (ci pensa KeyboardAvoidingView)', async () => {
-    const keyboard = mockKeyboardEvents();
-    jest.replaceProperty(Platform, 'OS', 'ios');
+  it('con la tastiera aperta il bottone invio resta toccabile al primo tap', async () => {
     mockKeyboardVisible = true;
+    const onPress = jest.fn();
     await render(
       <ComposerDock>
-        <Text>composer</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel="send" onPress={onPress} />
       </ComposerDock>,
     );
-    await act(async () => keyboard.emit('keyboardWillShow', 320));
-    expect(screen.getByTestId('composer-dock')).toHaveStyle({ paddingBottom: 0 });
+    await fireEvent.press(screen.getByRole('button', { name: 'send' }));
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

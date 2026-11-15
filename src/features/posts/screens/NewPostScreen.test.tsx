@@ -61,7 +61,7 @@ describe('NewPostScreen', () => {
     await render(<NewPostScreen />, { wrapper: createQueryWrapper().Wrapper });
     const publish = await screen.findByRole('button', { name: 'post:publish' });
     const scroll = screen.getByTestId('screen-scroll');
-    expect(scroll.props.automaticallyAdjustKeyboardInsets).toBe(true);
+    expect(scroll.props.bottomOffset).toBeGreaterThan(0);
     expect(within(scroll).getByRole('button', { name: 'post:publish' })).toBe(publish);
   });
 
