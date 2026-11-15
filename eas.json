@@ -11,7 +11,8 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease -x lintVitalRelease"
-      }
+      },
+      "autoIncrement": true
     },
     "production": {
       "channel": "production",
