@@ -1,28 +1,19 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/Button';
 import { Screen } from '@/components/ui/Screen';
-import { Text } from '@/components/ui/Text';
 import { AuthHeader } from '@/features/auth/components/AuthHeader';
 import { useSession } from '@/features/auth/useSession';
-import type { RpcErrorCode } from '@/lib/rpcError';
 
+import { HandleEditor } from '../components/HandleEditor';
 import { HandleReveal } from '../components/HandleReveal';
 import { useOnboardingStore } from '../store/onboardingStore';
-import { useRegenerateHandle } from '../useRegenerateHandle';
 
 export function HandleScreen() {
   const { t } = useTranslation('profile');
   const { profile } = useSession();
-  const regenerate = useRegenerateHandle();
   const finishHandleReveal = useOnboardingStore((state) => state.finishHandleReveal);
-  const [error, setError] = useState<RpcErrorCode | null>(null);
-
-  const change = async () => {
-    setError(await regenerate());
-  };
 
   const enter = () => {
     finishHandleReveal();
@@ -32,15 +23,16 @@ export function HandleScreen() {
   return (
     <Screen scroll>
       <AuthHeader step={t('handle.step')} title={t('handle.title')} body={t('handle.body')} />
-      {profile ? <HandleReveal handle={profile.handle} /> : null}
-      {error ? <Text color="error">{t(`errors:rpc.${error}`)}</Text> : null}
-      {profile?.handleChangedAt === null ? (
-        <Button label={t('handle.change')} variant="ghost" size="md" onPress={change} />
-      ) : (
-        <Text variant="body13" color="textSecondary">
-          {t('handle.changedOnce')}
-        </Text>
-      )}
+      {profile ? (
+        <>
+          <HandleReveal handle={profile.handle} />
+          <HandleEditor
+            key={profile.handle}
+            handle={profile.handle}
+            handleChangedAt={profile.handleChangedAt}
+          />
+        </>
+      ) : null}
       <Button label={t('handle.enter')} onPress={enter} feedback="confirm" />
     </Screen>
   );

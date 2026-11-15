@@ -96,6 +96,17 @@ export async function regenerateHandle(): Promise<string> {
   return z.string().parse(await callRpc('regenerate_handle'));
 }
 
+export async function setHandle(handle: string): Promise<string> {
+  return z.string().parse(await callRpc('set_handle', { p_handle: handle }));
+}
+
+const availabilitySchema = z.enum(['available', 'invalid', 'not_allowed', 'taken']);
+export type HandleAvailability = z.infer<typeof availabilitySchema>;
+
+export async function checkHandleAvailability(handle: string): Promise<HandleAvailability> {
+  return availabilitySchema.parse(await callRpc('is_handle_available', { p_handle: handle }));
+}
+
 export function deleteMyAccount(): Promise<void> {
   return callRpc('delete_my_account');
 }

@@ -36,8 +36,8 @@ select is(
   (select array_agg(p.proname::text order by p.proname) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'private' and has_function_privilege('authenticated', p.oid, 'execute')
       and p.proname not in ('is_blocked_pair', 'is_following', 'is_room_member', 'can_see_post',
-        'can_see_chat_author')),
-  null, 'i job e gli helper privati non sono eseguibili dai client (salvo gli helper di policy: can_see_chat_author, che usa auth.uid() e serve a chat_messages_read)');
+        'can_see_chat_author', 'is_valid_handle')),
+  null, 'i job e gli helper privati non sono eseguibili dai client (salvo gli helper di policy: can_see_chat_author, che usa auth.uid() e serve a chat_messages_read; is_valid_handle, funzione pura del check sul formato dell''handle)');
 
 select tests.create_user('lince.rosso') as a \gset
 select tests.authenticate_as(:'a');

@@ -12,6 +12,7 @@ describe('activeMentionQuery', () => {
     ['@', 1, ''],
     ['@lince.ro', 9, 'lince.ro'],
     ['ehi @lince.rosso come va', 16, 'lince.rosso'],
+    ['ehi @luca_97', 12, 'luca_97'],
   ])('in "%s" col cursore a %i cerca "%s"', (text, cursor, expected) => {
     expect(activeMentionQuery(text, cursor)).toBe(expected);
   });
@@ -65,6 +66,17 @@ describe('unknownMentions', () => {
   it('restituisce gli handle taggati che non seguo, una volta sola', () => {
     const text = 'ehi @orso.verde e @lince.rosso, @orso.verde di nuovo';
     expect(unknownMentions(text, ['lince.rosso'], 'volpe.viola')).toEqual(['orso.verde']);
+  });
+
+  it("riconosce gli handle scelti dall'utente, con underscore e cifre", () => {
+    expect(unknownMentions('ciao @luca_97, @mia.rossi_2 e @zz', [], 'volpe.viola')).toEqual([
+      'luca_97',
+      'mia.rossi_2',
+    ]);
+  });
+
+  it("non include il punto o l'underscore finali della frase", () => {
+    expect(unknownMentions('grazie @luca_97.', [], 'volpe.viola')).toEqual(['luca_97']);
   });
 
   it('ignora me stesso e le email', () => {

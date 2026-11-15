@@ -3,9 +3,17 @@ import { RpcError, rpcErrorCodeOf, toRpcErrorCode } from './rpcError';
 describe('toRpcErrorCode', () => {
   it('riconosce i codici sollevati dalle RPC', () => {
     expect(toRpcErrorCode({ message: 'UNDERAGE', code: 'P0001' })).toBe('UNDERAGE');
-    expect(toRpcErrorCode({ message: 'HANDLE_ALREADY_CHANGED', code: 'P0001' })).toBe(
-      'HANDLE_ALREADY_CHANGED',
-    );
+  });
+
+  it("riconosce i codici della scelta dell'@tag", () => {
+    for (const code of [
+      'INVALID_HANDLE',
+      'HANDLE_NOT_ALLOWED',
+      'HANDLE_TAKEN',
+      'HANDLE_CHANGE_TOO_SOON',
+    ]) {
+      expect(toRpcErrorCode({ message: code, code: 'P0001' })).toBe(code);
+    }
   });
 
   it('riconosce i codici della chat di serata', () => {

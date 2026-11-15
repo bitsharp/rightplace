@@ -31,7 +31,7 @@ App mobile (iOS + Android) per scoprire **dove va la gente stasera**. L'utente d
 
 ## Principi di prodotto NON negoziabili
 
-1. **Identità pubblica = solo handle `@animale.colore`** (es. `@lince.rosso`), fascia d'età e genere. Email, età esatta, posizione, contatti **non sono mai visibili ad altri utenti**.
+1. **Identità pubblica = solo l'handle `@…` scelto dall'utente o generato (`@animale.colore` di default, es. `@lince.rosso`), fascia d'età e genere.** Email, età esatta, posizione, contatti **non sono mai visibili ad altri utenti**.
 2. **Aggregati con k-anonimato**: ogni statistica su un gruppo (affluenza, età media, % genere) viene restituita dal server **solo se il gruppo ha ≥ 3 persone**; altrimenti `null` e la UI mostra "pochi" / il messaggio "meno di 3 persone… dati nascosti". L'affluenza si mostra sempre **a fasce** (`pochi`, `3–10`, `10–20`, `20–30`, `30–50`, `50–100`, `100+`), mai il numero esatto. La regola vive nelle funzioni SQL, non nel client.
 3. **Posizione opt-in e grossolana**: il toggle "Posizione" è off di default; se attivo, il client invia solo la posizione **arrotondata a ~500 m** e solo mentre l'app è in primo piano; serve esclusivamente al marker "Tu" e al centraggio della mappa. Nessun tracking in background, nessuna cronologia salvata.
 4. **Contatti opt-in e hashati**: l'import contatti serve solo a suggerire amici; si inviano al server solo **hash SHA-256 dei numeri normalizzati E.164**, mai i numeri né i nomi; gli hash non vengono conservati dopo il matching.
@@ -176,7 +176,7 @@ roadmap/
 | band | fascia di affluenza mostrata (`pochi`, `3–10`, … `100+`) |
 | age band | `18-24`, `25-34`, `35-44`, `45+` |
 | gender | `female`, `male`, `other` (mostrato solo in aggregato) |
-| handle | identità pubblica `@animale.colore`, generata, cambiabile una volta (stesse liste in IT; l'handle non si traduce) |
+| handle | identità pubblica `@…`: scelta dall'utente con regole (3–20 caratteri `a-z 0-9 . _`, blocklist, unico) o generata `animale.colore` di default; cambiabile una volta ogni 30 giorni; non si traduce |
 | locale | lingua dell'utente: `it` o `en`, salvata in `profiles.locale` |
 | follow | relazione asimmetrica A segue B con `status` `pending` (richiesta inviata) o `accepted` (B ha accettato); "seguire" = `accepted`; "amici" nella UI = chi segui con follow accettato |
 | follow request | riga `follows` in `pending`; B la vede in "Richieste" e sceglie Accetta / Rifiuta |

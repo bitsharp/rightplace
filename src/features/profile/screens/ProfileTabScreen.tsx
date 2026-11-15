@@ -45,7 +45,7 @@ export function ProfileTabScreen() {
         {t('setup.title')}
       </Text>
       <Text color="textSecondary">{t('setup.body')}</Text>
-      <HandleSection handle={profile.handle} alreadyChanged={profile.handleChangedAt !== null} />
+      <HandleSection handle={profile.handle} handleChangedAt={profile.handleChangedAt} />
       <ProfileForm
         initial={profile}
         submitLabel={t('app.save')}

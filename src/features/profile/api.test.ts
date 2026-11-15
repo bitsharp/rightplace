@@ -3,9 +3,11 @@ import { fakeProfileRow, fakeSupabase, setFakeTable } from '@/test/fakeSupabase'
 
 import {
   completeProfile,
+  checkHandleAvailability,
   deleteMyAccount,
   fetchMyProfile,
   regenerateHandle,
+  setHandle,
   setLocale,
 } from './api';
 
@@ -68,6 +70,29 @@ describe('profile api', () => {
     }).catch((caught: unknown) => caught);
     expect(error).toBeInstanceOf(RpcError);
     expect((error as RpcError).code).toBe('UNDERAGE');
+  });
+
+  it('sceglie il proprio @tag con set_handle', async () => {
+    fakeSupabase.rpc.mockResolvedValueOnce({ data: 'luca_97', error: null });
+    await expect(setHandle('luca_97')).resolves.toBe('luca_97');
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('set_handle', { p_handle: 'luca_97' });
+  });
+
+  it('traduce gli errori di set_handle in codici tipizzati', async () => {
+    fakeSupabase.rpc.mockResolvedValueOnce({ data: null, error: { message: 'HANDLE_TAKEN' } });
+    const error = await setHandle('luca_97').catch((caught: unknown) => caught);
+    expect((error as RpcError).code).toBe('HANDLE_TAKEN');
+  });
+
+  it('controlla la disponibilità di un @tag', async () => {
+    fakeSupabase.rpc.mockResolvedValueOnce({ data: 'taken', error: null });
+    await expect(checkHandleAvailability('luca_97')).resolves.toBe('taken');
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('is_handle_available', { p_handle: 'luca_97' });
+  });
+
+  it('rifiuta uno stato di disponibilità sconosciuto', async () => {
+    fakeSupabase.rpc.mockResolvedValueOnce({ data: 'boh', error: null });
+    await expect(checkHandleAvailability('luca_97')).rejects.toThrow();
   });
 
   it('cambia handle, lingua e cancella l’account via RPC', async () => {

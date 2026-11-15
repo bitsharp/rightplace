@@ -1,7 +1,8 @@
+import { isHandleShaped } from '@/features/profile/domain/handle';
+
 const SCHEME = 'rightplace://';
 const FALLBACK = '/map';
 const ID = /^[A-Za-z0-9-]+$/;
-const HANDLE = /^[a-z]+\.[a-z]+[0-9]*$/;
 
 const STATIC_ROUTES: Record<string, string> = {
   'post/new': '/post/new',
@@ -22,6 +23,6 @@ export function routeForNotification(url: string | null | undefined): string {
   const [first, id, last, ...extra] = path.split('/');
   if (extra.length > 0) return FALLBACK;
   if (first === 'night' && last === 'chat' && id && ID.test(id)) return `/night/${id}/chat`;
-  if (first === 'u' && id && last === undefined && HANDLE.test(id)) return `/u/${id}`;
+  if (first === 'u' && id && last === undefined && isHandleShaped(id)) return `/u/${id}`;
   return FALLBACK;
 }

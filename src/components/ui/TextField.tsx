@@ -12,9 +12,11 @@ type Props = Omit<TextInputProps, 'style'> & {
   onChangeText: (text: string) => void;
   error?: string;
   trailing?: ReactNode;
+  // Fixed text before the typed one (e.g. the "@" of a handle): not part of the value.
+  leading?: string;
 };
 
-export function TextField({ label, error, trailing, multiline, ...input }: Props) {
+export function TextField({ label, error, trailing, leading, multiline, ...input }: Props) {
   const [focused, setFocused] = useState(false);
   const borderColor = error ? colors.error : focused ? colors.primary : colors.border;
 
@@ -36,9 +38,17 @@ export function TextField({ label, error, trailing, multiline, ...input }: Props
             multiline ? styles.multiline : styles.singleLine,
             { borderColor },
             trailing ? styles.withTrailing : null,
+            leading ? styles.withLeading : null,
           ]}
           {...input}
         />
+        {leading ? (
+          <View style={styles.leading} pointerEvents="none">
+            <Text variant="body16" color="textSecondary">
+              {leading}
+            </Text>
+          </View>
+        ) : null}
         {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
       </View>
       {error ? (
@@ -62,6 +72,14 @@ const styles = StyleSheet.create({
   },
   singleLine: { height: heights.field, lineHeight: undefined },
   multiline: { minHeight: 96, paddingVertical: spacing.md + 2, textAlignVertical: 'top' },
+  withLeading: { paddingLeft: spacing.lg + spacing.lg },
+  leading: {
+    position: 'absolute',
+    left: spacing.lg,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
   withTrailing: { paddingRight: heights.minTapTarget + spacing.sm },
   trailing: {
     position: 'absolute',

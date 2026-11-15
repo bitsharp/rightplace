@@ -9,7 +9,7 @@ import {
   useDeletePost,
   useToggleLike,
 } from '@/features/posts/mutations';
-import { useRegenerateHandle } from '@/features/profile/useRegenerateHandle';
+import { useRegenerateHandle, useSetHandle } from '@/features/profile/useHandleChange';
 import { useSaveProfile } from '@/features/profile/useSaveProfile';
 import { useDeclare, useUndeclare } from '@/features/venue/hooks';
 import { setFakeRpc } from '@/test/fakeSupabase';
@@ -194,6 +194,19 @@ describe('profilo e handle', () => {
     });
     expect(invalidated()).toEqual(
       expect.arrayContaining([['profile', 'me', 'user-1'], ['recommendedVenue']]),
+    );
+  });
+
+  it('scegliere un @tag ricarica il profilo e ogni punto dove compare il mio @tag', async () => {
+    setFakeRpc({ set_handle: 'luca_97' });
+    const { Wrapper, client } = createQueryWrapper();
+    const invalidated = spyOnInvalidations(client);
+    const { result } = await renderHook(() => useSetHandle(), { wrapper: Wrapper });
+    await act(async () => {
+      expect(await result.current('luca_97')).toBeNull();
+    });
+    expect(invalidated()).toEqual(
+      expect.arrayContaining([['profile', 'me', 'user-1'], ['feed'], ['chatMessages']]),
     );
   });
 

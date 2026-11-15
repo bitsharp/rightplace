@@ -20,6 +20,18 @@ describe('TextField', () => {
     expect(onChangeText).toHaveBeenCalledWith('a@b.it');
   });
 
+  it('mostra un prefisso davanti al testo digitato', async () => {
+    await render(
+      <TextField
+        label="profile:handleEditor.label"
+        value=""
+        onChangeText={jest.fn()}
+        leading="@"
+      />,
+    );
+    expect(screen.getByText('@')).toBeOnTheScreen();
+  });
+
   it('mostra l’errore e colora il bordo', async () => {
     await render(
       <TextField label="auth:email" value="" onChangeText={jest.fn()} error="auth:errors.email" />,

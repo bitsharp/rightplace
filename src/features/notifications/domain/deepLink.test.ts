@@ -8,6 +8,7 @@ describe('routeForNotification', () => {
     ['rightplace://creator', '/creator'],
     ['rightplace://friends/requests', '/friends'],
     ['rightplace://u/volpe.viola', '/u/volpe.viola'],
+    ['rightplace://u/luca_97', '/u/luca_97'],
     ['rightplace://chat', '/chat'],
     ['rightplace://map', '/map'],
   ])('%s apre %s', (url, route) => {

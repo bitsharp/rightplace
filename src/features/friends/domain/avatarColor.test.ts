@@ -18,6 +18,11 @@ describe('avatarIntent', () => {
     expect(avatarIntent('volpe.viola')).toBe(avatarIntent('volpe.viola'));
   });
 
+  it("funziona con gli handle scelti dall'utente (underscore e cifre)", () => {
+    expect(avatarIntent('luca_97')).toBe(avatarIntent('@luca_97'));
+    expect(['going', 'maybe', 'neutral']).toContain(avatarIntent('luca_97'));
+  });
+
   it('ignora la @ iniziale', () => {
     expect(avatarIntent('@volpe.viola')).toBe(avatarIntent('volpe.viola'));
   });

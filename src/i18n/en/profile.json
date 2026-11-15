@@ -39,12 +39,10 @@
     }
   },
   "handle": {
-    "step": "03 / 03 · Your name",
-    "title": "This is your name in here",
-    "body": "Others will only see this, your age band and gender.",
-    "change": "Change it",
-    "changedOnce": "You have already changed your name once.",
-    "enter": "Let's go"
+    "step": "03 / 03 · Your @tag",
+    "title": "Choose your @tag",
+    "body": "Others will only see this, your age range and gender. We drew one for you: keep it or pick another.",
+    "enter": "Enter"
   },
   "app": {
     "step": "Private profile",
@@ -100,12 +98,31 @@
     "cleared": "People can no longer find you by number."
   },
   "handleSection": {
-    "title": "Your name",
-    "once": "You can change it only once",
-    "used": "You've already used your change: your @tag can't be changed again.",
-    "change": "Change my @tag",
-    "confirm": "Another random @tag will be drawn and you won't be able to change it again. Continue?",
-    "confirmYes": "Yes, draw another @tag",
-    "confirmNo": "Cancel"
+    "title": "Your @tag"
+  },
+  "handleEditor": {
+    "label": "Your @tag",
+    "warning": "Don't use your first and last name: your @tag is visible to everyone.",
+    "rules": "3 to 20 characters: lowercase letters, numbers, dot and underscore.",
+    "limit": "You can change it once every 30 days.",
+    "nextChange": "You will be able to change it again on {{date}}.",
+    "save": "Save my @tag",
+    "random": "Draw a random one",
+    "status": {
+      "checking": "Checking…",
+      "available": "Available",
+      "taken": "Someone already uses this @tag.",
+      "notAllowed": "This @tag is not allowed.",
+      "invalid": "This @tag is not valid.",
+      "error": "I can't check right now: you can still try to save."
+    },
+    "format": {
+      "tooShort": "At least 3 characters.",
+      "tooLong": "At most 20 characters.",
+      "badChars": "Lowercase letters, numbers, dot and underscore only.",
+      "badStart": "It must start with a letter.",
+      "badEnd": "It must end with a letter or a number.",
+      "doubleDot": "No two dots in a row."
+    }
   }
 }

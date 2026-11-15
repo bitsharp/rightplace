@@ -1,5 +1,6 @@
-const ACTIVE_MENTION = /(?:^|\s)@([a-z0-9.]*)$/i;
-const MENTION = /(?:^|\s)@([a-z]+\.[a-z]+[0-9]*)/gi;
+const ACTIVE_MENTION = /(?:^|\s)@([a-z0-9._]*)$/i;
+// Handles are chosen by the user: letters, digits, "." and "_", starting with a letter, ending with a letter or digit.
+const MENTION = /(?:^|\s)@([a-z][a-z0-9._]+[a-z0-9])/gi;
 
 // The text typed after an "@" that starts a word and sits right before the cursor, or null.
 export function activeMentionQuery(text: string, cursor: number): string | null {

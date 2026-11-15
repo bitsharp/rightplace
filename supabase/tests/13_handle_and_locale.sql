@@ -16,7 +16,7 @@ select tests.authenticate_as(:'a');
 select isnt(regenerate_handle(), 'lince.rosso', 'regenerate_handle assegna un nuovo handle');
 select isnt((select handle from profiles where id = auth.uid()), 'lince.rosso', 'il profilo ha il nuovo handle');
 select ok((select handle_changed_at is not null from profiles where id = auth.uid()), 'il cambio è registrato');
-select throws_ok($$ select regenerate_handle() $$, 'HANDLE_ALREADY_CHANGED', 'l''handle si cambia una sola volta');
+select throws_ok($$ select regenerate_handle() $$, 'HANDLE_CHANGE_TOO_SOON', 'l''handle si cambia al massimo una volta ogni 30 giorni');
 select matches((select handle from profiles where id = auth.uid()), '^[a-z]+\.[a-z]+[0-9]*$', 'resta nel formato animale.colore');
 
 select * from finish();

@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act } from 'react';
 
 import { useOnboardingStore } from '@/features/profile/store/onboardingStore';
 import { renderApp } from '@/test/appFlows';
@@ -18,6 +19,15 @@ async function fillProfile(year: string) {
   await fireEvent.changeText(screen.getByLabelText('profile:form.year'), year);
   await fireEvent.press(screen.getByRole('button', { name: 'profile:form.gender.other' }));
 }
+
+const FIELD = 'profile:handleEditor.label';
+const SAVE = 'profile:handleEditor.save';
+const RANDOM = 'profile:handleEditor.random';
+
+beforeEach(() => {
+  jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate', 'queueMicrotask'] });
+});
+afterEach(() => jest.useRealTimers());
 
 describe('profilo privato e handle', () => {
   it('completa il profilo, mostra l’handle e poi entra nella mappa', async () => {
@@ -46,86 +56,121 @@ describe('profilo privato e handle', () => {
     expect(fakeSupabase.auth.signOut).toHaveBeenCalled();
   });
 
-  it('l’handle si può cambiare una sola volta', async () => {
+  it('nello step @tag si sceglie un @tag proprio e poi si entra', async () => {
+    fakeSupabase.rpc.mockImplementation(async (name: string) => {
+      if (name === 'is_handle_available') return { data: 'available', error: null };
+      if (name === 'set_handle')
+        setFakeTable('profiles', [
+          fakeProfileRow({ handle: 'luca_97', handle_changed_at: new Date().toISOString() }),
+        ]);
+      return { data: name === 'set_handle' ? 'luca_97' : null, error: null };
+    });
+    useOnboardingStore.setState({ pendingHandleReveal: true });
+    await renderApp('ready', '/handle');
+    await fireEvent.changeText(await screen.findByLabelText(FIELD), 'Luca_97');
+    await act(async () => jest.advanceTimersByTime(400));
+    expect(await screen.findByText('profile:handleEditor.status.available')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: SAVE }));
+    await waitFor(() =>
+      expect(fakeSupabase.rpc).toHaveBeenCalledWith('set_handle', { p_handle: 'luca_97' }),
+    );
+    expect((await screen.findAllByText('@luca_97')).length).toBeGreaterThan(0);
+    await fireEvent.press(screen.getByRole('button', { name: 'profile:handle.enter' }));
+    expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
+  });
+
+  it('nello step @tag si può estrarne uno a caso', async () => {
     fakeSupabase.rpc.mockImplementation(async (name: string) => {
       if (name !== 'regenerate_handle') return { data: null, error: null };
       setFakeTable('profiles', [
-        fakeProfileRow({ handle: 'volpe.oro', handle_changed_at: '2026-11-01T10:00:00Z' }),
+        fakeProfileRow({ handle: 'volpe.oro', handle_changed_at: new Date().toISOString() }),
       ]);
       return { data: 'volpe.oro', error: null };
     });
     useOnboardingStore.setState({ pendingHandleReveal: true });
     await renderApp('ready', '/handle');
-    await fireEvent.press(await screen.findByRole('button', { name: 'profile:handle.change' }));
-    expect(await screen.findByText('@volpe.oro')).toBeOnTheScreen();
-    await waitFor(() =>
-      expect(screen.queryByRole('button', { name: 'profile:handle.change' })).not.toBeOnTheScreen(),
-    );
+    await fireEvent.press(await screen.findByRole('button', { name: RANDOM }));
+    expect((await screen.findAllByText('@volpe.oro')).length).toBeGreaterThan(0);
   });
 });
 
-describe('tab Profilo: cambio del @tag', () => {
-  const CHANGE = 'profile:handleSection.change';
-  const YES = 'profile:handleSection.confirmYes';
+describe('tab Profilo: scelta del @tag', () => {
+  it('mostra il @tag, l’avviso su nome e cognome e il limite di 30 giorni', async () => {
+    await renderApp('ready', '/profile');
+    expect((await screen.findAllByText('@lince.rosso')).length).toBeGreaterThan(0);
+    expect(screen.getByText('profile:handleEditor.warning')).toBeOnTheScreen();
+    expect(screen.getByText('profile:handleEditor.limit')).toBeOnTheScreen();
+    expect(screen.getByLabelText(FIELD).props.value).toBe('lince.rosso');
+  });
 
-  function seedRegenerate() {
+  it('normalizza mentre si scrive e segnala subito un formato sbagliato', async () => {
+    await renderApp('ready', '/profile');
+    const field = await screen.findByLabelText(FIELD);
+    await fireEvent.changeText(field, ' @Luca ');
+    expect(screen.getByLabelText(FIELD).props.value).toBe('luca');
+    await fireEvent.changeText(field, '1luca');
+    expect(await screen.findByText('profile:handleEditor.format.badStart')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: SAVE })).toBeDisabled();
+    expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('is_handle_available', expect.anything());
+  });
+
+  it('controlla la disponibilità dopo 400 ms e non permette di salvare un @tag occupato', async () => {
+    fakeSupabase.rpc.mockImplementation(async (name: string) => ({
+      data: name === 'is_handle_available' ? 'taken' : null,
+      error: null,
+    }));
+    await renderApp('ready', '/profile');
+    await fireEvent.changeText(await screen.findByLabelText(FIELD), 'volpe.blu');
+    expect(await screen.findByText('profile:handleEditor.status.checking')).toBeOnTheScreen();
+    await act(async () => jest.advanceTimersByTime(400));
+    expect(await screen.findByText('profile:handleEditor.status.taken')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: SAVE })).toBeDisabled();
+  });
+
+  it('mostra l’errore tradotto se il server rifiuta il salvataggio', async () => {
+    fakeSupabase.rpc.mockImplementation(async (name: string) => {
+      if (name === 'is_handle_available') return { data: 'available', error: null };
+      if (name === 'set_handle') return { data: null, error: { message: 'HANDLE_NOT_ALLOWED' } };
+      return { data: null, error: null };
+    });
+    await renderApp('ready', '/profile');
+    await fireEvent.changeText(await screen.findByLabelText(FIELD), 'luca_97');
+    await act(async () => jest.advanceTimersByTime(400));
+    expect(await screen.findByText('profile:handleEditor.status.available')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: SAVE }));
+    expect(await screen.findByText('errors:rpc.HANDLE_NOT_ALLOWED')).toBeOnTheScreen();
+  });
+
+  it('se il limite è attivo blocca la modifica e indica quando si potrà rifare', async () => {
+    const recent = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
+    await renderApp('ready', '/profile', { handle_changed_at: recent });
+    expect(
+      await screen.findByText(/^profile:handleEditor\.nextChange\(\{"date":"[^"]+"\}\)$/),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText('profile:handleEditor.limit')).toBeNull();
+    expect(screen.getByRole('button', { name: SAVE })).toBeDisabled();
+    expect(screen.getByRole('button', { name: RANDOM })).toBeDisabled();
+  });
+
+  it('dopo 30 giorni si può cambiare di nuovo', async () => {
+    const old = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
+    await renderApp('ready', '/profile', { handle_changed_at: old });
+    expect(await screen.findByText('profile:handleEditor.limit')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: RANDOM })).toBeEnabled();
+  });
+
+  it('"Generane uno a caso" estrae un @tag e lo mostra subito', async () => {
     fakeSupabase.rpc.mockImplementation(async (name: string) => {
       if (name !== 'regenerate_handle') return { data: null, error: null };
       setFakeTable('profiles', [
-        fakeProfileRow({ handle: 'volpe.oro', handle_changed_at: '2026-11-13T10:00:00Z' }),
+        fakeProfileRow({ handle: 'volpe.oro', handle_changed_at: new Date().toISOString() }),
       ]);
       return { data: 'volpe.oro', error: null };
     });
-  }
-
-  it('mostra il @tag e dice che si può cambiare una sola volta', async () => {
     await renderApp('ready', '/profile');
-    expect(await screen.findByText('profile:handleSection.once')).toBeOnTheScreen();
-    expect(screen.getAllByText('@lince.rosso').length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: CHANGE })).toBeOnTheScreen();
-  });
-
-  it('chiede conferma prima di estrarre un altro @tag e "Annulla" non cambia nulla', async () => {
-    seedRegenerate();
-    await renderApp('ready', '/profile');
-    await fireEvent.press(await screen.findByRole('button', { name: CHANGE }));
-    expect(screen.getByText('profile:handleSection.confirm')).toBeOnTheScreen();
-    expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('regenerate_handle', undefined);
-    await fireEvent.press(screen.getByRole('button', { name: 'profile:handleSection.confirmNo' }));
-    expect(screen.queryByText('profile:handleSection.confirm')).toBeNull();
-    expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('regenerate_handle', undefined);
-  });
-
-  it('confermando estrae un altro @tag, lo mostra subito e poi non è più disponibile', async () => {
-    seedRegenerate();
-    await renderApp('ready', '/profile');
-    await fireEvent.press(await screen.findByRole('button', { name: CHANGE }));
-    await fireEvent.press(screen.getByRole('button', { name: YES }));
-    await waitFor(() =>
-      expect(fakeSupabase.rpc).toHaveBeenCalledWith('regenerate_handle', undefined),
-    );
+    await fireEvent.press(await screen.findByRole('button', { name: RANDOM }));
     expect((await screen.findAllByText('@volpe.oro')).length).toBeGreaterThan(0);
-    expect(await screen.findByText('profile:handleSection.used')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: CHANGE })).toBeNull();
-    expect(screen.queryByText('profile:handleSection.once')).toBeNull();
-  });
-
-  it('se il @tag è già stato cambiato indica che non è più disponibile', async () => {
-    await renderApp('ready', '/profile', { handle_changed_at: '2026-11-01T10:00:00Z' });
-    expect(await screen.findByText('profile:handleSection.used')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: CHANGE })).toBeNull();
-  });
-
-  it("se il server rifiuta mostra l'errore tradotto", async () => {
-    fakeSupabase.rpc.mockImplementation(async (name: string) =>
-      name === 'regenerate_handle'
-        ? { data: null, error: { message: 'HANDLE_ALREADY_CHANGED' } }
-        : { data: null, error: null },
-    );
-    await renderApp('ready', '/profile');
-    await fireEvent.press(await screen.findByRole('button', { name: CHANGE }));
-    await fireEvent.press(screen.getByRole('button', { name: YES }));
-    expect(await screen.findByText('errors:rpc.HANDLE_ALREADY_CHANGED')).toBeOnTheScreen();
+    expect(await screen.findByText(/profile:handleEditor\.nextChange/)).toBeOnTheScreen();
   });
 });
 

@@ -4,6 +4,10 @@ describe('normalizeSearchQuery', () => {
   it('toglie spazi e @ iniziale e porta in minuscolo', () => {
     expect(normalizeSearchQuery('  @Volpe ')).toBe('volpe');
   });
+
+  it("mantiene underscore e cifre degli handle scelti dall'utente", () => {
+    expect(normalizeSearchQuery('@Luca_97')).toBe('luca_97');
+  });
 });
 
 describe('isSearchable', () => {

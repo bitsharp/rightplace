@@ -39,11 +39,9 @@
     }
   },
   "handle": {
-    "step": "03 / 03 · Il tuo nome",
-    "title": "Questo è il tuo nome qui dentro",
-    "body": "Gli altri vedranno solo questo, la tua fascia d'età e il genere.",
-    "change": "Cambialo",
-    "changedOnce": "Hai già cambiato il tuo nome una volta.",
+    "step": "03 / 03 · Il tuo @tag",
+    "title": "Scegli il tuo @tag",
+    "body": "Gli altri vedranno solo questo, la tua fascia d'età e il genere. Te ne abbiamo estratto uno: tienilo o scegline un altro.",
     "enter": "Entra"
   },
   "app": {
@@ -100,12 +98,31 @@
     "cleared": "Non ti troveranno più dal numero."
   },
   "handleSection": {
-    "title": "Il tuo nome",
-    "once": "Puoi cambiarlo una sola volta",
-    "used": "Hai già usato il cambio: il tuo @tag non si può più cambiare.",
-    "change": "Cambia il mio @tag",
-    "confirm": "Verrà estratto un altro @tag a caso e non potrai più cambiarlo. Vuoi procedere?",
-    "confirmYes": "Sì, estrai un altro @tag",
-    "confirmNo": "Annulla"
+    "title": "Il tuo @tag"
+  },
+  "handleEditor": {
+    "label": "Il tuo @tag",
+    "warning": "Non usare nome e cognome: il tuo @tag è visibile a tutti.",
+    "rules": "Da 3 a 20 caratteri: lettere minuscole, numeri, punto e underscore.",
+    "limit": "Puoi cambiarlo una volta ogni 30 giorni.",
+    "nextChange": "Potrai cambiarlo di nuovo il {{date}}.",
+    "save": "Salva il mio @tag",
+    "random": "Generane uno a caso",
+    "status": {
+      "checking": "Controllo…",
+      "available": "Disponibile",
+      "taken": "Questo @tag è già usato da qualcuno.",
+      "notAllowed": "Questo @tag non è consentito.",
+      "invalid": "Questo @tag non è valido.",
+      "error": "Non riesco a controllare ora: puoi comunque provare a salvare."
+    },
+    "format": {
+      "tooShort": "Almeno 3 caratteri.",
+      "tooLong": "Al massimo 20 caratteri.",
+      "badChars": "Solo lettere minuscole, numeri, punto e underscore.",
+      "badStart": "Deve iniziare con una lettera.",
+      "badEnd": "Deve finire con una lettera o un numero.",
+      "doubleDot": "Niente due punti di fila."
+    }
   }
 }

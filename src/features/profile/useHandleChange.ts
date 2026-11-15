@@ -11,7 +11,7 @@ import {
 } from '@/features/posts/keys';
 import { RpcError, type RpcErrorCode } from '@/lib/rpcError';
 
-import { regenerateHandle } from './api';
+import { regenerateHandle, setHandle } from './api';
 import { myProfileKey } from './hooks';
 
 // My @tag is printed on my posts, comments and chat messages: those copies must show the new one.
@@ -23,13 +23,12 @@ const HANDLE_DEPENDENT_KEYS = [
   CHAT_MESSAGES_ROOT_KEY,
 ] as const;
 
-// Draws another @animale.colore (allowed once, enforced by the server).
-export function useRegenerateHandle() {
+function useHandleChange() {
   const queryClient = useQueryClient();
   const { userId } = useSession();
-  return async (): Promise<RpcErrorCode | null> => {
+  return async (change: () => Promise<string>): Promise<RpcErrorCode | null> => {
     try {
-      await regenerateHandle();
+      await change();
       await invalidateKeys(queryClient, [
         myProfileKey(userId ?? undefined),
         ...HANDLE_DEPENDENT_KEYS,
@@ -39,4 +38,16 @@ export function useRegenerateHandle() {
       return error instanceof RpcError ? error.code : 'UNKNOWN';
     }
   };
+}
+
+// Draws another @animale.colore (at most once every 30 days, enforced by the server).
+export function useRegenerateHandle() {
+  const run = useHandleChange();
+  return () => run(regenerateHandle);
+}
+
+// Claims the @tag the user typed; the server validates, checks the blocklist and the 30-day limit.
+export function useSetHandle() {
+  const run = useHandleChange();
+  return (handle: string) => run(() => setHandle(handle));
 }

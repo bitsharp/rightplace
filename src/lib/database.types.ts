@@ -1515,6 +1515,7 @@ export type Database = {
         }[];
       };
       is_adult: { Args: { p_birth_date: string }; Returns: boolean };
+      is_handle_available: { Args: { p_handle: string }; Returns: string };
       level_from_avg: { Args: { p_avg: number }; Returns: number };
       match_contacts: {
         Args: { p_hashes: string[] };
@@ -1570,6 +1571,7 @@ export type Database = {
           message_id: string;
         }[];
       };
+      set_handle: { Args: { p_handle: string }; Returns: string };
       set_locale: { Args: { p_locale: string }; Returns: undefined };
       set_my_notification_prefs: { Args: { p_prefs: Json }; Returns: Json };
       set_my_phone_hash: { Args: { p_hash: string }; Returns: undefined };
