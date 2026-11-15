@@ -1,6 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
+import { mockKeyboardEvents } from '@/test/keyboardEvents';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
 import { CommentsSheet } from './CommentsSheet';
@@ -25,6 +27,32 @@ function open(onClose = jest.fn()) {
 }
 
 describe('CommentsSheet', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it('su Android con la tastiera aperta il foglio sta sopra i tasti e Invia si tocca al primo tap', async () => {
+    jest.replaceProperty(Platform, 'OS', 'android');
+    const keyboard = mockKeyboardEvents();
+    setFakeRpc({
+      get_post_comments: [comment('1', 'primo')],
+      add_post_comment: comment('2', 'ciao'),
+    });
+    await open();
+    const input = await screen.findByLabelText('feed:comments.placeholder');
+    await fireEvent(input, 'focus');
+    await act(async () => keyboard.emit('keyboardDidShow', 300));
+    expect(screen.getByTestId('sheet-keyboard-avoider')).toHaveStyle({ paddingBottom: 300 });
+    await fireEvent.changeText(input, 'ciao');
+    await fireEvent.press(screen.getByRole('button', { name: 'feed:comments.send' }));
+    await waitFor(() => expect(rpcCalls('add_post_comment')).toHaveLength(1));
+  });
+
+  it('la lista commenti non mangia il primo tap mentre la tastiera è aperta', async () => {
+    setFakeRpc({ get_post_comments: [comment('1', 'primo')] });
+    await open();
+    await screen.findByText('primo');
+    expect(screen.getByTestId('comments-list').props.keyboardShouldPersistTaps).toBe('handled');
+  });
+
   it('elenca i commenti dal più vecchio al più nuovo', async () => {
     setFakeRpc({ get_post_comments: [comment('2', 'secondo'), comment('1', 'primo')] });
     await open();

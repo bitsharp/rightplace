@@ -1,5 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Platform, Text } from 'react-native';
+
+import { mockKeyboardEvents } from '@/test/keyboardEvents';
 
 import { Sheet } from './Sheet';
 
@@ -54,5 +56,19 @@ describe('Sheet', () => {
     await render(<Sheet visible onClose={onClose} />);
     await fireEvent(screen.getByTestId('sheet-panel'), 'accessibilityEscape');
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('su Android si alza della altezza della tastiera: la finestra edge-to-edge non si ridimensiona', async () => {
+    const keyboard = mockKeyboardEvents();
+    jest.replaceProperty(Platform, 'OS', 'android');
+    await render(
+      <Sheet visible onClose={jest.fn()}>
+        <Text>contenuto</Text>
+      </Sheet>,
+    );
+    await act(async () => keyboard.emit('keyboardDidShow', 310));
+    expect(screen.getByTestId('sheet-keyboard-avoider')).toHaveStyle({ paddingBottom: 310 });
+    await act(async () => keyboard.emit('keyboardDidHide'));
+    expect(screen.getByTestId('sheet-keyboard-avoider')).toHaveStyle({ paddingBottom: 0 });
   });
 });

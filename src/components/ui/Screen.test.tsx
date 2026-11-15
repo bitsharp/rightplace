@@ -1,5 +1,7 @@
-import { render, screen } from '@testing-library/react-native';
-import { StyleSheet, Text } from 'react-native';
+import { act, render, screen } from '@testing-library/react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
+
+import { mockKeyboardEvents } from '@/test/keyboardEvents';
 
 import { colors, spacing } from '@/theme/tokens';
 
@@ -12,6 +14,8 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 describe('Screen', () => {
+  afterEach(() => jest.restoreAllMocks());
+
   it('ha lo sfondo scuro e mostra il contenuto', async () => {
     await render(
       <Screen testID="screen">
@@ -61,6 +65,37 @@ describe('Screen', () => {
         <Text>fisso</Text>
       </Screen>,
     );
+    const body = screen.getByText('fisso').parent;
+    expect(StyleSheet.flatten(body?.props.style).paddingBottom).toBe(34 + spacing.xxl);
+  });
+
+  it('su Android con la tastiera aperta lo schermo si accorcia della sua altezza', async () => {
+    const keyboard = mockKeyboardEvents();
+    jest.replaceProperty(Platform, 'OS', 'android');
+    await render(
+      <Screen scroll testID="screen">
+        <Text>lungo</Text>
+      </Screen>,
+    );
+    await act(async () => keyboard.emit('keyboardDidShow', 300));
+    expect(screen.getByTestId('screen')).toHaveStyle({ paddingBottom: 300 });
+    const content = StyleSheet.flatten(
+      screen.getByTestId('screen-scroll').props.contentContainerStyle,
+    );
+    // The home-indicator inset is under the keys now: only the regular gap remains.
+    expect(content.paddingBottom).toBe(spacing.xxl);
+  });
+
+  it('su iOS la tastiera non cambia il padding dello schermo', async () => {
+    const keyboard = mockKeyboardEvents();
+    jest.replaceProperty(Platform, 'OS', 'ios');
+    await render(
+      <Screen testID="screen">
+        <Text>fisso</Text>
+      </Screen>,
+    );
+    await act(async () => keyboard.emit('keyboardWillShow', 300));
+    expect(screen.getByTestId('screen')).not.toHaveStyle({ paddingBottom: 300 });
     const body = screen.getByText('fisso').parent;
     expect(StyleSheet.flatten(body?.props.style).paddingBottom).toBe(34 + spacing.xxl);
   });

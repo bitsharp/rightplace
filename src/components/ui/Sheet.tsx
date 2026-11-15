@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import { shouldDismissSheet } from './sheetGesture';
+import { useAndroidKeyboardInset } from './useKeyboardHeight';
 import { useKeyboardVisible } from './useKeyboardVisible';
 
 type Props = {
@@ -48,6 +49,7 @@ export function Sheet({ visible, onClose, onDismiss, children }: Props) {
   const insets = useSafeAreaInsets();
   const { translateY, responder, setHeight } = useDragToDismiss(onClose);
   const keyboardVisible = useKeyboardVisible();
+  const keyboardInset = useAndroidKeyboardInset();
   const bottomPadding = (keyboardVisible ? 0 : insets.bottom) + spacing.lg;
 
   useEffect(() => {
@@ -63,11 +65,12 @@ export function Sheet({ visible, onClose, onDismiss, children }: Props) {
       onDismiss={onDismiss}
       statusBarTranslucent
     >
-      {/* A Modal is its own native window: the screen's keyboard handling does not reach it. */}
+      {/* A Modal is its own native window: the screen's keyboard handling does not reach it. iOS:
+          KeyboardAvoidingView. Android edge-to-edge: the window never resizes, so lift by hand. */}
       <KeyboardAvoidingView
         testID="sheet-keyboard-avoider"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.root}
+        style={[styles.root, { paddingBottom: keyboardInset }]}
       >
         <Backdrop onClose={onClose} />
         <View testID="sheet-panel" accessibilityViewIsModal onAccessibilityEscape={onClose}>

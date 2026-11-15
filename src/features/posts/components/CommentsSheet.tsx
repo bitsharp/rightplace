@@ -80,7 +80,12 @@ function CommentList({
     return <Text color="textSecondary">{t('comments.empty')}</Text>;
   }
   return (
-    <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
+    <ScrollView
+      testID="comments-list"
+      keyboardShouldPersistTaps="handled"
+      style={styles.list}
+      contentContainerStyle={styles.listContent}
+    >
       {hasOlder ? (
         <Button label={t('comments.older')} variant="ghost" size="md" onPress={loadOlder} />
       ) : null}

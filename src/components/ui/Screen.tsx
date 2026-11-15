@@ -4,6 +4,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { colors, spacing } from '@/theme/tokens';
 
+import { useAndroidKeyboardInset } from './useKeyboardHeight';
+
 type Props = {
   children: ReactNode;
   scroll?: boolean;
@@ -11,13 +13,23 @@ type Props = {
 };
 
 // Edges exclude the bottom on purpose: the bottom inset becomes padding of the content, so the last
-// element can scroll clear of the home indicator. Keyboard: one strategy only (the ScrollView
-// insets itself on iOS, the window resizes on Android), so the focused field is never covered.
+// element can scroll clear of the home indicator. Keyboard: one strategy per platform, never both.
+// iOS: the ScrollView insets itself. Android (edge-to-edge): the window is not resized, so the
+// screen lifts its own bottom by the keyboard height, and the focused field scrolls in the rest.
 export function Screen({ children, scroll = false, testID }: Props) {
   const { bottom } = useSafeAreaInsets();
-  const content = [styles.content, { paddingBottom: bottom + spacing.xxl }];
+  const keyboardInset = useAndroidKeyboardInset();
+  // With the keyboard up, the home-indicator inset is already under the keys.
+  const content = [
+    styles.content,
+    { paddingBottom: (keyboardInset > 0 ? 0 : bottom) + spacing.xxl },
+  ];
   return (
-    <SafeAreaView testID={testID} style={styles.screen} edges={['top', 'left', 'right']}>
+    <SafeAreaView
+      testID={testID}
+      style={[styles.screen, { paddingBottom: keyboardInset }]}
+      edges={['top', 'left', 'right']}
+    >
       {scroll ? (
         <ScrollView
           testID="screen-scroll"
