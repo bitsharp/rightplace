@@ -42,7 +42,8 @@
     "step": "03 / 03 · Your @tag",
     "title": "Choose your @tag",
     "body": "Others will only see this, your age range and gender. We drew one for you: keep it or pick another.",
-    "enter": "Enter"
+    "enter": "Continue",
+    "freeUntilContinue": "Until you tap Continue you can change your @tag as often as you like. After that, you can change it once every 30 days."
   },
   "app": {
     "step": "Private profile",

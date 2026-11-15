@@ -41,6 +41,13 @@ describe('useSession', () => {
     await waitFor(() => expect(result.current.status).toBe('needsProfile'));
   });
 
+  it('è needsHandle finché il @tag non è confermato', async () => {
+    signedIn();
+    setFakeTable('profiles', [fakeProfileRow({ handle_confirmed_at: null })]);
+    const result = await statusOf();
+    await waitFor(() => expect(result.current.status).toBe('needsHandle'));
+  });
+
   it('è ready con il profilo completo ed espone handle ed email', async () => {
     signedIn();
     setFakeTable('profiles', [fakeProfileRow()]);

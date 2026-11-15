@@ -11,6 +11,7 @@ const profileRowSchema = z.object({
   id: z.string(),
   handle: z.string(),
   handle_changed_at: z.string().nullable(),
+  handle_confirmed_at: z.string().nullable(),
   birth_date: z.string().nullable(),
   gender: z.enum(['female', 'male', 'other']).nullable(),
   locale: z.enum(['it', 'en']),
@@ -26,6 +27,8 @@ export type MyProfile = {
   id: string;
   handle: string;
   handleChangedAt: string | null;
+  // null = still in the onboarding @tag step: free changes, no 30-day limit yet
+  handleConfirmedAt: string | null;
   birthDate: string | null;
   gender: Gender | null;
   locale: Language;
@@ -40,6 +43,7 @@ function toMyProfile(row: z.infer<typeof profileRowSchema>): MyProfile {
     id: row.id,
     handle: row.handle,
     handleChangedAt: row.handle_changed_at,
+    handleConfirmedAt: row.handle_confirmed_at,
     birthDate: row.birth_date,
     gender: row.gender,
     locale: row.locale,
@@ -98,6 +102,11 @@ export async function regenerateHandle(): Promise<string> {
 
 export async function setHandle(handle: string): Promise<string> {
   return z.string().parse(await callRpc('set_handle', { p_handle: handle }));
+}
+
+// Ends the free choice of the onboarding and starts the 30-day limit (idempotent on the server).
+export function confirmHandle(): Promise<void> {
+  return callRpc('confirm_handle');
 }
 
 const availabilitySchema = z.enum(['available', 'invalid', 'not_allowed', 'taken']);

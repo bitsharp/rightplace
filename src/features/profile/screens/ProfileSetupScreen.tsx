@@ -12,7 +12,6 @@ import type { RpcErrorCode } from '@/lib/rpcError';
 import type { ProfileInput } from '../api';
 import { ProfileForm } from '../components/ProfileForm';
 import type { ProfileFormInitial } from '../components/useProfileFormState';
-import { useOnboardingStore } from '../store/onboardingStore';
 import { useSaveProfile } from '../useSaveProfile';
 
 const emptyProfile = (locale: Language): ProfileFormInitial => ({
@@ -26,15 +25,10 @@ const emptyProfile = (locale: Language): ProfileFormInitial => ({
 
 function useCompleteOnboarding() {
   const save = useSaveProfile();
-  const { startHandleReveal, finishHandleReveal } = useOnboardingStore();
   const [error, setError] = useState<RpcErrorCode | null>(null);
   const submit = async (input: ProfileInput) => {
-    startHandleReveal();
     const code = await save(input);
-    if (code) {
-      finishHandleReveal();
-      return setError(code);
-    }
+    if (code) return setError(code);
     track('profile_completed'); // no age band or gender in analytics (prompt 05 §8)
   };
   return { submit, error };

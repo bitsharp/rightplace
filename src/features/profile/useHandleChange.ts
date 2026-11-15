@@ -11,7 +11,7 @@ import {
 } from '@/features/posts/keys';
 import { RpcError, type RpcErrorCode } from '@/lib/rpcError';
 
-import { regenerateHandle, setHandle } from './api';
+import { confirmHandle, regenerateHandle, setHandle } from './api';
 import { myProfileKey } from './hooks';
 
 // My @tag is printed on my posts, comments and chat messages: those copies must show the new one.
@@ -26,7 +26,7 @@ const HANDLE_DEPENDENT_KEYS = [
 function useHandleChange() {
   const queryClient = useQueryClient();
   const { userId } = useSession();
-  return async (change: () => Promise<string>): Promise<RpcErrorCode | null> => {
+  return async (change: () => Promise<unknown>): Promise<RpcErrorCode | null> => {
     try {
       await change();
       await invalidateKeys(queryClient, [
@@ -50,4 +50,11 @@ export function useRegenerateHandle() {
 export function useSetHandle() {
   const run = useHandleChange();
   return (handle: string) => run(() => setHandle(handle));
+}
+
+// "Continua" in the onboarding: the free choice ends and the 30-day limit starts. Refreshing the profile is what
+// moves the session from needsHandle to ready, so the app opens only once the server has confirmed.
+export function useConfirmHandle() {
+  const run = useHandleChange();
+  return () => run(confirmHandle);
 }

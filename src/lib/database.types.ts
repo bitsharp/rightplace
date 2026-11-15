@@ -675,6 +675,7 @@ export type Database = {
           gender: string | null;
           handle: string;
           handle_changed_at: string | null;
+          handle_confirmed_at: string | null;
           id: string;
           is_creator: boolean;
           locale: string;
@@ -694,6 +695,7 @@ export type Database = {
           gender?: string | null;
           handle: string;
           handle_changed_at?: string | null;
+          handle_confirmed_at?: string | null;
           id: string;
           is_creator?: boolean;
           locale?: string;
@@ -712,6 +714,7 @@ export type Database = {
           gender?: string | null;
           handle?: string;
           handle_changed_at?: string | null;
+          handle_confirmed_at?: string | null;
           id?: string;
           is_creator?: boolean;
           locale?: string;
@@ -1125,6 +1128,7 @@ export type Database = {
         Returns: undefined;
       };
       complete_storage_deletions: { Args: { p_ids: number[] }; Returns: number };
+      confirm_handle: { Args: Record<PropertyKey, never>; Returns: undefined };
       consume_places_search_session: {
         Args: { p_session_token: string; p_user_id: string };
         Returns: boolean;

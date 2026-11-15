@@ -62,6 +62,9 @@ function AppScreens({
       <Stack.Protected guard={status === 'needsProfile'}>
         <Stack.Screen name="profile-setup" />
       </Stack.Protected>
+      <Stack.Protected guard={status === 'needsHandle'}>
+        <Stack.Screen name="handle" />
+      </Stack.Protected>
       <Stack.Protected guard={status === 'ready'}>
         {READY_SCREENS.map((screen) => (
           <Stack.Screen key={screen.name} name={screen.name} options={screen.options} />
@@ -81,7 +84,6 @@ function AppScreens({
 
 const MODAL = { presentation: 'modal' } as const;
 const READY_SCREENS = [
-  { name: 'handle' },
   { name: '(tabs)' },
   { name: 'search' },
   { name: 'activity' },

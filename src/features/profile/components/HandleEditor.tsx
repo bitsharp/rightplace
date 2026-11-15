@@ -12,7 +12,8 @@ import { nextHandleChangeAt, normalizeHandle } from '../domain/handle';
 import { useRegenerateHandle, useSetHandle } from '../useHandleChange';
 import { useHandleAvailability, type HandleCheck } from '../useHandleAvailability';
 
-type Props = { handle: string; handleChangedAt: string | null };
+// onboarding: the @tag is free until "Continua" (no limit, no date shown); profile: one change every 30 days.
+type Props = { handle: string; handleChangedAt: string | null; phase: 'onboarding' | 'profile' };
 
 type Status = { key: string; tone: 'error' | 'maybe' | 'textSecondary' } | null;
 
@@ -39,7 +40,7 @@ const canSave = (check: HandleCheck) =>
   check.kind === 'error' || (check.kind === 'result' && check.value === 'available');
 
 // Mount it with key={handle}: the field starts from the current @tag and restarts when it changes.
-export function HandleEditor({ handle, handleChangedAt }: Props) {
+export function HandleEditor({ handle, handleChangedAt, phase }: Props) {
   const { t, i18n } = useTranslation('profile');
   const setHandle = useSetHandle();
   const regenerate = useRegenerateHandle();
@@ -47,7 +48,7 @@ export function HandleEditor({ handle, handleChangedAt }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<RpcErrorCode | null>(null);
   const check = useHandleAvailability(typed, handle);
-  const next = nextHandleChangeAt(handleChangedAt, new Date());
+  const next = phase === 'onboarding' ? null : nextHandleChangeAt(handleChangedAt, new Date());
   const status = statusOf(check);
 
   const run = async (action: () => Promise<RpcErrorCode | null>) => {
@@ -79,13 +80,15 @@ export function HandleEditor({ handle, handleChangedAt }: Props) {
       <Text variant="body13" color="textSecondary">
         {t('handleEditor.rules')}
       </Text>
-      <Text variant="body13" color="textSecondary">
-        {next
-          ? t('handleEditor.nextChange', {
-              date: new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(next),
-            })
-          : t('handleEditor.limit')}
-      </Text>
+      {phase === 'profile' ? (
+        <Text variant="body13" color="textSecondary">
+          {next
+            ? t('handleEditor.nextChange', {
+                date: new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(next),
+              })
+            : t('handleEditor.limit')}
+        </Text>
+      ) : null}
       {error ? <Text color="error">{t(`errors:rpc.${error}`)}</Text> : null}
       <Button
         label={t('handleEditor.save')}

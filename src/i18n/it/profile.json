@@ -42,7 +42,8 @@
     "step": "03 / 03 · Il tuo @tag",
     "title": "Scegli il tuo @tag",
     "body": "Gli altri vedranno solo questo, la tua fascia d'età e il genere. Te ne abbiamo estratto uno: tienilo o scegline un altro.",
-    "enter": "Entra"
+    "enter": "Continua",
+    "freeUntilContinue": "Finché non premi Continua puoi cambiare il tuo @tag quante volte vuoi. Dopo, potrai cambiarlo una volta ogni 30 giorni."
   },
   "app": {
     "step": "Profilo privato",

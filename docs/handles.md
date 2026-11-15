@@ -21,13 +21,20 @@ Tabella `private.handle_blocklist` (nessun accesso dai client), seed minimo da e
 
 ## Limite di cambio
 
-Uno ogni **30 giorni** (`profiles.handle_changed_at`), per `set_handle` e per `regenerate_handle`. Il profilo non ha un campo "completato" e lo step @tag segue subito `complete_profile`: il limite vale quindi sempre, e la prima scelta è libera (`handle_changed_at` è nullo finché non si cambia). Errore: `HANDLE_CHANGE_TOO_SOON`. Impostare lo stesso handle già in uso è un no-op.
+Durante l'onboarding l'handle è **libero**: nello step @tag (subito dopo `complete_profile`) l'utente lo sceglie o lo rigenera quante volte vuole (`set_handle`, `regenerate_handle`), senza limite e senza far partire alcun orologio. Il limite di **30 giorni** parte quando preme **"Continua"**, cioè quando il client chiama `confirm_handle()`: da lì `set_handle` e `regenerate_handle` rispondono `HANDLE_CHANGE_TOO_SOON` finché non sono passati 30 giorni da `profiles.handle_changed_at`. Impostare lo stesso handle già in uso è un no-op.
+
+Stato: `profiles.handle_confirmed_at` (null = handle non ancora confermato). `confirm_handle()` lo valorizza e imposta `handle_changed_at = now()`; è idempotente (una seconda chiamata non sposta le date). In onboarding `set_handle`/`regenerate_handle` non toccano `handle_changed_at`.
+
+Gating: il client deriva lo stato di sessione `needsHandle` da `handle_confirmed_at is null` (con profilo già completo): finché non è confermato l'app principale non si apre, anche dopo aver chiuso e riaperto l'app (si torna allo step @tag). Il valore è letto solo sul proprio profilo (RLS).
+
+Backfill (migration `20261117000200_handle_onboarding.sql`): i profili già oltre l'onboarding, cioè con `birth_date is not null` (lo stesso criterio con cui il client esce da "profilo privato"), ricevono `handle_confirmed_at = coalesce(handle_changed_at, created_at)`, quindi il loro limite attuale non cambia. Chi ha `birth_date` nullo passerà dallo step @tag.
 
 ## RPC
 
-- `set_handle(p_handle)`: normalizza, poi `INVALID_HANDLE`, `HANDLE_NOT_ALLOWED`, (no-op se uguale al proprio), `HANDLE_CHANGE_TOO_SOON`, `HANDLE_TAKEN`.
+- `set_handle(p_handle)`: normalizza, poi `INVALID_HANDLE`, `HANDLE_NOT_ALLOWED`, (no-op se uguale al proprio), `HANDLE_CHANGE_TOO_SOON` (solo dopo `confirm_handle`), `HANDLE_TAKEN`.
 - `is_handle_available(p_handle)`: `available | invalid | not_allowed | taken`, solo `authenticated`. Rivela solo ciò che la ricerca per handle già rivela.
-- `regenerate_handle()`: nuovo `animale.colore` casuale, stesso limite.
+- `regenerate_handle()`: nuovo `animale.colore` casuale, stesso limite (libero fino a `confirm_handle`).
+- `confirm_handle()`: fine dell'onboarding dell'handle e inizio del limite di 30 giorni; idempotente, solo `authenticated`, restituisce nulla.
 
 ## Privacy e moderazione
 

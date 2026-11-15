@@ -8,7 +8,7 @@ import { fakeProfileRow, fakeUserSession, setFakeSession, setFakeTable } from '.
 
 export const APP_DIR = path.join(__dirname, '..', '..', 'app');
 
-type AppState = 'signedOut' | 'unverified' | 'needsProfile' | 'ready';
+type AppState = 'signedOut' | 'unverified' | 'needsProfile' | 'needsHandle' | 'ready';
 
 // Puts the fake backend in a given session state, then renders the real router.
 export async function renderApp(
@@ -22,6 +22,8 @@ export async function renderApp(
   }
   if (state === 'needsProfile')
     setFakeTable('profiles', [fakeProfileRow({ birth_date: null, gender: null })]);
+  if (state === 'needsHandle')
+    setFakeTable('profiles', [fakeProfileRow({ handle_confirmed_at: null, ...profile })]);
   if (state === 'ready') setFakeTable('profiles', [fakeProfileRow(profile)]);
   return renderRouter(APP_DIR, { initialUrl });
 }

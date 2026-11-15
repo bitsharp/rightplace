@@ -26,6 +26,17 @@ describe('guard di sessione', () => {
     expect(await screen.findByRole('header', { name: 'profile:setup.title' })).toBeOnTheScreen();
   });
 
+  it('con il @tag non confermato porta allo step @tag, anche se si prova ad aprire la mappa', async () => {
+    await renderApp('needsHandle', '/map');
+    expect(await screen.findByRole('header', { name: 'profile:handle.title' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'map:view.general' })).toBeNull();
+  });
+
+  it('con il @tag confermato lo step @tag non è raggiungibile', async () => {
+    await renderApp('ready', '/handle');
+    expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
+  });
+
   it('con profilo completo apre la mappa', async () => {
     await renderApp('ready');
     expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();

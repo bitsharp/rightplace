@@ -19,7 +19,12 @@ export function HandleSection({ handle, handleChangedAt }: Props) {
       <Text variant="display17" color="primary">
         {formatHandle(handle)}
       </Text>
-      <HandleEditor key={handle} handle={handle} handleChangedAt={handleChangedAt} />
+      <HandleEditor
+        key={handle}
+        handle={handle}
+        handleChangedAt={handleChangedAt}
+        phase="profile"
+      />
     </View>
   );
 }

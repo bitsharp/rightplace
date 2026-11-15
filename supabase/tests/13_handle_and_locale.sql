@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(7);
+select plan(8);
 
 -- the sign-up locale (auth metadata) seeds profiles.locale, so Auth emails use the right language
 insert into auth.users (id, email, raw_user_meta_data)
@@ -15,6 +15,8 @@ select tests.create_user('lince.rosso') as a \gset
 select tests.authenticate_as(:'a');
 select isnt(regenerate_handle(), 'lince.rosso', 'regenerate_handle assegna un nuovo handle');
 select isnt((select handle from profiles where id = auth.uid()), 'lince.rosso', 'il profilo ha il nuovo handle');
+-- during onboarding the handle is free (test 27); the 30-day limit starts at confirm_handle()
+select lives_ok($$ select confirm_handle() $$, 'confermare l''handle fa partire il limite');
 select ok((select handle_changed_at is not null from profiles where id = auth.uid()), 'il cambio è registrato');
 select throws_ok($$ select regenerate_handle() $$, 'HANDLE_CHANGE_TOO_SOON', 'l''handle si cambia al massimo una volta ogni 30 giorni');
 select matches((select handle from profiles where id = auth.uid()), '^[a-z]+\.[a-z]+[0-9]*$', 'resta nel formato animale.colore');

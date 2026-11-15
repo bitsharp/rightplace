@@ -38,9 +38,19 @@ describe('deriveSessionStatus', () => {
       deriveSessionStatus({
         initialized: true,
         session: { emailConfirmed: true },
-        profile: { birthDate: null, deleted: false },
+        profile: { birthDate: null, handleConfirmedAt: null, deleted: false },
       }),
     ).toBe('needsProfile');
+  });
+
+  it('è needsHandle se il profilo è completo ma il @tag non è ancora confermato', () => {
+    expect(
+      deriveSessionStatus({
+        initialized: true,
+        session: { emailConfirmed: true },
+        profile: { birthDate: '2000-01-01', handleConfirmedAt: null, deleted: false },
+      }),
+    ).toBe('needsHandle');
   });
 
   it('è ready con il profilo completo', () => {
@@ -48,7 +58,11 @@ describe('deriveSessionStatus', () => {
       deriveSessionStatus({
         initialized: true,
         session: { emailConfirmed: true },
-        profile: { birthDate: '2000-01-01', deleted: false },
+        profile: {
+          birthDate: '2000-01-01',
+          handleConfirmedAt: '2026-11-01T10:00:00Z',
+          deleted: false,
+        },
       }),
     ).toBe('ready');
   });
@@ -58,7 +72,7 @@ describe('deriveSessionStatus', () => {
       deriveSessionStatus({
         initialized: true,
         session: { emailConfirmed: true },
-        profile: { birthDate: null, deleted: true },
+        profile: { birthDate: null, handleConfirmedAt: null, deleted: true },
       }),
     ).toBe('signedOut');
     expect(

@@ -4,6 +4,7 @@ import { fakeProfileRow, fakeSupabase, setFakeTable } from '@/test/fakeSupabase'
 import {
   completeProfile,
   checkHandleAvailability,
+  confirmHandle,
   deleteMyAccount,
   fetchMyProfile,
   regenerateHandle,
@@ -22,6 +23,7 @@ describe('profile api', () => {
       locale: 'it',
       isCreator: true,
       handleChangedAt: null,
+      handleConfirmedAt: '2026-11-01T10:00:00Z',
       deleted: false,
     });
   });
@@ -93,6 +95,11 @@ describe('profile api', () => {
   it('rifiuta uno stato di disponibilità sconosciuto', async () => {
     fakeSupabase.rpc.mockResolvedValueOnce({ data: 'boh', error: null });
     await expect(checkHandleAvailability('luca_97')).rejects.toThrow();
+  });
+
+  it('conferma il @tag con la RPC', async () => {
+    await confirmHandle();
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('confirm_handle', undefined);
   });
 
   it('cambia handle, lingua e cancella l’account via RPC', async () => {

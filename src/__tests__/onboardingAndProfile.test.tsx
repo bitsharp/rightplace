@@ -1,7 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { act } from 'react';
 
-import { useOnboardingStore } from '@/features/profile/store/onboardingStore';
 import { renderApp } from '@/test/appFlows';
 import { fakeProfileRow, fakeSupabase, setFakeTable } from '@/test/fakeSupabase';
 
@@ -33,6 +32,8 @@ describe('profilo privato e handle', () => {
   it('completa il profilo, mostra l’handle e poi entra nella mappa', async () => {
     fakeSupabase.rpc.mockImplementation(async (name: string) => {
       if (name === 'complete_profile')
+        setFakeTable('profiles', [fakeProfileRow({ gender: 'other', handle_confirmed_at: null })]);
+      if (name === 'confirm_handle')
         setFakeTable('profiles', [fakeProfileRow({ gender: 'other' })]);
       return { data: null, error: null };
     });
@@ -45,6 +46,7 @@ describe('profilo privato e handle', () => {
     );
     expect(await screen.findByText('@lince.rosso')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'profile:handle.enter' }));
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('confirm_handle', undefined);
     expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
   });
 
@@ -61,12 +63,13 @@ describe('profilo privato e handle', () => {
       if (name === 'is_handle_available') return { data: 'available', error: null };
       if (name === 'set_handle')
         setFakeTable('profiles', [
-          fakeProfileRow({ handle: 'luca_97', handle_changed_at: new Date().toISOString() }),
+          fakeProfileRow({ handle: 'luca_97', handle_confirmed_at: null }),
         ]);
+      if (name === 'confirm_handle')
+        setFakeTable('profiles', [fakeProfileRow({ handle: 'luca_97' })]);
       return { data: name === 'set_handle' ? 'luca_97' : null, error: null };
     });
-    useOnboardingStore.setState({ pendingHandleReveal: true });
-    await renderApp('ready', '/handle');
+    await renderApp('needsHandle', '/handle');
     await fireEvent.changeText(await screen.findByLabelText(FIELD), 'Luca_97');
     await act(async () => jest.advanceTimersByTime(400));
     expect(await screen.findByText('profile:handleEditor.status.available')).toBeOnTheScreen();
@@ -79,18 +82,37 @@ describe('profilo privato e handle', () => {
     expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeOnTheScreen();
   });
 
-  it('nello step @tag si può estrarne uno a caso', async () => {
+  it('nello step @tag si può estrarne uno a caso, quante volte si vuole, senza limite mostrato', async () => {
+    let drawn = 0;
     fakeSupabase.rpc.mockImplementation(async (name: string) => {
       if (name !== 'regenerate_handle') return { data: null, error: null };
-      setFakeTable('profiles', [
-        fakeProfileRow({ handle: 'volpe.oro', handle_changed_at: new Date().toISOString() }),
-      ]);
-      return { data: 'volpe.oro', error: null };
+      drawn += 1;
+      const handle = `volpe.oro${drawn}`;
+      setFakeTable('profiles', [fakeProfileRow({ handle, handle_confirmed_at: null })]);
+      return { data: handle, error: null };
     });
-    useOnboardingStore.setState({ pendingHandleReveal: true });
-    await renderApp('ready', '/handle');
+    await renderApp('needsHandle', '/handle');
     await fireEvent.press(await screen.findByRole('button', { name: RANDOM }));
-    expect((await screen.findAllByText('@volpe.oro')).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText('@volpe.oro1')).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: RANDOM })).toBeEnabled();
+    await fireEvent.press(screen.getByRole('button', { name: RANDOM }));
+    expect((await screen.findAllByText('@volpe.oro2')).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: RANDOM })).toBeEnabled();
+    expect(screen.queryByText('profile:handleEditor.limit')).toBeNull();
+    expect(screen.queryByText(/profile:handleEditor\.nextChange/)).toBeNull();
+    expect(screen.getByText('profile:handle.freeUntilContinue')).toBeOnTheScreen();
+  });
+
+  it('se la conferma del @tag fallisce resta sullo step e mostra l’errore tradotto', async () => {
+    fakeSupabase.rpc.mockImplementation(async (name: string) =>
+      name === 'confirm_handle'
+        ? { data: null, error: { message: 'NETWORK' } }
+        : { data: null, error: null },
+    );
+    await renderApp('needsHandle', '/handle');
+    await fireEvent.press(await screen.findByRole('button', { name: 'profile:handle.enter' }));
+    expect(await screen.findByText(/^errors:rpc\./)).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'map:view.general' })).toBeNull();
   });
 });
 

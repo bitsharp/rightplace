@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(60);
+select plan(61);
 
 -- ---------------------------------------------------------------- format rule (private.is_valid_handle)
 select ok(private.is_valid_handle('lince.rosso'), 'handle generato valido');
@@ -73,6 +73,8 @@ select is((select handle_changed_at from profiles where id = auth.uid()), null, 
 
 select is(set_handle('  Luca_97 '), 'luca_97', 'normalizza: trim e minuscole');
 select is((select handle from profiles where id = auth.uid()), 'luca_97', 'il profilo ha il nuovo handle');
+-- the limit starts at confirm_handle(): before it the handle is free (test 27)
+select lives_ok($$ select confirm_handle() $$, 'confirm_handle fa partire il limite');
 select ok((select handle_changed_at is not null from profiles where id = auth.uid()), 'il cambio è registrato');
 select is(set_handle('luca_97'), 'luca_97', 'stesso handle: no-op');
 select throws_ok($$ select set_handle('luca_98') $$, 'HANDLE_CHANGE_TOO_SOON', 'un secondo cambio entro 30 giorni è rifiutato');
