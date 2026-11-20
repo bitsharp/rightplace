@@ -9,11 +9,12 @@ const venue = (overrides: Partial<VenueRecord> = {}): VenueRecord => ({
   kind: 'bar',
   citySlug: 'milano',
   placesSyncedAt: new Date('2026-09-01T00:00:00Z'),
+  detailsSyncedAt: new Date('2026-10-30T00:00:00Z'),
   ...overrides,
 });
 
 function makeDeps(overrides: Partial<DetailHandlerDeps> = {}) {
-  const saved: { citySlug: string; id: string }[] = [];
+  const saved: { citySlug: string; id: string; website?: string | null }[] = [];
   const selectionCalls: { placeId: string; sessionToken: string; language: string }[] = [];
   const selectionSaved: { citySlug: string; id: string }[] = [];
   let googleCalls = 0;
@@ -29,7 +30,11 @@ function makeDeps(overrides: Partial<DetailHandlerDeps> = {}) {
       });
     },
     saveRow: (citySlug, row) => {
-      saved.push({ citySlug, id: row.google_place_id });
+      saved.push({
+        citySlug,
+        id: row.google_place_id,
+        ...(row.website_uri ? { website: row.website_uri } : {}),
+      });
       return Promise.resolve();
     },
     now: () => now,
@@ -78,6 +83,51 @@ Deno.test('dati recenti: non chiama Google e risponde refreshed=false', async ()
   const response = await handleDetail(request({ venue_id: 'v1' }), deps);
   assertEquals(await response.json(), { refreshed: false });
   assertEquals(googleCalls(), 0);
+});
+
+Deno.test(
+  'places_synced_at recente ma Details mai eseguita: chiama Google una volta (serve il sito)',
+  async () => {
+    const { deps, googleCalls } = makeDeps({
+      getVenue: () =>
+        Promise.resolve(
+          venue({ placesSyncedAt: new Date('2026-10-30T00:00:00Z'), detailsSyncedAt: null }),
+        ),
+    });
+    const response = await handleDetail(request({ venue_id: 'v1' }), deps);
+    assertEquals(await response.json(), { refreshed: true });
+    assertEquals(googleCalls(), 1);
+  },
+);
+
+Deno.test('Details eseguita da meno di 30 giorni: non richiama Google', async () => {
+  const { deps, googleCalls } = makeDeps({
+    getVenue: () =>
+      Promise.resolve(
+        venue({
+          placesSyncedAt: new Date('2026-10-30T00:00:00Z'),
+          detailsSyncedAt: new Date('2026-10-20T00:00:00Z'),
+        }),
+      ),
+  });
+  assertEquals(await (await handleDetail(request({ venue_id: 'v1' }), deps)).json(), {
+    refreshed: false,
+  });
+  assertEquals(googleCalls(), 0);
+});
+
+Deno.test('salva la riga con il sito web restituito da Google', async () => {
+  const { deps, saved } = makeDeps({
+    fetchDetails: () =>
+      Promise.resolve({
+        id: 'ChIJabc',
+        displayName: { text: 'Nome' },
+        location: { latitude: 1, longitude: 2 },
+        websiteUri: 'https://www.locale.it/',
+      }),
+  });
+  await handleDetail(request({ venue_id: 'v1' }), deps);
+  assertEquals(saved, [{ citySlug: 'milano', id: 'ChIJabc', website: 'https://www.locale.it/' }]);
 });
 
 Deno.test('i locali demo non vanno mai su Google', async () => {

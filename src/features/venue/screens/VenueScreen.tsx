@@ -17,6 +17,7 @@ import { ReportSpot } from '../components/ReportSpot';
 import { VenueCoverPhoto } from '../components/VenueCoverPhoto';
 import { VenueHeader } from '../components/VenueHeader';
 import { VenueTopBar } from '../components/VenueTopBar';
+import { VenueWebsite } from '../components/VenueWebsite';
 import { WhoIsGoing } from '../components/WhoIsGoing';
 import { useVenueScreen } from '../useVenueScreen';
 
@@ -89,6 +90,7 @@ function VenueBody({ screen }: BodyProps) {
     <View style={styles.body}>
       <VenueCoverPhoto photoUrl={venue.photoUrl} />
       <VenueHeader detail={venue} closingTime={screen.closingTime} />
+      <VenueWebsite url={venue.websiteUri} />
       <Bands screen={screen} />
       <WhoIsGoing segment={screen.segment} onSegment={screen.setSegment} view={screen.statsView} />
       <FriendsGoing friends={screen.friends} />

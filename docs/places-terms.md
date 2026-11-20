@@ -4,17 +4,17 @@ Valutazione dell'architetto/sviluppatore sui termini di Google Maps Platform per
 
 ## Cosa salviamo, e per quanto
 
-| Dato                                           | Dove                                                  | Durata                                                                                                                                              |
-| ---------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `place_id` (`venues.google_place_id`)          | `venues`                                              | **A tempo indeterminato.** È l'unico dato Places che i termini consentono di conservare senza limiti.                                               |
-| Nome, coordinate, indirizzo, orari di apertura | `venues.name`, `location`, `address`, `opening_hours` | **Al massimo 30 giorni** dall'ultima sync (`places_synced_at`). Si rinfrescano con la sync (`npm run venues:sync`) o con `places-detail` on demand. |
-| Tipo di locale (`kind`)                        | `venues.kind`                                         | Deriva da `primaryType` e dalla query: è una nostra classificazione, non un campo salvato così com'è.                                               |
+| Dato                                                     | Dove                                                                 | Durata                                                                                                                                              |
+| -------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `place_id` (`venues.google_place_id`)                    | `venues`                                                             | **A tempo indeterminato.** È l'unico dato Places che i termini consentono di conservare senza limiti.                                               |
+| Nome, coordinate, indirizzo, orari di apertura, sito web | `venues.name`, `location`, `address`, `opening_hours`, `website_uri` | **Al massimo 30 giorni** dall'ultima sync (`places_synced_at`). Si rinfrescano con la sync (`npm run venues:sync`) o con `places-detail` on demand. |
+| Tipo di locale (`kind`)                                  | `venues.kind`                                                        | Deriva da `primaryType` e dalla query: è una nostra classificazione, non un campo salvato così com'è.                                               |
 
 Il job `expire-stale-places` (ogni giorno, 04:30 UTC) applica la regola dei 30 giorni lato server: i locali reali con `places_synced_at` più vecchio di 30 giorni vengono disattivati e perdono nome, coordinate, indirizzo e orari (`name = google_place_id`). Non è una promessa della UI. Per questo la sync va rilanciata almeno ogni settimana (vedi `docs/places-sync.md`).
 
 ## Field mask minimo
 
-Chiediamo a Google **solo i campi che salviamo**: `id, displayName, location, formattedAddress, primaryType` e `regularOpeningHours` (Text Search); `id, displayName, location, formattedAddress, regularOpeningHours` (Place Details del dettaglio locale); `id, displayName, formattedAddress, location, types, primaryType` (Place Details Pro della selezione dalla ricerca). Niente recensioni, foto, rating, telefono o sito. Un test Deno verifica la maschera esatta.
+Chiediamo a Google **solo i campi che salviamo**: `id, displayName, location, formattedAddress, primaryType` e `regularOpeningHours` (Text Search); `id, displayName, location, formattedAddress, regularOpeningHours, websiteUri` (Place Details del dettaglio locale); `id, displayName, formattedAddress, location, types, primaryType` (Place Details Pro della selezione dalla ricerca). Niente recensioni, foto, rating o telefono. Il **sito web** (`websiteUri`) è solo nella Place Details del dettaglio locale: quella chiamata è già Enterprise per `regularOpeningHours` e `websiteUri` rientra nella stessa fascia, quindi il costo per chiamata non cambia. **Non** va mai nella Text Search (`places-sync`) né nella selezione Pro della ricerca: lì farebbe passare la richiesta a una fascia più cara (due test Deno lo verificano). Il sito si salva in `venues.website_uri` con le stesse regole dei 30 giorni (`expire_stale_places` lo azzera con gli altri contenuti). Poiché la Text Search non lo porta, `places-detail` esegue la Details anche la prima volta che si apre un locale mai passato da lì (`venues.details_synced_at` nullo) e poi al massimo una volta ogni 30 giorni. Un test Deno verifica la maschera esatta.
 
 ## Ricerca come su Google Maps (prompt 20)
 
@@ -29,7 +29,7 @@ Chiediamo a Google **solo i campi che salviamo**: `id, displayName, location, fo
 - Ogni sync per città fa al massimo `max_requests` chiamate Text Search (default 10, massimo assoluto 20). Il tetto è applicato in codice: le query pianificate vengono troncate a `max_requests` e c'è una chiamata per query (nessuna paginazione).
 - `--dry-run` (`dry_run: true`) **non chiama Google**: restituisce le query pianificate e `estimated_calls`. Usarlo prima di una sync reale.
 - Le chiamate effettive sono registrate nel log della funzione (`calls=N`) e stampate dallo script.
-- Place Details solo on demand, al massimo una volta ogni 30 giorni per locale (decisione server in `shouldRefresh`); i locali demo non vanno mai su Google.
+- Place Details solo on demand, al massimo una volta ogni 30 giorni per locale (decisione server in `shouldRefresh`, su `places_synced_at` e `details_synced_at`); i locali demo non vanno mai su Google.
 - Le query nascono dalla riga `cities` (nome, paese, `places_radius_m`, `places_areas`): nessuna città è scritta nel codice.
 
 ## Attribuzione

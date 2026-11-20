@@ -13,6 +13,9 @@ export type VenueRow = {
   opening_hours: unknown;
 };
 
+// Place Details row: the Text Search row plus the venue website (Details only: it is not in the Text Search mask).
+export type DetailsRow = VenueRow & { website_uri: string | null };
+
 // Everything comes from the cities row: nothing is hard-wired per city.
 export type SyncCity = {
   slug: string;

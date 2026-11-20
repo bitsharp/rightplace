@@ -187,6 +187,24 @@ describe('dettaglio locale e dichiarazione', () => {
     });
   });
 
+  describe('sito web', () => {
+    it('con website_uri mostra la riga "Sito web" che apre il sito', async () => {
+      seedBackend({ detail: { website_uri: 'https://www.arena.it/' } });
+      const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+      await renderApp('ready', '/venue/arena');
+      expect(await screen.findByText('www.arena.it')).toBeOnTheScreen();
+      await fireEvent.press(screen.getByText('www.arena.it'));
+      expect(open).toHaveBeenCalledWith('https://www.arena.it/');
+    });
+
+    it('senza website_uri la riga non c’è', async () => {
+      seedBackend({ detail: { website_uri: null } });
+      await renderApp('ready', '/venue/arena');
+      expect(await screen.findByText('Arena Club')).toBeOnTheScreen();
+      expect(screen.queryByText('venue:website.label')).toBeNull();
+    });
+  });
+
   describe('andare e tornare', () => {
     it('Uber apre il link di andata e, dopo il cambio, quello di ritorno', async () => {
       seedBackend();

@@ -21,6 +21,7 @@ const detailRow = (overrides: Record<string, unknown> = {}) => ({
   timezone: 'Europe/Rome',
   taxi_number: '+39 02 8585',
   photo_url: null,
+  website_uri: null,
   ...overrides,
 });
 
@@ -54,6 +55,7 @@ describe('fetchVenueDetail', () => {
       timezone: 'Europe/Rome',
       taxiNumber: '+39 02 8585',
       photoUrl: null,
+      websiteUri: null,
     });
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_venue_detail', { p_venue_id: 'v1' });
   });
@@ -63,6 +65,19 @@ describe('fetchVenueDetail', () => {
     await expect(fetchVenueDetail('v1')).resolves.toMatchObject({
       photoUrl: 'https://lh3.googleusercontent.com/p/abc',
     });
+  });
+
+  it('porta il sito web del locale quando c’è', async () => {
+    respondWith([detailRow({ website_uri: 'https://www.locale.it/' })]);
+    await expect(fetchVenueDetail('v1')).resolves.toMatchObject({
+      websiteUri: 'https://www.locale.it/',
+    });
+  });
+
+  it('tollera una RPC senza website_uri: nessun sito', async () => {
+    const { website_uri: _omitted, ...row } = detailRow();
+    respondWith([row]);
+    await expect(fetchVenueDetail('v1')).resolves.toMatchObject({ websiteUri: null });
   });
 
   it('tollera una RPC senza la colonna photo_url: nessuna foto', async () => {

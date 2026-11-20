@@ -19,6 +19,7 @@ const detail: VenueDetail = {
   timezone: 'Europe/Rome',
   taxiNumber: null,
   photoUrl: null,
+  websiteUri: null,
 };
 
 describe('VenueHeader', () => {

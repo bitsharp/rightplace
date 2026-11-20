@@ -1,9 +1,12 @@
 import { isSearchLanguage, isSessionToken } from './search.ts';
 import { mapKind, placeToRow } from './textSearch.ts';
-import type { SearchLanguage, SelectionRow, VenueKind, VenueRow } from './types.ts';
+import type { DetailsRow, SearchLanguage, SelectionRow, VenueKind } from './types.ts';
 
-// Minimal field mask for Place Details (New): identifiers and the fields the app shows.
-export const DETAILS_FIELD_MASK = 'id,displayName,location,formattedAddress,regularOpeningHours';
+// Minimal field mask for Place Details (New): identifiers and the fields the app shows. regularOpeningHours already
+// makes this call Enterprise, and websiteUri is billed in the same tier: adding it does not change the cost per call.
+// It must NOT go into the Text Search mask or the Pro selection mask below: there it would raise the SKU.
+export const DETAILS_FIELD_MASK =
+  'id,displayName,location,formattedAddress,regularOpeningHours,websiteUri';
 
 const REFRESH_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -33,8 +36,20 @@ export function buildDetailsRequest(
   };
 }
 
-export function detailsToRow(place: unknown, kind: VenueKind): VenueRow | null {
-  return placeToRow(place, kind);
+const WEBSITE = /^https?:\/\/\S+$/i;
+const MAX_WEBSITE_LENGTH = 2048;
+
+// Only http(s) links are kept: anything else (javascript:, tel:, bare text) is dropped, the app only ever opens web links.
+function toWebsite(value: unknown): string | null {
+  return typeof value === 'string' && value.length <= MAX_WEBSITE_LENGTH && WEBSITE.test(value)
+    ? value
+    : null;
+}
+
+export function detailsToRow(place: unknown, kind: VenueKind): DetailsRow | null {
+  const row = placeToRow(place, kind);
+  if (row === null) return null;
+  return { ...row, website_uri: toWebsite((place as { websiteUri?: unknown }).websiteUri) };
 }
 
 // Place Details Pro: no regularOpeningHours (that field moves the call to Enterprise). Opening hours stay with the

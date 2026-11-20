@@ -1,7 +1,12 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { buildDetailsRequest, buildSelectionDetailsRequest } from '../_shared/places/details.ts';
 import { requireApiKey } from '../_shared/places/search.ts';
-import type { SearchLanguage, SelectionRow, VenueKind, VenueRow } from '../_shared/places/types.ts';
+import type {
+  DetailsRow,
+  SearchLanguage,
+  SelectionRow,
+  VenueKind,
+} from '../_shared/places/types.ts';
 import { type CachedPlace, handleDetail, type VenueRecord } from './handler.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
@@ -25,7 +30,7 @@ async function getUserId(request: Request): Promise<string | null> {
 async function getVenue(venueId: string): Promise<VenueRecord | null> {
   const { data } = await admin
     .from('venues')
-    .select('id, google_place_id, kind, places_synced_at, cities(slug)')
+    .select('id, google_place_id, kind, places_synced_at, details_synced_at, cities(slug)')
     .eq('id', venueId)
     .eq('is_active', true)
     .maybeSingle();
@@ -37,6 +42,7 @@ async function getVenue(venueId: string): Promise<VenueRecord | null> {
     kind: data.kind as VenueKind,
     citySlug: city.slug,
     placesSyncedAt: data.places_synced_at ? new Date(data.places_synced_at) : null,
+    detailsSyncedAt: data.details_synced_at ? new Date(data.details_synced_at) : null,
   };
 }
 
@@ -84,9 +90,20 @@ async function saveSelection(citySlug: string, row: SelectionRow): Promise<strin
   return data;
 }
 
-async function saveRow(citySlug: string, row: VenueRow): Promise<void> {
-  const { error } = await admin.rpc('sync_places_venues', { p_city_slug: citySlug, p_rows: [row] });
-  if (error) throw new Error('UPSERT_FAILED');
+// The catalog upsert takes the Text Search columns; the website (Details only) goes through its own RPC, which also
+// stamps details_synced_at.
+async function saveRow(citySlug: string, row: DetailsRow): Promise<void> {
+  const { website_uri: websiteUri, ...venueRow } = row;
+  const upsert = await admin.rpc('sync_places_venues', {
+    p_city_slug: citySlug,
+    p_rows: [venueRow],
+  });
+  if (upsert.error) throw new Error('UPSERT_FAILED');
+  const details = await admin.rpc('set_venue_details', {
+    p_google_place_id: row.google_place_id,
+    p_website_uri: websiteUri,
+  });
+  if (details.error) throw new Error('UPSERT_FAILED');
 }
 
 Deno.serve((request) =>

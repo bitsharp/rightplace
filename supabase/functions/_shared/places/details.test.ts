@@ -1,4 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { PLACES_FIELD_MASK } from './textSearch.ts';
 import {
   buildDetailsRequest,
   buildSelectionDetailsRequest,
@@ -42,7 +43,10 @@ Deno.test('la richiesta Place Details è una GET con field mask minima', () => {
   const headers = init.headers as Record<string, string>;
   assertEquals(headers['X-Goog-Api-Key'], 'chiave');
   assertEquals(headers['X-Goog-FieldMask'], DETAILS_FIELD_MASK);
-  assertEquals(DETAILS_FIELD_MASK, 'id,displayName,location,formattedAddress,regularOpeningHours');
+  assertEquals(
+    DETAILS_FIELD_MASK,
+    'id,displayName,location,formattedAddress,regularOpeningHours,websiteUri',
+  );
 });
 
 Deno.test('detailsToRow mantiene il tipo già salvato del locale', () => {
@@ -58,6 +62,46 @@ Deno.test('detailsToRow mantiene il tipo già salvato del locale', () => {
   assertEquals(row?.kind, 'rooftop');
   assertEquals(row?.address, 'Via X');
   assertEquals(detailsToRow({ id: 'abc' }, 'bar'), null);
+});
+
+Deno.test(
+  'websiteUri resta fuori dalla Text Search e dalla selezione Pro (fascia più cara)',
+  () => {
+    assertEquals(PLACES_FIELD_MASK.includes('websiteUri'), false);
+    assertEquals(SELECTION_FIELD_MASK.includes('websiteUri'), false);
+  },
+);
+
+const detailsPlace = (extra: Record<string, unknown>) => ({
+  id: 'abc',
+  displayName: { text: 'Nome' },
+  location: { latitude: 1, longitude: 2 },
+  ...extra,
+});
+
+Deno.test('detailsToRow porta il sito web http(s) del locale', () => {
+  assertEquals(
+    detailsToRow(detailsPlace({ websiteUri: 'https://www.locale.it/' }), 'bar')?.website_uri,
+    'https://www.locale.it/',
+  );
+  assertEquals(
+    detailsToRow(detailsPlace({ websiteUri: 'http://locale.it' }), 'bar')?.website_uri,
+    'http://locale.it',
+  );
+});
+
+Deno.test('detailsToRow: sito assente, non testo o con schema diverso → null', () => {
+  for (const websiteUri of [
+    undefined,
+    null,
+    5,
+    '',
+    'javascript:alert(1)',
+    'tel:+39021234',
+    'www.x.it',
+  ]) {
+    assertEquals(detailsToRow(detailsPlace({ websiteUri }), 'bar')?.website_uri, null);
+  }
 });
 
 const SESSION = '3f1c8a52-7d0e-4a56-9b1f-2c6d8e4a1b90';

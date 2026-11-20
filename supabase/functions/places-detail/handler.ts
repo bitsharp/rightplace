@@ -7,7 +7,12 @@ import {
   selectionToRow,
   shouldRefresh,
 } from '../_shared/places/details.ts';
-import type { SearchLanguage, SelectionRow, VenueKind, VenueRow } from '../_shared/places/types.ts';
+import type {
+  DetailsRow,
+  SearchLanguage,
+  SelectionRow,
+  VenueKind,
+} from '../_shared/places/types.ts';
 
 export type VenueRecord = {
   id: string;
@@ -15,6 +20,8 @@ export type VenueRecord = {
   kind: VenueKind;
   citySlug: string;
   placesSyncedAt: Date | null;
+  // Last Place Details call: it brings the website, which the Text Search sync never fetches.
+  detailsSyncedAt: Date | null;
 };
 
 export type CachedPlace = { venueId: string; placesSyncedAt: Date | null };
@@ -23,7 +30,7 @@ export type DetailHandlerDeps = {
   getUserId: (request: Request) => Promise<string | null>;
   getVenue: (venueId: string) => Promise<VenueRecord | null>;
   fetchDetails: (placeId: string) => Promise<unknown>;
-  saveRow: (citySlug: string, row: VenueRow) => Promise<void>;
+  saveRow: (citySlug: string, row: DetailsRow) => Promise<void>;
   // Search selection (Details Pro): cache lookup, the Google call that closes the Autocomplete session, the upsert.
   getCachedPlace: (placeId: string) => Promise<CachedPlace | null>;
   fetchSelection: (
@@ -58,9 +65,10 @@ async function refresh(venue: VenueRecord, deps: DetailHandlerDeps): Promise<Res
 async function handleVenue(venueId: string, deps: DetailHandlerDeps): Promise<Response> {
   const venue = await deps.getVenue(venueId);
   if (venue === null) return json({ error: 'NOT_FOUND' }, 404);
-  if (!isRealPlaceId(venue.googlePlaceId) || !shouldRefresh(venue.placesSyncedAt, deps.now())) {
-    return json({ refreshed: false });
-  }
+  const now = deps.now();
+  const fresh =
+    !shouldRefresh(venue.placesSyncedAt, now) && !shouldRefresh(venue.detailsSyncedAt, now);
+  if (!isRealPlaceId(venue.googlePlaceId) || fresh) return json({ refreshed: false });
   return refresh(venue, deps);
 }
 

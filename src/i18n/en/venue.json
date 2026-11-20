@@ -113,5 +113,9 @@
   "cover": {
     "caption": "Photo from Google Maps",
     "open": "Open the venue photo full screen"
+  },
+  "website": {
+    "label": "Website",
+    "open": "Open the website {{domain}}"
   }
 }

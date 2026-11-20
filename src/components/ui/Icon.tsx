@@ -49,6 +49,14 @@ const GLYPHS = {
       d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"
     />,
   ],
+  globe: [
+    <Circle key="c" cx="12" cy="12" r="8.5" />,
+    <Path key="p" d="M3.5 12h17" />,
+    <Path
+      key="q"
+      d="M12 3.5c2.5 2.5 3.5 5.5 3.5 8.5s-1 6-3.5 8.5c-2.5-2.5-3.5-5.5-3.5-8.5s1-6 3.5-8.5z"
+    />,
+  ],
   clock: [<Circle key="c" cx="12" cy="12" r="8.5" />, <Path key="p" d="M12 7.5V12l3 2" />],
   bell: [<Path key="p" d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z" />, <Path key="q" d="M10 21h4" />],
   camera: [

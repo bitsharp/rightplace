@@ -113,5 +113,9 @@
   "cover": {
     "caption": "Foto da Google Maps",
     "open": "Apri la foto del locale a schermo intero"
+  },
+  "website": {
+    "label": "Sito web",
+    "open": "Apri il sito web {{domain}}"
   }
 }

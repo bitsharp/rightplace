@@ -944,6 +944,7 @@ export type Database = {
           city_id: string;
           created_at: string;
           created_by: string | null;
+          details_synced_at: string | null;
           google_place_id: string;
           hidden_at: string | null;
           id: string;
@@ -958,6 +959,7 @@ export type Database = {
           source: string;
           spot_expires_at: string | null;
           updated_at: string;
+          website_uri: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -965,6 +967,7 @@ export type Database = {
           city_id: string;
           created_at?: string;
           created_by?: string | null;
+          details_synced_at?: string | null;
           google_place_id: string;
           hidden_at?: string | null;
           id?: string;
@@ -979,12 +982,14 @@ export type Database = {
           source?: string;
           spot_expires_at?: string | null;
           updated_at?: string;
+          website_uri?: string | null;
         };
         Update: {
           address?: string | null;
           city_id?: string;
           created_at?: string;
           created_by?: string | null;
+          details_synced_at?: string | null;
           google_place_id?: string;
           hidden_at?: string | null;
           id?: string;
@@ -999,6 +1004,7 @@ export type Database = {
           source?: string;
           spot_expires_at?: string | null;
           updated_at?: string;
+          website_uri?: string | null;
         };
         Relationships: [
           {
@@ -1505,6 +1511,7 @@ export type Database = {
           taxi_number: string;
           timezone: string;
           venue_id: string;
+          website_uri: string;
         }[];
       };
       get_venue_stats: {
@@ -1599,6 +1606,10 @@ export type Database = {
         }[];
       };
       set_profile_city: { Args: { p_city_slug: string }; Returns: undefined };
+      set_venue_details: {
+        Args: { p_google_place_id: string; p_website_uri: string };
+        Returns: boolean;
+      };
       sync_places_venues: {
         Args: { p_city_slug: string; p_rows: Json };
         Returns: {
