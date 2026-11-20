@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, within } from '@testing-library/react-native';
 import { AppState, Text } from 'react-native';
 
 import { AppProviders } from './AppProviders';
@@ -34,5 +34,16 @@ describe('AppProviders', () => {
     expect(provider.props.statusBarTranslucent).toBe(true);
     expect(provider.props.navigationBarTranslucent).toBe(true);
     expect(screen.getByText('child')).toBeOnTheScreen();
+  });
+
+  it('mette la radice dei gesti (GestureHandlerRootView) sopra tutta l’app, a schermo intero', async () => {
+    await render(
+      <AppProviders>
+        <Text>child</Text>
+      </AppProviders>,
+    );
+    const root = screen.getByTestId('gesture-root');
+    expect(root).toHaveStyle({ flex: 1 });
+    expect(within(root).getByText('child')).toBeOnTheScreen();
   });
 });

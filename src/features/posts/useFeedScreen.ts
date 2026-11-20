@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
+import { usePhotoViewerState } from '@/components/app/usePhotoViewerState';
+
 import { useFeed, usePostPhotoUrls, useToggleLike } from './hooks';
 import type { PostNotice } from './components/PostActionsSheet';
 import type { FeedPost } from './domain/types';
@@ -17,6 +19,10 @@ export function useFeedScreen() {
   const [notice, setNotice] = useState<PostNotice | null>(null);
   const photoIds = feed.posts.filter((post) => post.hasPhoto).map((post) => post.id);
   const photoUrls = usePostPhotoUrls(photoIds);
+  // The viewer scrolls through the photos of the posts loaded so far, in feed order.
+  const viewer = usePhotoViewerState(
+    photoIds.map((id) => ({ id, uri: photoUrls[id], cacheKey: id, scene: id.charCodeAt(0) })),
+  );
 
   useEffect(() => {
     if (!notice) return;
@@ -27,6 +33,7 @@ export function useFeedScreen() {
   return {
     feed,
     photoUrls,
+    viewer,
     commentsFor,
     openComments: setCommentsFor,
     actionsFor,

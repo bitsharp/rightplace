@@ -16,6 +16,7 @@ type Props = {
   onLoadOlder: () => void;
   onRetry: (messageId: string) => void;
   onLongPress: (message: ChatMessage) => void;
+  onOpenPhoto: (messageId: string) => void;
 };
 
 // Inverted: the newest message sits at the bottom and the "chat created" event is the last item (the top).
@@ -26,6 +27,7 @@ export function MessageList({
   onLoadOlder,
   onRetry,
   onLongPress,
+  onOpenPhoto,
 }: Props) {
   const { t } = useTranslation('chat');
   return (
@@ -42,6 +44,7 @@ export function MessageList({
           photoUri={photoUrls[item.id]}
           onRetry={onRetry}
           onLongPress={onLongPress}
+          onOpenPhoto={onOpenPhoto}
         />
       )}
       ListFooterComponent={
@@ -62,6 +65,7 @@ type ItemProps = {
   photoUri: string | undefined;
   onRetry: (messageId: string) => void;
   onLongPress: (message: ChatMessage) => void;
+  onOpenPhoto: (messageId: string) => void;
 };
 
 function canOpenActions(message: ChatMessage): boolean {
@@ -69,7 +73,7 @@ function canOpenActions(message: ChatMessage): boolean {
   return !message.isMine || message.kind === 'text';
 }
 
-function MessageItem({ message, photoUri, onRetry, onLongPress }: ItemProps) {
+function MessageItem({ message, photoUri, onRetry, onLongPress, onOpenPhoto }: ItemProps) {
   const sending = message.pending === true;
   return (
     <MessageBubble
@@ -79,6 +83,11 @@ function MessageItem({ message, photoUri, onRetry, onLongPress }: ItemProps) {
       onRetry={() => onRetry(message.id)}
       // delivered messages only: copy (mine included) and, on other people's, moderation
       onLongPress={canOpenActions(message) ? () => onLongPress(message) : undefined}
+      onOpenPhoto={
+        message.kind === 'photo' && !sending && !message.failed
+          ? () => onOpenPhoto(message.id)
+          : undefined
+      }
       content={
         message.kind === 'photo'
           ? { kind: 'photo', uri: photoUri }

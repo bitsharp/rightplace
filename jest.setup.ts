@@ -1,9 +1,23 @@
+import 'react-native-gesture-handler/jestSetup';
 import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/async-storage-mock';
 
 // Deterministic public config for tests (real values come from .env at runtime).
 process.env.EXPO_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY = '1x00000000000000000000AA';
+
+// Gestures and animations are native: react-native-gesture-handler's official jest setup renders plain views and
+// the gesture callbacks are exercised through its jest utils. Worklets run on the JS thread (see the resolver in
+// package.json); binding the gestures to the UI runtime has no meaning there and throws.
+jest.mock('react-native-gesture-handler/src/handlers/gestures/installUIRuntimeBindings', () => ({
+  installUIRuntimeBindings: jest.fn(),
+}));
+jest.mock(
+  'react-native-gesture-handler/lib/module/handlers/gestures/installUIRuntimeBindings',
+  () => ({
+    installUIRuntimeBindings: jest.fn(),
+  }),
+);
 
 jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 

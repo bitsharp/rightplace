@@ -21,6 +21,8 @@ type Props = {
   onRetry?: () => void;
   // Long press opens the moderation actions (report / block).
   onLongPress?: () => void;
+  // Tap on a delivered photo opens it full screen.
+  onOpenPhoto?: () => void;
 };
 
 export function MessageBubble({
@@ -30,9 +32,12 @@ export function MessageBubble({
   status,
   onRetry,
   onLongPress,
+  onOpenPhoto,
 }: Props) {
   const { t } = useTranslation('ui');
   const mine = author === 'me';
+  const failed = status === 'failed';
+  const opensPhoto = !failed && content.kind === 'photo' && onOpenPhoto !== undefined;
   return (
     <View testID="bubble-wrap" style={[styles.wrap, mine ? styles.mine : styles.theirs]}>
       {!mine && senderName ? (
@@ -41,8 +46,9 @@ export function MessageBubble({
         </Text>
       ) : null}
       <Pressable
-        accessibilityRole={status === 'failed' ? 'button' : undefined}
-        onPress={status === 'failed' ? onRetry : undefined}
+        accessibilityRole={failed || opensPhoto ? 'button' : undefined}
+        accessibilityLabel={opensPhoto ? t('photoViewer.open') : undefined}
+        onPress={failed ? onRetry : opensPhoto ? onOpenPhoto : undefined}
         onLongPress={onLongPress}
         style={mine ? styles.mine : undefined}
       >

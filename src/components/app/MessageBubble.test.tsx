@@ -147,3 +147,36 @@ describe('MessageBubble: link', () => {
     expect(onLongPress).toHaveBeenCalled();
   });
 });
+
+describe('MessageBubble: foto', () => {
+  it('un tocco su una foto consegnata la apre a schermo intero', async () => {
+    const onOpenPhoto = jest.fn();
+    await render(
+      <MessageBubble author="other" content={{ kind: 'photo' }} onOpenPhoto={onOpenPhoto} />,
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'ui:photoViewer.open' }));
+    expect(onOpenPhoto).toHaveBeenCalledTimes(1);
+  });
+
+  it('una foto che non è partita al tocco riprova, non si apre', async () => {
+    const onOpenPhoto = jest.fn();
+    const onRetry = jest.fn();
+    await render(
+      <MessageBubble
+        author="me"
+        status="failed"
+        content={{ kind: 'photo' }}
+        onOpenPhoto={onOpenPhoto}
+        onRetry={onRetry}
+      />,
+    );
+    await fireEvent.press(screen.getByRole('button'));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(onOpenPhoto).not.toHaveBeenCalled();
+  });
+
+  it('senza azione di apertura la foto non è un bottone', async () => {
+    await render(<MessageBubble author="other" content={{ kind: 'photo' }} />);
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+});

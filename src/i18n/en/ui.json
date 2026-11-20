@@ -120,5 +120,11 @@
     "cancel": "Cancel",
     "copied": "Copied",
     "openFailed": "We can’t open this link"
+  },
+  "photoViewer": {
+    "counter": "{{current}} / {{total}}",
+    "close": "Close",
+    "photoOf": "Photo {{current}} of {{total}}",
+    "open": "Open photo"
   }
 }

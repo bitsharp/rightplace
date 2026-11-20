@@ -10,6 +10,7 @@ import { Toast } from '@/components/ui/Toast';
 import { colors, heights, spacing } from '@/theme/tokens';
 
 import { PhotoSourceSheet } from '@/components/app/PhotoSourceSheet';
+import { PhotoViewer } from '@/components/app/PhotoViewer';
 import { ChatComposer } from '../components/ChatComposer';
 import { ComposerDock } from '../components/ComposerDock';
 import { ExpiryBanner } from '../components/ExpiryBanner';
@@ -27,7 +28,7 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
       <ChatHeader title={screen.title} onBack={screen.goBack} />
       <View style={styles.top}>
         <ExpiryBanner hours={screen.expiryHours} />
-        <PhotoStrip photos={screen.photos} />
+        <PhotoStrip photos={screen.photos} onOpen={screen.viewer.open} />
       </View>
       {screen.loadFailed ? <EmptyState message={t('loadError')} /> : null}
       {/* Same strategy on iOS and Android: with edge-to-edge the window never resizes for the keyboard. */}
@@ -39,6 +40,7 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
           onLoadOlder={() => void screen.loadOlder()}
           onRetry={screen.retry}
           onLongPress={screen.select}
+          onOpenPhoto={screen.viewer.open}
         />
         <ComposerDock>
           <ChatComposer
@@ -71,6 +73,11 @@ function ChatOverlays({ screen }: { screen: ReturnType<typeof useNightChatScreen
         onPick={(source) => void screen.photoFlow.choose(source)}
         onClose={screen.photoFlow.closeSheet}
         onDismiss={screen.photoFlow.onSheetDismiss}
+      />
+      <PhotoViewer
+        photos={screen.viewer.photos}
+        index={screen.viewer.index}
+        onClose={screen.viewer.close}
       />
       <MessageActionsSheet
         message={screen.selected}
