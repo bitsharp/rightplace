@@ -42,12 +42,12 @@ App mobile (iOS + Android) per scoprire **dove va la gente stasera**. L'utente d
    **Lingue**: ogni testo visibile esiste in italiano **e** inglese dal primo commit; una feature con stringhe mancanti in una delle due lingue non è finita.
 9. **Nessuna vendita di dati, nessun SDK pubblicitario.** Le uniche "pubblicità" sono le serate sponsorizzate dai creator, etichettate **SPONSORIZZATA**.
 10. **Il check-in resta veloce**: dalla mappa alla dichiarazione in ≤ 3 tap.
-11. **Due strati sulla mappa, mai confusi**: lo strato **"di solito"** (`typical_level` 0–3 per venue/giorno/ora, da `venue_typical_busyness`) è grigio, neutro e serve a non mostrare il vuoto; lo strato **"stasera"** (dichiarazioni, `going_band`/`maybe_band`) è colorato e rispetta il principio 2. Lo strato tipico **non** usa mai i "Popular times" di Google (non esposti dall'API, scraping vietato dai termini): nasce da curatela manuale e viene sostituito dalla nostra media storica (k ≥ 3) appena ci sono dati. In UI i due strati hanno etichette diverse ("di solito" / "stasera") e l'uno non si somma mai all'altro.
+11. **Due strati sulla mappa, mai confusi**: lo strato **"di solito"** (`typical_level` 0–3 per venue/giorno/ora, da `venue_typical_busyness`) è grigio, neutro e serve a non mostrare il vuoto; lo strato **"stasera"** (dichiarazioni, `going_band`/`maybe_band`) è colorato e rispetta il principio 2. Lo strato tipico nasce da tre fonti, in ordine di precedenza: la nostra media storica (k ≥ 3), la curatela manuale e, per decisione di Luca del 20/11/2026 con rischio accettato, i "Popular times" di Google estratti via Apify (prompt 21: solo livelli 0–3, mai il dato "live", mai nello strato "stasera"; lo scraping viola i termini di Google Maps Platform e può costare la sospensione dell'account — rischi e interruttore in `docs/typical-apify.md`). In UI i due strati hanno etichette diverse ("di solito" / "stasera") e l'uno non si somma mai all'altro.
 
 ## Stack e vincoli tecnici
 
 - **Expo SDK (ultimo stabile) + TypeScript strict + Expo Router.** Niente bare workflow salvo necessità motivata.
-- Mappa: `react-native-maps` (Apple Maps iOS / Google Maps Android), stile dark. Dati locali da **Google Places API (New)** via Edge Function (mai la chiave Places nel client), con cache in tabella `venues`. **Nessuna libreria o servizio di scraping dei Popular times** (`populartimes`, SerpApi e simili) né in client né in Edge Function.
+- Mappa: `react-native-maps` (Apple Maps iOS / Google Maps Android), stile dark. Dati locali da **Google Places API (New)** via Edge Function (mai la chiave Places nel client), con cache in tabella `venues`. **Nessuna libreria o servizio di scraping** né nel client né nelle Edge Function, con un'unica eccezione decisa da Luca (20/11/2026): l'attore Apify per i Popular times, usato solo dallo script `typical:apify` per lo strato "di solito" (prompt 21).
 - Stato: `zustand` per UI/sessione, `@tanstack/react-query` per dati remoti.
 - Backend: **Supabase** — Postgres, Auth (email + password), Storage (foto), Realtime (chat), Edge Functions, pg_cron. Tutte le letture aggregate passano da **RPC `security definer`**; mai select dirette su tabelle con dati per-utente altrui.
 - Captcha: **Cloudflare Turnstile** collegato a Supabase Auth (captcha protection).
@@ -191,5 +191,5 @@ roadmap/
 | sponsored | event/venue in evidenza (etichetta SPONSORIZZATA) |
 | hot spot | punto caldo sulla mappa: venue con affluenza visibile (≥ 3) — strato "stasera" |
 | typical dot | punto grigio dello strato "di solito": venue con `typical_level ≥ 1` nell'ora corrente ma senza hot spot |
-| typical_level | affluenza tipica di un venue per giorno/ora: `0` chiuso/vuoto, `1` tranquillo, `2` animato, `3` pieno; da curatela manuale (`source='manual'`) o dalla nostra storia (`source='history'`) |
+| typical_level | affluenza tipica di un venue per giorno/ora: `0` chiuso/vuoto, `1` tranquillo, `2` animato, `3` pieno; dalla nostra storia (`source='history'`), da curatela manuale (`source='manual'`) o dai Popular times via Apify (`source='apify'`), in quest'ordine di precedenza |
 | k | soglia di anonimato = 3 |
