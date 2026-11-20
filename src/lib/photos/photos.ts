@@ -5,9 +5,11 @@ import * as ImagePicker from 'expo-image-picker';
 import { RpcError, toRpcErrorCode } from '@/lib/rpcError';
 import { supabase } from '@/lib/supabase';
 
-import { resizeTarget } from './photoSize';
+import { MAX_PHOTO_SIDE, resizeTarget } from './photoSize';
 
 export type PhotoSource = 'camera' | 'library';
+// 'square' = the system crop editor with a 1:1 frame (profile photo).
+export type PhotoShape = 'free' | 'square';
 export type PickedPhoto = { uri: string; width: number; height: number };
 export type PickResult =
   { status: 'picked'; photo: PickedPhoto } | { status: 'cancelled' } | { status: 'denied' };
@@ -21,6 +23,12 @@ const PICKER_OPTIONS: ImagePicker.ImagePickerOptions = {
   exif: false,
 };
 
+const SQUARE_OPTIONS: ImagePicker.ImagePickerOptions = {
+  ...PICKER_OPTIONS,
+  allowsEditing: true,
+  aspect: [1, 1],
+};
+
 function toResult(result: ImagePicker.ImagePickerResult): PickResult {
   const [asset] = result.assets ?? [];
   if (result.canceled || !asset) return { status: 'cancelled' };
@@ -29,12 +37,15 @@ function toResult(result: ImagePicker.ImagePickerResult): PickResult {
 
 // Permissions are asked only now, at the tap on the camera. The gallery uses the system picker,
 // which needs no permission: the app never sees photos the user did not choose.
-export async function pickPhoto(source: PhotoSource): Promise<PickResult> {
-  if (source === 'library')
-    return toResult(await ImagePicker.launchImageLibraryAsync(PICKER_OPTIONS));
+export async function pickPhoto(
+  source: PhotoSource,
+  shape: PhotoShape = 'free',
+): Promise<PickResult> {
+  const options = shape === 'square' ? SQUARE_OPTIONS : PICKER_OPTIONS;
+  if (source === 'library') return toResult(await ImagePicker.launchImageLibraryAsync(options));
   const permission = await ImagePicker.requestCameraPermissionsAsync();
   if (!permission.granted) return { status: 'denied' };
-  return toResult(await ImagePicker.launchCameraAsync(PICKER_OPTIONS));
+  return toResult(await ImagePicker.launchCameraAsync(options));
 }
 
 async function sizeOf(photo: PickedPhoto): Promise<{ width: number; height: number }> {
@@ -43,11 +54,14 @@ async function sizeOf(photo: PickedPhoto): Promise<{ width: number; height: numb
   return { width: image.width, height: image.height };
 }
 
-// Returns the uri of a new JPEG: long side <= 1280 px, never upscaled. Re-encoding does not copy the
+// Returns the uri of a new JPEG: long side <= maxSide (1280 px by default), never upscaled. Re-encoding does not copy the
 // original's EXIF block, so the GPS position of the shot never leaves the phone (principle 3).
-export async function preparePhoto(photo: PickedPhoto): Promise<string> {
+export async function preparePhoto(
+  photo: PickedPhoto,
+  maxSide: number = MAX_PHOTO_SIDE,
+): Promise<string> {
   const original = await sizeOf(photo);
-  const target = resizeTarget(original.width, original.height);
+  const target = resizeTarget(original.width, original.height, maxSide);
   const context = ImageManipulator.manipulate(photo.uri);
   if (target.width !== original.width || target.height !== original.height) context.resize(target);
   const image = await context.renderAsync();
@@ -55,7 +69,7 @@ export async function preparePhoto(photo: PickedPhoto): Promise<string> {
   return saved.uri;
 }
 
-export type PhotoBucket = 'chat-photos' | 'posts' | 'feedback';
+export type PhotoBucket = 'chat-photos' | 'posts' | 'feedback' | 'avatars';
 
 // `cleanUri` must be the output of preparePhoto: the original file is never uploaded.
 // The path is always <user id>/<uuid>.jpg: it is the only shape the RPCs accept.

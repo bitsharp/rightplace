@@ -5,9 +5,17 @@ import { usePhotoFlow } from './usePhotoFlow';
 
 const mockPick = jest.fn();
 const mockPrepare = jest.fn();
+const mockShape = jest.fn();
+const mockMaxSide = jest.fn();
 jest.mock('./photos', () => ({
-  pickPhoto: (source: string) => mockPick(source),
-  preparePhoto: (photo: unknown) => mockPrepare(photo),
+  pickPhoto: (source: string, shape: string) => {
+    mockShape(shape);
+    return mockPick(source);
+  },
+  preparePhoto: (photo: unknown, maxSide?: number) => {
+    mockMaxSide(maxSide);
+    return mockPrepare(photo);
+  },
 }));
 
 const setOs = (os: 'ios' | 'android') => jest.replaceProperty(Platform, 'OS', os);
@@ -64,5 +72,28 @@ describe('usePhotoFlow', () => {
     const { result } = await renderHook(() => usePhotoFlow(jest.fn()));
     await act(async () => result.current.choose('camera'));
     expect(result.current.notice).toBe('denied');
+  });
+
+  it('la foto profilo usa il ritaglio quadrato e il lato massimo di 512', async () => {
+    setOs('android');
+    const photo = { uri: 'file://a.jpg', width: 1, height: 1 };
+    mockPick.mockResolvedValue({ status: 'picked', photo });
+    mockPrepare.mockResolvedValue('file://clean.jpg');
+    const onReady = jest.fn();
+    const { result } = await renderHook(() => usePhotoFlow(onReady, 'avatar'));
+    await act(async () => result.current.choose('library'));
+    expect(mockShape).toHaveBeenCalledWith('square');
+    expect(mockMaxSide).toHaveBeenCalledWith(512);
+    expect(onReady).toHaveBeenCalledWith('file://clean.jpg');
+  });
+
+  it('le foto normali restano libere e a 1280', async () => {
+    setOs('android');
+    mockPick.mockResolvedValue({ status: 'picked', photo: { uri: 'x', width: 1, height: 1 } });
+    mockPrepare.mockResolvedValue('file://clean.jpg');
+    const { result } = await renderHook(() => usePhotoFlow(jest.fn()));
+    await act(async () => result.current.choose('library'));
+    expect(mockShape).toHaveBeenCalledWith('free');
+    expect(mockMaxSide).toHaveBeenCalledWith(1280);
   });
 });

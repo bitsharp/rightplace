@@ -18,6 +18,7 @@ import { typography } from '@/theme/typography';
 import { setLocale, type MyProfile, type ProfileInput } from '../api';
 import { CityPicker } from '../components/CityPicker';
 import { AccountSection } from '../components/AccountSection';
+import { AvatarEditor } from '../components/AvatarEditor';
 import { BlockedSection } from '../components/BlockedSection';
 import { FindMeByPhone } from '../components/FindMeByPhone';
 import { HandleSection } from '../components/HandleSection';
@@ -46,6 +47,7 @@ export function ProfileTabScreen() {
         {t('setup.title')}
       </Text>
       <Text color="textSecondary">{t('setup.body')}</Text>
+      <AvatarEditor handle={profile.handle} />
       <HandleSection
         handle={profile.handle}
         handleChangedAt={profile.handleChangedAt}

@@ -95,7 +95,7 @@ Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attend
 
 ## Storage
 
-I bucket `posts`, `chat-photos` e `feedback` sono privati. Il caricamento è permesso solo nel proprio prefisso `<user_id>/…`. **Non esiste una policy di lettura**: le immagini si servono solo con signed URL generati lato server (`chat-photo-urls` per la chat, prompt 10; `post-photo-urls` per i post, prompt 11).
+I bucket `posts`, `chat-photos`, `feedback` e `avatars` sono privati. Il caricamento è permesso solo nel proprio prefisso `<user_id>/…`. **Non esiste una policy di lettura**: le immagini si servono solo con signed URL generati lato server (`chat-photo-urls` per la chat, prompt 10; `post-photo-urls` per i post, prompt 11; `avatar-urls` per la foto profilo). `avatars` accetta solo JPEG fino a 2 MB.
 
 ## Decisioni rispetto a `roadmap/04`
 
@@ -232,3 +232,22 @@ Nessuna azione manuale oltre `npx supabase db push`. Aggiunge la RPC `set_profil
 ### Feedback in-app (migration `20261120000500_feedback.sql`)
 
 Nessuna azione manuale oltre `npx supabase db push`. Aggiunge il bucket privato `feedback` (upload solo in `<user_id>/…`, nessuna lettura per gli utenti), la tabella `public.feedback` (RLS attiva, nessuna policy né privilegio per i client) e la RPC `submit_feedback` (`security definer`, solo `authenticated`): voto 1–5 obbligatorio (`INVALID_RATING`), commento fino a 1000 caratteri (`INVALID_FEEDBACK_COMMENT`), schermata 1–200 caratteri (`INVALID_SCREEN`), piattaforma `ios`/`android` (`INVALID_PLATFORM`), percorso screenshot esattamente `<uid>/<uuid>.jpg` o `null` (`INVALID_SCREENSHOT`), al massimo 10 invii nelle ultime 24 ore (`FEEDBACK_LIMIT`). Il job `purge-old-feedback` cancella dopo 180 giorni e accoda gli screenshot; la migration ridefinisce anche `delete_my_account()` perché cancelli i feedback e accodi gli screenshot. Come si leggono e cosa dire nell'informativa: `docs/feedback.md`.
+
+### Foto profilo e profilo in stile Instagram (migration `20261120000600_profile_avatar.sql`)
+
+Dettagli di visibilità in `docs/profile.md`. Oggetti nuovi:
+
+- **Bucket** `avatars` (privato, 2 MB, solo `image/jpeg`): upload e delete solo nel proprio prefisso `<user_id>/…`, nessuna lettura per i client.
+- **`profiles.avatar_path`**: letto solo dalla propria riga (RLS `profiles_own_read`); non è nel grant di update e `public_profiles` non lo espone. Si scrive solo con `set_avatar(path)` (path esattamente `<uid>/<uuid>.jpg`, altrimenti `INVALID_AVATAR_PATH`; il file precedente va in `private.storage_deletion_queue`) e `clear_avatar()`.
+- **`private.can_see_avatar(viewer, owner)`**: vero se sono io, oppure se seguo l'owner con follow accettato e non c'è un blocco in nessuna direzione; falso per profili cancellati. `get_avatar_paths(user_ids uuid[])` (max 100, `INVALID_ARGUMENT` oltre) restituisce solo i path visibili al chiamante ed è usata dalla Edge Function di firma.
+- **`get_profile_summary(user_id)`**: handle, fascia d'età, genere, `is_creator`, `follow_state` per chiunque; `followers_count`, `following_count`, `posts_count` solo per me e per i follower accettati, altrimenti `null`. Nessuna riga per bloccati e profili cancellati.
+- **`get_user_posts(user_id, before_visible, before_id, limit)`**: stessi campi di `get_feed`, post attivi di una persona visibili al chiamante (`private.visible_posts()`), cursore composto, massimo 50 per pagina.
+- **`delete_my_account()`** ridefinita (tutto invariato, feedback compreso) per accodare anche l'avatar e azzerare `avatar_path`.
+- **Edge Function** `avatar-urls` (JWT utente, `verify_jwt` attivo): corpo `{ userIds }`, firma per 1 ora solo i path restituiti da `get_avatar_paths`, con la logica condivisa di `functions/_shared/photoUrls.ts`.
+- **Errore nuovo**: `INVALID_AVATAR_PATH`.
+
+#### Azioni manuali per Luca
+
+1. Applica la migration: `npx supabase db push`.
+2. Pubblica la funzione (con verifica JWT, il default): `npx supabase functions deploy avatar-urls`.
+3. Nessun nuovo secret. `storage-gc` svuota già la coda anche per il bucket `avatars`.

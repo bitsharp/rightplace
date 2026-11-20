@@ -52,6 +52,7 @@
     "INVALID_SCREEN": "Non riesco a riconoscere la schermata. Riprova.",
     "INVALID_SCREENSHOT": "Lo screenshot non è valido. Rimuovilo e riprova.",
     "INVALID_PLATFORM": "Piattaforma non supportata.",
-    "FEEDBACK_LIMIT": "Hai già inviato molti feedback oggi. Riprova domani."
+    "FEEDBACK_LIMIT": "Hai già inviato molti feedback oggi. Riprova domani.",
+    "INVALID_AVATAR_PATH": "Non è stato possibile salvare la foto profilo. Riprova."
   }
 }

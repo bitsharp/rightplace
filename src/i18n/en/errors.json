@@ -52,6 +52,7 @@
     "INVALID_SCREEN": "I could not recognise the screen. Try again.",
     "INVALID_SCREENSHOT": "The screenshot is not valid. Remove it and try again.",
     "INVALID_PLATFORM": "Unsupported platform.",
-    "FEEDBACK_LIMIT": "You have already sent a lot of feedback today. Try again tomorrow."
+    "FEEDBACK_LIMIT": "You have already sent a lot of feedback today. Try again tomorrow.",
+    "INVALID_AVATAR_PATH": "We couldn't save your profile photo. Please try again."
   }
 }

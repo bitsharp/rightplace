@@ -131,5 +131,11 @@
       "badEnd": "It must end with a letter or a number.",
       "doubleDot": "No two dots in a row."
     }
+  },
+  "avatar": {
+    "change": "Change your profile photo",
+    "title": "Profile photo",
+    "hint": "Only you and your followers can see it. Anyone who doesn't follow you sees your initial.",
+    "remove": "Remove photo"
   }
 }

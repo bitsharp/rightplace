@@ -70,6 +70,25 @@ describe('pickPhoto', () => {
     );
   });
 
+  it('per la foto profilo apre il ritaglio quadrato (1:1) sia da galleria sia da fotocamera', async () => {
+    picker.requestCameraPermissionsAsync.mockResolvedValue({ granted: true } as never);
+    picker.launchCameraAsync.mockResolvedValue({ canceled: true, assets: null } as never);
+    picker.launchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: null } as never);
+    await pickPhoto('library', 'square');
+    await pickPhoto('camera', 'square');
+    const square = expect.objectContaining({ allowsEditing: true, aspect: [1, 1], exif: false });
+    expect(picker.launchImageLibraryAsync).toHaveBeenCalledWith(square);
+    expect(picker.launchCameraAsync).toHaveBeenCalledWith(square);
+  });
+
+  it('le foto normali non hanno il ritaglio', async () => {
+    picker.launchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: null } as never);
+    await pickPhoto('library');
+    expect(picker.launchImageLibraryAsync).toHaveBeenCalledWith(
+      expect.not.objectContaining({ allowsEditing: true }),
+    );
+  });
+
   it("se l'utente annulla non restituisce nessuna foto", async () => {
     picker.launchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: null } as never);
     await expect(pickPhoto('library')).resolves.toEqual({ status: 'cancelled' });
@@ -92,6 +111,12 @@ describe('preparePhoto', () => {
     expect(saveAsync).toHaveBeenCalledWith({ format: SaveFormat.JPEG, compress: 0.7 });
   });
 
+  it('con un lato massimo di 512 riduce 4032×3024 a 512×384', async () => {
+    const { resize } = stubManipulator({ width: 512, height: 384 });
+    await preparePhoto(asset(), 512);
+    expect(resize).toHaveBeenCalledWith({ width: 512, height: 384 });
+  });
+
   it("se il selettore non dà le dimensioni le legge dall'immagine prima di ridurla", async () => {
     const { resize, renderAsync } = stubManipulator({ width: 4032, height: 3024 });
     await preparePhoto(asset({ width: 0, height: 0 }));
@@ -108,7 +133,7 @@ describe('uploadPhoto', () => {
     })) as unknown as typeof fetch;
   });
 
-  it.each(['chat-photos', 'posts'] as const)(
+  it.each(['chat-photos', 'posts', 'avatars'] as const)(
     'carica il file ripulito in %s/<userId>/<uuid>.jpg come JPEG, senza sovrascrivere',
     async (bucket) => {
       const path = await uploadPhoto(bucket, 'user-1', 'file:///clean.jpg');

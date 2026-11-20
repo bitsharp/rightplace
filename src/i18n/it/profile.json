@@ -131,5 +131,11 @@
       "badEnd": "Deve finire con una lettera o un numero.",
       "doubleDot": "Niente due punti di fila."
     }
+  },
+  "avatar": {
+    "change": "Cambia la foto profilo",
+    "title": "Foto profilo",
+    "hint": "La vedono solo tu e i tuoi follower. Chi non ti segue vede l'iniziale.",
+    "remove": "Rimuovi foto"
   }
 }

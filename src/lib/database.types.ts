@@ -720,6 +720,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          avatar_path: string | null;
           birth_date: string | null;
           city_id: string | null;
           coarse_location: unknown;
@@ -741,6 +742,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          avatar_path?: string | null;
           birth_date?: string | null;
           city_id?: string | null;
           coarse_location?: unknown;
@@ -761,6 +763,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          avatar_path?: string | null;
           birth_date?: string | null;
           city_id?: string | null;
           coarse_location?: unknown;
@@ -1183,6 +1186,7 @@ export type Database = {
           object_path: string;
         }[];
       };
+      clear_avatar: { Args: Record<PropertyKey, never>; Returns: undefined };
       clear_my_phone_hash: { Args: Record<PropertyKey, never>; Returns: undefined };
       coarsen: { Args: { p_point: unknown }; Returns: unknown };
       complete_profile: {
@@ -1251,6 +1255,13 @@ export type Database = {
           lng: number;
           name: string;
           slug: string;
+        }[];
+      };
+      get_avatar_paths: {
+        Args: { p_user_ids: string[] };
+        Returns: {
+          avatar_path: string;
+          user_id: string;
         }[];
       };
       get_blocked_users: {
@@ -1502,6 +1513,20 @@ export type Database = {
           venue_name: string;
         }[];
       };
+      get_profile_summary: {
+        Args: { p_user_id: string };
+        Returns: {
+          age_band: string;
+          follow_state: string;
+          followers_count: number;
+          following_count: number;
+          gender: string;
+          handle: string;
+          is_creator: boolean;
+          is_me: boolean;
+          posts_count: number;
+        }[];
+      };
       get_recommended_venue: {
         Args: { p_city_slug: string };
         Returns: {
@@ -1533,6 +1558,29 @@ export type Database = {
       };
       get_story_posts: {
         Args: { p_user_id: string };
+        Returns: {
+          author_handle: string;
+          author_id: string;
+          caption: string;
+          comment_count: number;
+          expires_at: string;
+          has_photo: boolean;
+          is_mine: boolean;
+          like_count: number;
+          liked_by_me: boolean;
+          night_date: string;
+          post_id: string;
+          venue_name: string;
+          visible_from: string;
+        }[];
+      };
+      get_user_posts: {
+        Args: {
+          p_before_id?: string;
+          p_before_visible?: string;
+          p_limit?: number;
+          p_user_id: string;
+        };
         Returns: {
           author_handle: string;
           author_id: string;
@@ -1649,6 +1697,7 @@ export type Database = {
           message_id: string;
         }[];
       };
+      set_avatar: { Args: { p_path: string }; Returns: undefined };
       set_handle: { Args: { p_handle: string }; Returns: string };
       set_locale: { Args: { p_locale: string }; Returns: undefined };
       set_my_notification_prefs: { Args: { p_prefs: Json }; Returns: Json };

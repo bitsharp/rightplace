@@ -116,6 +116,13 @@ describe('profilo privato e handle', () => {
   });
 });
 
+describe('tab Profilo: foto profilo', () => {
+  it('mostra l’avatar toccabile per cambiare la foto', async () => {
+    await renderApp('ready', '/profile');
+    expect(await screen.findByRole('button', { name: 'profile:avatar.change' })).toBeOnTheScreen();
+  });
+});
+
 describe('tab Profilo: scelta del @tag', () => {
   it('mostra il @tag, l’avviso su nome e cognome e il cambio gratuito ancora disponibile', async () => {
     await renderApp('ready', '/profile');
