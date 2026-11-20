@@ -10,11 +10,12 @@ import { useIsFocused } from 'expo-router';
 import { CHAT_ROOMS_KEY } from '@/features/chat/keys';
 import type { MyDeclaration } from '@/features/map/api';
 import { MY_DECLARATION_KEY } from '@/features/map/hooks';
+import { isGooglePlaceId } from '@/features/venues/domain/googleMaps';
 import type { Intent } from '@/features/nights/domain/band';
 import { confirmFeedback } from '@/lib/haptics';
 import { RpcError } from '@/lib/rpcError';
 
-import { declare, fetchVenueDetail, fetchVenueStats, undeclare } from './api';
+import { declare, fetchVenueDetail, fetchVenueStats, refreshVenueDetails, undeclare } from './api';
 import type { DeclarationTarget } from './domain/declarationState';
 import type { StatsSegment } from './domain/statsState';
 
@@ -35,6 +36,44 @@ export function useVenueDetail(venueId: string, enabled = true) {
     enabled,
     staleTime: ONE_HOUR_MS,
     retry: retryUnlessMissing,
+  });
+}
+
+type RefreshableVenue = { venueId: string; googlePlaceId: string; kind: string };
+
+// Spots and demo rows have no Google place behind them: nothing to refresh.
+function hasGooglePlace(venue: RefreshableVenue | null): venue is RefreshableVenue {
+  return (
+    venue !== null &&
+    venue.kind !== 'spot' &&
+    isGooglePlaceId(venue.googlePlaceId) &&
+    !venue.googlePlaceId.startsWith('demo-')
+  );
+}
+
+// Opening a venue asks the server once per session to refresh its Google details (website, hours).
+// Fire and forget: the page never waits for it, and a failure is only logged (no ids, no payload).
+export function useRefreshVenueDetails(venue: RefreshableVenue | null) {
+  const queryClient = useQueryClient();
+  const venueId = venue?.venueId ?? '';
+  return useQuery({
+    queryKey: ['venueDetailsRefresh', venueId],
+    queryFn: async () => {
+      try {
+        const { refreshed } = await refreshVenueDetails(venueId);
+        if (refreshed) await queryClient.invalidateQueries({ queryKey: ['venueDetail', venueId] });
+        return refreshed;
+      } catch {
+        console.warn('Aggiornamento dati Google non riuscito');
+        return false;
+      }
+    },
+    enabled: hasGooglePlace(venue),
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
+    meta: { persist: false },
   });
 }
 

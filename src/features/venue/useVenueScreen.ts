@@ -11,7 +11,7 @@ import { closingTimeTonight } from './domain/openingHours';
 import { openTransportLink } from './domain/openTransportLink';
 import { statsView, type StatsSegment } from './domain/statsState';
 import { buildTransportLinks, type TransportDirection } from './domain/transport';
-import { useVenueDetail, useVenueStats } from './hooks';
+import { useRefreshVenueDetails, useVenueDetail, useVenueStats } from './hooks';
 
 export function linksFor(venue: VenueDetail, direction: TransportDirection) {
   return buildTransportLinks({
@@ -29,6 +29,7 @@ export function linksFor(venue: VenueDetail, direction: TransportDirection) {
 export function useVenueScreen(venueId: string) {
   const router = useRouter();
   const detail = useVenueDetail(venueId);
+  useRefreshVenueDetails(detail.data ?? null);
   const [segment, setSegment] = useState<StatsSegment>('going');
   const stats = useVenueStats(venueId, segment);
   const mine = useMyDeclaration();

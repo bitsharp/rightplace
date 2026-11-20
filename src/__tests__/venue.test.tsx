@@ -290,6 +290,42 @@ describe('dettaglio locale e dichiarazione', () => {
     });
   });
 
+  describe('aggiornamento dei dati Google', () => {
+    it('apro un locale: chiede al server di aggiornarlo e poi mostra il sito web', async () => {
+      let websiteUri: string | null = null;
+      seedBackend();
+      setFakeRpc({
+        ...{ get_venue_detail: () => [{ ...DETAIL, website_uri: websiteUri }] },
+        get_venue_stats: [stats()],
+        get_city_map: [mapRow],
+        get_active_cities: [
+          {
+            slug: 'milano',
+            name: 'Milano',
+            country: 'IT',
+            lat: 45.46,
+            lng: 9.19,
+            default_zoom: 13,
+          },
+        ],
+        get_stories: [],
+        get_story_posts: [],
+        get_recommended_venue: [],
+      });
+      fakeSupabase.functions.invoke.mockImplementation(async () => {
+        websiteUri = 'https://www.arenaclub.it';
+        return { data: { refreshed: true }, error: null };
+      });
+      await renderApp('ready', '/venue/arena');
+      await screen.findByText('Arena Club');
+      expect(await screen.findByText('www.arenaclub.it')).toBeOnTheScreen();
+      expect(fakeSupabase.functions.invoke).toHaveBeenCalledTimes(1);
+      expect(fakeSupabase.functions.invoke).toHaveBeenCalledWith('places-detail', {
+        body: { venue_id: 'arena' },
+      });
+    });
+  });
+
   it('se il locale non esiste mostra l’errore ma resta la barra con indietro', async () => {
     setFakeRpc({ get_venue_detail: [], get_venue_stats: [stats()] });
     await renderApp('ready', '/venue/missing');

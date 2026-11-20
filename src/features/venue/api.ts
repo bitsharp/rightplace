@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { BANDS, type Band, type Intent } from '@/features/nights/domain/band';
 import { VENUE_KINDS, type VenueKind } from '@/features/venues/domain/venueList';
 import { callRpc } from '@/lib/callRpc';
+import { supabase } from '@/lib/supabase';
 import { RpcError } from '@/lib/rpcError';
 
 import type { DeclarationTarget } from './domain/declarationState';
@@ -136,4 +137,16 @@ export async function declare(target: DeclarationTarget, intent: Intent): Promis
 
 export async function undeclare(): Promise<void> {
   await callRpc<unknown>('undeclare');
+}
+
+const refreshResponseSchema = z.object({ refreshed: z.boolean() });
+
+// The server decides whether Google is called at all (only if details are missing or older than 30 days):
+// a fresh venue answers `refreshed: false` at no cost. The Google key never reaches the client.
+export async function refreshVenueDetails(venueId: string): Promise<{ refreshed: boolean }> {
+  const { data, error } = await supabase.functions.invoke('places-detail', {
+    body: { venue_id: venueId },
+  });
+  if (error) throw new Error('places-detail failed');
+  return refreshResponseSchema.parse(data);
 }

@@ -10,6 +10,7 @@ import { createQueryWrapper } from '@/test/queryWrapper';
 
 import {
   useDeclare,
+  useRefreshVenueDetails,
   useUndeclare,
   useVenueDetail,
   useVenueStats,
@@ -237,5 +238,90 @@ describe('useUndeclare', () => {
     await act(async () => release({ message: 'NOT_AUTHENTICATED' }));
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(client.getQueryData(MY_DECLARATION_KEY)).toEqual(before);
+  });
+});
+
+describe('useRefreshVenueDetails', () => {
+  const arenaVenue = { venueId: 'arena', googlePlaceId: 'ChIJabc', kind: 'club' as const };
+  const invokeCalls = () => fakeSupabase.functions.invoke.mock.calls;
+  const answer = (data: unknown) =>
+    fakeSupabase.functions.invoke.mockResolvedValue({ data, error: null });
+
+  it('chiede al server di aggiornare i dati Google del locale una volta sola', async () => {
+    answer({ refreshed: false });
+    const { Wrapper } = createQueryWrapper();
+    const { rerender } = await renderHook(() => useRefreshVenueDetails(arenaVenue), {
+      wrapper: Wrapper,
+    });
+    await waitFor(() => expect(invokeCalls()).toHaveLength(1));
+    expect(invokeCalls()[0]).toEqual(['places-detail', { body: { venue_id: 'arena' } }]);
+    await rerender({});
+    expect(invokeCalls()).toHaveLength(1);
+  });
+
+  it('non richiama il server riaprendo lo stesso locale nella stessa sessione', async () => {
+    answer({ refreshed: false });
+    const { Wrapper } = createQueryWrapper();
+    const first = await renderHook(() => useRefreshVenueDetails(arenaVenue), { wrapper: Wrapper });
+    await waitFor(() => expect(invokeCalls()).toHaveLength(1));
+    await first.unmount();
+    await renderHook(() => useRefreshVenueDetails(arenaVenue), { wrapper: Wrapper });
+    await act(async () => undefined);
+    expect(invokeCalls()).toHaveLength(1);
+  });
+
+  it.each([
+    ['uno spot di un utente', { googlePlaceId: 'spot:1', kind: 'spot' as const }],
+    ['uno spot da Google', { googlePlaceId: 'ChIJxyz', kind: 'spot' as const }],
+    ['un locale demo', { googlePlaceId: 'demo-arena', kind: 'club' as const }],
+  ])('non chiama il server per %s', async (_label, venue) => {
+    const { Wrapper } = createQueryWrapper();
+    await renderHook(() => useRefreshVenueDetails({ venueId: 'x', ...venue }), {
+      wrapper: Wrapper,
+    });
+    await act(async () => undefined);
+    expect(invokeCalls()).toHaveLength(0);
+  });
+
+  it('non chiama il server finché il locale non è caricato', async () => {
+    const { Wrapper } = createQueryWrapper();
+    await renderHook(() => useRefreshVenueDetails(null), { wrapper: Wrapper });
+    await act(async () => undefined);
+    expect(invokeCalls()).toHaveLength(0);
+  });
+
+  it('ricarica il dettaglio del locale quando il server ha aggiornato i dati', async () => {
+    answer({ refreshed: true });
+    const { Wrapper, client } = createQueryWrapper();
+    const invalidate = jest.spyOn(client, 'invalidateQueries');
+    await renderHook(() => useRefreshVenueDetails(arenaVenue), { wrapper: Wrapper });
+    await waitFor(() =>
+      expect(invalidate).toHaveBeenCalledWith({ queryKey: ['venueDetail', 'arena'] }),
+    );
+  });
+
+  it('non ricarica nulla quando i dati erano già freschi', async () => {
+    answer({ refreshed: false });
+    const { Wrapper, client } = createQueryWrapper();
+    const invalidate = jest.spyOn(client, 'invalidateQueries');
+    await renderHook(() => useRefreshVenueDetails(arenaVenue), { wrapper: Wrapper });
+    await waitFor(() => expect(invokeCalls()).toHaveLength(1));
+    await act(async () => undefined);
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['errore della funzione', { data: null, error: { context: { status: 502 } } }],
+    ['risposta inattesa', { data: { ok: 1 }, error: null }],
+  ])('ignora in silenzio una %s', async (_label, result) => {
+    fakeSupabase.functions.invoke.mockResolvedValue(result);
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const { Wrapper, client } = createQueryWrapper();
+    const invalidate = jest.spyOn(client, 'invalidateQueries');
+    await renderHook(() => useRefreshVenueDetails(arenaVenue), { wrapper: Wrapper });
+    await waitFor(() => expect(warn).toHaveBeenCalledTimes(1));
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('arena');
+    expect(invalidate).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });
