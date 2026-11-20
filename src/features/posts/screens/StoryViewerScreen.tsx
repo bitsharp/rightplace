@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { PhotoViewer } from '@/components/app/PhotoViewer';
 import { PhotoFrame } from '@/components/app/PhotoFrame';
 import { Icon } from '@/components/ui/Icon';
+import { LinkedText } from '@/components/ui/LinkedText';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
@@ -20,6 +23,9 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
   const viewer = useStoryViewer(userId);
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  // A tap opens just that photo, zoomable; swiping between stories stays the page list below.
+  const [zoomedId, setZoomedId] = useState<string | null>(null);
+  const zoomed = viewer.posts.find((post) => post.id === zoomedId);
   return (
     // A fullScreenModal draws under the status bar and the home indicator: insets are applied here.
     <View style={[styles.screen, { paddingBottom: insets.bottom }]}>
@@ -42,8 +48,16 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
             position={index + 1}
             total={viewer.posts.length}
             photoUri={viewer.photoUrls[item.id]}
+            onOpenPhoto={item.hasPhoto ? () => setZoomedId(item.id) : undefined}
           />
         )}
+      />
+      <PhotoViewer
+        photos={
+          zoomed ? [{ id: zoomed.id, uri: viewer.photoUrls[zoomed.id], cacheKey: zoomed.id }] : []
+        }
+        index={zoomed ? 0 : null}
+        onClose={() => setZoomedId(null)}
       />
     </View>
   );
@@ -87,21 +101,30 @@ type PageProps = {
   position: number;
   total: number;
   photoUri?: string;
+  onOpenPhoto?: () => void;
 };
 
-function StoryPage({ post, width, position, total, photoUri }: PageProps) {
+function StoryPage({ post, width, position, total, photoUri, onOpenPhoto }: PageProps) {
   const { t } = useTranslation('feed');
+  const { t: tUi } = useTranslation('ui');
   return (
     <View style={[styles.page, { width }]}>
       <MonoLabel>{t('story.position', { current: position, total })}</MonoLabel>
-      <PhotoFrame
-        height={420}
-        uri={photoUri}
-        scene={post.id.charCodeAt(0)}
-        accessibilityLabel={t('story.a11yPhoto', { handle: formatHandle(post.authorHandle) })}
-        cacheKey={post.id}
-      />
-      {post.caption ? <Text variant="body16">{post.caption}</Text> : null}
+      <Pressable
+        disabled={!onOpenPhoto}
+        accessibilityRole={onOpenPhoto ? 'button' : undefined}
+        accessibilityLabel={onOpenPhoto ? tUi('photoViewer.open') : undefined}
+        onPress={onOpenPhoto}
+      >
+        <PhotoFrame
+          height={420}
+          uri={photoUri}
+          scene={post.id.charCodeAt(0)}
+          accessibilityLabel={t('story.a11yPhoto', { handle: formatHandle(post.authorHandle) })}
+          cacheKey={post.id}
+        />
+      </Pressable>
+      {post.caption ? <LinkedText text={post.caption} variant="body16" /> : null}
       <Text variant="body13" color="textSecondary">
         {postMetaText(t, post, new Date())}
       </Text>

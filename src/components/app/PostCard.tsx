@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, type AvatarIntent } from '@/components/ui/Avatar';
+import { LinkedText } from '@/components/ui/LinkedText';
 import { Icon } from '@/components/ui/Icon';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
@@ -21,6 +22,8 @@ type Props = {
   commentCount: number;
   onToggleLike: () => void;
   onOpenComments: () => void;
+  // Tap on the photo opens it full screen (only for posts that have one).
+  onOpenPhoto?: () => void;
   // Long press: report / block / delete (principle 7).
   onLongPress?: () => void;
   caption?: string;
@@ -39,6 +42,7 @@ export function PostCard({
   photoCacheKey,
   scene,
   onLongPress,
+  onOpenPhoto,
   ...social
 }: Props) {
   const { t } = useTranslation('ui');
@@ -57,21 +61,48 @@ export function PostCard({
         {/* Posts are deleted server-side after 7 days (CLAUDE.md principle 5). */}
         <MonoLabel>{t('post.expires', { count: daysLeft })}</MonoLabel>
       </View>
-      <PhotoFrame
-        height={210}
+      <PostPhoto
         uri={photoUri}
         scene={scene}
-        accessibilityLabel={caption}
+        caption={caption}
         cacheKey={photoCacheKey}
+        onOpen={onOpenPhoto}
       />
       <View style={styles.footer}>
-        {caption ? (
-          <Text testID="post-caption" variant="body14">
-            {caption}
-          </Text>
-        ) : null}
+        {caption ? <LinkedText testID="post-caption" text={caption} variant="body14" /> : null}
         <SocialActions {...social} />
       </View>
+    </Pressable>
+  );
+}
+
+type PostPhotoProps = {
+  uri?: string;
+  scene?: number;
+  caption?: string;
+  cacheKey?: string;
+  onOpen?: () => void;
+};
+
+function PostPhoto({ uri, scene, caption, cacheKey, onOpen }: PostPhotoProps) {
+  const { t } = useTranslation('ui');
+  const frame = (
+    <PhotoFrame
+      height={210}
+      uri={uri}
+      scene={scene}
+      accessibilityLabel={caption}
+      cacheKey={cacheKey}
+    />
+  );
+  if (!onOpen) return frame;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('photoViewer.open')}
+      onPress={onOpen}
+    >
+      {frame}
     </Pressable>
   );
 }

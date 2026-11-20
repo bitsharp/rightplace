@@ -23,6 +23,7 @@ jest.mock('../useNightChatScreen', () => ({
     follow: jest.fn(),
     select: jest.fn(),
     selected: null,
+    viewer: { photos: [], index: null, open: jest.fn(), close: jest.fn() },
     photoFlow: {
       sheetOpen: false,
       notice: null,

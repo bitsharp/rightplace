@@ -55,6 +55,8 @@ App mobile (iOS + Android) per scoprire **dove va la gente stasera**. L'utente d
 - Pagamenti creator: **RevenueCat** (StoreKit 2 + Google Play Billing). Vedi prompt 13 per la motivazione.
 - Push: `expo-notifications` + Expo Push Service (Edge Function che invia). Locali per i promemoria.
 - Tastiera: `react-native-keyboard-controller` (`KeyboardProvider` alla radice e dentro i Modal, `KeyboardAvoidingView` / `KeyboardAwareScrollView` ovunque ci sia un campo); una sola strategia iOS + Android edge-to-edge, mai padding manuale né `automaticallyAdjustKeyboardInsets`.
+- Appunti: `expo-clipboard` (copia di messaggi e link).
+- Gesti e animazioni: `react-native-gesture-handler` + `react-native-reanimated` (+ `react-native-worklets`, peer di Reanimated 4) per il viewer foto a schermo intero (pinch, doppio tap, swipe); `GestureHandlerRootView` alla radice in `AppProviders`.
 - AI ("Chiedi all'AI"): Edge Function che chiama l'API Claude (modello economico) con i dati del locale; mai la chiave nel client.
 - Variabili d'ambiente in `.env` con prefisso `EXPO_PUBLIC_`. **Mai** committare `service_role`, Places key, Anthropic key, Stripe/RevenueCat secret: vivono solo in Supabase Edge Function secrets / EAS secrets.
 - Stile: `StyleSheet` + token in `src/theme`. Niente Tailwind/NativeWind.

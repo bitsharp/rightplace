@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
+import { Linking } from 'react-native';
 
 import { PostCard } from './PostCard';
 
@@ -87,5 +88,30 @@ describe('PostCard', () => {
     expect(
       screen.getByTestId('photo-placeholder', { includeHiddenElements: true }),
     ).toBeOnTheScreen();
+  });
+});
+
+describe('PostCard: link nella didascalia', () => {
+  it('un link nella didascalia è toccabile e apre il browser', async () => {
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    await render(<PostCard {...baseProps} caption="foto su www.example.com/a" />);
+    await fireEvent.press(screen.getByRole('link'));
+    expect(Linking.openURL).toHaveBeenCalledWith('https://www.example.com/a');
+  });
+});
+
+describe('PostCard: foto', () => {
+  it('un tocco sulla foto la apre, senza mettere like', async () => {
+    const onOpenPhoto = jest.fn();
+    const onToggleLike = jest.fn();
+    await render(<PostCard {...baseProps} onToggleLike={onToggleLike} onOpenPhoto={onOpenPhoto} />);
+    await fireEvent.press(screen.getByRole('button', { name: 'ui:photoViewer.open' }));
+    expect(onOpenPhoto).toHaveBeenCalledTimes(1);
+    expect(onToggleLike).not.toHaveBeenCalled();
+  });
+
+  it('senza foto da aprire (post di solo testo) non offre il bottone', async () => {
+    await render(<PostCard {...baseProps} />);
+    expect(screen.queryByRole('button', { name: 'ui:photoViewer.open' })).toBeNull();
   });
 });

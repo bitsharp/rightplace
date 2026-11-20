@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PhotoViewer } from '@/components/app/PhotoViewer';
 import { TopBar } from '@/components/app/TopBar';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -41,10 +42,16 @@ export function FeedScreen() {
             onToggleLike={screen.toggleLike}
             onOpenComments={screen.openComments}
             onLongPress={screen.openActions}
+            onOpenPhoto={screen.viewer.open}
           />
         )}
       />
       {screen.notice ? <Toast tone="success" message={t(`actions.${screen.notice}`)} /> : null}
+      <PhotoViewer
+        photos={screen.viewer.photos}
+        index={screen.viewer.index}
+        onClose={screen.viewer.close}
+      />
       <CommentsSheet postId={screen.commentsFor} onClose={() => screen.openComments(null)} />
       <PostActionsSheet
         post={screen.actionsFor}

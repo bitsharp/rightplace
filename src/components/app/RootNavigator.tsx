@@ -14,6 +14,7 @@ import { useDeviceLanguageSync } from '@/i18n/useDeviceLanguageSync';
 import { colors } from '@/theme/tokens';
 
 import { BootScreen } from './BootScreen';
+import { LinkActionsHost } from './LinkActionsHost';
 
 // Which screens exist depends only on the session status (useSession); the client never decides
 // on privacy, it only routes. Data access is enforced by RLS/RPC on the server.
@@ -34,6 +35,7 @@ function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
   return (
     <>
       <PrePermissionSheet />
+      <LinkActionsHost />
       <AppScreens status={status} canOpenCreatorRoutes={canOpenCreatorRoutes} />
     </>
   );

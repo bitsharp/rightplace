@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { PhotoStrip } from './PhotoStrip';
 
@@ -26,5 +26,20 @@ describe('PhotoStrip', () => {
   it('senza foto la striscia non compare', async () => {
     await render(<PhotoStrip photos={[]} />);
     expect(screen.queryByText(/chat:photos/)).toBeNull();
+  });
+
+  it('un tocco su una miniatura chiede di aprire quella foto', async () => {
+    const onOpen = jest.fn();
+    await render(
+      <PhotoStrip
+        onOpen={onOpen}
+        photos={[
+          { id: 'm1', handle: 'volpe.viola' },
+          { id: 'm2', handle: 'lince.rosso' },
+        ]}
+      />,
+    );
+    await fireEvent.press(screen.getAllByRole('button')[1] as never);
+    expect(onOpen).toHaveBeenCalledWith('m2');
   });
 });

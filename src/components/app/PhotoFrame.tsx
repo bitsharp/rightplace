@@ -32,7 +32,7 @@ export function PhotoFrame({ height, uri, scene = 0, accessibilityLabel, cacheKe
 }
 
 // Gradient stand-in while a photo loads or is missing (the mock-up "FOTO DI ESEMPIO" scenes).
-function ScenePlaceholder({ height, scene }: { height: number; scene: number }) {
+export function ScenePlaceholder({ height, scene }: { height: number; scene: number }) {
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   const look = photoScenes[Math.abs(scene) % photoScenes.length] ?? photoScenes[0];
   const [first, second, last] = look.stops;

@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { usePhotoViewerState } from '@/components/app/usePhotoViewerState';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useFollowing } from '@/features/friends/hooks';
 import { useMarkRoomRead } from '@/features/notifications/hooks';
@@ -46,6 +47,10 @@ export function useNightChatScreen(roomId: string) {
   );
   const [selected, setSelected] = useState<ChatMessage | null>(null);
   const follow = useFollowByHandle();
+  // Same photos, same order as the "FOTO DELLA SERATA" strip.
+  const viewer = usePhotoViewerState(
+    photos.map((m) => ({ id: m.id, uri: photoUrls[m.id], cacheKey: m.id })),
+  );
 
   return {
     title: room ? t('venueTitle', { venue: room.eventName ?? room.venueName }) : t('nightTitle'),
@@ -66,6 +71,7 @@ export function useNightChatScreen(roomId: string) {
     send: (text: string) => sender.send({ text }),
     retry: sender.retry,
     photoFlow,
+    viewer,
     selected,
     select: setSelected,
     requestedHandles: follow.requested,

@@ -39,7 +39,9 @@
     "blockBody": "You won't see each other any more: you stop following each other and their messages disappear from this chat.",
     "blockConfirm": "Block",
     "reported": "Report sent. Thank you.",
-    "blocked": "User blocked."
+    "blocked": "User blocked.",
+    "copyText": "Copy text",
+    "copyTitle": "Message actions"
   },
   "back": "Back"
 }

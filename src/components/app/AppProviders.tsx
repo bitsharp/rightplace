@@ -1,6 +1,8 @@
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, ThemeProvider, type Theme } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import {
@@ -36,9 +38,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
         dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
       }}
     >
-      <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
-        <ThemeProvider value={navigationTheme}>{children}</ThemeProvider>
-      </KeyboardProvider>
+      {/* Gestures (photo viewer zoom, swipes) work only under this root. */}
+      <GestureHandlerRootView testID="gesture-root" style={styles.root}>
+        <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+          <ThemeProvider value={navigationTheme}>{children}</ThemeProvider>
+        </KeyboardProvider>
+      </GestureHandlerRootView>
     </PersistQueryClientProvider>
   );
 }
+
+const styles = StyleSheet.create({ root: { flex: 1 } });

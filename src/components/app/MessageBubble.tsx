@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { LinkedText } from '@/components/ui/LinkedText';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { colors, radius, spacing } from '@/theme/tokens';
@@ -20,6 +21,8 @@ type Props = {
   onRetry?: () => void;
   // Long press opens the moderation actions (report / block).
   onLongPress?: () => void;
+  // Tap on a delivered photo opens it full screen.
+  onOpenPhoto?: () => void;
 };
 
 export function MessageBubble({
@@ -29,9 +32,12 @@ export function MessageBubble({
   status,
   onRetry,
   onLongPress,
+  onOpenPhoto,
 }: Props) {
   const { t } = useTranslation('ui');
   const mine = author === 'me';
+  const failed = status === 'failed';
+  const opensPhoto = !failed && content.kind === 'photo' && onOpenPhoto !== undefined;
   return (
     <View testID="bubble-wrap" style={[styles.wrap, mine ? styles.mine : styles.theirs]}>
       {!mine && senderName ? (
@@ -40,8 +46,9 @@ export function MessageBubble({
         </Text>
       ) : null}
       <Pressable
-        accessibilityRole={status === 'failed' ? 'button' : undefined}
-        onPress={status === 'failed' ? onRetry : undefined}
+        accessibilityRole={failed || opensPhoto ? 'button' : undefined}
+        accessibilityLabel={opensPhoto ? t('photoViewer.open') : undefined}
+        onPress={failed ? onRetry : opensPhoto ? onOpenPhoto : undefined}
         onLongPress={onLongPress}
         style={mine ? styles.mine : undefined}
       >
@@ -63,9 +70,12 @@ export function MessageBubble({
 function TextBubble({ mine, text }: { mine: boolean; text: string }) {
   return (
     <View testID="bubble" style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleTheirs]}>
-      <Text variant={mine ? 'body15Strong' : 'body15'} color={mine ? 'onAccent' : 'text'}>
-        {text}
-      </Text>
+      <LinkedText
+        text={text}
+        variant={mine ? 'body15Strong' : 'body15'}
+        color={mine ? 'onAccent' : 'text'}
+        linkColor={mine ? 'onAccent' : 'maybe'}
+      />
     </View>
   );
 }
@@ -86,11 +96,7 @@ function PhotoBubble({
     <>
       <View style={[styles.frame, { borderColor: mine ? colors.going : colors.border }]}>
         <PhotoFrame height={150} uri={uri} scene={scene} accessibilityLabel={caption} />
-        {caption ? (
-          <Text variant="body14" style={styles.caption}>
-            {caption}
-          </Text>
-        ) : null}
+        {caption ? <LinkedText text={caption} variant="body14" style={styles.caption} /> : null}
       </View>
       {mine ? <MonoLabel>{t('chat.followersOnly')}</MonoLabel> : null}
     </>

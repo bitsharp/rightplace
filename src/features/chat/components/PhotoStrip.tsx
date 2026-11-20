@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { PhotoFrame } from '@/components/app/PhotoFrame';
 import { MonoLabel } from '@/components/ui/MonoLabel';
@@ -10,7 +10,9 @@ export type StripPhoto = { id: string; handle: string; uri?: string };
 
 const THUMB = 72;
 
-export function PhotoStrip({ photos }: { photos: StripPhoto[] }) {
+type Props = { photos: StripPhoto[]; onOpen?: (photoId: string) => void };
+
+export function PhotoStrip({ photos, onOpen }: Props) {
   const { t } = useTranslation('chat');
   if (photos.length === 0) return null;
   return (
@@ -22,14 +24,15 @@ export function PhotoStrip({ photos }: { photos: StripPhoto[] }) {
         contentContainerStyle={styles.row}
       >
         {photos.map((photo, index) => (
-          <View key={photo.id} style={styles.thumb}>
-            <PhotoFrame
-              height={THUMB}
-              uri={photo.uri}
-              scene={index}
-              accessibilityLabel={t('photoThumb', { handle: formatHandle(photo.handle) })}
-            />
-          </View>
+          <Pressable
+            key={photo.id}
+            accessibilityRole="button"
+            accessibilityLabel={t('photoThumb', { handle: formatHandle(photo.handle) })}
+            onPress={() => onOpen?.(photo.id)}
+            style={styles.thumb}
+          >
+            <PhotoFrame height={THUMB} uri={photo.uri} scene={index} />
+          </Pressable>
         ))}
       </ScrollView>
     </View>
