@@ -13,5 +13,7 @@ e importalo con `npm run typical:import -- --city <slug> [--file percorso.csv]`.
 | `level`           | 0 chiuso/vuoto, 1 tranquillo, 2 animato, 3 pieno                                       |
 
 Fonti ammesse: informazioni pubbliche **del locale stesso** (sito, profili social, orari di apertura, giorni forti
-dichiarati). **Mai** i "Popular times" di Google né servizi che li copiano. I file con dati reali non vanno
+dichiarati). I "Popular times" di Google **non** si copiano a mano in questo CSV: arrivano dal canale separato
+`npm run typical:apify` (`docs/typical-apify.md`). Questo CSV ha **precedenza** sulle righe Apify (history > manuale >
+Apify). I file con dati reali non vanno
 committati finché non sono stati verificati a mano. L'import è atomico e idempotente e non tocca le righe `history`.

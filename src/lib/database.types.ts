@@ -1514,6 +1514,7 @@ export type Database = {
         }[];
       };
       has_phone_hash: { Args: Record<PropertyKey, never>; Returns: boolean };
+      import_typical_apify: { Args: { p_city_slug: string; p_rows: Json }; Returns: number };
       import_typical_manual: {
         Args: { p_city_slug: string; p_rows: Json };
         Returns: {
