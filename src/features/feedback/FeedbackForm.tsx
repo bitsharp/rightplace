@@ -11,14 +11,14 @@ import { Text } from '@/components/ui/Text';
 import { TextField } from '@/components/ui/TextField';
 import { useSession } from '@/features/auth/useSession';
 import { rpcErrorCodeOf } from '@/lib/rpcError';
-import { spacing } from '@/theme/tokens';
+import { colors, radius, spacing } from '@/theme/tokens';
 
 import { MAX_COMMENT_LENGTH, canSubmitFeedback, remainingCharacters } from './domain/form';
 import { sendFeedback } from './sendFeedback';
 import { StarRating } from './StarRating';
 import { useFeedback, type FeedbackDraft } from './store/feedbackStore';
 
-const PREVIEW_HEIGHT = 160;
+const PREVIEW_HEIGHT = 140;
 
 export function FeedbackForm({ draft }: { draft: FeedbackDraft }) {
   const { t, i18n } = useTranslation('feedback');
@@ -48,7 +48,7 @@ export function FeedbackForm({ draft }: { draft: FeedbackDraft }) {
   return (
     <View style={styles.form}>
       <MonoLabel tone="going">{t('label')}</MonoLabel>
-      <Text accessibilityRole="header" variant="display17">
+      <Text accessibilityRole="header" variant="display17" numberOfLines={2}>
         {t('title')}
       </Text>
       <Text variant="body13" color="textSecondary">
@@ -98,7 +98,14 @@ function Screenshot({ uri, onRemove }: { uri: string; onRemove: () => void }) {
   const { t } = useTranslation('feedback');
   return (
     <View style={styles.preview}>
-      <PhotoFrame height={PREVIEW_HEIGHT} uri={uri} accessibilityLabel={t('screenshotA11y')} />
+      <View style={styles.thumb}>
+        <PhotoFrame
+          height={PREVIEW_HEIGHT}
+          uri={uri}
+          contentFit="contain"
+          accessibilityLabel={t('screenshotA11y')}
+        />
+      </View>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t('removeScreenshot')}
@@ -116,5 +123,13 @@ function Screenshot({ uri, onRemove }: { uri: string; onRemove: () => void }) {
 const styles = StyleSheet.create({
   form: { gap: spacing.md },
   preview: { gap: spacing.sm, alignItems: 'center' },
+  thumb: {
+    width: '100%',
+    overflow: 'hidden',
+    borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
   remove: { minHeight: 44, justifyContent: 'center' },
 });

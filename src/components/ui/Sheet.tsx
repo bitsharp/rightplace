@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Animated, Modal, PanResponder, Pressable, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  Modal,
+  PanResponder,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { KeyboardAvoidingView, KeyboardProvider } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -38,6 +47,9 @@ function useDragToDismiss(onClose: () => void) {
 
 export function Sheet({ visible, onClose, onDismiss, children }: Props) {
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
+  // Never taller than the screen below the status bar / notch: what does not fit scrolls inside the sheet.
+  const maxHeight = windowHeight - insets.top - spacing.xl;
   const { translateY, responder, setHeight } = useDragToDismiss(onClose);
   const keyboardVisible = useKeyboardVisible();
   const bottomPadding = (keyboardVisible ? 0 : insets.bottom) + spacing.lg;
@@ -67,14 +79,31 @@ export function Sheet({ visible, onClose, onDismiss, children }: Props) {
           style={styles.root}
         >
           <Backdrop onClose={onClose} />
-          <View testID="sheet-panel" accessibilityViewIsModal onAccessibilityEscape={onClose}>
+          <View
+            testID="sheet-panel"
+            style={styles.shrink}
+            accessibilityViewIsModal
+            onAccessibilityEscape={onClose}
+          >
             <Animated.View
+              testID="sheet-surface"
               onLayout={(event) => setHeight(event.nativeEvent.layout.height)}
-              style={[styles.panel, { paddingBottom: bottomPadding, transform: [{ translateY }] }]}
+              style={[
+                styles.panel,
+                { maxHeight, paddingBottom: bottomPadding, transform: [{ translateY }] },
+              ]}
               {...responder.panHandlers}
             >
               <View testID="sheet-handle" style={styles.handle} />
-              {children}
+              <ScrollView
+                testID="sheet-content"
+                style={styles.shrink}
+                contentContainerStyle={styles.content}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
+                {children}
+              </ScrollView>
             </Animated.View>
           </View>
         </KeyboardAvoidingView>
@@ -102,6 +131,8 @@ function Backdrop({ onClose }: { onClose: () => void }) {
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { flex: 1, backgroundColor: colors.backdrop },
+  shrink: { flexShrink: 1 },
+  content: { gap: spacing.lg },
   panel: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.cardLarge,

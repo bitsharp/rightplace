@@ -1,5 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
+import { StyleSheet } from 'react-native';
+
 import { RpcError } from '@/lib/rpcError';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
@@ -43,6 +45,16 @@ describe('FeedbackHost', () => {
     expect(screen.getAllByRole('button', { name: /^feedback:starA11y/ })).toHaveLength(5);
     expect(screen.getByText('feedback:privacyNote')).toBeOnTheScreen();
     expect(screen.getByText('feedback:counter({"count":1000})')).toBeOnTheScreen();
+  });
+
+  it('lo screenshot è una miniatura compatta di 140 pt, intera (contain), e il titolo sta su 2 righe', async () => {
+    await renderHost();
+    await openDraft();
+    const thumb = screen.getByLabelText('feedback:screenshotA11y');
+    expect(thumb.props.contentFit).toBe('contain');
+    expect(StyleSheet.flatten(thumb.props.style).height).toBe(140);
+    expect(screen.getByText('feedback:title').props.numberOfLines).toBe(2);
+    expect(screen.getByRole('button', { name: 'feedback:removeScreenshot' })).toBeOnTheScreen();
   });
 
   it('le stelle sono obbligatorie: senza voto il bottone Invia è disattivato', async () => {

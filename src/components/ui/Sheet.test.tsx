@@ -1,7 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Platform, Text } from 'react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
 
 import { Sheet } from './Sheet';
+
+const mockInsets = { top: 47, bottom: 34, left: 0, right: 0 };
+jest.mock('react-native-safe-area-context', () => ({
+  ...jest.requireActual<object>('react-native-safe-area-context'),
+  useSafeAreaInsets: () => mockInsets,
+}));
+jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
+  __esModule: true,
+  default: () => ({ width: 390, height: 800, scale: 3, fontScale: 1 }),
+}));
 
 describe('Sheet', () => {
   it('sale sopra la tastiera con una sola strategia su iOS e Android: padding della libreria', async () => {
@@ -69,5 +79,28 @@ describe('Sheet', () => {
     await render(<Sheet visible onClose={onClose} />);
     await fireEvent(screen.getByTestId('sheet-panel'), 'accessibilityEscape');
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('non supera lo schermo: altezza massima = finestra - inset superiore - margine', async () => {
+    await render(
+      <Sheet visible onClose={jest.fn()}>
+        <Text>contenuto</Text>
+      </Sheet>,
+    );
+    // 800 - 47 (barra di stato / notch) - 20 (spacing.xl)
+    expect(StyleSheet.flatten(screen.getByTestId('sheet-surface').props.style).maxHeight).toBe(
+      800 - 47 - 20,
+    );
+  });
+
+  it('il contenuto scorre dentro il foglio e i tap sui bottoni passano con la tastiera aperta', async () => {
+    await render(
+      <Sheet visible onClose={jest.fn()}>
+        <Text>contenuto</Text>
+      </Sheet>,
+    );
+    const scroll = screen.getByTestId('sheet-content');
+    expect(scroll.props.keyboardShouldPersistTaps).toBe('handled');
+    expect(screen.getByText('contenuto')).toBeOnTheScreen();
   });
 });

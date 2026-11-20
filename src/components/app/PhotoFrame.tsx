@@ -13,9 +13,17 @@ type Props = {
   // Signed URLs change on every request and photos must not outlive their 7 days (principle 5):
   // with a cache key the picture is kept in memory only, under a stable key.
   cacheKey?: string;
+  contentFit?: 'cover' | 'contain';
 };
 
-export function PhotoFrame({ height, uri, scene = 0, accessibilityLabel, cacheKey }: Props) {
+export function PhotoFrame({
+  height,
+  uri,
+  scene = 0,
+  accessibilityLabel,
+  cacheKey,
+  contentFit = 'cover',
+}: Props) {
   if (uri) {
     return (
       <Image
@@ -23,7 +31,7 @@ export function PhotoFrame({ height, uri, scene = 0, accessibilityLabel, cacheKe
         cachePolicy={cacheKey ? 'memory' : undefined}
         accessible
         accessibilityLabel={accessibilityLabel}
-        contentFit="cover"
+        contentFit={contentFit}
         style={{ height, width: '100%' }}
       />
     );
