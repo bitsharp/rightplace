@@ -39,7 +39,9 @@
     "blockBody": "Non vi vedrete più: smettete di seguirvi e i suoi messaggi spariscono da questa chat.",
     "blockConfirm": "Blocca",
     "reported": "Segnalazione inviata. Grazie.",
-    "blocked": "Utente bloccato."
+    "blocked": "Utente bloccato.",
+    "copyText": "Copia testo",
+    "copyTitle": "Azioni sul messaggio"
   },
   "back": "Indietro"
 }

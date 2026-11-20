@@ -25,6 +25,9 @@ jest.mock('react-native-keyboard-controller', () => {
   };
 });
 
+// expo-clipboard is a native module: tests assert on what was copied.
+jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(async () => true) }));
+
 jest.mock('expo-haptics', () => ({
   selectionAsync: jest.fn(() => Promise.resolve()),
   notificationAsync: jest.fn(() => Promise.resolve()),
@@ -155,4 +158,11 @@ beforeEach(() =>
       '@/features/notifications/store/notificationStore',
     )
     .resetNotificationState(),
+);
+
+// Link actions (sheet and toast) live in a store shared by every text with links.
+beforeEach(() =>
+  jest
+    .requireActual<typeof import('@/lib/links/linkActionsStore')>('@/lib/links/linkActionsStore')
+    .resetLinkActions(),
 );

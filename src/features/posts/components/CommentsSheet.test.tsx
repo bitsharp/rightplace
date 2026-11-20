@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
@@ -24,6 +24,25 @@ function open(onClose = jest.fn()) {
   const { Wrapper } = createQueryWrapper();
   return render(<CommentsSheet postId="p1" onClose={onClose} />, { wrapper: Wrapper });
 }
+
+describe('CommentsSheet: link', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it('un link in un commento si apre con un tocco', async () => {
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    setFakeRpc({ get_post_comments: [comment('1', 'guarda https://example.com/a')] });
+    await open();
+    await fireEvent.press(await screen.findByRole('link'));
+    expect(Linking.openURL).toHaveBeenCalledWith('https://example.com/a');
+  });
+
+  it('il tocco lungo sul link di un commento apre le azioni del commento (un solo foglio)', async () => {
+    setFakeRpc({ get_post_comments: [comment('1', 'guarda https://example.com/a')] });
+    await open();
+    await fireEvent(await screen.findByRole('link'), 'longPress');
+    expect(await screen.findByText('feed:actions.reportComment')).toBeOnTheScreen();
+  });
+});
 
 describe('CommentsSheet', () => {
   afterEach(() => jest.restoreAllMocks());

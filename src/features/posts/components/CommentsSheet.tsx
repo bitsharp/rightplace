@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
+import { LinkedText } from '@/components/ui/LinkedText';
 import { Sheet } from '@/components/ui/Sheet';
 import { Text } from '@/components/ui/Text';
 import { Toast } from '@/components/ui/Toast';
@@ -99,9 +100,13 @@ function CommentList({
           <Text variant="body13Medium" color="textSecondary">
             {formatHandle(comment.handle)}
           </Text>
-          <Text testID="comment-text" variant="body14">
-            {comment.text}
-          </Text>
+          {/* Inside this Modal the link sheet would be a second Modal: long press opens the comment actions. */}
+          <LinkedText
+            testID="comment-text"
+            text={comment.text}
+            variant="body14"
+            onLinkLongPress={() => onSelect(comment)}
+          />
         </Pressable>
       ))}
     </ScrollView>

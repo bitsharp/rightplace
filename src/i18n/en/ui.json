@@ -112,5 +112,13 @@
       "female": "Women",
       "male": "Men"
     }
+  },
+  "links": {
+    "title": "Link",
+    "open": "Open link",
+    "copy": "Copy link",
+    "cancel": "Cancel",
+    "copied": "Copied",
+    "openFailed": "We can’t open this link"
   }
 }

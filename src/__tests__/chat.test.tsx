@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import * as Clipboard from 'expo-clipboard';
 import * as Crypto from 'expo-crypto';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
@@ -236,6 +237,38 @@ describe('chat di serata', () => {
     await open();
     await fireEvent(await screen.findByText('ciao da me'), 'longPress');
     expect(screen.queryByText('chat:actions.report')).toBeNull();
+    expect(screen.queryByText('chat:actions.block')).toBeNull();
+  });
+
+  it('sui miei messaggi il tocco lungo offre Copia testo', async () => {
+    seedChatBackend({
+      rooms: [ARENA],
+      messages: [
+        {
+          ...message('m1', { id: 'user-1', handle: 'lince.rosso' }, 'ciao da me', 1),
+          is_mine: true,
+        },
+      ],
+    });
+    await open();
+    await fireEvent(await screen.findByText('ciao da me'), 'longPress');
+    await fireEvent.press(await screen.findByText('chat:actions.copyText'));
+    expect(Clipboard.setStringAsync).toHaveBeenCalledWith('ciao da me');
+    expect(await screen.findByText('ui:links.copied')).toBeOnTheScreen();
+  });
+
+  it('tocco lungo su un messaggio altrui → Copia testo, oltre a segnala e blocca', async () => {
+    seedChatBackend({
+      rooms: [ARENA],
+      messages: [message('m1', VOLPE, 'ciao da volpe', 1)],
+      users: [VOLPE],
+      accepted: ['u-volpe'],
+    });
+    await open();
+    await fireEvent(await screen.findByText('ciao da volpe'), 'longPress');
+    expect(await screen.findByText('chat:actions.report')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByText('chat:actions.copyText'));
+    expect(Clipboard.setStringAsync).toHaveBeenCalledWith('ciao da volpe');
   });
 });
 

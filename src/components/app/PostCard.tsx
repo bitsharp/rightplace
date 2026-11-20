@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, type AvatarIntent } from '@/components/ui/Avatar';
+import { LinkedText } from '@/components/ui/LinkedText';
 import { Icon } from '@/components/ui/Icon';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
@@ -65,11 +66,7 @@ export function PostCard({
         cacheKey={photoCacheKey}
       />
       <View style={styles.footer}>
-        {caption ? (
-          <Text testID="post-caption" variant="body14">
-            {caption}
-          </Text>
-        ) : null}
+        {caption ? <LinkedText testID="post-caption" text={caption} variant="body14" /> : null}
         <SocialActions {...social} />
       </View>
     </Pressable>

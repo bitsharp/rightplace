@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PhotoFrame } from '@/components/app/PhotoFrame';
 import { Icon } from '@/components/ui/Icon';
+import { LinkedText } from '@/components/ui/LinkedText';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
@@ -101,7 +102,7 @@ function StoryPage({ post, width, position, total, photoUri }: PageProps) {
         accessibilityLabel={t('story.a11yPhoto', { handle: formatHandle(post.authorHandle) })}
         cacheKey={post.id}
       />
-      {post.caption ? <Text variant="body16">{post.caption}</Text> : null}
+      {post.caption ? <LinkedText text={post.caption} variant="body16" /> : null}
       <Text variant="body13" color="textSecondary">
         {postMetaText(t, post, new Date())}
       </Text>

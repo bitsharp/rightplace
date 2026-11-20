@@ -64,6 +64,11 @@ type ItemProps = {
   onLongPress: (message: ChatMessage) => void;
 };
 
+function canOpenActions(message: ChatMessage): boolean {
+  if (message.pending || message.failed) return false;
+  return !message.isMine || message.kind === 'text';
+}
+
 function MessageItem({ message, photoUri, onRetry, onLongPress }: ItemProps) {
   const sending = message.pending === true;
   return (
@@ -72,8 +77,8 @@ function MessageItem({ message, photoUri, onRetry, onLongPress }: ItemProps) {
       senderName={message.isMine ? undefined : formatHandle(message.handle)}
       status={message.failed ? 'failed' : sending ? 'sending' : undefined}
       onRetry={() => onRetry(message.id)}
-      // moderation applies to other people's delivered messages only
-      onLongPress={message.isMine || sending ? undefined : () => onLongPress(message)}
+      // delivered messages only: copy (mine included) and, on other people's, moderation
+      onLongPress={canOpenActions(message) ? () => onLongPress(message) : undefined}
       content={
         message.kind === 'photo'
           ? { kind: 'photo', uri: photoUri }

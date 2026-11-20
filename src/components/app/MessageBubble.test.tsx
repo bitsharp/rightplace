@@ -1,4 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Linking, StyleSheet } from 'react-native';
+
+import { useLinkActions } from '@/lib/links/linkActionsStore';
 
 import { colors } from '@/theme/tokens';
 
@@ -91,5 +94,56 @@ describe('PhotoFrame', () => {
       <PhotoFrame height={150} uri="https://example.com/a.jpg" accessibilityLabel="feed:photo" />,
     );
     expect(screen.getByLabelText('feed:photo')).toBeOnTheScreen();
+  });
+});
+
+describe('MessageBubble: link', () => {
+  beforeEach(() => {
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+  });
+
+  it('un link nel messaggio altrui è toccabile e apre il browser', async () => {
+    await render(
+      <MessageBubble
+        author="other"
+        content={{ kind: 'text', text: 'biglietti su www.example.com/b' }}
+      />,
+    );
+    await fireEvent.press(screen.getByRole('link'));
+    expect(Linking.openURL).toHaveBeenCalledWith('https://www.example.com/b');
+  });
+
+  it('un link nel mio messaggio è leggibile sul viola (colore del testo sul viola)', async () => {
+    await render(
+      <MessageBubble author="me" content={{ kind: 'text', text: 'https://example.com' }} />,
+    );
+    expect(StyleSheet.flatten(screen.getByRole('link').props.style).color).toBe(colors.onAccent);
+  });
+
+  it('il tocco lungo sul link apre le azioni del link, non quelle del messaggio', async () => {
+    const onLongPress = jest.fn();
+    await render(
+      <MessageBubble
+        author="other"
+        content={{ kind: 'text', text: 'https://example.com' }}
+        onLongPress={onLongPress}
+      />,
+    );
+    await fireEvent(screen.getByRole('link'), 'longPress');
+    expect(useLinkActions.getState().sheetUrl).toBe('https://example.com');
+    expect(onLongPress).not.toHaveBeenCalled();
+  });
+
+  it('il tocco lungo sul resto del messaggio apre le azioni del messaggio', async () => {
+    const onLongPress = jest.fn();
+    await render(
+      <MessageBubble
+        author="other"
+        content={{ kind: 'text', text: 'ciao https://example.com' }}
+        onLongPress={onLongPress}
+      />,
+    );
+    await fireEvent(screen.getByText(/ciao/), 'longPress');
+    expect(onLongPress).toHaveBeenCalled();
   });
 });
