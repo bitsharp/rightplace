@@ -109,5 +109,9 @@
     "reportConfirm": "Yes, report",
     "reportCancel": "Cancel",
     "reported": "Report sent. Thank you."
+  },
+  "cover": {
+    "caption": "Photo from Google Maps",
+    "open": "Open the venue photo full screen"
   }
 }

@@ -58,3 +58,52 @@ scritti), ritenta al massimo 3 volte su 429/5xx/errori di rete.
 
 - Script: senza `TYPICAL_APIFY_ENABLED=true` esce senza alcuna chiamata di rete.
 - Dati: `delete from public.venue_typical_busyness where source = 'apify';` (da SQL editor / service_role).
+
+## Foto di copertina del locale (rischio accettato, 20 nov 2026)
+
+Decisione di Luca: una **sola foto di copertina per locale**, presa dall'`imageUrl` principale dei dettagli del place
+restituiti dallo stesso attore, mostrata nel dettaglio locale con la didascalia "Foto da Google Maps" (IT/EN).
+Eccezione estesa del principio 11 / "nessuno scraping" di `CLAUDE.md`: solo questa foto, solo tramite `typical:apify`.
+
+### Rischi
+
+- **Diritti d'autore non licenziati**: l'immagine appartiene a chi l'ha caricata su Google Maps (spesso un utente o il
+  proprietario del locale); RightPlace non ha licenza per mostrarla. Possibili richieste di rimozione e contestazioni.
+- Gli stessi rischi di contratto/account Google dei Popular times (§3.2.3 dei Termini Maps Platform) e di legittimità
+  dell'estrazione.
+
+### Mitigazioni
+
+- **Nessuna copia dell'immagine**: si salva solo l'URL (`venues.photo_url` + `photo_fetched_at`); il client la scarica da
+  `*.googleusercontent.com`. Un solo URL per locale, sempre `imageUrl`: mai `imageUrls`, mai le foto delle recensioni o dei
+  profili (il parser non le legge). Lo script e la RPC `import_venue_photos_apify` accettano solo `https://` con host
+  `googleusercontent.com` o un suo sottodominio.
+- Le colonne non sono leggibili dai client (grant per colonna del prompt 20): la foto arriva solo da `get_venue_detail`, che
+  la restituisce solo se il flag server `venue_photo_apify` è acceso **e** `photo_fetched_at` è più recente di 60 giorni.
+- Il job giornaliero `purge-stale-venue-photos` (04:45 UTC) azzera `photo_url` e `photo_fetched_at` oltre i 60 giorni.
+- Se l'immagine non carica, il client nasconde la foto (nessun box rotto); se manca, il layout è quello di prima.
+
+### Interruttori
+
+- Script: `VENUE_PHOTOS_APIFY_ENABLED=true` (default **spento**, separato da `TYPICAL_APIFY_ENABLED`). Spento, lo script non
+  legge né scrive nessuna foto.
+- Dati, subito e per tutti i client: `update private.feature_flags set enabled = false where name = 'venue_photo_apify';`
+  (riaccendere con `true`). Per cancellare tutte le foto: `update public.venues set photo_url = null, photo_fetched_at = null;`.
+- **Rimozione di una singola foto su richiesta del proprietario**:
+  `update public.venues set photo_url = null, photo_fetched_at = null where google_place_id = '<place id>';`
+  (e finché il locale resta nella città, la prossima esecuzione di `typical:apify` con il flag acceso la riscriverebbe:
+  togliere il locale dal giro o tenere il flag spento).
+
+### Da controllare al primo dry-run (azione per Luca)
+
+L'input dell'attore **non cambia** (`maxImages: 0`): l'`imageUrl` principale arriva comunque nei dettagli del place, ma non
+è garantito per ogni versione dell'attore. Al primo giro:
+
+```bash
+export TYPICAL_APIFY_ENABLED=true VENUE_PHOTOS_APIFY_ENABLED=true APIFY_TOKEN=... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=...
+npm run typical:apify -- --city milano --dry-run --limit 20
+```
+
+La riga `Foto di copertina: N/M` dice quante foto sono arrivate. Se è `0/M` l'attore non restituisce `imageUrl` con
+`maxImages: 0` (l'unica modifica da valutare, in `scripts/lib/apifyInput.js`, sarebbe `maxImages: 1`: **non** farla senza
+decisione esplicita perché cambia il costo e il volume scaricato). Il dry-run non scrive nulla.

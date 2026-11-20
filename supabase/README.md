@@ -82,6 +82,7 @@ Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attend
 | `refresh-typical-from-history` | lunedì 06:00 UTC                 | ricalcola lo strato "di solito" dalla storia delle ultime 8 settimane                                       |
 | `process-account-deletions`    | ogni ora (:15)                   | elimina da `auth.users` gli account per cui è stata chiesta la cancellazione                                |
 | `expire-stale-places`          | ogni giorno 04:30 UTC            | locali Places non sincronizzati da 30 giorni: disattivati, senza nome/indirizzo/orari                       |
+| `purge-stale-venue-photos`     | ogni giorno 04:45 UTC            | azzera `photo_url` / `photo_fetched_at` oltre i 60 giorni (foto di copertina da Apify)                      |
 
 ## Supabase Auth (prompt 05)
 
@@ -118,6 +119,7 @@ Regole complete in `docs/places-terms.md`, passi operativi in `docs/places-sync.
 - `places-detail`: chiamata dall'app con il JWT utente; Place Details solo se i dati hanno 30 giorni o più.
 - **Colonne** `cities.places_radius_m` (1000–50000, default 8000) e `cities.places_areas` (quartieri usati nelle query).
 - **RPC solo `service_role`** (revocate ad `anon` e `authenticated`): `sync_places_venues(city_slug, rows)` (upsert su `google_place_id`; disattiva i demo della sola città quando ha almeno 10 locali reali attivi), `get_city_sync_info(city_slug)`, `import_typical_manual(city_slug, rows)` (atomica; rimpiazza solo le righe `manual`, errori `UNKNOWN_VENUE` / `INVALID_ARGUMENT` / `NOT_FOUND`).
+- **Foto di copertina** (`20261120000300_venue_cover_photo.sql`, rischio accettato, `docs/typical-apify.md`): `venues.photo_url` + `photo_fetched_at` (solo l'URL, nessuna copia; nessun grant ai client: arriva solo da `get_venue_detail`, che la restituisce solo con il flag `private.feature_flags` `venue_photo_apify` acceso e un URL più recente di 60 giorni). RPC solo `service_role`: `import_venue_photos_apify(city_slug, rows)` (accetta solo `https` su `googleusercontent.com`, venue attivi non spot della città). Interruttore: `update private.feature_flags set enabled = false where name = 'venue_photo_apify';`.
 - **RPC per gli utenti**: `remember_venue(venue_id)` scrive solo nella cronologia ricerche propria.
 - **Job**: `expire-stale-places` (tabella sopra).
 

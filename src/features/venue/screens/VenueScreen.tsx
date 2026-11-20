@@ -14,6 +14,7 @@ import { DeclareCta } from '../components/DeclareCta';
 import { FriendsGoing } from '../components/FriendsGoing';
 import { GettingThere } from '../components/GettingThere';
 import { ReportSpot } from '../components/ReportSpot';
+import { VenueCoverPhoto } from '../components/VenueCoverPhoto';
 import { VenueHeader } from '../components/VenueHeader';
 import { VenueTopBar } from '../components/VenueTopBar';
 import { WhoIsGoing } from '../components/WhoIsGoing';
@@ -86,6 +87,7 @@ function VenueBody({ screen }: BodyProps) {
   if (!venue) return null;
   return (
     <View style={styles.body}>
+      <VenueCoverPhoto photoUrl={venue.photoUrl} />
       <VenueHeader detail={venue} closingTime={screen.closingTime} />
       <Bands screen={screen} />
       <WhoIsGoing segment={screen.segment} onSegment={screen.setSegment} view={screen.statsView} />

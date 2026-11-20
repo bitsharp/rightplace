@@ -1,4 +1,4 @@
-const { histogramToRows, toLevel, DAY_INDEX } = require('./apifyTypical');
+const { histogramToRows, toLevel, toPhotoRow, DAY_INDEX } = require('./apifyTypical');
 
 describe('toLevel', () => {
   it.each([
@@ -88,5 +88,31 @@ describe('histogramToRows', () => {
     });
     expect(rows).toHaveLength(1);
     expect(rows[0].level).toBe(3);
+  });
+});
+
+describe('toPhotoRow', () => {
+  it('accetta https su googleusercontent.com e sottodomini', () => {
+    expect(toPhotoRow('ChIJa', 'https://lh3.googleusercontent.com/p/abc=w800')).toEqual({
+      google_place_id: 'ChIJa',
+      image_url: 'https://lh3.googleusercontent.com/p/abc=w800',
+    });
+    expect(toPhotoRow('ChIJa', 'https://googleusercontent.com/x')).not.toBeNull();
+  });
+
+  it('rifiuta http, altri host, trucchi di host e valori non stringa', () => {
+    const bad = [
+      'http://lh3.googleusercontent.com/x',
+      'https://evil.example.com/x',
+      'https://googleusercontent.com.evil.example.com/x',
+      'https://lh3.googleusercontent.com@evil.example.com/x',
+      'https://notgoogleusercontent.com/x',
+      'javascript:alert(1)',
+      '',
+      undefined,
+      null,
+      42,
+    ];
+    for (const url of bad) expect(toPhotoRow('ChIJa', url)).toBeNull();
   });
 });

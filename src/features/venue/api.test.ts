@@ -20,6 +20,7 @@ const detailRow = (overrides: Record<string, unknown> = {}) => ({
   country: 'IT',
   timezone: 'Europe/Rome',
   taxi_number: '+39 02 8585',
+  photo_url: null,
   ...overrides,
 });
 
@@ -52,8 +53,22 @@ describe('fetchVenueDetail', () => {
       country: 'IT',
       timezone: 'Europe/Rome',
       taxiNumber: '+39 02 8585',
+      photoUrl: null,
     });
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_venue_detail', { p_venue_id: 'v1' });
+  });
+
+  it('porta la foto di copertina quando la RPC la restituisce', async () => {
+    respondWith([detailRow({ photo_url: 'https://lh3.googleusercontent.com/p/abc' })]);
+    await expect(fetchVenueDetail('v1')).resolves.toMatchObject({
+      photoUrl: 'https://lh3.googleusercontent.com/p/abc',
+    });
+  });
+
+  it('tollera una RPC senza la colonna photo_url: nessuna foto', async () => {
+    const { photo_url: _omitted, ...row } = detailRow();
+    respondWith([row]);
+    await expect(fetchVenueDetail('v1')).resolves.toMatchObject({ photoUrl: null });
   });
 
   it('senza righe il locale non esiste: NOT_FOUND', async () => {

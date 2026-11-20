@@ -65,6 +65,28 @@ describe('extractPlaces', () => {
     expect(place.popularTimes).toEqual([{ day: 'Mo', popular_times: [] }]);
   });
 
+  it('legge solo imageUrl come foto: mai imageUrls né le foto delle recensioni', () => {
+    const [place] = extractPlaces([
+      {
+        placeId: 'ChIJa',
+        imageUrl: 'https://lh3.googleusercontent.com/p/a',
+        imageUrls: ['https://lh3.googleusercontent.com/p/b'],
+        reviews: [{ reviewerPhotoUrl: 'https://lh3.googleusercontent.com/a/c' }],
+      },
+    ]);
+    expect(place.imageUrl).toBe('https://lh3.googleusercontent.com/p/a');
+    expect(JSON.stringify(place)).not.toMatch(/p\/b|a\/c/);
+  });
+
+  it('senza imageUrl o con un valore non stringa la foto è assente', () => {
+    expect(extractPlaces([{ placeId: 'a' }])[0].imageUrl).toBeUndefined();
+    expect(extractPlaces([{ placeId: 'a', imageUrl: 5 }])[0].imageUrl).toBeUndefined();
+  });
+
+  it('non scarica altre immagini: maxImages resta 0', () => {
+    expect(buildActorInput(['a']).maxImages).toBe(0);
+  });
+
   it('scarta elementi inattesi o senza placeId', () => {
     expect(extractPlaces([null, 3, 'x', {}, { placeId: 7 }, { title: 'x' }])).toEqual([]);
   });

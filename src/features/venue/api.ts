@@ -22,6 +22,8 @@ const detailRowSchema = z.object({
   country: z.string(),
   timezone: z.string(),
   taxi_number: z.string().nullable(),
+  // Cover photo URL: null when absent, stale or switched off server-side; tolerated missing on an older RPC.
+  photo_url: z.string().nullish(),
 });
 
 export type VenueDetail = {
@@ -38,6 +40,7 @@ export type VenueDetail = {
   country: string;
   timezone: string;
   taxiNumber: string | null;
+  photoUrl: string | null;
 };
 
 // Catalog data only (no per-user fields): the RPC exists because PostgREST returns `location` as EWKB.
@@ -61,6 +64,7 @@ export async function fetchVenueDetail(venueId: string): Promise<VenueDetail> {
     country: row.country,
     timezone: row.timezone,
     taxiNumber: row.taxi_number,
+    photoUrl: row.photo_url ?? null,
   };
 }
 

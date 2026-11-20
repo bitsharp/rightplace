@@ -83,4 +83,29 @@ function histogramToRows(placeId, popularTimes) {
   return [...cells.values()];
 }
 
-module.exports = { DAY_INDEX, LEVEL_1_MAX_SCORE, LEVEL_2_MAX_SCORE, histogramToRows, toLevel };
+// Cover photo (accepted risk, CLAUDE.md principle 11 exception): only the https URL of the actor's main `imageUrl`
+// on googleusercontent.com survives. Same rule as import_venue_photos_apify, checked here too so nothing else is sent.
+const PHOTO_HOST = 'googleusercontent.com';
+
+function toPhotoRow(placeId, imageUrl) {
+  if (typeof imageUrl !== 'string') return null;
+  let url;
+  try {
+    url = new URL(imageUrl);
+  } catch {
+    return null;
+  }
+  const hostOk = url.hostname === PHOTO_HOST || url.hostname.endsWith(`.${PHOTO_HOST}`);
+  if (url.protocol !== 'https:' || !hostOk || url.username !== '' || url.password !== '')
+    return null;
+  return { google_place_id: placeId, image_url: imageUrl };
+}
+
+module.exports = {
+  DAY_INDEX,
+  LEVEL_1_MAX_SCORE,
+  LEVEL_2_MAX_SCORE,
+  histogramToRows,
+  toLevel,
+  toPhotoRow,
+};

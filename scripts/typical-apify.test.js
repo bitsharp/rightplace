@@ -2,6 +2,7 @@ const {
   chunk,
   filterPlaceIds,
   isEnabled,
+  isPhotosEnabled,
   parseApifyArgs,
   readApifyEnv,
   run,
@@ -31,6 +32,7 @@ function makeFetch({ placeIds, apify, rpc } = {}) {
       return json((placeIds ?? []).map((id) => ({ google_place_id: id })));
     if (String(url).includes('api.apify.com')) return (apify ?? (() => json([])))(calls.length);
     if (String(url).includes('/rpc/import_typical_apify')) return (rpc ?? (() => json(1)))();
+    if (String(url).includes('/rpc/import_venue_photos_apify')) return json(1);
     throw new Error(`rete inattesa: ${url}`);
   };
   return { fetchFn, calls };
@@ -259,5 +261,85 @@ describe('run', () => {
     const { fetchFn, calls } = makeFetch({ placeIds: ['demo-01', 'spot:x'] });
     await run({ ...base, env, fetchFn });
     expect(calls.some((c) => c.url.includes('api.apify.com'))).toBe(false);
+  });
+});
+
+describe('foto di copertina (flag separato VENUE_PHOTOS_APIFY_ENABLED)', () => {
+  const photoUrl = 'https://lh3.googleusercontent.com/p/AF1Qip=w800';
+  const item = {
+    placeId: 'ChIJa',
+    imageUrl: photoUrl,
+    imageUrls: ['https://lh3.googleusercontent.com/p/ALTRA'],
+    reviews: [{ reviewerPhotoUrl: 'https://lh3.googleusercontent.com/a/PERSONA' }],
+    popularTimesHistogram: histogram,
+  };
+  const base = { argv: ['--city', 'milano'], sleep: noSleep, log: () => {} };
+  const withPhotos = { ...env, VENUE_PHOTOS_APIFY_ENABLED: 'true' };
+  const photoCall = (calls) => calls.find((c) => c.url.includes('/rpc/import_venue_photos_apify'));
+
+  it('isPhotosEnabled vale solo con "true" e di default è spento', () => {
+    expect(isPhotosEnabled({})).toBe(false);
+    expect(isPhotosEnabled({ VENUE_PHOTOS_APIFY_ENABLED: 'false' })).toBe(false);
+    expect(isPhotosEnabled({ VENUE_PHOTOS_APIFY_ENABLED: 'true' })).toBe(true);
+  });
+
+  it('con il flag acceso scrive solo imageUrl, mai imageUrls né foto delle recensioni', async () => {
+    const { fetchFn, calls } = makeFetch({ placeIds: ['ChIJa'], apify: () => json([item]) });
+    await run({ ...base, env: withPhotos, fetchFn });
+    const rpc = photoCall(calls);
+    expect(rpc.init.headers.Authorization).toBe('Bearer srv-key');
+    expect(JSON.parse(rpc.init.body)).toEqual({
+      p_city_slug: 'milano',
+      p_rows: [{ google_place_id: 'ChIJa', image_url: photoUrl }],
+    });
+    expect(rpc.init.body).not.toMatch(/ALTRA|PERSONA/);
+  });
+
+  it('con il flag spento non scrive nessuna foto (nemmeno le legge)', async () => {
+    const { fetchFn, calls } = makeFetch({ placeIds: ['ChIJa'], apify: () => json([item]) });
+    const result = await run({ ...base, env, fetchFn });
+    expect(photoCall(calls)).toBeUndefined();
+    expect(result.summary.photos).toBeUndefined();
+  });
+
+  it('scarta URL non https o fuori da googleusercontent.com', async () => {
+    const bad = ['http://lh3.googleusercontent.com/x', 'https://evil.example.com/x', 'boh', 7];
+    for (const imageUrl of bad) {
+      const { fetchFn, calls } = makeFetch({
+        placeIds: ['ChIJa'],
+        apify: () => json([{ placeId: 'ChIJa', imageUrl, popularTimesHistogram: histogram }]),
+      });
+      await run({ ...base, env: withPhotos, fetchFn });
+      expect(photoCall(calls)).toBeUndefined();
+    }
+  });
+
+  it('--dry-run conta le foto trovate senza scrivere', async () => {
+    const { fetchFn, calls } = makeFetch({
+      placeIds: ['ChIJa', 'ChIJb'],
+      apify: () => json([item, { placeId: 'ChIJb', popularTimesHistogram: histogram }]),
+    });
+    const lines = [];
+    const result = await run({
+      ...base,
+      argv: ['--city', 'milano', '--dry-run'],
+      env: withPhotos,
+      fetchFn,
+      log: (l) => lines.push(l),
+    });
+    expect(calls.some((c) => c.url.includes('/rpc/'))).toBe(false);
+    expect(result.summary.photos).toBe(1);
+    expect(lines.join('\n')).toMatch(/Foto di copertina: 1\/2/);
+    expect(lines.join('\n')).not.toContain('googleusercontent');
+  });
+
+  it('un place senza Popular times ma con foto scrive comunque la foto', async () => {
+    const { fetchFn, calls } = makeFetch({
+      placeIds: ['ChIJa'],
+      apify: () => json([{ placeId: 'ChIJa', imageUrl: photoUrl }]),
+    });
+    await run({ ...base, env: withPhotos, fetchFn });
+    expect(photoCall(calls)).toBeDefined();
+    expect(calls.some((c) => c.url.includes('/rpc/import_typical_apify'))).toBe(false);
   });
 });

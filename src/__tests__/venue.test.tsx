@@ -75,13 +75,17 @@ const POST_TARGET = {
 
 // Stand-in for the server: remembers the one active declaration, like get_my_declaration/declare.
 function seedBackend(
-  options: { stats?: (segment: string) => unknown; mine?: 'going' | 'maybe' } = {},
+  options: {
+    stats?: (segment: string) => unknown;
+    mine?: 'going' | 'maybe';
+    detail?: Record<string, unknown>;
+  } = {},
 ) {
   let mine: ReturnType<typeof declarationRow> | null = options.mine
     ? declarationRow(options.mine)
     : null;
   setFakeRpc({
-    get_venue_detail: [DETAIL],
+    get_venue_detail: [{ ...DETAIL, ...options.detail }],
     get_venue_stats: (args: unknown) => [
       options.stats?.((args as { p_segment: string }).p_segment) ?? stats(),
     ],
@@ -164,6 +168,22 @@ describe('dettaglio locale e dichiarazione', () => {
       });
       await renderApp('ready', '/venue/arena');
       expect(await screen.findByText('@volpe.viola')).toBeOnTheScreen();
+    });
+  });
+
+  describe('foto di copertina', () => {
+    it('con photo_url mostra la foto e la didascalia in testa al dettaglio', async () => {
+      seedBackend({ detail: { photo_url: 'https://lh3.googleusercontent.com/p/abc' } });
+      await renderApp('ready', '/venue/arena');
+      expect(await screen.findByTestId('venue-cover-photo')).toBeOnTheScreen();
+      expect(screen.getByText('venue:cover.caption')).toBeOnTheScreen();
+    });
+
+    it('senza photo_url il dettaglio resta com’è', async () => {
+      seedBackend({ detail: { photo_url: null } });
+      await renderApp('ready', '/venue/arena');
+      expect(await screen.findByText('Arena Club')).toBeOnTheScreen();
+      expect(screen.queryByTestId('venue-cover-photo')).toBeNull();
     });
   });
 

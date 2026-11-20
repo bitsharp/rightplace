@@ -5,7 +5,7 @@
 // and the token are never stored or logged. Disabled unless TYPICAL_APIFY_ENABLED=true.
 const { readApifyEnv, readServiceEnv } = require('./lib/serviceEnv');
 const { buildActorInput, extractPlaces } = require('./lib/apifyInput');
-const { histogramToRows } = require('./lib/apifyTypical');
+const { histogramToRows, toPhotoRow } = require('./lib/apifyTypical');
 
 const CITY_SLUG = /^[a-z0-9-]+$/;
 const DEFAULT_LIMIT = 200;
@@ -32,6 +32,9 @@ function parseApifyArgs(argv) {
 }
 
 const isEnabled = (env) => (env.TYPICAL_APIFY_ENABLED ?? '').trim().toLowerCase() === 'true';
+// Separate, default-off switch for the cover photo (one `imageUrl` per venue, accepted risk).
+const isPhotosEnabled = (env) =>
+  (env.VENUE_PHOTOS_APIFY_ENABLED ?? '').trim().toLowerCase() === 'true';
 
 function chunk(items, size) {
   const chunks = [];
@@ -47,12 +50,13 @@ function filterPlaceIds(ids) {
   );
 }
 
-function summarize(requested, rows) {
+function summarize(requested, rows, photos) {
   const levels = { 0: 0, 1: 0, 2: 0, 3: 0 };
   for (const row of rows) levels[row.level] += 1;
   const withData = new Set(rows.map((row) => row.google_place_id)).size;
   return {
     requested,
+    ...(photos === undefined ? {} : { photos }),
     withData,
     withoutData: requested - withData,
     rows: rows.length,
@@ -101,19 +105,23 @@ async function callApify(fetchFn, sleep, { token, actorId }, placeIds) {
   }
 }
 
-// Only places we asked for count; the rows carry weekday/hour/level and nothing else.
-function itemsToRows(items, requestedIds) {
+// Only places we asked for count; rows carry weekday/hour/level, photos only {place id, image URL}.
+function parseItems(items, requestedIds, withPhotos) {
   const places = extractPlaces(items);
   if (places === null)
     throw new Error('Output di Apify inatteso (non è una lista): lotto scartato.');
   const asked = new Set(requestedIds);
-  return places
-    .filter((place) => asked.has(place.placeId))
-    .flatMap((place) => histogramToRows(place.placeId, place.popularTimes));
+  const askedPlaces = places.filter((place) => asked.has(place.placeId));
+  return {
+    rows: askedPlaces.flatMap((place) => histogramToRows(place.placeId, place.popularTimes)),
+    photos: withPhotos
+      ? askedPlaces.map((place) => toPhotoRow(place.placeId, place.imageUrl)).filter(Boolean)
+      : [],
+  };
 }
 
-async function importRows(fetchFn, serviceEnv, city, rows) {
-  const response = await fetchFn(`${serviceEnv.url}/rest/v1/rpc/import_typical_apify`, {
+async function importRows(fetchFn, serviceEnv, city, rows, rpcName = 'import_typical_apify') {
+  const response = await fetchFn(`${serviceEnv.url}/rest/v1/rpc/${rpcName}`, {
     method: 'POST',
     headers: serviceHeaders(serviceEnv.serviceRoleKey),
     body: JSON.stringify({ p_city_slug: city, p_rows: rows }),
@@ -128,6 +136,9 @@ function describeSummary(summary, dryRun) {
   return [
     `${dryRun ? '[dry-run] ' : ''}Place con Popular times: ${summary.withData}/${summary.requested} (senza dati: ${summary.withoutData})`,
     `Righe orarie: ${summary.rows} (livello 0: ${levels[0]}, 1: ${levels[1]}, 2: ${levels[2]}, 3: ${levels[3]})`,
+    ...(summary.photos === undefined
+      ? []
+      : [`${dryRun ? '[dry-run] ' : ''}Foto di copertina: ${summary.photos}/${summary.requested}`]),
     `Costo stimato: ~$${summary.estimatedCostUsd} (${ESTIMATED_USD_PER_PLACE} $/place, da verificare sul prezzo dell'attore)`,
   ];
 }
@@ -143,14 +154,19 @@ async function run({ argv, env, fetchFn = fetch, sleep = realSleep, log = consol
   const apifyEnv = readApifyEnv(env);
   const serviceEnv = readServiceEnv(env);
 
+  const withPhotos = isPhotosEnabled(env);
   const placeIds = await fetchPlaceIds(fetchFn, city, limit, serviceEnv);
   const rows = [];
+  const photos = [];
   for (const batch of chunk(placeIds, BATCH_SIZE)) {
-    const batchRows = itemsToRows(await callApify(fetchFn, sleep, apifyEnv, batch), batch);
-    if (!dryRun && batchRows.length > 0) await importRows(fetchFn, serviceEnv, city, batchRows);
-    rows.push(...batchRows);
+    const parsed = parseItems(await callApify(fetchFn, sleep, apifyEnv, batch), batch, withPhotos);
+    if (!dryRun && parsed.rows.length > 0) await importRows(fetchFn, serviceEnv, city, parsed.rows);
+    if (!dryRun && parsed.photos.length > 0)
+      await importRows(fetchFn, serviceEnv, city, parsed.photos, 'import_venue_photos_apify');
+    rows.push(...parsed.rows);
+    photos.push(...parsed.photos);
   }
-  const summary = summarize(placeIds.length, rows);
+  const summary = summarize(placeIds.length, rows, withPhotos ? photos.length : undefined);
   describeSummary(summary, dryRun).forEach((line) => log(line));
   return { summary };
 }
@@ -162,4 +178,13 @@ if (require.main === module) {
   });
 }
 
-module.exports = { chunk, filterPlaceIds, isEnabled, parseApifyArgs, readApifyEnv, run, summarize };
+module.exports = {
+  chunk,
+  filterPlaceIds,
+  isEnabled,
+  isPhotosEnabled,
+  parseApifyArgs,
+  readApifyEnv,
+  run,
+  summarize,
+};

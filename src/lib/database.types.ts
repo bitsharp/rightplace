@@ -952,6 +952,8 @@ export type Database = {
           location: unknown;
           name: string;
           opening_hours: Json | null;
+          photo_fetched_at: string | null;
+          photo_url: string | null;
           places_synced_at: string | null;
           source: string;
           spot_expires_at: string | null;
@@ -971,6 +973,8 @@ export type Database = {
           location?: unknown;
           name: string;
           opening_hours?: Json | null;
+          photo_fetched_at?: string | null;
+          photo_url?: string | null;
           places_synced_at?: string | null;
           source?: string;
           spot_expires_at?: string | null;
@@ -989,6 +993,8 @@ export type Database = {
           location?: unknown;
           name?: string;
           opening_hours?: Json | null;
+          photo_fetched_at?: string | null;
+          photo_url?: string | null;
           places_synced_at?: string | null;
           source?: string;
           spot_expires_at?: string | null;
@@ -1495,6 +1501,7 @@ export type Database = {
           lng: number;
           name: string;
           opening_hours: Json;
+          photo_url: string;
           taxi_number: string;
           timezone: string;
           venue_id: string;
@@ -1522,6 +1529,7 @@ export type Database = {
           venues: number;
         }[];
       };
+      import_venue_photos_apify: { Args: { p_city_slug: string; p_rows: Json }; Returns: number };
       is_adult: { Args: { p_birth_date: string }; Returns: boolean };
       is_handle_available: { Args: { p_handle: string }; Returns: string };
       level_from_avg: { Args: { p_avg: number }; Returns: number };

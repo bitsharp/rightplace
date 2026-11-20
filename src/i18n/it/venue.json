@@ -109,5 +109,9 @@
     "reportConfirm": "Sì, segnala",
     "reportCancel": "Annulla",
     "reported": "Segnalazione inviata. Grazie."
+  },
+  "cover": {
+    "caption": "Foto da Google Maps",
+    "open": "Apri la foto del locale a schermo intero"
   }
 }

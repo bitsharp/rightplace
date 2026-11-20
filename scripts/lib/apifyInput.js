@@ -55,6 +55,7 @@ function buildStartUrlsInput(placeIds) {
 // Output of one dataset item → only the place ID and the histogram. `popularTimesHistogram` is the actor's
 // field ({ Su: [{hour, occupancyPercent}], Mo: [...] }); popular_times / popularTimes are tolerated fallbacks.
 // popularTimesLiveText / popularTimesLivePercent and everything else are never read (principle 11).
+// The single exception is the main `imageUrl` (cover photo, accepted risk): never `imageUrls`, never review images.
 function extractPlaces(items) {
   if (!Array.isArray(items)) return null;
   return items
@@ -62,6 +63,7 @@ function extractPlaces(items) {
     .map((item) => ({
       placeId: item.placeId,
       popularTimes: item.popularTimesHistogram ?? item.popular_times ?? item.popularTimes,
+      imageUrl: typeof item.imageUrl === 'string' ? item.imageUrl : undefined,
     }));
 }
 
