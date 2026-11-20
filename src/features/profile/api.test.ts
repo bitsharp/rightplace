@@ -10,6 +10,7 @@ import {
   regenerateHandle,
   setHandle,
   setLocale,
+  setProfileCity,
 } from './api';
 
 describe('profile api', () => {
@@ -26,6 +27,20 @@ describe('profile api', () => {
       handleConfirmedAt: '2026-11-01T10:00:00Z',
       handleFreeChangeUsed: false,
       deleted: false,
+    });
+  });
+
+  it('espone lo slug della città del proprio profilo, null se non ne ha', async () => {
+    setFakeTable('profiles', [fakeProfileRow({ cities: { slug: 'las-palmas' } })]);
+    await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ citySlug: 'las-palmas' });
+    setFakeTable('profiles', [fakeProfileRow({ cities: null })]);
+    await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ citySlug: null });
+  });
+
+  it('salva la città della mappa con la RPC set_profile_city', async () => {
+    await setProfileCity('las-palmas');
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('set_profile_city', {
+      p_city_slug: 'las-palmas',
     });
   });
 

@@ -36,6 +36,10 @@ const searchCityCalls = () =>
   fakeSupabase.rpc.mock.calls
     .filter(([name]) => name === 'search_venues')
     .map(([, args]) => (args as { p_city_slug: string }).p_city_slug);
+const savedCityCalls = () =>
+  fakeSupabase.rpc.mock.calls
+    .filter(([name]) => name === 'set_profile_city')
+    .map(([, args]) => (args as { p_city_slug: string }).p_city_slug);
 const mapLatitude = () => screen.getByTestId('map-view').props.initialRegion.latitude as number;
 
 describe('città della mappa', () => {
@@ -93,6 +97,37 @@ describe('città della mappa', () => {
     expect(Location.requestForegroundPermissionsAsync).not.toHaveBeenCalled();
   });
 
+  describe('città salvata sul profilo', () => {
+    it('in automatico con la posizione spenta non salva nulla e la mappa non chiede permessi', async () => {
+      await renderApp('ready', '/map');
+      await waitFor(() => expect(mapCityCalls()).toContain('milano'));
+      expect(savedCityCalls()).toEqual([]);
+      expect(Location.requestForegroundPermissionsAsync).not.toHaveBeenCalled();
+    });
+
+    it('con la cella vicino a Las Palmas salva las-palmas', async () => {
+      await renderApp('ready', '/map', { location_opt_in: true });
+      await act(async () => useCoarsePositionStore.setState({ cell: NEAR_LAS_PALMAS }));
+      await waitFor(() => expect(savedCityCalls()).toEqual(['las-palmas']));
+      expect(Location.requestForegroundPermissionsAsync).not.toHaveBeenCalled();
+    });
+
+    it('scegliere Las Palmas nel profilo la salva sul server', async () => {
+      await renderApp('ready', '/profile');
+      await fireEvent.press(await screen.findByRole('button', { name: 'Las Palmas' }));
+      await waitFor(() => expect(savedCityCalls()).toEqual(['las-palmas']));
+    });
+
+    it('tornando in Italia con la preferenza esplicita su Milano e profilo a Milano non richiama', async () => {
+      useMapStore.setState({ cityPreference: 'milano' });
+      await renderApp('ready', '/map', { location_opt_in: true });
+      await act(async () => useCoarsePositionStore.setState({ cell: NEAR_LAS_PALMAS }));
+      await act(async () => useCoarsePositionStore.setState({ cell: { lat: 45.46, lng: 9.19 } }));
+      await waitFor(() => expect(mapCityCalls()).toContain('milano'));
+      expect(savedCityCalls()).toEqual([]);
+    });
+  });
+
   describe('selettore nel profilo', () => {
     const AUTO = 'profile:city.auto';
 
@@ -106,6 +141,19 @@ describe('città della mappa', () => {
 
     it('con la posizione spenta spiega che si usa la città del profilo', async () => {
       await renderApp('ready', '/profile');
+      expect(await screen.findByText('profile:city.autoOff({"city":"Milano"})')).toBeOnTheScreen();
+    });
+
+    it('con la posizione spenta la nota mostra la città salvata nel profilo', async () => {
+      await renderApp('ready', '/profile', { cities: { slug: 'las-palmas' } });
+      expect(
+        await screen.findByText('profile:city.autoOff({"city":"Las Palmas"})'),
+      ).toBeOnTheScreen();
+    });
+
+    it('la nota nomina la città del profilo anche con una scelta esplicita diversa', async () => {
+      useMapStore.setState({ cityPreference: 'las-palmas' });
+      await renderApp('ready', '/profile', { cities: { slug: 'milano' } });
       expect(await screen.findByText('profile:city.autoOff({"city":"Milano"})')).toBeOnTheScreen();
     });
 

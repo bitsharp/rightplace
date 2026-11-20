@@ -68,7 +68,8 @@ export function useActivity(enabled = true) {
   });
 }
 
-export const cityTimezoneKey = (citySlug: string) => ['cityTimezone', citySlug] as const;
+export const CITY_TIMEZONE_KEY = ['cityTimezone'] as const;
+export const cityTimezoneKey = (citySlug: string) => [...CITY_TIMEZONE_KEY, citySlug] as const;
 
 export function useCityTimezone() {
   const citySlug = useCurrentCity();

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { useSession } from '@/features/auth/useSession';
 import { DEFAULT_CITY_SLUG } from '@/features/profile/api';
 import { useCoarsePositionStore } from '@/features/profile/location';
 import { useActiveCities } from '@/features/venues/hooks';
@@ -14,16 +15,16 @@ export function useCurrentCity(): string {
   const preference = useMapStore((state) => state.cityPreference);
   const cell = useCoarsePositionStore((state) => state.cell);
   const cities = useActiveCities().data;
+  const profileCity = useSession().profile?.citySlug ?? null;
   return useMemo(
     () =>
       resolveCity({
         preference,
         detected: cell && cities ? nearestActiveCity(cell, cities) : null,
-        // profiles.city_id is not exposed to the client and complete_profile always writes the default
-        profileCity: null,
+        profileCity,
         fallback: DEFAULT_CITY_SLUG,
         activeSlugs: cities ? cities.map((city) => city.slug) : null,
       }),
-    [preference, cell, cities],
+    [preference, cell, cities, profileCity],
   );
 }

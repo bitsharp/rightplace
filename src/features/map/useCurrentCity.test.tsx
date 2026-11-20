@@ -2,7 +2,8 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 import { act } from 'react';
 
 import { useCoarsePositionStore } from '@/features/profile/location';
-import { setFakeRpc } from '@/test/fakeSupabase';
+import { useAuthStore } from '@/features/auth/store/authStore';
+import { fakeProfileRow, setFakeRpc, setFakeTable } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
 import { useMapStore } from './store/mapStore';
@@ -54,6 +55,16 @@ describe('useCurrentCity', () => {
     const { result } = await renderCity();
     await waitFor(() => expect(result.current).toBe('milano'));
     await act(async () => useCoarsePositionStore.setState({ cell: NEAR_LAS_PALMAS }));
+    await waitFor(() => expect(result.current).toBe('las-palmas'));
+  });
+
+  it('in automatico e senza posizione usa la città salvata nel profilo', async () => {
+    useAuthStore.setState({
+      initialized: true,
+      session: { userId: 'user-1', email: 'lince@example.com', emailConfirmed: true },
+    });
+    setFakeTable('profiles', [fakeProfileRow({ cities: { slug: 'las-palmas' } })]);
+    const { result } = await renderCity();
     await waitFor(() => expect(result.current).toBe('las-palmas'));
   });
 

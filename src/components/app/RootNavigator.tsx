@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import type { SessionStatus } from '@/features/auth/domain/sessionStatus';
 import { useAuthListener } from '@/features/auth/store/authStore';
 import { useSession } from '@/features/auth/useSession';
+import { useSyncProfileCity } from '@/features/map/useSyncProfileCity';
 import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { resetSeenStories } from '@/features/posts/store/seenStories';
 import { PrePermissionSheet } from '@/features/notifications/components/PrePermissionSheet';
@@ -23,6 +24,7 @@ export function RootNavigator() {
   useAuthListener();
   const { status, userId, profile, profileError, retryProfile } = useSession();
   useCoarseLocationSync(status === 'ready' && profile?.locationOptIn === true);
+  useSyncProfileCity(status === 'ready');
   useClearCacheOnSignOut(userId);
   useNotificationRuntime(status === 'ready');
   if (status === 'loading')

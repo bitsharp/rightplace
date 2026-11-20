@@ -1590,6 +1590,7 @@ export type Database = {
           liked_by_me: boolean;
         }[];
       };
+      set_profile_city: { Args: { p_city_slug: string }; Returns: undefined };
       sync_places_venues: {
         Args: { p_city_slug: string; p_rows: Json };
         Returns: {

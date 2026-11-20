@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/Text';
 import { AUTO_CITY } from '@/features/map/domain/cityChoice';
 import { useMapStore } from '@/features/map/store/mapStore';
 import { useCurrentCity } from '@/features/map/useCurrentCity';
+import { useSession } from '@/features/auth/useSession';
 import { useActiveCities } from '@/features/venues/hooks';
 import { spacing } from '@/theme/tokens';
 
@@ -19,7 +20,9 @@ export function CityPicker({ locationOn }: { locationOn: boolean }) {
   const setPreference = useMapStore((state) => state.setCityPreference);
   const currentSlug = useCurrentCity();
   const isExplicit = cities.some((city) => city.slug === preference);
-  const currentName = cities.find((city) => city.slug === currentSlug)?.name ?? '';
+  // With the position off "auto" falls back to the city saved on the profile, not to the one shown now.
+  const profileSlug = useSession().profile?.citySlug ?? currentSlug;
+  const profileCityName = cities.find((city) => city.slug === profileSlug)?.name ?? '';
   return (
     <View style={styles.field}>
       <MonoLabel>{t('city.title')}</MonoLabel>
@@ -46,7 +49,7 @@ export function CityPicker({ locationOn }: { locationOn: boolean }) {
       </ScrollView>
       {locationOn ? null : (
         <Text variant="body13" color="textSecondary">
-          {t('city.autoOff', { city: currentName })}
+          {t('city.autoOff', { city: profileCityName })}
         </Text>
       )}
     </View>

@@ -20,9 +20,13 @@ const profileRowSchema = z.object({
   contacts_opt_in: z.boolean(),
   is_creator: z.boolean(),
   deleted_at: z.string().nullable(),
+  // embedded from profiles.city_id: the map city the user chose, own row only
+  cities: z.object({ slug: z.string() }).nullable(),
 });
 
-const PROFILE_COLUMNS = Object.keys(profileRowSchema.shape).join(', ');
+const PROFILE_COLUMNS = Object.keys(profileRowSchema.shape)
+  .map((column) => (column === 'cities' ? 'cities(slug)' : column))
+  .join(', ');
 
 export type MyProfile = {
   id: string;
@@ -38,6 +42,8 @@ export type MyProfile = {
   locationOptIn: boolean;
   contactsOptIn: boolean;
   isCreator: boolean;
+  // slug of profiles.city_id (the city the server uses for e.g. the feed digest); null = never set
+  citySlug: string | null;
   deleted: boolean;
 };
 
@@ -54,6 +60,7 @@ function toMyProfile(row: z.infer<typeof profileRowSchema>): MyProfile {
     locationOptIn: row.location_opt_in,
     contactsOptIn: row.contacts_opt_in,
     isCreator: row.is_creator,
+    citySlug: row.cities?.slug ?? null,
     deleted: row.deleted_at !== null,
   };
 }
@@ -80,6 +87,11 @@ export type ProfileInput = {
 
 // Launch city is Milano (CLAUDE.md); city choice arrives with multi-city.
 export const DEFAULT_CITY_SLUG = 'milano';
+
+// The map city also reaches the server (profiles.city_id): only a city slug, never a position.
+export function setProfileCity(citySlug: string): Promise<void> {
+  return callRpc('set_profile_city', { p_city_slug: citySlug });
+}
 
 export function completeProfile(input: ProfileInput): Promise<void> {
   return callRpc('complete_profile', {
