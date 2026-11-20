@@ -1,8 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+
+import { openLink } from '@/lib/links/links';
 
 import type { VenueDetail } from '../api';
 import { VenueHeader } from './VenueHeader';
+
+jest.mock('@/lib/links/links', () => ({ openLink: jest.fn().mockResolvedValue(true) }));
 
 const detail: VenueDetail = {
   venueId: 'v1',
@@ -50,10 +53,11 @@ describe('VenueHeader', () => {
     expect(screen.queryByText('Via Test 1, Milano')).toBeNull();
   });
 
-  it('"Apri in Google Maps" apre la scheda del luogo', async () => {
-    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+  it('"Apri in Google Maps" apre la scheda del luogo tramite openLink', async () => {
     await render(<VenueHeader detail={detail} closingTime={null} />);
     await fireEvent.press(screen.getByRole('link', { name: 'venues:openInGoogleMaps' }));
-    expect(open).toHaveBeenCalledWith('https://www.google.com/maps/place/?q=place_id:ChIJabc');
+    expect(openLink).toHaveBeenCalledWith(
+      'https://www.google.com/maps/search/?api=1&query=Arena%20Club%2C%20Via%20Test%201%2C%20Milano&query_place_id=ChIJabc',
+    );
   });
 });

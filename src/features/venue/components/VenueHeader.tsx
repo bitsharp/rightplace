@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { googleMapsPlaceUrl, isGooglePlaceId } from '@/features/venues/domain/googleMaps';
+import { openLink } from '@/lib/links/links';
 import { heights, spacing } from '@/theme/tokens';
 
 import type { VenueDetail } from '../api';
@@ -23,17 +24,14 @@ export function VenueHeader({ detail, closingTime }: Props) {
       <Text variant="body14" color="maybe">
         {typeLine}
       </Text>
-      {isGooglePlaceId(detail.googlePlaceId) ? (
-        <AddressLines address={detail.address} googlePlaceId={detail.googlePlaceId} />
-      ) : null}
+      {isGooglePlaceId(detail.googlePlaceId) ? <AddressLines detail={detail} /> : null}
     </View>
   );
 }
 
-type AddressProps = { address: string | null; googlePlaceId: string };
-
 // Places data must carry the Google attribution and a link back to Google Maps (docs/places-terms.md).
-function AddressLines({ address, googlePlaceId }: AddressProps) {
+function AddressLines({ detail }: { detail: VenueDetail }) {
+  const { address } = detail;
   const { t } = useTranslation('venues');
   return (
     <View style={styles.address}>
@@ -46,7 +44,9 @@ function AddressLines({ address, googlePlaceId }: AddressProps) {
       <Pressable
         accessibilityRole="link"
         accessibilityLabel={t('openInGoogleMaps')}
-        onPress={() => void Linking.openURL(googleMapsPlaceUrl(googlePlaceId))}
+        onPress={() =>
+          void openLink(googleMapsPlaceUrl({ ...detail, placeId: detail.googlePlaceId }))
+        }
         style={styles.link}
       >
         <Text variant="body13Medium" color="going">

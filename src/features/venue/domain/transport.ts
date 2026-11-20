@@ -17,7 +17,7 @@ type Input = {
 type Venue = Input['venue'];
 
 const UBER = 'https://m.uber.com/ul/?action=setPickup';
-const MAPS_DIRECTIONS = 'https://www.google.com/maps/dir/?api=1&travelmode=transit';
+const MAPS_DIRECTIONS = 'https://www.google.com/maps/dir/?api=1';
 
 // Deep links only, no API (roadmap 08). Brackets in Uber's keys are literal, values are encoded.
 function uberLink(direction: TransportDirection, venue: Venue): TransportLink {
@@ -36,7 +36,7 @@ function transitLink(direction: TransportDirection, venue: Venue): TransportLink
     ? `&${end}_place_id=${encodeURIComponent(venue.googlePlaceId)}`
     : '';
   const place = `${coordinates}${placeId}`;
-  return { provider: 'transit', primaryUrl: `${MAPS_DIRECTIONS}&${place}` };
+  return { provider: 'transit', primaryUrl: `${MAPS_DIRECTIONS}&${place}&travelmode=transit` };
 }
 
 const LOCAL_RIDE_APPS: Record<string, TransportLink> = {

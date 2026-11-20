@@ -77,12 +77,12 @@ describe('buildTransportLinks', () => {
   it('mezzi pubblici: andata con destination, ritorno con origin', () => {
     const there = buildTransportLinks({ direction: 'there', venue, city: milan });
     const back = buildTransportLinks({ direction: 'back', venue, city: milan });
-    const base = 'https://www.google.com/maps/dir/?api=1&travelmode=transit&';
+    const base = 'https://www.google.com/maps/dir/?api=1&';
     expect(link(there, 'transit')?.primaryUrl).toBe(
-      `${base}destination=45.4642,9.19&destination_place_id=ChIJabc`,
+      `${base}destination=45.4642,9.19&destination_place_id=ChIJabc&travelmode=transit`,
     );
     expect(link(back, 'transit')?.primaryUrl).toBe(
-      `${base}origin=45.4642,9.19&origin_place_id=ChIJabc`,
+      `${base}origin=45.4642,9.19&origin_place_id=ChIJabc&travelmode=transit`,
     );
   });
 
@@ -95,7 +95,9 @@ describe('buildTransportLinks', () => {
     const spot = { ...venue, googlePlaceId: 'spot:3f1c8a52-7d0e-4a56-9b1f-2c6d8e4a1b90' };
     const links = buildTransportLinks({ direction: 'there', venue: spot, city: milan });
     const transit = link(links, 'transit')?.primaryUrl ?? '';
-    expect(transit).toContain('destination=45.4642,9.19');
+    expect(transit).toBe(
+      'https://www.google.com/maps/dir/?api=1&destination=45.4642,9.19&travelmode=transit',
+    );
     expect(transit).not.toContain('place_id');
     expect(transit).not.toContain('spot');
   });
