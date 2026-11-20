@@ -137,7 +137,7 @@
   "avatar": {
     "change": "Change your profile photo",
     "title": "Profile photo",
-    "hint": "Only you and your followers can see it. Anyone who doesn't follow you sees your initial.",
+    "hint": "Only you and people you have an accepted follow with (who follow you and whom you follow) can see it. Everyone else sees your initial.",
     "remove": "Remove photo"
   },
   "header": {

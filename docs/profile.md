@@ -4,12 +4,12 @@ Schermata 13 (`ProfiloApp.dc.html`), riletta nel formato "profilo Instagram": fo
 
 ## Cosa vede chi
 
-| Chi guarda                                                 | Foto profilo    | Contatori (post, follower, seguiti) | Griglia dei post                             | Elenchi follower / seguiti |
-| ---------------------------------------------------------- | --------------- | ----------------------------------- | -------------------------------------------- | -------------------------- |
-| Io                                                         | sì              | sì                                  | tutti i miei post attivi                     | sì (dai contatori)         |
-| Chi segue il profilo con follow accettato dal proprietario | sì              | sì                                  | solo i post già nella finestra "giorno dopo" | no, solo i numeri          |
-| Richiesta in attesa, sconosciuto                           | no (l'iniziale) | `null` (trattino)                   | lucchetto "Profilo privato"                  | no                         |
-| Bloccato in una direzione qualsiasi                        | no              | profilo "non trovato"               | niente                                       | no                         |
+| Chi guarda                                                       | Foto profilo    | Contatori (post, follower, seguiti) | Griglia dei post                             | Elenchi follower / seguiti |
+| ---------------------------------------------------------------- | --------------- | ----------------------------------- | -------------------------------------------- | -------------------------- |
+| Io                                                               | sì              | sì                                  | tutti i miei post attivi                     | sì (dai contatori)         |
+| Follow accettato con il proprietario, in una delle due direzioni | sì              | sì                                  | solo i post già nella finestra "giorno dopo" | no, solo i numeri          |
+| Richiesta in attesa, sconosciuto                                 | no (l'iniziale) | `null` (trattino)                   | lucchetto "Profilo privato"                  | no                         |
+| Bloccato in una direzione qualsiasi                              | no              | profilo "non trovato"               | niente                                       | no                         |
 
 La regola vive nel database, non nel client:
 
@@ -17,7 +17,7 @@ La regola vive nel database, non nel client:
 - `get_profile_summary(user_id)` restituisce l'identità pubblica a chiunque e i conteggi solo a me e ai follower accettati (principio 6). Un conteggio `null` non è mai trasformato in zero dal client.
 - `get_user_posts(user_id, …)` usa `private.visible_posts()`, la stessa fonte di feed e storie: post attivi (7 giorni, principio 5), mai oltre un blocco.
 
-"Seguire" nel codice è sempre follow accettato. La foto di una persona si vede solo se la si segue con follow accettato: nell'elenco dei miei follower, chi non seguo a mia volta mostra quindi l'iniziale. Il permesso è uno solo, "il proprietario ha accettato il mio follow", mai "mi segue".
+"Seguire" nel codice è sempre follow accettato. La foto di una persona (decisione del 20/11/2026) si vede solo se c'è un legame, cioè un follow accettato in una delle due direzioni (`private.is_linked`): i follower accettati del proprietario e le persone che il proprietario segue. Nell'elenco dei miei follower vedo quindi la foto di tutti, perché ognuno ha un follow accettato verso di me. Richieste in attesa, sconosciuti e qualunque blocco mostrano l'iniziale.
 
 ## Foto: file e cache
 
@@ -29,7 +29,7 @@ La regola vive nel database, non nel client:
 
 Nessuna superficie nuova da moderare in modo diverso:
 
-- la foto profilo è visibile solo a chi ho accettato; **segnala utente** (`report('user', id)`) e **blocca** esistono già e dal profilo pubblico si raggiungono con "Segnala o blocca" (e con il tocco lungo sulle liste). Un blocco nasconde subito la foto in entrambe le direzioni;
+- la foto profilo è visibile solo a chi ha con me un follow accettato in una delle due direzioni; **segnala utente** (`report('user', id)`) e **blocca** esistono già e dal profilo pubblico si raggiungono con "Segnala o blocca" (e con il tocco lungo sulle liste). Un blocco nasconde subito la foto in entrambe le direzioni;
 - sui post della griglia il tocco lungo apre le stesse azioni del feed (segnala, blocca autore, elimina il proprio);
 - il filtro automatico sulle foto, la rimozione entro 24 ore e i termini di tolleranza zero restano nel prompt 16 e valgono anche per `avatars` quando verrà fatto (da collegare lì: oggi nessun filtro automatico controlla le foto profilo).
 

@@ -90,8 +90,10 @@ select is((select count(*)::int from get_avatar_paths(array[:'a'::uuid])), 0,
   'chi mi ha bloccato non la vede, anche se mi segue');
 reset role;
 select tests.authenticate_as(:'g');
-select is((select count(*)::int from get_avatar_paths(array[:'a'::uuid])), 0,
-  'seguire non basta: chi è seguito da me ma non mi segue non vede la mia foto (g non segue a)');
+-- Updated 20/11/2026 (migration 0033, avatar_linked): the old rule needed viewer->owner accepted, so g (followed by a,
+-- not following a) saw nothing; the rule is now an accepted follow in either direction, so g sees a's photo.
+select is((select count(*)::int from get_avatar_paths(array[:'a'::uuid])), 1,
+  'chi è seguito da me (accettato) vede la mia foto anche se non mi segue (legame in una delle due direzioni)');
 reset role;
 select tests.authenticate_as(:'a');
 select is((select count(*)::int from get_avatar_paths(array[:'g'::uuid])), 0, 'g non ha una foto: nessuna riga');

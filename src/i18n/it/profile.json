@@ -137,7 +137,7 @@
   "avatar": {
     "change": "Cambia la foto profilo",
     "title": "Foto profilo",
-    "hint": "La vedono solo tu e i tuoi follower. Chi non ti segue vede l'iniziale.",
+    "hint": "La vedono solo tu e le persone con cui hai un follow accettato (chi ti segue e chi segui). Gli altri vedono l'iniziale.",
     "remove": "Rimuovi foto"
   },
   "header": {
