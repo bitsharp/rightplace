@@ -47,19 +47,25 @@ Niente email: i feedback arrivano **dentro RightPlace** agli account del support
 1. Applicare la migration: `npx supabase db push`.
 2. Deploy della funzione: `npx supabase functions deploy feedback-screenshot-urls`.
 3. Nel SQL editor del progetto:
+
    ```sql
    update public.profiles set is_support = true where handle = '<handle senza @>';
    ```
+
    (per togliere: `= false`; le push in coda di chi non è più supporto vengono scartate). L'app rilegge il profilo al prossimo avvio.
 
    Fase di test (decisione di Luca, 20/11/2026): **tutti gli utenti attivi sono supporto**:
+
    ```sql
    update public.profiles set is_support = true where deleted_at is null;
    ```
+
    Ognuno riceve una push per ogni feedback e vede tutti i feedback con gli screenshot (che possono mostrare contenuti privati di altri). Prima del lancio pubblico riportare il ruolo al solo team:
+
    ```sql
    update public.profiles set is_support = false where handle not in ('<handle1>', '<handle2>');
    ```
+
 4. Ridistribuire anche `send-push` (accetta il nuovo canale `supporto`): `npx supabase functions deploy send-push --no-verify-jwt`. Le push richiedono la configurazione già descritta per le notifiche (secret `SEND_PUSH_KEY`, Vault `send_push_url` / `send_push_key`). Il canale Android `supporto` lo crea l'app all'avvio: basta `eas update`.
 
 ## Ritenzione e privacy
