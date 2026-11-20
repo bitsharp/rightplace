@@ -130,5 +130,18 @@
     "close": "Chiudi",
     "photoOf": "Foto {{current}} di {{total}}",
     "open": "Apri foto"
+  },
+  "quickEmoji": {
+    "insert": "Inserisci {{name}}",
+    "names": {
+      "heart": "cuore",
+      "raisedHands": "mani alzate",
+      "fire": "fuoco",
+      "clap": "applauso",
+      "cry": "faccia che piange",
+      "heartEyes": "occhi a cuore",
+      "wow": "faccia stupita",
+      "laugh": "faccia che ride"
+    }
   }
 }

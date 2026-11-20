@@ -85,3 +85,25 @@ describe('ChatComposer', () => {
     expect(onPhoto).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('ChatComposer: emoji rapide', () => {
+  const EMOJI = (key: string) => `ui:quickEmoji.insert({"name":"ui:quickEmoji.names.${key}"})`;
+
+  it('un tocco sull’emoji la inserisce al cursore', async () => {
+    const { input } = await setup();
+    await fireEvent.changeText(input, 'ciao mondo');
+    await fireEvent(input, 'selectionChange', {
+      nativeEvent: { selection: { start: 4, end: 4 } },
+    });
+    await fireEvent.press(screen.getByLabelText(EMOJI('fire')));
+    expect(screen.getByLabelText('chat:composer.placeholder').props.value).toBe('ciao🔥 mondo');
+  });
+
+  it('senza cursore la inserisce in coda e il messaggio parte con l’emoji', async () => {
+    const { input, onSend } = await setup();
+    await fireEvent.changeText(input, 'bella');
+    await fireEvent.press(screen.getByLabelText(EMOJI('heart')));
+    await fireEvent.press(screen.getByLabelText('chat:composer.send'));
+    expect(onSend).toHaveBeenCalledWith('bella❤️');
+  });
+});

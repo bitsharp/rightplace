@@ -122,7 +122,8 @@ describe('CommentsSheet', () => {
     setFakeRpc({ get_post_comments: [] });
     await open();
     const input = await screen.findByLabelText('feed:comments.placeholder');
-    expect(input.props.maxLength).toBe(300);
+    await fireEvent.changeText(input, 'x'.repeat(305));
+    expect(screen.getByLabelText('feed:comments.placeholder').props.value).toBe('x'.repeat(300));
     await fireEvent.changeText(input, 'ciao');
     expect(screen.getByText('feed:comments.counter({"count":4,"max":300})')).toBeOnTheScreen();
   });
@@ -239,5 +240,84 @@ describe('CommentsSheet: profilo dell’autore', () => {
     });
     await fireEvent.press(links[1] as never);
     expect(mockPush).toHaveBeenCalledWith('/profile');
+  });
+});
+
+const EMOJI = (key: string) => `ui:quickEmoji.insert({"name":"ui:quickEmoji.names.${key}"})`;
+
+describe('CommentsSheet: emoji', () => {
+  const field = () => screen.getByLabelText('feed:comments.placeholder');
+
+  it('un tocco sull’emoji la inserisce in coda quando non c’è selezione', async () => {
+    setFakeRpc({ get_post_comments: [] });
+    await open();
+    await fireEvent.changeText(await screen.findByLabelText('feed:comments.placeholder'), 'ciao');
+    await fireEvent.press(screen.getByLabelText(EMOJI('fire')));
+    expect(field().props.value).toBe('ciao🔥');
+  });
+
+  it('inserisce nella posizione del cursore', async () => {
+    setFakeRpc({ get_post_comments: [] });
+    await open();
+    const input = await screen.findByLabelText('feed:comments.placeholder');
+    await fireEvent.changeText(input, 'ciao mondo');
+    await fireEvent(input, 'selectionChange', {
+      nativeEvent: { selection: { start: 4, end: 4 } },
+    });
+    await fireEvent.press(screen.getByLabelText(EMOJI('heartEyes')));
+    expect(field().props.value).toBe('ciao😍 mondo');
+  });
+
+  it('il contatore conta i code point, non le unità UTF-16', async () => {
+    setFakeRpc({ get_post_comments: [] });
+    await open();
+    await fireEvent.changeText(await screen.findByLabelText('feed:comments.placeholder'), '👨‍👩‍👧😂');
+    expect(screen.getByText('feed:comments.counter({"count":6,"max":300})')).toBeOnTheScreen();
+  });
+
+  it('300 emoji sono un commento valido e Invia resta attivo', async () => {
+    setFakeRpc({ get_post_comments: [] });
+    await open();
+    await fireEvent.changeText(
+      await screen.findByLabelText('feed:comments.placeholder'),
+      '🔥'.repeat(300),
+    );
+    expect(field().props.value).toBe('🔥'.repeat(300));
+    expect(screen.getByRole('button', { name: 'feed:comments.send' })).toBeEnabled();
+  });
+
+  it('non permette di superare 300 code point inserendo un’emoji', async () => {
+    setFakeRpc({ get_post_comments: [] });
+    await open();
+    await fireEvent.changeText(
+      await screen.findByLabelText('feed:comments.placeholder'),
+      'x'.repeat(299),
+    );
+    await fireEvent.press(screen.getByLabelText(EMOJI('fire')));
+    await fireEvent.press(screen.getByLabelText(EMOJI('laugh')));
+    expect(field().props.value).toBe(`${'x'.repeat(299)}🔥`);
+  });
+
+  it('invia alla RPC il testo con le emoji intatto', async () => {
+    setFakeRpc({
+      get_post_comments: [],
+      add_post_comment: [{ comment_id: 'c9', created_at: '2026-11-09T12:00:00Z' }],
+    });
+    await open();
+    await fireEvent.changeText(await screen.findByLabelText('feed:comments.placeholder'), 'bella');
+    await fireEvent.press(screen.getByLabelText(EMOJI('heart')));
+    await fireEvent.press(screen.getByRole('button', { name: 'feed:comments.send' }));
+    await waitFor(() => expect(rpcCalls('add_post_comment')).toHaveLength(1));
+    expect(rpcCalls('add_post_comment')[0]?.[1]).toEqual({ p_post_id: 'p1', p_text: 'bella❤️' });
+  });
+
+  it('nei commenti pubblicati le emoji restano intere, anche accanto a un link', async () => {
+    setFakeRpc({
+      get_post_comments: [comment('1', '👨‍👩‍👧 🇮🇹 ❤️ www.example.com🔥 😂')],
+    });
+    await open();
+    const link = await screen.findByRole('link', { name: 'www.example.com' });
+    expect(link.props.children).toBe('www.example.com');
+    expect(screen.getByTestId('comment-text')).toHaveTextContent('👨‍👩‍👧 🇮🇹 ❤️ www.example.com🔥 😂');
   });
 });

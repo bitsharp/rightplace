@@ -5,6 +5,9 @@ const CANDIDATE = /(?:https?:\/\/|www\.)[^\s<>]+/gi;
 // A link starts a word: after "@" it is a handle or an e-mail, after ":" it may hide another scheme.
 const BEFORE_LINK = /^(?:|[\s([{"'])$/;
 const TRAILING_PUNCTUATION = /[.,;:!?'"]$/;
+// An emoji typed right after an address ('www.example.com🔥') is not part of it.
+const TRAILING_EMOJI =
+  /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|\p{Emoji_Modifier}|[\u200D\uFE0F])+$/u;
 const CLOSERS: Record<string, string> = { ')': '(', ']': '[', '}': '{' };
 const HOST = /^[a-z0-9][a-z0-9.-]*(?::\d+)?$/i;
 const HTTP_URL = /^https?:\/\/\S+$/i;
@@ -22,6 +25,11 @@ function count(text: string, char: string): number {
 function trimTrailing(candidate: string): string {
   let url = candidate;
   for (;;) {
+    const withoutEmoji = url.replace(TRAILING_EMOJI, '');
+    if (withoutEmoji !== url) {
+      url = withoutEmoji;
+      continue;
+    }
     const last = url.slice(-1);
     const opener = CLOSERS[last];
     const strip =

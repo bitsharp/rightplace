@@ -128,3 +128,35 @@ describe('isOpenableUrl', () => {
     expect(isOpenableUrl('www.example.com')).toBe(false);
   });
 });
+
+describe('linkify: emoji', () => {
+  it('un testo di sole emoji resta testo intero', () => {
+    expect(linkify('👨‍👩‍👧 🇮🇹 ❤️ 😂')).toEqual([{ kind: 'text', text: '👨‍👩‍👧 🇮🇹 ❤️ 😂' }]);
+  });
+
+  it('un’emoji prima del link non lo rompe e non si spezza', () => {
+    expect(linkify('🔥 https://example.com/a 😂')).toEqual([
+      { kind: 'text', text: '🔥 ' },
+      { kind: 'link', text: 'https://example.com/a', url: 'https://example.com/a' },
+      { kind: 'text', text: ' 😂' },
+    ]);
+  });
+});
+
+describe('linkify: emoji attaccata al link', () => {
+  it('l’emoji subito dopo l’indirizzo resta testo e il link funziona', () => {
+    expect(linkify('www.example.com🔥 ok')).toEqual([
+      { kind: 'link', text: 'www.example.com', url: 'https://www.example.com' },
+      { kind: 'text', text: '🔥 ok' },
+    ]);
+  });
+
+  it('anche un’emoji composta (famiglia, bandiera, cuore con variante)', () => {
+    for (const emoji of ['👨‍👩‍👧', '🇮🇹', '❤️']) {
+      expect(linkify(`https://example.com${emoji}`)).toEqual([
+        { kind: 'link', text: 'https://example.com', url: 'https://example.com' },
+        { kind: 'text', text: emoji },
+      ]);
+    }
+  });
+});

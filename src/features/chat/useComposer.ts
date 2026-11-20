@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { insertAtSelection } from '@/features/posts/domain/quickEmojis';
+
 import {
   activeMentionQuery,
   insertMention,
@@ -38,6 +40,16 @@ export function useComposer(
     },
     pickMention: (handle: string) => {
       const next = insertMention(text, cursor ?? text.length, handle);
+      setText(next.text);
+      setCursor(next.cursor);
+      setForced({ start: next.cursor, end: next.cursor });
+    },
+    insertEmoji: (emoji: string) => {
+      const next = insertAtSelection(
+        text,
+        cursor === null ? null : { start: cursor, end: cursor },
+        emoji,
+      );
       setText(next.text);
       setCursor(next.cursor);
       setForced({ start: next.cursor, end: next.cursor });

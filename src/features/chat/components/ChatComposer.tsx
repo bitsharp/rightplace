@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
+import { QuickEmojiBar } from '@/components/ui/QuickEmojiBar';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
 import { typography } from '@/theme/typography';
 
@@ -46,6 +47,7 @@ export function ChatComposer({
           onFollow={onFollow}
         />
       ))}
+      <QuickEmojiBar onPick={composer.insertEmoji} />
       <InputRow composer={composer} canSend={trimmed !== ''} onSend={send} onPhoto={onPhoto} />
     </View>
   );
