@@ -331,7 +331,7 @@ describe('richieste ricevute', () => {
     await act(async () => release());
   });
 
-  it('accettare ricarica anche l’elenco dei follower', async () => {
+  it('accettare ricarica l’elenco dei follower e il contatore del mio profilo', async () => {
     setFakeRpc({});
     const { Wrapper, client } = createQueryWrapper();
     const invalidate = jest.spyOn(client, 'invalidateQueries');
@@ -341,7 +341,9 @@ describe('richieste ricevute', () => {
     });
     await waitFor(() => expect(hook.current.isSuccess).toBe(true));
     const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
-    expect(keys).toEqual(expect.arrayContaining([FOLLOWERS_KEY, ['followRequests']]));
+    expect(keys).toEqual(
+      expect.arrayContaining([FOLLOWERS_KEY, ['followRequests'], ['profileSummary']]),
+    );
   });
 
   it('se accettare fallisce, la richiesta torna in lista', async () => {

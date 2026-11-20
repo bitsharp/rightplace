@@ -6,3 +6,5 @@ export const storyPostsKey = (userId: string) => [...STORY_POSTS_ROOT_KEY, userI
 export const POST_COMMENTS_ROOT_KEY = ['postComments'] as const;
 export const commentsKey = (postId: string) => [...POST_COMMENTS_ROOT_KEY, postId] as const;
 export const postPhotoUrlsKey = (postIds: string[]) => ['postPhotoUrls', ...postIds] as const;
+export const USER_POSTS_ROOT_KEY = ['userPosts'] as const;
+export const userPostsKey = (userId: string) => [...USER_POSTS_ROOT_KEY, userId] as const;

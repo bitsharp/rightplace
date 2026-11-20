@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { Share } from 'react-native';
 
+import type { ViewStyle } from 'react-native';
+
 import { Button } from '@/components/ui/Button';
 import { shareLinks } from '@/features/friends/domain/shareLinks';
 
 import { formatHandle } from '../domain/handle';
 
 // The way to be followed by people met offline: it shares the @tag and nothing else.
-export function ShareHandleButton({ handle }: { handle: string }) {
+export function ShareHandleButton({ handle, style }: { handle: string; style?: ViewStyle }) {
   const { t } = useTranslation('profile');
   const share = () => {
     const links = shareLinks(handle);
@@ -16,6 +18,12 @@ export function ShareHandleButton({ handle }: { handle: string }) {
     });
   };
   return (
-    <Button label={t('share.cta')} variant="secondary" size="md" onPress={() => void share()} />
+    <Button
+      label={t('share.cta')}
+      variant="secondary"
+      size="md"
+      style={style}
+      onPress={() => void share()}
+    />
   );
 }

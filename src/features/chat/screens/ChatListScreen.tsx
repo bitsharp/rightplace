@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { TopBar } from '@/components/app/TopBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Text } from '@/components/ui/Text';
+import { useTopBar } from '@/features/posts/useTopBar';
 import { colors, spacing } from '@/theme/tokens';
 
 import { RoomRow } from '../components/RoomRow';
@@ -14,8 +16,10 @@ export function ChatListScreen() {
   const { t } = useTranslation('chat');
   const router = useRouter();
   const rooms = useMyChatRooms();
+  const topBar = useTopBar();
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+      <TopBar {...topBar} />
       <ScrollView contentContainerStyle={styles.content}>
         <Text accessibilityRole="header" variant="display22">
           {t('title')}

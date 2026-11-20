@@ -4,7 +4,8 @@ import { Platform } from 'react-native';
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
-import { AvatarEditor } from './AvatarEditor';
+import { useAvatarEditor } from '../avatar/useAvatarEditor';
+import { AvatarEditor, AvatarEditorNotice } from './AvatarEditor';
 
 const mockPick = jest.fn();
 jest.mock('@/lib/photos/photos', () => ({
@@ -25,10 +26,17 @@ beforeEach(() => {
   invoke.mockResolvedValue(urls([]));
 });
 
-const renderEditor = () =>
-  render(<AvatarEditor handle="lince.rosso" />, {
-    wrapper: createQueryWrapper().Wrapper,
-  });
+function Harness() {
+  const editor = useAvatarEditor();
+  return (
+    <>
+      <AvatarEditor handle="lince.rosso" editor={editor} />
+      <AvatarEditorNotice editor={editor} />
+    </>
+  );
+}
+
+const renderEditor = () => render(<Harness />, { wrapper: createQueryWrapper().Wrapper });
 
 describe('AvatarEditor', () => {
   it('senza foto mostra l’iniziale e toccando l’avatar apre il foglio', async () => {

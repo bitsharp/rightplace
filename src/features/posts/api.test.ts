@@ -11,6 +11,8 @@ import {
   fetchPostPhotoUrls,
   fetchPostTarget,
   fetchStoryPosts,
+  fetchUserPostsPage,
+  USER_POSTS_PAGE_SIZE,
   reportComment,
   reportPost,
   setPostLike,
@@ -51,6 +53,38 @@ const feedPost = {
   likedByMe: false,
   isMine: false,
 };
+
+describe('fetchUserPostsPage', () => {
+  it('chiede i post di una persona con il cursore composto e 30 per pagina', async () => {
+    respondWith([postRow()]);
+    await expect(
+      fetchUserPostsPage('u1', { beforeVisible: '2026-11-09T05:00:00.1+00:00', beforeId: 'p0' }),
+    ).resolves.toEqual([feedPost]);
+    expect(USER_POSTS_PAGE_SIZE).toBe(30);
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_user_posts', {
+      p_user_id: 'u1',
+      p_before_visible: '2026-11-09T05:00:00.1+00:00',
+      p_before_id: 'p0',
+      p_limit: 30,
+    });
+  });
+
+  it('la prima pagina parte senza cursore', async () => {
+    respondWith([]);
+    await expect(fetchUserPostsPage('u1')).resolves.toEqual([]);
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_user_posts', {
+      p_user_id: 'u1',
+      p_before_visible: null,
+      p_before_id: null,
+      p_limit: 30,
+    });
+  });
+
+  it('un errore del server diventa un errore tipizzato', async () => {
+    respondWith(null, { message: 'NOT_AUTHENTICATED' });
+    await expect(fetchUserPostsPage('u1')).rejects.toEqual(new RpcError('NOT_AUTHENTICATED'));
+  });
+});
 
 describe('fetchPostTarget', () => {
   it('senza righe non si può postare', async () => {

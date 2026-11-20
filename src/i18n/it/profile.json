@@ -79,7 +79,8 @@
     "title": "I tuoi follower",
     "empty": "Nessuno ti segue ancora. Condividi il tuo @tag con gli amici.",
     "remove": "Rimuovi",
-    "a11yRemove": "Rimuovi {{handle}} dai tuoi follower"
+    "a11yRemove": "Rimuovi {{handle}} dai tuoi follower",
+    "screenTitle": "Follower"
   },
   "blocked": {
     "title": "Bloccati",
@@ -137,5 +138,25 @@
     "title": "Foto profilo",
     "hint": "La vedono solo tu e i tuoi follower. Chi non ti segue vede l'iniziale.",
     "remove": "Rimuovi foto"
+  },
+  "header": {
+    "posts": "post",
+    "followers": "follower",
+    "following": "seguiti",
+    "a11yFollowers_one": "{{count}} follower: apri l'elenco",
+    "a11yFollowers_other": "{{count}} follower: apri l'elenco",
+    "a11yFollowing_one": "{{count}} seguito: apri l'elenco",
+    "a11yFollowing_other": "{{count}} seguiti: apri l'elenco",
+    "edit": "Modifica profilo"
+  },
+  "posts": {
+    "emptyMine": "I tuoi post del giorno dopo compaiono qui per 7 giorni.",
+    "loadError": "Non riusciamo a caricare i post. Tira giù per riprovare."
+  },
+  "edit": {
+    "title": "Modifica profilo"
+  },
+  "lists": {
+    "back": "Indietro"
   }
 }

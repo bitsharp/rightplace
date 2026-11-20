@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { FriendRow, type FollowAction } from '@/components/app/FriendRow';
+import type { AvatarPhoto } from '@/components/ui/Avatar';
 
 import type { Person } from '../api';
 import type { FollowStatus } from '../domain/followButton';
@@ -11,6 +12,8 @@ type Props = {
   followState: FollowStatus;
   onAction: (userId: string, action: FollowAction) => void;
   onLongPress?: (person: Person) => void;
+  onPress?: (person: Person) => void;
+  avatarPhoto?: AvatarPhoto;
   followsMe?: boolean;
   venueName?: string | null;
   note?: string;
@@ -22,6 +25,8 @@ export function PersonRow({
   followState,
   onAction,
   onLongPress,
+  onPress,
+  avatarPhoto,
   followsMe,
   venueName,
   note,
@@ -37,6 +42,8 @@ export function PersonRow({
       venueLine={venueName ? t('tonight', { venue: venueName }) : undefined}
       onAction={(action) => onAction(person.userId, action)}
       onLongPress={onLongPress ? () => onLongPress(person) : undefined}
+      onPress={onPress ? () => onPress(person) : undefined}
+      avatarPhoto={avatarPhoto}
     />
   );
 }

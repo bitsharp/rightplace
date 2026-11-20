@@ -7,11 +7,20 @@ import {
   fetchPostPhotoUrls,
   fetchPostTarget,
   fetchStoryPosts,
+  fetchUserPostsPage,
   FEED_PAGE_SIZE,
+  USER_POSTS_PAGE_SIZE,
 } from './api';
 import { nextCursor } from './domain/feedPages';
 import type { FeedCursor, PostComment } from './domain/types';
-import { commentsKey, FEED_KEY, POST_TARGET_KEY, postPhotoUrlsKey, storyPostsKey } from './keys';
+import {
+  commentsKey,
+  FEED_KEY,
+  POST_TARGET_KEY,
+  postPhotoUrlsKey,
+  storyPostsKey,
+  userPostsKey,
+} from './keys';
 
 export * from './keys';
 export * from './mutations';
@@ -34,6 +43,32 @@ export function useFeed() {
     queryFn: ({ pageParam }) => fetchFeedPage(pageParam),
     getNextPageParam: (lastPage) => nextCursor(lastPage, FEED_PAGE_SIZE),
     refetchOnWindowFocus: true,
+    meta: PRIVATE,
+  });
+  return {
+    posts: query.data?.pages.flat() ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+    isRefreshing: query.isRefetching && !query.isFetchingNextPage,
+    hasMore: query.hasNextPage,
+    loadMore: () => {
+      if (query.hasNextPage && !query.isFetchingNextPage) void query.fetchNextPage();
+    },
+    refresh: async () => {
+      await query.refetch();
+    },
+  };
+}
+
+// The grid of a profile: mine, or an accepted follow's. `enabled` is false for a private profile, so a stranger's
+// screen never even asks (the server would answer with nothing anyway).
+export function useUserPosts(userId: string, enabled = true) {
+  const query = useInfiniteQuery({
+    queryKey: userPostsKey(userId),
+    initialPageParam: undefined as FeedCursor | undefined,
+    queryFn: ({ pageParam }) => fetchUserPostsPage(userId, pageParam),
+    getNextPageParam: (lastPage) => nextCursor(lastPage, USER_POSTS_PAGE_SIZE),
+    enabled: enabled && userId !== '',
     meta: PRIVATE,
   });
   return {

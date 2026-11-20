@@ -147,14 +147,14 @@ afterEach(() => jest.useRealTimers());
 describe('dal profilo', () => {
   it('un creator trova "Il tuo profilo creator" e arriva alle sue serate', async () => {
     seedBackend();
-    await renderApp('ready', '/profile', CREATOR);
+    await renderApp('ready', '/profile/edit', CREATOR);
     await fireEvent.press(await screen.findByText('profile:app.creatorProfile'));
     expect(await screen.findByText('creator:events.title')).toBeOnTheScreen();
   });
 
   it('chi non lo è vede "Diventa creator" e arriva all’invito', async () => {
     seedBackend();
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     await fireEvent.press(await screen.findByText('profile:app.becomeCreator'));
     expect(await screen.findByText('creator:notCreator.title')).toBeOnTheScreen();
   });

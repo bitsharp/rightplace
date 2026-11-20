@@ -21,7 +21,7 @@ export function NotCreatorNotice() {
         <Button
           label={t('notCreator.cta')}
           variant="creator"
-          onPress={() => router.replace('/profile')}
+          onPress={() => router.replace('/profile/edit')}
         />
       </View>
     </Card>

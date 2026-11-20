@@ -48,6 +48,12 @@
   "publicProfile": {
     "title": "Profile",
     "notFound": "No user with this tag.",
-    "back": "Back"
+    "back": "Back",
+    "privateTitle": "Private profile",
+    "privateBody": "Follow {{handle}} to see their day-after posts.",
+    "privateRequested": "Request sent: you'll see their posts once they accept.",
+    "empty": "No posts right now.",
+    "loadError": "We can't load the posts. Try again shortly.",
+    "more": "Report or block"
   }
 }

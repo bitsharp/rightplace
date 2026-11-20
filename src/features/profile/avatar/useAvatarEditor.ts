@@ -33,3 +33,5 @@ export function useAvatarEditor() {
     errorCode: rpcErrorCodeOf(change.error ?? remove.error),
   };
 }
+
+export type AvatarEditorState = ReturnType<typeof useAvatarEditor>;

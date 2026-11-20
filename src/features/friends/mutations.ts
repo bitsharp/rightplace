@@ -118,7 +118,7 @@ function useRequestAnswer(
 }
 
 export const useAcceptFollow = () =>
-  useRequestAnswer(acceptFollow, confirmFeedback, [FOLLOWERS_KEY]);
+  useRequestAnswer(acceptFollow, confirmFeedback, [FOLLOWERS_KEY, ['profileSummary']]);
 export const useDeclineFollow = () => useRequestAnswer(declineFollow, selectionFeedback, []);
 
 function useInvalidatingMutation(

@@ -17,8 +17,9 @@ import {
   usePostTarget,
   useStoryPosts,
   useToggleLike,
+  useUserPosts,
 } from './hooks';
-import { FEED_KEY, STORIES_KEY, storyPostsKey } from './keys';
+import { FEED_KEY, STORIES_KEY, storyPostsKey, USER_POSTS_ROOT_KEY, userPostsKey } from './keys';
 
 jest.mock('expo-router', () => ({ useIsFocused: jest.fn(() => true) }));
 jest.mock('@/lib/photos/photos', () => ({ uploadPhoto: jest.fn(async () => 'me/x.jpg') }));
@@ -112,6 +113,41 @@ describe('useFeed', () => {
   });
 });
 
+describe('useUserPosts', () => {
+  it('con una pagina piena la successiva riparte dal cursore composto e non va su disco', async () => {
+    const full = Array.from({ length: 30 }, (_, i) => row(`p${i}`));
+    setFakeRpc({
+      get_user_posts: (args: unknown) =>
+        (args as { p_before_id: string | null }).p_before_id ? [row('last')] : full,
+    });
+    const { Wrapper, client } = createQueryWrapper();
+    const { result } = await renderHook(() => useUserPosts('u1'), { wrapper: Wrapper });
+    await waitFor(() => expect(result.current.posts).toHaveLength(30));
+    expect(result.current.hasMore).toBe(true);
+    await act(async () => result.current.loadMore());
+    expect(rpcCalls('get_user_posts')[1]?.[1]).toEqual({
+      p_user_id: 'u1',
+      p_before_visible: '2026-11-09T05:00:00.5+00:00',
+      p_before_id: 'p29',
+      p_limit: 30,
+    });
+    await waitFor(() => expect(result.current.posts).toHaveLength(31));
+    expect(result.current.hasMore).toBe(false);
+    expect(client.getQueryCache().find({ queryKey: userPostsKey('u1') })?.meta).toEqual({
+      persist: false,
+    });
+  });
+
+  it('disabilitato (profilo privato o senza id) non chiama il server', async () => {
+    setFakeRpc({ get_user_posts: [row('a')] });
+    const { Wrapper } = createQueryWrapper();
+    const { result } = await renderHook(() => useUserPosts('u1', false), { wrapper: Wrapper });
+    await renderHook(() => useUserPosts(''), { wrapper: Wrapper });
+    expect(result.current.posts).toEqual([]);
+    expect(rpcCalls('get_user_posts')).toHaveLength(0);
+  });
+});
+
 describe('useToggleLike', () => {
   const seed = (client: ReturnType<typeof createQueryWrapper>['client']) => {
     client.setQueryData<InfiniteData<FeedPost[], unknown>>(FEED_KEY, {
@@ -178,6 +214,7 @@ describe('useCreatePost', () => {
         FEED_KEY,
         STORIES_KEY,
         ['storyPosts'],
+        USER_POSTS_ROOT_KEY,
         CHAT_MESSAGES_ROOT_KEY,
         CHAT_ROOMS_KEY,
       ]),
@@ -261,6 +298,20 @@ describe('useDeletePost, useStoryPosts, usePostPhotoUrls', () => {
     await act(async () => result.current.mutateAsync('p1'));
     expect(
       client.getQueryData<InfiniteData<FeedPost[]>>(FEED_KEY)?.pages[0]?.map((p) => p.id),
+    ).toEqual(['p2']);
+  });
+
+  it('eliminare un post lo toglie subito anche dalla griglia del profilo', async () => {
+    setFakeRpc({ delete_post: null });
+    const { Wrapper, client } = createQueryWrapper();
+    client.setQueryData<InfiniteData<FeedPost[], unknown>>(userPostsKey('me'), {
+      pages: [[post('p1'), post('p2')]],
+      pageParams: [undefined],
+    });
+    const { result } = await renderHook(() => useDeletePost(), { wrapper: Wrapper });
+    await act(async () => result.current.mutateAsync('p1'));
+    expect(
+      client.getQueryData<InfiniteData<FeedPost[]>>(userPostsKey('me'))?.pages[0]?.map((p) => p.id),
     ).toEqual(['p2']);
   });
 

@@ -19,6 +19,10 @@ const FOLLOW_DEPENDENT_KEYS = [
   ['storyPosts'],
   ['postComments'],
   ['venueStats'],
+  // profile screens: the grid, the counters and the photo of a person depend on the accepted follow too
+  ['userPosts'],
+  ['profileSummary'],
+  ['avatarUrls'],
 ] as const;
 
 export function invalidateFollowDependents(queryClient: QueryClient): Promise<unknown> {

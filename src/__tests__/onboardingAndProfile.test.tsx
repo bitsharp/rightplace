@@ -118,14 +118,14 @@ describe('profilo privato e handle', () => {
 
 describe('tab Profilo: foto profilo', () => {
   it('mostra l’avatar toccabile per cambiare la foto', async () => {
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     expect(await screen.findByRole('button', { name: 'profile:avatar.change' })).toBeOnTheScreen();
   });
 });
 
 describe('tab Profilo: scelta del @tag', () => {
   it('mostra il @tag, l’avviso su nome e cognome e il cambio gratuito ancora disponibile', async () => {
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     expect((await screen.findAllByText('@lince.rosso')).length).toBeGreaterThan(0);
     expect(screen.getByText('profile:handleEditor.warning')).toBeOnTheScreen();
     expect(screen.getByText('profile:handleEditor.freeChange')).toBeOnTheScreen();
@@ -133,7 +133,7 @@ describe('tab Profilo: scelta del @tag', () => {
   });
 
   it('normalizza mentre si scrive e segnala subito un formato sbagliato', async () => {
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     const field = await screen.findByLabelText(FIELD);
     await fireEvent.changeText(field, ' @Luca ');
     expect(screen.getByLabelText(FIELD).props.value).toBe('luca');
@@ -148,7 +148,7 @@ describe('tab Profilo: scelta del @tag', () => {
       data: name === 'is_handle_available' ? 'taken' : null,
       error: null,
     }));
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     await fireEvent.changeText(await screen.findByLabelText(FIELD), 'volpe.blu');
     expect(await screen.findByText('profile:handleEditor.status.checking')).toBeOnTheScreen();
     await act(async () => jest.advanceTimersByTime(400));
@@ -162,7 +162,7 @@ describe('tab Profilo: scelta del @tag', () => {
       if (name === 'set_handle') return { data: null, error: { message: 'HANDLE_NOT_ALLOWED' } };
       return { data: null, error: null };
     });
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     await fireEvent.changeText(await screen.findByLabelText(FIELD), 'luca_97');
     await act(async () => jest.advanceTimersByTime(400));
     expect(await screen.findByText('profile:handleEditor.status.available')).toBeOnTheScreen();
@@ -172,7 +172,7 @@ describe('tab Profilo: scelta del @tag', () => {
 
   it('se il limite è attivo blocca la modifica e indica quando si potrà rifare', async () => {
     const recent = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
-    await renderApp('ready', '/profile', {
+    await renderApp('ready', '/profile/edit', {
       handle_changed_at: recent,
       handle_free_change_used: true,
     });
@@ -186,7 +186,7 @@ describe('tab Profilo: scelta del @tag', () => {
 
   it('se il cambio gratuito è ancora disponibile si può cambiare subito, anche entro 30 giorni', async () => {
     const recent = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString();
-    await renderApp('ready', '/profile', { handle_changed_at: recent });
+    await renderApp('ready', '/profile/edit', { handle_changed_at: recent });
     expect(await screen.findByText('profile:handleEditor.freeChange')).toBeOnTheScreen();
     expect(screen.queryByText('profile:handleEditor.limit')).toBeNull();
     expect(screen.queryByText(/profile:handleEditor\.nextChange/)).toBeNull();
@@ -196,7 +196,7 @@ describe('tab Profilo: scelta del @tag', () => {
 
   it('dopo 30 giorni si può cambiare di nuovo', async () => {
     const old = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
-    await renderApp('ready', '/profile', {
+    await renderApp('ready', '/profile/edit', {
       handle_changed_at: old,
       handle_free_change_used: true,
     });
@@ -216,7 +216,7 @@ describe('tab Profilo: scelta del @tag', () => {
       ]);
       return { data: 'volpe.oro', error: null };
     });
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     await fireEvent.press(await screen.findByRole('button', { name: RANDOM }));
     expect((await screen.findAllByText('@volpe.oro')).length).toBeGreaterThan(0);
     expect(await screen.findByText(/profile:handleEditor\.nextChange/)).toBeOnTheScreen();
@@ -225,14 +225,14 @@ describe('tab Profilo: scelta del @tag', () => {
 
 describe('tab Profilo', () => {
   it('mostra l’email solo in lettura e permette di uscire', async () => {
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     expect(await screen.findByText('lince@example.com')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'profile:account.signOut' }));
     expect(await screen.findByRole('header', { name: 'auth:signUp.title' })).toBeOnTheScreen();
   });
 
   it('salva le modifiche del profilo', async () => {
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     await fireEvent.press(await screen.findByRole('button', { name: 'profile:form.gender.male' }));
     await fireEvent.press(screen.getByRole('button', { name: 'profile:app.save' }));
     expect(fakeSupabase.rpc).toHaveBeenCalledWith(
@@ -243,13 +243,13 @@ describe('tab Profilo', () => {
   });
 
   it('cambia lingua salvandola subito sul profilo', async () => {
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     await fireEvent.press(await screen.findByRole('button', { name: 'profile:form.language.en' }));
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('set_locale', { p_locale: 'en' });
   });
 
   it('elimina l’account solo dopo una doppia conferma', async () => {
-    await renderApp('ready', '/profile');
+    await renderApp('ready', '/profile/edit');
     await fireEvent.press(await screen.findByRole('button', { name: 'profile:account.delete' }));
     expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('delete_my_account', undefined);
     await fireEvent.press(screen.getByRole('button', { name: 'profile:delete.continue' }));
@@ -262,7 +262,7 @@ describe('tab Profilo', () => {
   });
 
   it('mostra il link al profilo creator solo ai creator', async () => {
-    await renderApp('ready', '/profile', { is_creator: true });
+    await renderApp('ready', '/profile/edit', { is_creator: true });
     expect(await screen.findByText('profile:app.creatorProfile')).toBeOnTheScreen();
   });
 });

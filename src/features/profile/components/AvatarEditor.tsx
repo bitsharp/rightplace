@@ -7,18 +7,17 @@ import { Toast } from '@/components/ui/Toast';
 import { avatarIntent } from '@/features/friends/domain/avatarColor';
 import { colors, heights } from '@/theme/tokens';
 
-import { useAvatarEditor } from '../avatar/useAvatarEditor';
+import type { AvatarEditorState } from '../avatar/useAvatarEditor';
 import { formatHandle } from '../domain/handle';
 import { AvatarSheet } from './AvatarSheet';
 
-type Props = { handle: string; size?: number };
+type Props = { handle: string; editor: AvatarEditorState; size?: number };
 
 // The avatar of my own profile: a tap opens the sheet to change or remove the photo (visible only to me and to my
-// accepted followers). Without a photo it shows the initial, as everywhere else.
-export function AvatarEditor({ handle, size = 86 }: Props) {
+// accepted followers). Without a photo it shows the initial, as everywhere else. The state comes from the parent
+// (useAvatarEditor) so the notices can be drawn where there is room for them (AvatarEditorNotice).
+export function AvatarEditor({ handle, editor, size = 86 }: Props) {
   const { t } = useTranslation('profile');
-  const { t: tUi } = useTranslation('ui');
-  const editor = useAvatarEditor();
   const { photoFlow } = editor;
   const photo =
     editor.photoUri && editor.userId
@@ -47,12 +46,6 @@ export function AvatarEditor({ handle, size = 86 }: Props) {
           )}
         </View>
       </Pressable>
-      {photoFlow.notice ? (
-        <Toast tone="info" message={tUi(`photoSource.${photoFlow.notice}`)} />
-      ) : null}
-      {editor.errorCode ? (
-        <Toast tone="info" message={t(`errors:rpc.${editor.errorCode}`)} />
-      ) : null}
       <AvatarSheet
         visible={photoFlow.sheetOpen}
         hasPhoto={photo !== undefined}
@@ -63,6 +56,15 @@ export function AvatarEditor({ handle, size = 86 }: Props) {
       />
     </View>
   );
+}
+
+export function AvatarEditorNotice({ editor }: { editor: AvatarEditorState }) {
+  const { t } = useTranslation('profile');
+  const { t: tUi } = useTranslation('ui');
+  const { notice } = editor.photoFlow;
+  if (notice) return <Toast tone="info" message={tUi(`photoSource.${notice}`)} />;
+  if (editor.errorCode) return <Toast tone="info" message={t(`errors:rpc.${editor.errorCode}`)} />;
+  return null;
 }
 
 const BADGE = heights.minTapTarget / 2;

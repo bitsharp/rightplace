@@ -79,7 +79,8 @@
     "title": "Your followers",
     "empty": "Nobody follows you yet. Share your @tag with friends.",
     "remove": "Remove",
-    "a11yRemove": "Remove {{handle}} from your followers"
+    "a11yRemove": "Remove {{handle}} from your followers",
+    "screenTitle": "Followers"
   },
   "blocked": {
     "title": "Blocked",
@@ -137,5 +138,25 @@
     "title": "Profile photo",
     "hint": "Only you and your followers can see it. Anyone who doesn't follow you sees your initial.",
     "remove": "Remove photo"
+  },
+  "header": {
+    "posts": "posts",
+    "followers": "followers",
+    "following": "following",
+    "a11yFollowers_one": "{{count}} follower: open the list",
+    "a11yFollowers_other": "{{count}} followers: open the list",
+    "a11yFollowing_one": "{{count}} following: open the list",
+    "a11yFollowing_other": "{{count}} following: open the list",
+    "edit": "Edit profile"
+  },
+  "posts": {
+    "emptyMine": "Your day-after posts show up here for 7 days.",
+    "loadError": "We can't load the posts. Pull down to try again."
+  },
+  "edit": {
+    "title": "Edit profile"
+  },
+  "lists": {
+    "back": "Back"
   }
 }

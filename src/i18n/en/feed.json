@@ -55,5 +55,8 @@
     "position": "{{current}} of {{total}}",
     "a11yPhoto": "Photo by {{handle}}"
   },
-  "followMore": "Follow more people to see more photos"
+  "followMore": "Follow more people to see more photos",
+  "grid": {
+    "open": "Open {{handle}}'s post"
+  }
 }

@@ -48,6 +48,12 @@
   "publicProfile": {
     "title": "Profilo",
     "notFound": "Nessun utente con questo tag.",
-    "back": "Indietro"
+    "back": "Indietro",
+    "privateTitle": "Profilo privato",
+    "privateBody": "Segui {{handle}} per vedere i suoi post del giorno dopo.",
+    "privateRequested": "Richiesta inviata: vedrai i suoi post quando la accetta.",
+    "empty": "Nessun post al momento.",
+    "loadError": "Non riusciamo a caricare i post. Riprova tra poco.",
+    "more": "Segnala o blocca"
   }
 }

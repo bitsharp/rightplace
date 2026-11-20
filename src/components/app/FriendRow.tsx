@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar } from '@/components/ui/Avatar';
+import { Avatar, type AvatarPhoto } from '@/components/ui/Avatar';
 import { Text } from '@/components/ui/Text';
 import { avatarIntent } from '@/features/friends/domain/avatarColor';
 import {
@@ -24,7 +24,11 @@ type Props = {
   followsMe?: boolean;
   onAction: (action: FollowAction) => void;
   onLongPress?: () => void;
+  // Opens the person's profile.
+  onPress?: () => void;
   venueLine?: string;
+  // Only for people whose photo the server signed for me (accepted follows).
+  avatarPhoto?: AvatarPhoto;
 };
 
 export function FriendRow({
@@ -34,7 +38,9 @@ export function FriendRow({
   followsMe = false,
   onAction,
   onLongPress,
+  onPress,
   venueLine,
+  avatarPhoto,
 }: Props) {
   const publicHandle = formatHandle(handle);
   const button = followButtonState(followState, followsMe);
@@ -42,10 +48,11 @@ export function FriendRow({
     <Pressable
       testID="friend-row"
       accessible={false}
+      onPress={onPress}
       onLongPress={onLongPress}
       style={rowStyles.row}
     >
-      <Avatar intent={avatarIntent(handle)} initial={publicHandle.charAt(1)} />
+      <Avatar intent={avatarIntent(handle)} initial={publicHandle.charAt(1)} photo={avatarPhoto} />
       <View style={rowStyles.texts}>
         <Text variant="body15Strong" numberOfLines={1} ellipsizeMode="tail">
           {publicHandle}
@@ -70,6 +77,29 @@ type FollowButtonProps = {
   button: FollowButtonState;
   onAction: (action: FollowAction) => void;
 };
+
+type FollowStateButtonProps = {
+  handle: string;
+  followState: FollowStatus;
+  followsMe?: boolean;
+  onAction: (action: FollowAction) => void;
+};
+
+// The three-state follow button on its own (public profile): request, withdraw, or stop following.
+export function FollowStateButton({
+  handle,
+  followState,
+  followsMe = false,
+  onAction,
+}: FollowStateButtonProps) {
+  return (
+    <FollowButton
+      publicHandle={formatHandle(handle)}
+      button={followButtonState(followState, followsMe)}
+      onAction={onAction}
+    />
+  );
+}
 
 function useConfirmUnfollow(publicHandle: string, confirm: () => void) {
   const { t } = useTranslation('ui');

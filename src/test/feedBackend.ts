@@ -29,8 +29,37 @@ export type FakeComment = {
   can_delete?: boolean;
 };
 
+// What get_profile_summary answers for one person (null counters = not visible to the caller).
+export type FakeSummary = {
+  handle?: string;
+  age_band?: string | null;
+  gender?: string | null;
+  is_creator?: boolean;
+  followers_count?: number | null;
+  following_count?: number | null;
+  posts_count?: number | null;
+  is_me?: boolean;
+  follow_state?: 'none' | 'pending' | 'accepted';
+};
+
+const summaryRow = (summary: FakeSummary) => ({
+  handle: 'volpe.viola',
+  age_band: '25-34',
+  gender: 'female',
+  is_creator: false,
+  followers_count: null,
+  following_count: null,
+  posts_count: null,
+  is_me: false,
+  follow_state: 'none',
+  ...summary,
+});
+
 type Options = {
   posts?: FakePost[];
+  // by user id: what get_profile_summary and get_user_posts return for that person
+  summaries?: Record<string, FakeSummary>;
+  userPosts?: Record<string, FakePost[]>;
   stories?: { user_id: string; handle: string; latest_post_at: string }[];
   storyPosts?: Record<string, FakePost[]>;
   target?: { room_id?: string | null; venue_name?: string; night_date?: string | null } | null;
@@ -71,6 +100,12 @@ export function seedFeedBackend(options: Options = {}) {
     { users: options.users ?? [], accepted: options.accepted },
     {
       get_feed: () => posts,
+      get_profile_summary: (args: unknown) => {
+        const summary = options.summaries?.[(args as { p_user_id: string }).p_user_id];
+        return summary ? [summaryRow(summary)] : [];
+      },
+      get_user_posts: (args: unknown) =>
+        (options.userPosts?.[(args as { p_user_id: string }).p_user_id] ?? []).map(postRow),
       get_stories: options.stories ?? [],
       get_story_posts: (args: unknown) =>
         (options.storyPosts?.[(args as { p_user_id: string }).p_user_id] ?? []).map(postRow),

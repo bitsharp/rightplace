@@ -63,7 +63,7 @@ describe('area creator con flag spento (build tester)', () => {
   });
 
   it('nel profilo non mostra né il toggle né il link creator', async () => {
-    await renderApp('ready', '/profile', { is_creator: true });
+    await renderApp('ready', '/profile/edit', { is_creator: true });
     await screen.findByRole('button', { name: 'profile:app.save' });
     expect(screen.queryByText('profile:app.creatorProfile')).not.toBeOnTheScreen();
     expect(screen.queryByText('profile:app.becomeCreator')).not.toBeOnTheScreen();
@@ -71,7 +71,7 @@ describe('area creator con flag spento (build tester)', () => {
   });
 
   it('salvando il profilo non cambia is_creator di chi lo è già', async () => {
-    await renderApp('ready', '/profile', { is_creator: true });
+    await renderApp('ready', '/profile/edit', { is_creator: true });
     await fireEvent.press(await screen.findByRole('button', { name: 'profile:form.gender.male' }));
     await fireEvent.press(screen.getByRole('button', { name: 'profile:app.save' }));
     expect(fakeSupabase.rpc).toHaveBeenCalledWith(

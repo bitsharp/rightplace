@@ -15,13 +15,20 @@ import {
 } from './api';
 import { patchPost, removePostsWhere, restorePosts, snapshotPosts, type Snapshot } from './cache';
 import { applyLike } from './domain/likes';
-import { commentsKey, FEED_KEY, STORIES_KEY, STORY_POSTS_ROOT_KEY } from './keys';
+import {
+  commentsKey,
+  FEED_KEY,
+  STORIES_KEY,
+  STORY_POSTS_ROOT_KEY,
+  USER_POSTS_ROOT_KEY,
+} from './keys';
 import { publishPost } from './publish';
 
 const PUBLISH_INVALIDATES = [
   FEED_KEY,
   STORIES_KEY,
   STORY_POSTS_ROOT_KEY,
+  USER_POSTS_ROOT_KEY,
   CHAT_MESSAGES_ROOT_KEY,
   CHAT_ROOMS_KEY,
 ] as const;
@@ -96,7 +103,12 @@ export function useDeletePost() {
     mutationFn: deletePost,
     onSuccess: (_result, postId) => {
       removePostsWhere(queryClient, (post) => post.id === postId);
-      return invalidateKeys(queryClient, [FEED_KEY, STORIES_KEY, STORY_POSTS_ROOT_KEY]);
+      return invalidateKeys(queryClient, [
+        FEED_KEY,
+        STORIES_KEY,
+        STORY_POSTS_ROOT_KEY,
+        USER_POSTS_ROOT_KEY,
+      ]);
     },
   });
 }

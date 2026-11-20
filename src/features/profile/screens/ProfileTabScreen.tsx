@@ -1,98 +1,53 @@
-import { Link } from 'expo-router';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { MonoLabel } from '@/components/ui/MonoLabel';
-import { Screen } from '@/components/ui/Screen';
-import { Text } from '@/components/ui/Text';
-import { Toast } from '@/components/ui/Toast';
+import { TopBar } from '@/components/app/TopBar';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useSession } from '@/features/auth/useSession';
-import { NotificationSettings } from '@/features/notifications/components/NotificationSettings';
-import { useCreatorUi } from '@/features/creator/useCreatorUi';
-import { UiKitLink } from '@/features/dev/UiKitLink';
-import type { RpcErrorCode } from '@/lib/rpcError';
-import { colors, spacing } from '@/theme/tokens';
-import { typography } from '@/theme/typography';
+import { PostGrid } from '@/features/posts/components/PostGrid';
+import { ProfileGridOverlays } from '@/features/posts/components/ProfileGridOverlays';
+import { useProfileGrid } from '@/features/posts/useProfileGrid';
+import { useTopBar } from '@/features/posts/useTopBar';
+import { colors } from '@/theme/tokens';
 
-import { setLocale, type MyProfile, type ProfileInput } from '../api';
-import { CityPicker } from '../components/CityPicker';
-import { AccountSection } from '../components/AccountSection';
-import { AvatarEditor } from '../components/AvatarEditor';
-import { BlockedSection } from '../components/BlockedSection';
-import { FindMeByPhone } from '../components/FindMeByPhone';
-import { HandleSection } from '../components/HandleSection';
-import { FollowersSection } from '../components/FollowersSection';
-import { ProfileForm } from '../components/ProfileForm';
-import { ShareHandleButton } from '../components/ShareHandleButton';
-import { useShareUi } from '../useShareUi';
-import { useSaveProfile } from '../useSaveProfile';
+import { MyProfileHeader } from '../components/MyProfileHeader';
+import { useProfileSummary } from '../summary/hooks';
 
+// Schermata 13, Instagram style: the top bar, my header (photo, counters, buttons) and under it the grid of my
+// active posts (the day-after posts live 7 days). Everything that used to be the form is behind "Edit profile".
 export function ProfileTabScreen() {
   const { t } = useTranslation('profile');
-  const { profile, email } = useSession();
-  const save = useSaveProfile();
-  const { showCreatorProfileLink } = useCreatorUi();
-  const [result, setResult] = useState<'saved' | RpcErrorCode | null>(null);
+  const { profile, userId } = useSession();
+  const topBar = useTopBar();
+  const summary = useProfileSummary(userId);
+  const grid = useProfileGrid(userId ?? '');
   if (!profile) return null;
 
-  const submit = async (input: ProfileInput) => setResult((await save(input)) ?? 'saved');
-
+  const { posts } = grid;
   return (
-    <Screen scroll>
-      <MonoLabel tone="going" size="large">
-        {t('app.step')}
-      </MonoLabel>
-      <Text accessibilityRole="header" variant="display26">
-        {t('setup.title')}
-      </Text>
-      <Text color="textSecondary">{t('setup.body')}</Text>
-      <AvatarEditor handle={profile.handle} />
-      <HandleSection
-        handle={profile.handle}
-        handleChangedAt={profile.handleChangedAt}
-        handleFreeChangeUsed={profile.handleFreeChangeUsed}
+    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+      <TopBar {...topBar} />
+      <PostGrid
+        posts={posts.posts}
+        photoUrls={grid.photoUrls}
+        header={<MyProfileHeader handle={profile.handle} summary={summary.data} />}
+        empty={
+          <EmptyState
+            message={
+              posts.isError ? t('posts.loadError') : posts.isLoading ? '' : t('posts.emptyMine')
+            }
+          />
+        }
+        onOpenPost={grid.openPost}
+        onLongPressPost={grid.openActions}
+        onLoadMore={posts.loadMore}
+        refreshing={posts.isRefreshing}
+        onRefresh={() => void Promise.all([posts.refresh(), summary.refetch()])}
       />
-      <ProfileForm
-        initial={profile}
-        submitLabel={t('app.save')}
-        onSubmit={submit}
-        // principle: the UI and profiles.locale (push, AI, emails) switch together, right away
-        onLanguageChange={(locale) => void setLocale(locale).catch(() => setResult('NETWORK'))}
-        errorMessage={result && result !== 'saved' ? t(`errors:rpc.${result}`) : undefined}
-      />
-      <CityPicker locationOn={profile.locationOptIn} />
-      {result === 'saved' ? <Toast tone="success" message={t('app.saved')} /> : null}
-      {showCreatorProfileLink ? (
-        <Link href="/creator" style={styles.link}>
-          {profile.isCreator ? t('app.creatorProfile') : t('app.becomeCreator')}
-        </Link>
-      ) : null}
-      <ProfileSections profile={profile} email={email ?? ''} />
-    </Screen>
+      <ProfileGridOverlays grid={grid} />
+    </SafeAreaView>
   );
 }
 
-function ProfileSections({ profile, email }: { profile: MyProfile; email: string }) {
-  const { showShareHandle } = useShareUi();
-  return (
-    <>
-      {showShareHandle ? <ShareHandleButton handle={profile.handle} /> : null}
-      {profile.contactsOptIn ? <FindMeByPhone /> : null}
-      <NotificationSettings />
-      <FollowersSection />
-      <BlockedSection />
-      <AccountSection email={email} />
-      <UiKitLink />
-    </>
-  );
-}
-
-const styles = StyleSheet.create({
-  link: {
-    ...typography.body14,
-    color: colors.secondary,
-    textAlign: 'center',
-    paddingVertical: spacing.sm,
-  },
-});
+const styles = StyleSheet.create({ screen: { flex: 1, backgroundColor: colors.background } });

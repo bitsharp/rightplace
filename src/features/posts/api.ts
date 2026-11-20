@@ -8,6 +8,8 @@ import type { FeedCursor, FeedPost, PostComment, PostTarget } from './domain/typ
 
 export const FEED_PAGE_SIZE = 20;
 export const COMMENTS_PAGE_SIZE = 30;
+// A multiple of 3: the profile grid has 3 columns, so a full page ends on a full row.
+export const USER_POSTS_PAGE_SIZE = 30;
 
 const targetSchema = z.object({
   night_id: z.string().nullable(),
@@ -116,6 +118,19 @@ export async function fetchFeedPage(cursor?: FeedCursor): Promise<FeedPost[]> {
       p_before_visible: cursor?.beforeVisible ?? null,
       p_before_id: cursor?.beforeId ?? null,
       p_limit: FEED_PAGE_SIZE,
+    }),
+  );
+  return rows.map(toPost);
+}
+
+// The posts of one person that I may see (mine, or an accepted follow's inside their window): the server decides.
+export async function fetchUserPostsPage(userId: string, cursor?: FeedCursor): Promise<FeedPost[]> {
+  const rows = z.array(postSchema).parse(
+    await callRpc<unknown>('get_user_posts', {
+      p_user_id: userId,
+      p_before_visible: cursor?.beforeVisible ?? null,
+      p_before_id: cursor?.beforeId ?? null,
+      p_limit: USER_POSTS_PAGE_SIZE,
     }),
   );
   return rows.map(toPost);

@@ -33,6 +33,41 @@ describe('FriendRow', () => {
 
   beforeEach(() => jest.clearAllMocks());
 
+  it('con la foto profilo visibile la mostra al posto dell’iniziale', async () => {
+    await render(
+      <FriendRow
+        handle="volpe.viola"
+        meta="18–24 · Donna"
+        followState="accepted"
+        avatarPhoto={{ uri: 'https://signed.test/u1', cacheKey: 'u1' }}
+        onAction={jest.fn()}
+      />,
+    );
+    expect(screen.getByTestId('avatar-image', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+
+  it('senza foto resta l’iniziale', async () => {
+    await render(
+      <FriendRow handle="volpe.viola" meta="m" followState="none" onAction={jest.fn()} />,
+    );
+    expect(screen.queryByTestId('avatar-image', { includeHiddenElements: true })).toBeNull();
+  });
+
+  it('il tocco sulla riga (non sul bottone) apre il profilo', async () => {
+    const onPress = jest.fn();
+    await render(
+      <FriendRow
+        handle="volpe.viola"
+        meta="m"
+        followState="accepted"
+        onPress={onPress}
+        onAction={jest.fn()}
+      />,
+    );
+    await fireEvent.press(screen.getByTestId('friend-row'));
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
   it('mostra handle, fascia e dove va stasera quando il follow è accettato', async () => {
     await render(
       <FriendRow
