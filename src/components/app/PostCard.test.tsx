@@ -26,6 +26,20 @@ describe('PostCard', () => {
     expect(screen.getByText('ui:post.expires({"count":6})')).toBeOnTheScreen();
   });
 
+  it('senza foto profilo mostra l’iniziale dell’autore', async () => {
+    await render(<PostCard {...baseProps} />);
+    expect(screen.queryByTestId('avatar-image', { includeHiddenElements: true })).toBeNull();
+    expect(screen.getByText('V', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+
+  it('con la foto profilo la mostra al posto dell’iniziale', async () => {
+    await render(
+      <PostCard {...baseProps} avatarPhoto={{ uri: 'https://signed.test/a/u1', cacheKey: 'u1' }} />,
+    );
+    expect(screen.getByTestId('avatar-image', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.queryByText('V', { includeHiddenElements: true })).toBeNull();
+  });
+
   it('mostra la didascalia solo se presente', async () => {
     const { rerender } = await render(<PostCard {...baseProps} />);
     expect(screen.queryByTestId('post-caption')).not.toBeOnTheScreen();

@@ -4,6 +4,8 @@ import { useSession } from '@/features/auth/useSession';
 import { useUnseenActivityCount } from '@/features/notifications/hooks';
 import { useStories } from '@/features/map/hooks';
 
+import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
+import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 import { useOpenFeedback } from '@/features/feedback/useOpenFeedback';
 
 import { canPost } from './domain/canPost';
@@ -31,6 +33,8 @@ export function useTopBar() {
   const onOpenFeedback = useOpenFeedback();
   const handle = profile?.handle ?? '';
   const entries = stories.data ?? [];
+  // One request for my photo and everyone in the strip: only the ones I may see come back.
+  const avatars = useAvatarUrls([userId, ...entries.map((entry) => entry.userId)]);
 
   return {
     handle,
@@ -42,6 +46,9 @@ export function useTopBar() {
       myLatestPostAt: latestVisibleFrom(mine.data),
       entries,
       seenKeys,
+    }).map((story) => {
+      const photo = avatarPhotoFor(avatars, story.mine ? userId : story.id);
+      return photo ? { ...story, photo } : story;
     }),
     onPost: () => router.push('/post/new'),
     onOpenProfile: () => router.push('/profile'),

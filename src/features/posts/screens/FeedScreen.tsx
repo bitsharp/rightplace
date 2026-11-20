@@ -39,6 +39,7 @@ export function FeedScreen() {
           <FeedPostItem
             post={item}
             photoUri={screen.photoUrls[item.id]}
+            avatarUrls={screen.avatarUrls}
             onToggleLike={screen.toggleLike}
             onOpenComments={screen.openComments}
             onLongPress={screen.openActions}

@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { useSession } from '@/features/auth/useSession';
 import { useStories } from '@/features/map/hooks';
+import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 
 import { storyKey } from './domain/stories';
 import { usePostPhotoUrls, useStoryPosts } from './hooks';
@@ -31,6 +32,7 @@ export function useStoryViewer(userId: string) {
   const markSeen = useSeenStories((state) => state.markSeen);
   const photoIds = (posts.data ?? []).filter((post) => post.hasPhoto).map((post) => post.id);
   const photoUrls = usePostPhotoUrls(photoIds);
+  const avatarUrls = useAvatarUrls([posts.data?.[0]?.authorId]);
   const loaded = posts.isSuccess && posts.data.length > 0;
 
   // Opening the story is what marks it as seen (local only).
@@ -43,6 +45,7 @@ export function useStoryViewer(userId: string) {
     isLoading: posts.isLoading,
     isError: posts.isError,
     photoUrls,
+    avatarUrls,
     close: () => (router.canGoBack() ? router.back() : router.replace('/feed')),
   };
 }

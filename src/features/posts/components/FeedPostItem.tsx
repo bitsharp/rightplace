@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { PostCard } from '@/components/app/PostCard';
+import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
 
 import { expiresInDays } from '../domain/expiry';
 import { postMetaText } from '../domain/postMeta';
@@ -9,6 +10,8 @@ import type { FeedPost } from '../domain/types';
 type Props = {
   post: FeedPost;
   photoUri?: string;
+  // Signed profile photos of the page's authors, by user id (one batch for the whole feed).
+  avatarUrls?: Record<string, string>;
   onToggleLike: (post: FeedPost) => void;
   onOpenComments: (postId: string) => void;
   onLongPress: (post: FeedPost) => void;
@@ -19,6 +22,7 @@ type Props = {
 export function FeedPostItem({
   post,
   photoUri,
+  avatarUrls = {},
   onToggleLike,
   onOpenComments,
   onLongPress,
@@ -30,6 +34,7 @@ export function FeedPostItem({
     <PostCard
       handle={post.authorHandle}
       meta={postMetaText(t, post, now)}
+      avatarPhoto={avatarPhotoFor(avatarUrls, post.authorId)}
       tone={post.isMine ? 'neutral' : 'going'}
       daysLeft={expiresInDays(post.expiresAt, now)}
       caption={post.caption ?? undefined}

@@ -21,6 +21,25 @@ const baseProps = {
   onOpenStory: jest.fn(),
 };
 
+describe('TopBar: foto delle storie', () => {
+  it('mostra la foto di chi ce l’ha visibile e l’iniziale per gli altri', async () => {
+    const stories: Story[] = [
+      {
+        id: 'me',
+        handle: 'lince.rosso',
+        initial: 'L',
+        tone: 'neutral',
+        mine: true,
+        photo: { uri: 'https://signed.test/a/me', cacheKey: 'me' },
+      },
+      { id: 's1', handle: 'volpe.viola', initial: 'V', tone: 'going' },
+    ];
+    await render(<TopBar {...baseProps} canPost={false} stories={stories} />);
+    expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(1);
+    expect(screen.getByText('V', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+});
+
 describe('TopBar', () => {
   it('nasconde il "+" finché l’utente non ha dichiarato la serata', async () => {
     await render(<TopBar {...baseProps} canPost={false} />);

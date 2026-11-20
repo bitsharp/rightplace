@@ -44,6 +44,35 @@ describe('CommentsSheet: link', () => {
   });
 });
 
+describe('CommentsSheet: foto profilo', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it('mostra la foto degli autori visibili (una richiesta) e l’iniziale per gli altri', async () => {
+    fakeSupabase.functions.invoke.mockResolvedValue({
+      data: { urls: [{ userId: 'u2', url: 'https://signed.test/a/u2' }] },
+      error: null,
+    });
+    setFakeRpc({
+      get_post_comments: [
+        comment('1', 'ciao'),
+        comment('2', 'anche io', { user_id: 'u3', handle: 'orso.verde' }),
+      ],
+    });
+    await open();
+    await screen.findByText('ciao');
+    await waitFor(() =>
+      expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(
+        1,
+      ),
+    );
+    expect(screen.getByText('O', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(fakeSupabase.functions.invoke).toHaveBeenCalledTimes(1);
+    expect(fakeSupabase.functions.invoke).toHaveBeenCalledWith('avatar-urls', {
+      body: { userIds: ['u2', 'u3'] },
+    });
+  });
+});
+
 describe('CommentsSheet', () => {
   afterEach(() => jest.restoreAllMocks());
 

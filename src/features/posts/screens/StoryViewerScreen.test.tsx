@@ -12,11 +12,14 @@ jest.mock('react-native-safe-area-context', () => ({
   ...jest.requireActual<{ default: object }>('react-native-safe-area-context/jest/mock').default,
   useSafeAreaInsets: () => ({ top: 47, bottom: 34, left: 0, right: 0 }),
 }));
+const mockAvatars: Record<string, string> = {};
 jest.mock('../useStoryViewer', () => ({
   useStoryViewer: () => ({
+    avatarUrls: mockAvatars,
     posts: [
       {
         id: 'p1',
+        authorId: 'u1',
         authorHandle: 'demo.milano2',
         isMine: false,
         caption: null,
@@ -35,6 +38,17 @@ describe('StoryViewerScreen', () => {
     await render(<StoryViewerScreen userId="u1" />);
     const header = screen.getByTestId('story-header');
     expect(StyleSheet.flatten(header.props.style).paddingTop).toBe(INSET_TOP + spacing.sm);
+  });
+
+  it('l’intestazione mostra la foto dell’autore se visibile, altrimenti l’iniziale', async () => {
+    const { unmount } = await render(<StoryViewerScreen userId="u1" />);
+    expect(screen.queryByTestId('avatar-image', { includeHiddenElements: true })).toBeNull();
+    expect(screen.getByText('D', { includeHiddenElements: true })).toBeOnTheScreen();
+    await unmount();
+    mockAvatars.u1 = 'https://signed.test/a/u1';
+    await render(<StoryViewerScreen userId="u1" />);
+    expect(screen.getByTestId('avatar-image', { includeHiddenElements: true })).toBeOnTheScreen();
+    delete mockAvatars.u1;
   });
 
   it('il titolo sta su una riga con ellissi', async () => {

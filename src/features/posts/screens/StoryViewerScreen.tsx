@@ -5,10 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PhotoViewer } from '@/components/app/PhotoViewer';
 import { PhotoFrame } from '@/components/app/PhotoFrame';
+import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { LinkedText } from '@/components/ui/LinkedText';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
+import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { colors, heights, spacing } from '@/theme/tokens';
 
@@ -29,7 +31,12 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
   return (
     // A fullScreenModal draws under the status bar and the home indicator: insets are applied here.
     <View style={[styles.screen, { paddingBottom: insets.bottom }]}>
-      <StoryHeader top={insets.top} first={viewer.posts[0]} onClose={viewer.close} />
+      <StoryHeader
+        top={insets.top}
+        first={viewer.posts[0]}
+        avatarUrls={viewer.avatarUrls}
+        onClose={viewer.close}
+      />
       {viewer.posts.length === 0 && !viewer.isLoading ? (
         <Text color="textSecondary" style={styles.empty}>
           {t('story.empty')}
@@ -63,9 +70,14 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
   );
 }
 
-type HeaderProps = { top: number; first?: FeedPost; onClose: () => void };
+type HeaderProps = {
+  top: number;
+  first?: FeedPost;
+  avatarUrls: Record<string, string>;
+  onClose: () => void;
+};
 
-function StoryHeader({ top, first, onClose }: HeaderProps) {
+function StoryHeader({ top, first, avatarUrls, onClose }: HeaderProps) {
   const { t } = useTranslation('feed');
   const title =
     first && !first.isMine
@@ -73,6 +85,14 @@ function StoryHeader({ top, first, onClose }: HeaderProps) {
       : t('story.mine');
   return (
     <View testID="story-header" style={[styles.header, { paddingTop: top + spacing.sm }]}>
+      {first ? (
+        <Avatar
+          intent={first.isMine ? 'neutral' : 'going'}
+          size={36}
+          initial={first.authorHandle.replace(/^@/, '').charAt(0)}
+          photo={avatarPhotoFor(avatarUrls, first.authorId)}
+        />
+      ) : null}
       <Text
         accessibilityRole="header"
         variant="display17"

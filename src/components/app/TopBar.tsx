@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import type { AvatarIntent } from '@/components/ui/Avatar';
+import type { AvatarIntent, AvatarPhoto } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
@@ -20,6 +20,8 @@ export type Story = {
   mine?: boolean;
   // Local only (see the seen-stories store): false = something new to watch.
   seen?: boolean;
+  // Signed profile photo, only when I may see it; otherwise the initial.
+  photo?: AvatarPhoto;
 };
 
 type Props = {
@@ -136,7 +138,12 @@ function StoryStrip({ stories, onOpenStory }: Pick<Props, 'stories' | 'onOpenSto
           onPress={() => onOpenStory(story.id)}
           style={styles.story}
         >
-          <StoryAvatar initial={story.initial} tone={story.tone} seen={story.seen === true} />
+          <StoryAvatar
+            initial={story.initial}
+            tone={story.tone}
+            seen={story.seen === true}
+            photo={story.photo}
+          />
           <Text
             variant="body11Medium"
             color="textSecondary"

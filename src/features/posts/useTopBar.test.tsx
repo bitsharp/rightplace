@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
-import { setFakeRpc } from '@/test/fakeSupabase';
+import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
 import { useNotificationStore } from '@/features/notifications/store/notificationStore';
@@ -76,6 +76,42 @@ describe('useTopBar', () => {
     const { Wrapper } = createQueryWrapper();
     const { result } = await renderHook(() => useTopBar(), { wrapper: Wrapper });
     await waitFor(() => expect(result.current.stories[0]).toMatchObject({ id: 'me', mine: true }));
+  });
+
+  it('le storie portano la foto firmata per me (una sola richiesta, la mia compresa)', async () => {
+    seed({ get_stories: [STORY], get_story_posts: [MY_POST] });
+    fakeSupabase.functions.invoke.mockResolvedValue({
+      data: {
+        urls: [
+          { userId: 'me', url: 'https://signed.test/a/me' },
+          { userId: 'u2', url: 'https://signed.test/a/u2' },
+        ],
+      },
+      error: null,
+    });
+    const { Wrapper } = createQueryWrapper();
+    const { result } = await renderHook(() => useTopBar(), { wrapper: Wrapper });
+    await waitFor(() => expect(result.current.stories[1]?.photo).toBeDefined());
+    expect(result.current.stories[0]?.photo).toEqual({
+      uri: 'https://signed.test/a/me',
+      cacheKey: 'me',
+    });
+    expect(result.current.stories[1]?.photo).toEqual({
+      uri: 'https://signed.test/a/u2',
+      cacheKey: 'u2',
+    });
+    const last = fakeSupabase.functions.invoke.mock.calls.at(-1);
+    expect(last).toEqual(['avatar-urls', { body: { userIds: ['me', 'u2'] } }]);
+  });
+
+  it('senza URL firmato la storia resta senza foto (iniziale)', async () => {
+    seed({ get_stories: [STORY] });
+    fakeSupabase.functions.invoke.mockResolvedValue({ data: { urls: [] }, error: null });
+    const { Wrapper } = createQueryWrapper();
+    const { result } = await renderHook(() => useTopBar(), { wrapper: Wrapper });
+    await waitFor(() => expect(result.current.stories[0]).toMatchObject({ id: 'u2' }));
+    await waitFor(() => expect(fakeSupabase.functions.invoke).toHaveBeenCalled());
+    expect(result.current.stories[0]?.photo).toBeUndefined();
   });
 
   it('il pallino delle novità c’è finché una storia degli altri non è stata vista', async () => {

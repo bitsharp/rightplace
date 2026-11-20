@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, type AvatarIntent } from '@/components/ui/Avatar';
+import { Avatar, type AvatarIntent, type AvatarPhoto } from '@/components/ui/Avatar';
 import { LinkedText } from '@/components/ui/LinkedText';
 import { Icon } from '@/components/ui/Icon';
 import { MonoLabel } from '@/components/ui/MonoLabel';
@@ -16,6 +16,8 @@ type Props = {
   handle: string;
   meta: string;
   tone: AvatarIntent;
+  // Only when the server signed the author's photo for me (principle 1); otherwise the initial.
+  avatarPhoto?: AvatarPhoto;
   daysLeft: number;
   likeCount: number;
   liked: boolean;
@@ -36,6 +38,7 @@ export function PostCard({
   handle,
   meta,
   tone,
+  avatarPhoto,
   daysLeft,
   caption,
   photoUri,
@@ -49,7 +52,12 @@ export function PostCard({
   return (
     <Pressable testID="post-card" accessible={false} onLongPress={onLongPress} style={styles.card}>
       <View style={styles.header}>
-        <Avatar intent={tone} size={36} />
+        <Avatar
+          intent={tone}
+          size={36}
+          initial={handle.replace(/^@/, '').charAt(0)}
+          photo={avatarPhoto}
+        />
         <View style={styles.headerTexts}>
           <Text variant="body14Medium" numberOfLines={1} ellipsizeMode="tail">
             {formatHandle(handle)}

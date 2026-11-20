@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 
-import { Avatar, type AvatarIntent } from '@/components/ui/Avatar';
+import { Avatar, type AvatarIntent, type AvatarPhoto } from '@/components/ui/Avatar';
 import { colors } from '@/theme/tokens';
 
 const SIZE = 64;
@@ -13,10 +13,11 @@ type Props = {
   initial: string;
   tone: AvatarIntent;
   seen: boolean;
+  photo?: AvatarPhoto;
 };
 
 // Story ring from TopBar.dc.html: violet→cyan gradient while there is something new, plain border once seen.
-export function StoryAvatar({ initial, tone, seen }: Props) {
+export function StoryAvatar({ initial, tone, seen, photo }: Props) {
   const gradientId = `ring${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
     <View style={styles.box}>
@@ -37,7 +38,7 @@ export function StoryAvatar({ initial, tone, seen }: Props) {
           fill="none"
         />
       </Svg>
-      <Avatar intent={tone} initial={initial} size={SIZE - RING * 4} />
+      <Avatar intent={tone} initial={initial} size={SIZE - RING * 4} photo={photo} />
     </View>
   );
 }

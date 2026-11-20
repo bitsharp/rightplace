@@ -7,6 +7,9 @@ import { LinkedText } from '@/components/ui/LinkedText';
 import { Sheet } from '@/components/ui/Sheet';
 import { Text } from '@/components/ui/Text';
 import { Toast } from '@/components/ui/Toast';
+import { Avatar } from '@/components/ui/Avatar';
+import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
+import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { spacing } from '@/theme/tokens';
 
@@ -76,6 +79,8 @@ function CommentList({
 }) {
   const { t } = useTranslation('feed');
   const { comments, isLoading, isError, hasOlder, loadOlder } = useComments(postId);
+  // One request for every author; the server only signs the photos I may see.
+  const avatars = useAvatarUrls(comments.map((comment) => comment.userId));
   if (isError) return <Text color="textSecondary">{t('comments.loadError')}</Text>;
   if (!isLoading && comments.length === 0) {
     return <Text color="textSecondary">{t('comments.empty')}</Text>;
@@ -97,16 +102,24 @@ function CommentList({
           onLongPress={() => onSelect(comment)}
           style={styles.comment}
         >
-          <Text variant="body13Medium" color="textSecondary">
-            {formatHandle(comment.handle)}
-          </Text>
-          {/* Inside this Modal the link sheet would be a second Modal: long press opens the comment actions. */}
-          <LinkedText
-            testID="comment-text"
-            text={comment.text}
-            variant="body14"
-            onLinkLongPress={() => onSelect(comment)}
+          <Avatar
+            intent={comment.isMine ? 'neutral' : 'going'}
+            size={28}
+            initial={comment.handle.replace(/^@/, '').charAt(0)}
+            photo={avatarPhotoFor(avatars, comment.userId)}
           />
+          <View style={styles.commentBody}>
+            <Text variant="body13Medium" color="textSecondary">
+              {formatHandle(comment.handle)}
+            </Text>
+            {/* Inside this Modal the link sheet would be a second Modal: long press opens the comment actions. */}
+            <LinkedText
+              testID="comment-text"
+              text={comment.text}
+              variant="body14"
+              onLinkLongPress={() => onSelect(comment)}
+            />
+          </View>
         </Pressable>
       ))}
     </ScrollView>
@@ -118,5 +131,6 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   list: { maxHeight: 320 },
   listContent: { gap: spacing.md },
-  comment: { gap: 2 },
+  comment: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm + 2 },
+  commentBody: { flex: 1, minWidth: 0, gap: 2 },
 });
