@@ -16,6 +16,7 @@ type Props = {
   onOpenComments: (postId: string) => void;
   onLongPress: (post: FeedPost) => void;
   onOpenPhoto: (postId: string) => void;
+  onOpenAuthor: (post: FeedPost) => void;
 };
 
 // Maps a server post to the presentational card. The photo shows a placeholder until its signed URL arrives.
@@ -27,6 +28,7 @@ export function FeedPostItem({
   onOpenComments,
   onLongPress,
   onOpenPhoto,
+  onOpenAuthor,
 }: Props) {
   const { t } = useTranslation('feed');
   const now = new Date();
@@ -47,6 +49,7 @@ export function FeedPostItem({
       onToggleLike={() => onToggleLike(post)}
       onOpenComments={() => onOpenComments(post.id)}
       onLongPress={() => onLongPress(post)}
+      onOpenAuthor={() => onOpenAuthor(post)}
       onOpenPhoto={post.hasPhoto ? () => onOpenPhoto(post.id) : undefined}
     />
   );

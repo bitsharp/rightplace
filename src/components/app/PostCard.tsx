@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -5,6 +6,7 @@ import { Avatar, type AvatarIntent, type AvatarPhoto } from '@/components/ui/Ava
 import { LinkedText } from '@/components/ui/LinkedText';
 import { Icon } from '@/components/ui/Icon';
 import { MonoLabel } from '@/components/ui/MonoLabel';
+import { ProfileLink } from '@/components/ui/ProfileLink';
 import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { confirmFeedback } from '@/lib/haptics';
@@ -24,6 +26,8 @@ type Props = {
   commentCount: number;
   onToggleLike: () => void;
   onOpenComments: () => void;
+  // Tap on avatar or @handle opens the author's profile.
+  onOpenAuthor?: () => void;
   // Tap on the photo opens it full screen (only for posts that have one).
   onOpenPhoto?: () => void;
   // Long press: report / block / delete (principle 7).
@@ -46,22 +50,27 @@ export function PostCard({
   scene,
   onLongPress,
   onOpenPhoto,
+  onOpenAuthor,
   ...social
 }: Props) {
   const { t } = useTranslation('ui');
   return (
     <Pressable testID="post-card" accessible={false} onLongPress={onLongPress} style={styles.card}>
       <View style={styles.header}>
-        <Avatar
-          intent={tone}
-          size={36}
-          initial={handle.replace(/^@/, '').charAt(0)}
-          photo={avatarPhoto}
-        />
+        <AuthorLink handle={handle} onOpen={onOpenAuthor}>
+          <Avatar
+            intent={tone}
+            size={36}
+            initial={handle.replace(/^@/, '').charAt(0)}
+            photo={avatarPhoto}
+          />
+        </AuthorLink>
         <View style={styles.headerTexts}>
-          <Text variant="body14Medium" numberOfLines={1} ellipsizeMode="tail">
-            {formatHandle(handle)}
-          </Text>
+          <AuthorLink handle={handle} onOpen={onOpenAuthor}>
+            <Text variant="body14Medium" numberOfLines={1} ellipsizeMode="tail">
+              {formatHandle(handle)}
+            </Text>
+          </AuthorLink>
           <Text variant="body12" color="textSecondary" numberOfLines={1} ellipsizeMode="tail">
             {meta}
           </Text>
@@ -81,6 +90,17 @@ export function PostCard({
         <SocialActions {...social} />
       </View>
     </Pressable>
+  );
+}
+
+type AuthorLinkProps = { handle: string; onOpen?: () => void; children: ReactNode };
+
+function AuthorLink({ handle, onOpen, children }: AuthorLinkProps) {
+  if (!onOpen) return <>{children}</>;
+  return (
+    <ProfileLink handle={handle} onPress={onOpen}>
+      {children}
+    </ProfileLink>
   );
 }
 

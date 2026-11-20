@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
-import { Linking } from 'react-native';
+import { Linking, StyleSheet } from 'react-native';
 
 import { PostCard } from './PostCard';
 
@@ -127,5 +127,48 @@ describe('PostCard: foto', () => {
   it('senza foto da aprire (post di solo testo) non offre il bottone', async () => {
     await render(<PostCard {...baseProps} />);
     expect(screen.queryByRole('button', { name: 'ui:photoViewer.open' })).toBeNull();
+  });
+});
+
+describe('PostCard: profilo dell’autore', () => {
+  const LABEL = 'ui:profileLink.open({"handle":"@volpe.viola"})';
+
+  it('il tocco su avatar e su @handle apre il profilo dell’autore', async () => {
+    const onOpenAuthor = jest.fn();
+    await render(<PostCard {...baseProps} onOpenAuthor={onOpenAuthor} />);
+    const links = screen.getAllByRole('link', { name: LABEL });
+    expect(links).toHaveLength(2);
+    await fireEvent.press(links[0] as never);
+    await fireEvent.press(links[1] as never);
+    expect(onOpenAuthor).toHaveBeenCalledTimes(2);
+  });
+
+  it('senza onOpenAuthor non ci sono link', async () => {
+    await render(<PostCard {...baseProps} />);
+    expect(screen.queryByRole('link')).toBeNull();
+  });
+
+  it('l’area di tocco è di almeno 44 punti', async () => {
+    await render(<PostCard {...baseProps} onOpenAuthor={jest.fn()} />);
+    for (const link of screen.getAllByRole('link', { name: LABEL })) {
+      const { minHeight, minWidth } = StyleSheet.flatten(link.props.style) ?? {};
+      expect(Math.max(minHeight ?? 0, minWidth ?? 0)).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  it('il tocco sulla foto resta il visore e non apre il profilo', async () => {
+    const onOpenAuthor = jest.fn();
+    const onOpenPhoto = jest.fn();
+    await render(
+      <PostCard
+        {...baseProps}
+        onOpenAuthor={onOpenAuthor}
+        onOpenPhoto={onOpenPhoto}
+        photoUri="https://x.test/p.jpg"
+      />,
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'ui:photoViewer.open' }));
+    expect(onOpenPhoto).toHaveBeenCalledTimes(1);
+    expect(onOpenAuthor).not.toHaveBeenCalled();
   });
 });

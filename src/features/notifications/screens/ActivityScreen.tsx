@@ -4,10 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
+import { ProfileLink } from '@/components/ui/ProfileLink';
 import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
+import { useOpenProfile } from '@/features/profile/useOpenProfile';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
 
 import type { ActivityItem } from '../api';
@@ -30,30 +33,39 @@ function useMarkActivitySeen(items: readonly ActivityItem[] | undefined) {
   }, [items, markSeen]);
 }
 
-function ActivityRow({ item, onPress }: { item: ActivityItem; onPress: () => void }) {
+type RowProps = { item: ActivityItem; onPress: () => void; onOpenActor: () => void };
+
+function ActivityRow({ item, onPress, onOpenActor }: RowProps) {
   const { t, i18n } = useTranslation('notifications');
   const when = new Intl.DateTimeFormat(i18n.language, {
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(new Date(item.createdAt));
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.row}>
-      <View style={styles.body}>
-        <Text variant="body15Strong">
-          {t(`activity.items.${item.kind}`, { handle: formatHandle(item.actorHandle) })}
-        </Text>
-        <Text variant="body12" color="textSecondary">
-          {when}
-        </Text>
-      </View>
-      <Icon name="chevronRight" size={16} color="textSecondary" />
-    </Pressable>
+    <View style={styles.row}>
+      {/* The row leads to what happened; the actor's avatar leads to their profile. */}
+      <ProfileLink handle={item.actorHandle} onPress={onOpenActor}>
+        <Avatar intent="going" size={36} initial={item.actorHandle.replace(/^@/, '').charAt(0)} />
+      </ProfileLink>
+      <Pressable accessibilityRole="button" onPress={onPress} style={styles.target}>
+        <View style={styles.body}>
+          <Text variant="body15Strong">
+            {t(`activity.items.${item.kind}`, { handle: formatHandle(item.actorHandle) })}
+          </Text>
+          <Text variant="body12" color="textSecondary">
+            {when}
+          </Text>
+        </View>
+        <Icon name="chevronRight" size={16} color="textSecondary" />
+      </Pressable>
+    </View>
   );
 }
 
 export function ActivityScreen() {
   const { t } = useTranslation('notifications');
   const router = useRouter();
+  const openProfile = useOpenProfile();
   const activity = useActivity();
   useMarkActivitySeen(activity.data);
   return (
@@ -78,6 +90,7 @@ export function ActivityScreen() {
           key={`${item.kind}:${item.actorHandle}:${item.postId ?? ''}:${item.createdAt}`}
           item={item}
           onPress={() => router.push(activityRoute(item) as Href)}
+          onOpenActor={() => openProfile({ handle: item.actorHandle, isMine: false })}
         />
       ))}
     </Screen>
@@ -100,11 +113,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    padding: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
     borderRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
+  },
+  target: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: heights.buttonMedium,
   },
   body: { flex: 1, gap: spacing.xs },
 });

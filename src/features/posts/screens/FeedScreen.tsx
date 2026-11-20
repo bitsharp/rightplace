@@ -44,6 +44,7 @@ export function FeedScreen() {
             onOpenComments={screen.openComments}
             onLongPress={screen.openActions}
             onOpenPhoto={screen.viewer.open}
+            onOpenAuthor={screen.openAuthor}
           />
         )}
       />

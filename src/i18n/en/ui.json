@@ -70,6 +70,9 @@
     "expires_other": "Expires in {{count}} days",
     "comments": "Comments"
   },
+  "profileLink": {
+    "open": "Open the profile of {{handle}}"
+  },
   "plan": {
     "active": "Active",
     "cancelled": "Cancelled"

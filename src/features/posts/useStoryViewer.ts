@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { useSession } from '@/features/auth/useSession';
 import { useStories } from '@/features/map/hooks';
+import { useOpenProfile } from '@/features/profile/useOpenProfile';
 import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 
 import { storyKey } from './domain/stories';
@@ -27,6 +28,7 @@ function useStoryKey(userId: string, myPosts: readonly { visibleFrom: string }[]
 
 export function useStoryViewer(userId: string) {
   const router = useRouter();
+  const openProfile = useOpenProfile();
   const posts = useStoryPosts(userId);
   const key = useStoryKey(userId, posts.data);
   const markSeen = useSeenStories((state) => state.markSeen);
@@ -46,6 +48,11 @@ export function useStoryViewer(userId: string) {
     isError: posts.isError,
     photoUrls,
     avatarUrls,
+    // Every post of a story has the same author: the first one names them.
+    openAuthor: () => {
+      const first = posts.data?.[0];
+      if (first) openProfile({ handle: first.authorHandle, isMine: first.isMine });
+    },
     close: () => (router.canGoBack() ? router.back() : router.replace('/feed')),
   };
 }

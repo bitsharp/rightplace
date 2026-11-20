@@ -70,6 +70,20 @@ describe('ActivityScreen', () => {
     expect(mockPush).toHaveBeenCalledWith('/friends');
   });
 
+  it('il tocco sull’@handle di chi ha messo like apre il suo profilo, la riga resta sul feed', async () => {
+    setFakeRpc({ get_my_activity: ITEMS });
+    await render(<ActivityScreen />, { wrapper: createQueryWrapper().Wrapper });
+    await fireEvent.press(
+      await screen.findByRole('link', { name: 'ui:profileLink.open({"handle":"@volpe.viola"})' }),
+    );
+    expect(mockPush).toHaveBeenCalledWith('/u/volpe.viola');
+    mockPush.mockClear();
+    await fireEvent.press(
+      screen.getByText('notifications:activity.items.like({"handle":"@volpe.viola"})'),
+    );
+    expect(mockPush).toHaveBeenCalledWith('/feed');
+  });
+
   it('senza novità mostra lo stato vuoto', async () => {
     setFakeRpc({ get_my_activity: [] });
     await render(<ActivityScreen />, { wrapper: createQueryWrapper().Wrapper });

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { usePhotoViewerState } from '@/components/app/usePhotoViewerState';
 
+import { useOpenProfile } from '@/features/profile/useOpenProfile';
 import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 
 import { useFeed, usePostPhotoUrls, useToggleLike } from './hooks';
@@ -14,6 +15,7 @@ const NOTICE_MS = 3000;
 // Everything the feed screen needs: the paged list, signed photo URLs, likes and the two sheets.
 export function useFeedScreen() {
   const router = useRouter();
+  const openProfile = useOpenProfile();
   const feed = useFeed();
   const toggleLike = useToggleLike();
   const [commentsFor, setCommentsFor] = useState<string | null>(null);
@@ -46,6 +48,7 @@ export function useFeedScreen() {
     notice,
     setNotice,
     toggleLike: (post: FeedPost) => toggleLike.mutate({ postId: post.id, liked: !post.likedByMe }),
+    openAuthor: (post: FeedPost) => openProfile({ handle: post.authorHandle, isMine: post.isMine }),
     followMore: () => router.push('/friends'),
   };
 }

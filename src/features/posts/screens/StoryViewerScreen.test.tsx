@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
 import { heights, spacing } from '@/theme/tokens';
@@ -13,9 +13,11 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 47, bottom: 34, left: 0, right: 0 }),
 }));
 const mockAvatars: Record<string, string> = {};
+const mockOpenAuthor = jest.fn();
 jest.mock('../useStoryViewer', () => ({
   useStoryViewer: () => ({
     avatarUrls: mockAvatars,
+    openAuthor: mockOpenAuthor,
     posts: [
       {
         id: 'p1',
@@ -34,6 +36,19 @@ jest.mock('../useStoryViewer', () => ({
 }));
 
 describe('StoryViewerScreen', () => {
+  beforeEach(() => mockOpenAuthor.mockClear());
+
+  it('il tocco su avatar e titolo dell’intestazione apre il profilo dell’autore', async () => {
+    await render(<StoryViewerScreen userId="u1" />);
+    const links = screen.getAllByRole('link', {
+      name: 'ui:profileLink.open({"handle":"@demo.milano2"})',
+    });
+    expect(links).toHaveLength(2);
+    await fireEvent.press(links[0] as never);
+    await fireEvent.press(links[1] as never);
+    expect(mockOpenAuthor).toHaveBeenCalledTimes(2);
+  });
+
   it('l’intestazione parte sotto la status bar', async () => {
     await render(<StoryViewerScreen userId="u1" />);
     const header = screen.getByTestId('story-header');

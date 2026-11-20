@@ -1,10 +1,13 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Linking, Platform } from 'react-native';
 
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
 import { CommentsSheet } from './CommentsSheet';
+
+const mockPush = jest.fn();
+jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
 
 const comment = (id: string, text: string, overrides: Record<string, unknown> = {}) => ({
   comment_id: id,
@@ -32,14 +35,17 @@ describe('CommentsSheet: link', () => {
     jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
     setFakeRpc({ get_post_comments: [comment('1', 'guarda https://example.com/a')] });
     await open();
-    await fireEvent.press(await screen.findByRole('link'));
+    await fireEvent.press(await screen.findByRole('link', { name: 'https://example.com/a' }));
     expect(Linking.openURL).toHaveBeenCalledWith('https://example.com/a');
   });
 
   it('il tocco lungo sul link di un commento apre le azioni del commento (un solo foglio)', async () => {
     setFakeRpc({ get_post_comments: [comment('1', 'guarda https://example.com/a')] });
     await open();
-    await fireEvent(await screen.findByRole('link'), 'longPress');
+    await fireEvent(
+      await screen.findByRole('link', { name: 'https://example.com/a' }),
+      'longPress',
+    );
     expect(await screen.findByText('feed:actions.reportComment')).toBeOnTheScreen();
   });
 });
@@ -195,5 +201,43 @@ describe('CommentsSheet', () => {
     const { Wrapper } = createQueryWrapper();
     await render(<CommentsSheet postId={null} onClose={jest.fn()} />, { wrapper: Wrapper });
     expect(screen.queryByLabelText('feed:comments.placeholder')).toBeNull();
+  });
+});
+
+describe('CommentsSheet: profilo dell’autore', () => {
+  const LINK = 'ui:profileLink.open({"handle":"@gatto.blu"})';
+  beforeEach(() => mockPush.mockClear());
+  afterEach(() => jest.restoreAllMocks());
+
+  it('su iOS chiude il foglio e apre il profilo solo a foglio sparito', async () => {
+    const onClose = jest.fn();
+    setFakeRpc({ get_post_comments: [comment('1', 'ciao')] });
+    await open(onClose);
+    await fireEvent.press((await screen.findAllByRole('link', { name: LINK }))[0] as never);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(mockPush).not.toHaveBeenCalled();
+    await act(async () => screen.getByTestId('sheet-modal').props.onDismiss());
+    expect(mockPush).toHaveBeenCalledWith('/u/gatto.blu');
+  });
+
+  it('su Android apre il profilo subito', async () => {
+    jest.replaceProperty(Platform, 'OS', 'android');
+    setFakeRpc({ get_post_comments: [comment('1', 'ciao')] });
+    await open();
+    await fireEvent.press((await screen.findAllByRole('link', { name: LINK }))[0] as never);
+    expect(mockPush).toHaveBeenCalledWith('/u/gatto.blu');
+  });
+
+  it('il mio commento porta alla tab Profilo', async () => {
+    jest.replaceProperty(Platform, 'OS', 'android');
+    setFakeRpc({
+      get_post_comments: [comment('1', 'ciao', { is_mine: true, handle: 'lince.rosso' })],
+    });
+    await open();
+    const links = await screen.findAllByRole('link', {
+      name: 'ui:profileLink.open({"handle":"@lince.rosso"})',
+    });
+    await fireEvent.press(links[1] as never);
+    expect(mockPush).toHaveBeenCalledWith('/profile');
   });
 });

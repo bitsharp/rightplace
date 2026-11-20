@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { FeedPostItem } from './FeedPostItem';
 import type { FeedPost } from '../domain/types';
@@ -24,6 +24,7 @@ const handlers = {
   onOpenComments: jest.fn(),
   onLongPress: jest.fn(),
   onOpenPhoto: jest.fn(),
+  onOpenAuthor: jest.fn(),
 };
 
 describe('FeedPostItem: foto profilo', () => {
@@ -59,5 +60,17 @@ describe('FeedPostItem: foto profilo', () => {
       />,
     );
     expect(screen.getByTestId('avatar-image', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+});
+
+describe('FeedPostItem: profilo dell’autore', () => {
+  it('il tocco sull’@handle passa il post a onOpenAuthor', async () => {
+    const onOpenAuthor = jest.fn();
+    await render(<FeedPostItem post={POST} {...handlers} onOpenAuthor={onOpenAuthor} />);
+    const [link] = screen.getAllByRole('link', {
+      name: 'ui:profileLink.open({"handle":"@volpe.viola"})',
+    });
+    await fireEvent.press(link as never);
+    expect(onOpenAuthor).toHaveBeenCalledWith(POST);
   });
 });

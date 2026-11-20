@@ -9,6 +9,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { LinkedText } from '@/components/ui/LinkedText';
 import { MonoLabel } from '@/components/ui/MonoLabel';
+import { ProfileLink } from '@/components/ui/ProfileLink';
 import { Text } from '@/components/ui/Text';
 import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
 import { formatHandle } from '@/features/profile/domain/handle';
@@ -36,6 +37,7 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
         first={viewer.posts[0]}
         avatarUrls={viewer.avatarUrls}
         onClose={viewer.close}
+        onOpenAuthor={viewer.openAuthor}
       />
       {viewer.posts.length === 0 && !viewer.isLoading ? (
         <Text color="textSecondary" style={styles.empty}>
@@ -75,9 +77,10 @@ type HeaderProps = {
   first?: FeedPost;
   avatarUrls: Record<string, string>;
   onClose: () => void;
+  onOpenAuthor: () => void;
 };
 
-function StoryHeader({ top, first, avatarUrls, onClose }: HeaderProps) {
+function StoryHeader({ top, first, avatarUrls, onClose, onOpenAuthor }: HeaderProps) {
   const { t } = useTranslation('feed');
   const title =
     first && !first.isMine
@@ -86,22 +89,16 @@ function StoryHeader({ top, first, avatarUrls, onClose }: HeaderProps) {
   return (
     <View testID="story-header" style={[styles.header, { paddingTop: top + spacing.sm }]}>
       {first ? (
-        <Avatar
-          intent={first.isMine ? 'neutral' : 'going'}
-          size={36}
-          initial={first.authorHandle.replace(/^@/, '').charAt(0)}
-          photo={avatarPhotoFor(avatarUrls, first.authorId)}
-        />
+        <ProfileLink handle={first.authorHandle} onPress={onOpenAuthor}>
+          <Avatar
+            intent={first.isMine ? 'neutral' : 'going'}
+            size={36}
+            initial={first.authorHandle.replace(/^@/, '').charAt(0)}
+            photo={avatarPhotoFor(avatarUrls, first.authorId)}
+          />
+        </ProfileLink>
       ) : null}
-      <Text
-        accessibilityRole="header"
-        variant="display17"
-        numberOfLines={1}
-        ellipsizeMode="tail"
-        style={styles.title}
-      >
-        {title}
-      </Text>
+      <StoryTitle first={first} title={title} onOpenAuthor={onOpenAuthor} />
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t('story.close')}
@@ -112,6 +109,22 @@ function StoryHeader({ top, first, avatarUrls, onClose }: HeaderProps) {
         <Icon name="close" />
       </Pressable>
     </View>
+  );
+}
+
+type TitleProps = { first?: FeedPost; title: string; onOpenAuthor: () => void };
+
+function StoryTitle({ first, title, onOpenAuthor }: TitleProps) {
+  const text = (
+    <Text accessibilityRole="header" variant="display17" numberOfLines={1} ellipsizeMode="tail">
+      {title}
+    </Text>
+  );
+  if (!first) return <View style={styles.title}>{text}</View>;
+  return (
+    <ProfileLink handle={first.authorHandle} onPress={onOpenAuthor} style={styles.title}>
+      {text}
+    </ProfileLink>
   );
 }
 
