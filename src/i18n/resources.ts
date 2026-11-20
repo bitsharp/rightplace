@@ -6,6 +6,7 @@ import enDev from './en/dev.json';
 import enErrors from './en/errors.json';
 import enEvent from './en/event.json';
 import enFeed from './en/feed.json';
+import enFeedback from './en/feedback.json';
 import enFriends from './en/friends.json';
 import enLegal from './en/legal.json';
 import enMap from './en/map.json';
@@ -24,6 +25,7 @@ import itDev from './it/dev.json';
 import itErrors from './it/errors.json';
 import itEvent from './it/event.json';
 import itFeed from './it/feed.json';
+import itFeedback from './it/feedback.json';
 import itFriends from './it/friends.json';
 import itLegal from './it/legal.json';
 import itMap from './it/map.json';
@@ -43,6 +45,7 @@ export const resources = {
     friends: itFriends,
     chat: itChat,
     feed: itFeed,
+    feedback: itFeedback,
     notifications: itNotifications,
     post: itPost,
     profile: itProfile,
@@ -63,6 +66,7 @@ export const resources = {
     friends: enFriends,
     chat: enChat,
     feed: enFeed,
+    feedback: enFeedback,
     notifications: enNotifications,
     post: enPost,
     profile: enProfile,

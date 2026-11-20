@@ -158,6 +158,7 @@ export function NavigationSection() {
         onPost={noop}
         onOpenProfile={noop}
         onOpenNews={noop}
+        onOpenFeedback={noop}
         onOpenStory={noop}
       />
       <TabBar active={tab} onSelect={setTab} />

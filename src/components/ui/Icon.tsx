@@ -43,6 +43,14 @@ const GLYPHS = {
       d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"
     />,
   ],
+  star: [
+    <Path key="p" d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z" />,
+  ],
+  // Speech bubble with a small star: "tell us what you think of this page".
+  feedback: [
+    <Path key="p" d="M4 4.5h16v12H9.5L4 20.5z" />,
+    <Path key="q" d="M12 7.2l1.1 2.3 2.5.4-1.8 1.7.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.7 2.5-.4z" />,
+  ],
   phone: [
     <Path
       key="p"

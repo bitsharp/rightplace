@@ -13,6 +13,7 @@ const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush }),
   useIsFocused: () => true,
+  usePathname: () => '/map',
 }));
 jest.mock('@/features/auth/useSession', () => ({
   useSession: () => ({ userId: 'me', profile: { handle: 'lince.rosso' } }),
@@ -52,6 +53,14 @@ describe('useTopBar', () => {
     });
     await waitFor(() => expect(result.current.stories).toEqual([]));
     expect(result.current.canPost).toBe(false);
+  });
+
+  it('espone l’apertura del feedback', async () => {
+    seed({});
+    const { result } = await renderHook(() => useTopBar(), {
+      wrapper: createQueryWrapper().Wrapper,
+    });
+    expect(result.current.onOpenFeedback).toEqual(expect.any(Function));
   });
 
   it('con una serata recente indicata dal server c’è il "+"', async () => {

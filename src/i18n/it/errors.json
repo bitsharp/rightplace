@@ -46,6 +46,12 @@
     "INVALID_SPOT_NAME": "Il nome dello spot deve avere da 3 a 40 caratteri, senza @ né link.",
     "SPOT_LIMIT": "Puoi creare un solo spot per serata. Dichiara uno di quelli già sulla mappa.",
     "OUT_OF_CITY": "Questo punto è fuori dalle città disponibili.",
-    "PLACE_NOT_CACHED": "Questo luogo non è ancora disponibile. Cercalo di nuovo."
+    "PLACE_NOT_CACHED": "Questo luogo non è ancora disponibile. Cercalo di nuovo.",
+    "INVALID_RATING": "Scegli un voto da 1 a 5 stelle.",
+    "INVALID_FEEDBACK_COMMENT": "Il commento può avere al massimo 1000 caratteri.",
+    "INVALID_SCREEN": "Non riesco a riconoscere la schermata. Riprova.",
+    "INVALID_SCREENSHOT": "Lo screenshot non è valido. Rimuovilo e riprova.",
+    "INVALID_PLATFORM": "Piattaforma non supportata.",
+    "FEEDBACK_LIMIT": "Hai già inviato molti feedback oggi. Riprova domani."
   }
 }

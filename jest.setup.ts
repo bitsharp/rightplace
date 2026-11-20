@@ -174,6 +174,20 @@ beforeEach(() =>
     .resetNotificationState(),
 );
 
+// react-native-view-shot is a native module: tests decide what the capture returns.
+jest.mock('react-native-view-shot', () => ({
+  captureScreen: jest.fn(async () => 'file:///capture.jpg'),
+}));
+
+// The feedback draft (and its temporary screenshot) must not leak between tests of the same file.
+beforeEach(() =>
+  jest
+    .requireActual<typeof import('@/features/feedback/store/feedbackStore')>(
+      '@/features/feedback/store/feedbackStore',
+    )
+    .resetFeedback(),
+);
+
 // Link actions (sheet and toast) live in a store shared by every text with links.
 beforeEach(() =>
   jest

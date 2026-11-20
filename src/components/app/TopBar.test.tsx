@@ -17,6 +17,7 @@ const baseProps = {
   onPost: jest.fn(),
   onOpenProfile: jest.fn(),
   onOpenNews: jest.fn(),
+  onOpenFeedback: jest.fn(),
   onOpenStory: jest.fn(),
 };
 
@@ -46,6 +47,28 @@ describe('TopBar', () => {
     expect(screen.queryByTestId('news-dot', { includeHiddenElements: true })).not.toBeOnTheScreen();
     await rerender(<TopBar {...baseProps} canPost={false} hasNews />);
     expect(screen.getByTestId('news-dot', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+
+  it('mostra sempre l’icona del feedback, grande quanto il cuore, e la apre al tocco', async () => {
+    const onOpenFeedback = jest.fn();
+    await render(<TopBar {...baseProps} canPost={false} onOpenFeedback={onOpenFeedback} />);
+    const feedback = screen.getByRole('button', { name: 'ui:topBar.feedback' });
+    const news = screen.getByRole('button', { name: 'ui:topBar.news' });
+    const hidden = { includeHiddenElements: true };
+    expect(screen.getByTestId('icon-feedback', hidden).props.width).toBe(
+      screen.getByTestId('icon-heart', hidden).props.width,
+    );
+    expect(StyleSheet.flatten(feedback.props.style).height).toBe(
+      StyleSheet.flatten(news.props.style).height,
+    );
+    await fireEvent.press(feedback);
+    expect(onOpenFeedback).toHaveBeenCalled();
+  });
+
+  it('l’icona del feedback sta subito prima del cuore', async () => {
+    await render(<TopBar {...baseProps} canPost={false} />);
+    const labels = screen.getAllByRole('button').map((node) => node.props.accessibilityLabel);
+    expect(labels.indexOf('ui:topBar.feedback') + 1).toBe(labels.indexOf('ui:topBar.news'));
   });
 
   it('elenca le storie e apre quella toccata', async () => {

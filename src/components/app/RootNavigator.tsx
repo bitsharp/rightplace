@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import type { SessionStatus } from '@/features/auth/domain/sessionStatus';
 import { useAuthListener } from '@/features/auth/store/authStore';
 import { useSession } from '@/features/auth/useSession';
+import { FeedbackHost } from '@/features/feedback/FeedbackHost';
 import { useSyncProfileCity } from '@/features/map/useSyncProfileCity';
 import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { resetSeenStories } from '@/features/posts/store/seenStories';
@@ -38,6 +39,7 @@ function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
     <>
       <PrePermissionSheet />
       <LinkActionsHost />
+      <FeedbackHost />
       <AppScreens status={status} canOpenCreatorRoutes={canOpenCreatorRoutes} />
     </>
   );

@@ -1,0 +1,16 @@
+{
+  "label": "FEEDBACK",
+  "title": "Invia un feedback",
+  "intro": "Dicci cosa ne pensi di questa pagina: ci aiuta a migliorare RightPlace.",
+  "screenshotA11y": "Screenshot della pagina che stai guardando",
+  "removeScreenshot": "Rimuovi screenshot",
+  "ratingLabel": "Il tuo voto",
+  "starA11y": "{{count}} su 5 stelle",
+  "commentLabel": "Il tuo commento (facoltativo)",
+  "commentPlaceholder": "Cosa ti piace, cosa non funziona, cosa vorresti…",
+  "counter": "{{count}} caratteri rimasti",
+  "privacyNote": "Lo screenshot può contenere contenuti di altri utenti: lo vede solo il supporto e viene cancellato dopo 180 giorni.",
+  "send": "Invia",
+  "cancel": "Annulla",
+  "thanks": "Grazie per il feedback"
+}

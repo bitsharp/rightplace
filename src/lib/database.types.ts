@@ -361,6 +361,61 @@ export type Database = {
           },
         ];
       };
+      feedback: {
+        Row: {
+          app_version: string | null;
+          comment: string;
+          created_at: string;
+          id: string;
+          locale: string | null;
+          platform: string;
+          rating: number;
+          screen: string;
+          screenshot_path: string | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          app_version?: string | null;
+          comment?: string;
+          created_at?: string;
+          id?: string;
+          locale?: string | null;
+          platform: string;
+          rating: number;
+          screen: string;
+          screenshot_path?: string | null;
+          user_id: string;
+        };
+        Update: {
+          app_version?: string | null;
+          comment?: string;
+          created_at?: string;
+          id?: string;
+          locale?: string | null;
+          platform?: string;
+          rating?: number;
+          screen?: string;
+          screenshot_path?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'feedback_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'feedback_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'public_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       follows: {
         Row: {
           created_at: string;
@@ -1609,6 +1664,18 @@ export type Database = {
       set_venue_details: {
         Args: { p_google_place_id: string; p_website_uri: string };
         Returns: boolean;
+      };
+      submit_feedback: {
+        Args: {
+          p_app_version: string;
+          p_comment: string;
+          p_locale: string;
+          p_platform: string;
+          p_rating: number;
+          p_screen: string;
+          p_screenshot_path: string;
+        };
+        Returns: string;
       };
       sync_places_venues: {
         Args: { p_city_slug: string; p_rows: Json };

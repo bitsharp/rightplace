@@ -4,6 +4,8 @@ import { useSession } from '@/features/auth/useSession';
 import { useUnseenActivityCount } from '@/features/notifications/hooks';
 import { useStories } from '@/features/map/hooks';
 
+import { useOpenFeedback } from '@/features/feedback/useOpenFeedback';
+
 import { canPost } from './domain/canPost';
 import { isUnseen } from './domain/stories';
 import { buildTopBarStories } from './domain/topBarStories';
@@ -26,6 +28,7 @@ export function useTopBar() {
   const mine = useStoryPosts(userId ?? '');
   const seenKeys = useSeenStories((state) => state.seen);
   const unseenActivity = useUnseenActivityCount();
+  const onOpenFeedback = useOpenFeedback();
   const handle = profile?.handle ?? '';
   const entries = stories.data ?? [];
 
@@ -43,6 +46,7 @@ export function useTopBar() {
     onPost: () => router.push('/post/new'),
     onOpenProfile: () => router.push('/profile'),
     onOpenNews: () => router.push('/activity'),
+    onOpenFeedback: () => void onOpenFeedback(),
     onOpenStory: (id: string) =>
       router.push({
         pathname: '/story/[userId]',

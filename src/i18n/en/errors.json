@@ -46,6 +46,12 @@
     "INVALID_SPOT_NAME": "The spot name must be 3 to 40 characters, with no @ or links.",
     "SPOT_LIMIT": "You can create only one spot per night. Declare one of those already on the map.",
     "OUT_OF_CITY": "This point is outside the available cities.",
-    "PLACE_NOT_CACHED": "This place is not available yet. Search for it again."
+    "PLACE_NOT_CACHED": "This place is not available yet. Search for it again.",
+    "INVALID_RATING": "Pick a rating from 1 to 5 stars.",
+    "INVALID_FEEDBACK_COMMENT": "The comment can be at most 1000 characters.",
+    "INVALID_SCREEN": "I could not recognise the screen. Try again.",
+    "INVALID_SCREENSHOT": "The screenshot is not valid. Remove it and try again.",
+    "INVALID_PLATFORM": "Unsupported platform.",
+    "FEEDBACK_LIMIT": "You have already sent a lot of feedback today. Try again tomorrow."
   }
 }

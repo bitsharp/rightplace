@@ -30,6 +30,7 @@ type Props = {
   onPost: () => void;
   onOpenProfile: () => void;
   onOpenNews: () => void;
+  onOpenFeedback: () => void;
   onOpenStory: (id: string) => void;
 };
 
@@ -41,13 +42,16 @@ export function TopBar({
   onPost,
   onOpenProfile,
   onOpenNews,
+  onOpenFeedback,
   onOpenStory,
 }: Props) {
   const { t } = useTranslation('ui');
   return (
     <View>
       <View style={styles.row}>
-        <View style={styles.side}>{canPost ? <PostButton onPress={onPost} /> : null}</View>
+        <View style={[styles.side, styles.left]}>
+          {canPost ? <PostButton onPress={onPost} /> : null}
+        </View>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('topBar.profile')}
@@ -57,7 +61,10 @@ export function TopBar({
           <Text variant="display17">{formatHandle(handle)}</Text>
           <Icon name="chevronDown" size={12} strokeWidth={2.6} />
         </Pressable>
-        <NewsButton hasNews={hasNews} onPress={onOpenNews} />
+        <View style={styles.right}>
+          <FeedbackButton onPress={onOpenFeedback} />
+          <NewsButton hasNews={hasNews} onPress={onOpenNews} />
+        </View>
       </View>
       <StoryStrip stories={stories} onOpenStory={onOpenStory} />
     </View>
@@ -75,6 +82,21 @@ function PostButton({ onPress }: { onPress: () => void }) {
       style={styles.post}
     >
       <Icon name="plus" size={22} color="onAccent" strokeWidth={2.4} />
+    </Pressable>
+  );
+}
+
+// Always visible, same size and tap target as the heart: feedback is about the page being looked at.
+function FeedbackButton({ onPress }: { onPress: () => void }) {
+  const { t } = useTranslation('ui');
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('topBar.feedback')}
+      onPress={onPress}
+      style={[styles.side, styles.feedback]}
+    >
+      <Icon name="feedback" size={26} />
     </Pressable>
   );
 }
@@ -139,6 +161,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   side: { width: heights.minTapTarget, height: heights.minTapTarget, justifyContent: 'center' },
+  // As wide as the right group, so the handle stays centred.
+  left: { width: heights.minTapTarget * 2 },
+  right: { flexDirection: 'row', alignItems: 'center' },
+  feedback: { alignItems: 'center' },
   news: { alignItems: 'flex-end' },
   post: {
     width: 40,

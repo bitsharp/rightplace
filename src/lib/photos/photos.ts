@@ -55,7 +55,7 @@ export async function preparePhoto(photo: PickedPhoto): Promise<string> {
   return saved.uri;
 }
 
-export type PhotoBucket = 'chat-photos' | 'posts';
+export type PhotoBucket = 'chat-photos' | 'posts' | 'feedback';
 
 // `cleanUri` must be the output of preparePhoto: the original file is never uploaded.
 // The path is always <user id>/<uuid>.jpg: it is the only shape the RPCs accept.

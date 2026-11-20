@@ -65,6 +65,7 @@ Gli errori sono codici tipizzati nel messaggio dell'eccezione: `NOT_AUTHENTICATE
 | Creator        | `create_event(...)`, `update_event(...)`, `cancel_event(event_id)`, `get_my_creator_events('upcoming'\|'past')`, `get_event_attendance(event_id)` (prompt 12)                                                                                                                                                                                                                                                                                                                                                  |
 | Serate         | `get_city_events(city_slug, query?, days?)`, `get_event_detail(event_id)` (prompt 12)                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | Moderazione    | `report(kind, id, reason)`, `block_user`, `unblock_user`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Feedback       | `submit_feedback(rating, comment, screen, screenshot_path, app_version, platform, locale)` (voto 1–5, max 10 al giorno; lettura solo con service role, vedi `docs/feedback.md`)                                                                                                                                                                                                                                                                                                                                |
 
 Azione per applicare `20261113000100_has_phone_hash.sql` al progetto hosted: `npx supabase db push`.
 
@@ -80,6 +81,7 @@ Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attend
 | `daily-cleanup`                | 06:00 UTC (07:00 Roma d'inverno) | salva i conteggi per serata, cancella dichiarazioni scadute da oltre 7 giorni, tiene 20 ricerche per utente |
 | `expire-sponsorships`          | lunedì 05:00 UTC                 | spegne le sponsorizzazioni scadute                                                                          |
 | `refresh-typical-from-history` | lunedì 06:00 UTC                 | ricalcola lo strato "di solito" dalla storia delle ultime 8 settimane                                       |
+| `purge-old-feedback`           | ogni giorno 06:30 UTC            | feedback più vecchi di 180 giorni; accoda gli screenshot per lo Storage                                     |
 | `process-account-deletions`    | ogni ora (:15)                   | elimina da `auth.users` gli account per cui è stata chiesta la cancellazione                                |
 | `expire-stale-places`          | ogni giorno 04:30 UTC            | locali Places non sincronizzati da 30 giorni: disattivati, senza nome/indirizzo/orari                       |
 | `purge-stale-venue-photos`     | ogni giorno 04:45 UTC            | azzera `photo_url` / `photo_fetched_at` oltre i 60 giorni (foto di copertina da Apify)                      |
@@ -93,7 +95,7 @@ Funzioni pure (pubbliche, senza dati personali): `age_band`, `is_adult`, `attend
 
 ## Storage
 
-I bucket `posts` e `chat-photos` sono privati. Il caricamento è permesso solo nel proprio prefisso `<user_id>/…`. **Non esiste una policy di lettura**: le immagini si servono solo con signed URL generati lato server (`chat-photo-urls` per la chat, prompt 10; `post-photo-urls` per i post, prompt 11).
+I bucket `posts`, `chat-photos` e `feedback` sono privati. Il caricamento è permesso solo nel proprio prefisso `<user_id>/…`. **Non esiste una policy di lettura**: le immagini si servono solo con signed URL generati lato server (`chat-photo-urls` per la chat, prompt 10; `post-photo-urls` per i post, prompt 11).
 
 ## Decisioni rispetto a `roadmap/04`
 
@@ -226,3 +228,7 @@ Nessuna azione manuale oltre `npx supabase db push`. Aggiunge `profiles.handle_f
 ### Città della mappa sul profilo (migration `20261120000200_set_profile_city.sql`)
 
 Nessuna azione manuale oltre `npx supabase db push`. Aggiunge la RPC `set_profile_city(p_city_slug text) returns void` (`security definer`, solo `authenticated` e `service_role`): aggiorna **solo** `profiles.city_id` del chiamante, è idempotente e rifiuta le città inesistenti o non attive con `CITY_NOT_ACTIVE`. Il client la chiama quando la città risolta (scelta nel profilo o nella Ricerca, oppure rilevata dalla cella grossolana) differisce da quella del profilo; viaggia solo lo slug della città, mai la posizione. Serve al server per ciò che dipende dalla città dell'utente, per esempio il digest del feed delle 12:00 nel fuso della città (`private.queue_feed_digests`). Il client legge lo slug della propria città dal proprio profilo (`cities(slug)` via `profiles.city_id`, solo riga propria).
+
+### Feedback in-app (migration `20261120000500_feedback.sql`)
+
+Nessuna azione manuale oltre `npx supabase db push`. Aggiunge il bucket privato `feedback` (upload solo in `<user_id>/…`, nessuna lettura per gli utenti), la tabella `public.feedback` (RLS attiva, nessuna policy né privilegio per i client) e la RPC `submit_feedback` (`security definer`, solo `authenticated`): voto 1–5 obbligatorio (`INVALID_RATING`), commento fino a 1000 caratteri (`INVALID_FEEDBACK_COMMENT`), schermata 1–200 caratteri (`INVALID_SCREEN`), piattaforma `ios`/`android` (`INVALID_PLATFORM`), percorso screenshot esattamente `<uid>/<uuid>.jpg` o `null` (`INVALID_SCREENSHOT`), al massimo 10 invii nelle ultime 24 ore (`FEEDBACK_LIMIT`). Il job `purge-old-feedback` cancella dopo 180 giorni e accoda gli screenshot; la migration ridefinisce anche `delete_my_account()` perché cancelli i feedback e accodi gli screenshot. Come si leggono e cosa dire nell'informativa: `docs/feedback.md`.
