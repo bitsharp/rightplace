@@ -13,6 +13,7 @@ describe('parseNotificationPrefs', () => {
       reminder_time: '18:00',
     };
     expect(parseNotificationPrefs(serverDefaults)).toEqual(DEFAULT_NOTIFICATION_PREFS);
+    expect(DEFAULT_NOTIFICATION_PREFS.support).toBe(true);
     expect(DEFAULT_NOTIFICATION_PREFS.reminderTime).toBe('18:00');
     expect(DEFAULT_NOTIFICATION_PREFS.reminderDays).toEqual([0, 1, 2, 3, 4, 5, 6]);
   });
@@ -35,9 +36,25 @@ describe('parseNotificationPrefs', () => {
       chat: false,
       feed: true,
       creator: false,
+      support: true,
       reminderDays: [4, 5, 6],
       reminderTime: '19:30',
     });
+  });
+
+  it('la categoria support (solo per il supporto) è letta quando c’è', () => {
+    const base = {
+      reminder: true,
+      day_after: true,
+      friends: true,
+      chat: true,
+      feed: true,
+      creator: true,
+      reminder_days: [0],
+      reminder_time: '18:00',
+    };
+    expect(parseNotificationPrefs({ ...base, support: false }).support).toBe(false);
+    expect(toServerPrefs({ support: false })).toEqual({ support: false });
   });
 
   it('rifiuta un contenuto che non rispetta il contratto', () => {

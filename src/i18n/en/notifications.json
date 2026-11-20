@@ -16,7 +16,8 @@
     "amici": "Friends",
     "chat": "Chats and nights",
     "feed": "Feed",
-    "creator": "Creator"
+    "creator": "Creator",
+    "supporto": "Feedback received"
   },
   "prePermission": {
     "label": "NOTIFICATIONS",
@@ -51,6 +52,10 @@
       "creator": {
         "title": "Creator",
         "description": "Sign-ups to your nights, never about a single person."
+      },
+      "support": {
+        "title": "Feedback received",
+        "description": "A notice when someone sends feedback."
       }
     },
     "days": {

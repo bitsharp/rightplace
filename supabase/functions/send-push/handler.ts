@@ -1,6 +1,6 @@
 import { json, safeEqual } from '../_shared/auth.ts';
 
-const CHANNELS = ['promemoria', 'amici', 'chat', 'feed', 'creator'] as const;
+const CHANNELS = ['promemoria', 'amici', 'chat', 'feed', 'creator', 'supporto'] as const;
 type Channel = (typeof CHANNELS)[number];
 
 const EXPO_BATCH_SIZE = 100;

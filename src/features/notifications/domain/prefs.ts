@@ -7,6 +7,7 @@ export const NOTIFICATION_CATEGORIES = [
   'chat',
   'feed',
   'creator',
+  'support',
 ] as const;
 export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 
@@ -25,6 +26,7 @@ export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
   chat: true,
   feed: true,
   creator: true,
+  support: true,
   reminderDays: [0, 1, 2, 3, 4, 5, 6],
   reminderTime: '18:00',
 };
@@ -36,6 +38,8 @@ const serverPrefsSchema = z.object({
   chat: z.boolean(),
   feed: z.boolean(),
   creator: z.boolean(),
+  // only present for support accounts (set by the user); the server default has no such key
+  support: z.boolean().optional(),
   reminder_days: z.array(z.number().int().min(0).max(6)),
   reminder_time: z.string().regex(/^([01]\d|2[0-3]):(00|15|30|45)$/),
 });
@@ -49,6 +53,7 @@ export function parseNotificationPrefs(raw: unknown): NotificationPrefs {
     chat: row.chat,
     feed: row.feed,
     creator: row.creator,
+    support: row.support ?? true,
     reminderDays: [...row.reminder_days].sort((a, b) => a - b),
     reminderTime: row.reminder_time,
   };

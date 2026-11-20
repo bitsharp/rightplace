@@ -8,6 +8,7 @@ import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { Toggle } from '@/components/ui/Toggle';
 import { StepPicker } from '@/features/creator/components/StepPicker';
+import { useSession } from '@/features/auth/useSession';
 import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { spacing } from '@/theme/tokens';
 
@@ -95,11 +96,13 @@ function ReminderSchedule({ prefs, save }: { prefs: NotificationPrefs; save: Sav
 export function NotificationSettings() {
   const { t } = useTranslation('notifications');
   const { showCreatorProfileLink } = useCreatorUi();
+  const isSupport = useSession().profile?.isSupport === true;
   const prefs = useNotificationPrefs().data;
   const { mutate: save } = useSaveNotificationPrefs();
   if (!prefs) return null;
   const categories = NOTIFICATION_CATEGORIES.filter(
-    (category) => category !== 'creator' || showCreatorProfileLink,
+    (category) =>
+      (category !== 'creator' || showCreatorProfileLink) && (category !== 'support' || isSupport),
   );
   return (
     <View style={styles.section}>

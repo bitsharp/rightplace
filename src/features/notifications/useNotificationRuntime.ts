@@ -31,6 +31,7 @@ export function useNotificationRuntime(ready: boolean): void {
       chat: t('channels.chat'),
       feed: t('channels.feed'),
       creator: t('channels.creator'),
+      supporto: t('channels.supporto'),
     }).catch(() => console.warn('android channels failed'));
   }, [t, i18n.language]);
   useEffect(() => {

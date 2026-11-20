@@ -19,6 +19,8 @@ const profileRowSchema = z.object({
   location_opt_in: z.boolean(),
   contacts_opt_in: z.boolean(),
   is_creator: z.boolean(),
+  // own row only: never in public_profiles
+  is_support: z.boolean(),
   deleted_at: z.string().nullable(),
   // embedded from profiles.city_id: the map city the user chose, own row only
   cities: z.object({ slug: z.string() }).nullable(),
@@ -42,6 +44,8 @@ export type MyProfile = {
   locationOptIn: boolean;
   contactsOptIn: boolean;
   isCreator: boolean;
+  // support team: sees the feedback inbox (set only with SQL on the server)
+  isSupport: boolean;
   // slug of profiles.city_id (the city the server uses for e.g. the feed digest); null = never set
   citySlug: string | null;
   deleted: boolean;
@@ -60,6 +64,7 @@ function toMyProfile(row: z.infer<typeof profileRowSchema>): MyProfile {
     locationOptIn: row.location_opt_in,
     contactsOptIn: row.contacts_opt_in,
     isCreator: row.is_creator,
+    isSupport: row.is_support,
     citySlug: row.cities?.slug ?? null,
     deleted: row.deleted_at !== null,
   };

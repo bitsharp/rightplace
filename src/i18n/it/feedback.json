@@ -12,5 +12,12 @@
   "privacyNote": "Lo screenshot può contenere contenuti di altri utenti: lo vede solo il supporto e viene cancellato dopo 180 giorni.",
   "send": "Invia",
   "cancel": "Annulla",
-  "thanks": "Grazie per il feedback"
+  "thanks": "Grazie per il feedback",
+  "support": {
+    "title": "Feedback ricevuti",
+    "empty": "Nessun feedback ricevuto per ora.",
+    "loadError": "Non riesco a caricare i feedback. Trascina verso il basso per riprovare.",
+    "noComment": "(nessun commento)",
+    "screenshotA11y": "Apri lo screenshot a schermo intero"
+  }
 }

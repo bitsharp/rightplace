@@ -35,12 +35,17 @@ export function RootNavigator() {
 
 function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
   const { canOpenCreatorRoutes } = useCreatorUi();
+  const isSupport = useSession().profile?.isSupport === true;
   return (
     <>
       <PrePermissionSheet />
       <LinkActionsHost />
       <FeedbackHost />
-      <AppScreens status={status} canOpenCreatorRoutes={canOpenCreatorRoutes} />
+      <AppScreens
+        status={status}
+        canOpenCreatorRoutes={canOpenCreatorRoutes}
+        canOpenSupportRoutes={isSupport}
+      />
     </>
   );
 }
@@ -48,9 +53,11 @@ function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
 function AppScreens({
   status,
   canOpenCreatorRoutes,
+  canOpenSupportRoutes,
 }: {
   status: Exclude<SessionStatus, 'loading'>;
   canOpenCreatorRoutes: boolean;
+  canOpenSupportRoutes: boolean;
 }) {
   return (
     <Stack
@@ -80,6 +87,10 @@ function AppScreens({
         {CREATOR_SCREENS.map((screen) => (
           <Stack.Screen key={screen.name} name={screen.name} options={screen.options} />
         ))}
+      </Stack.Protected>
+      {/* The feedback inbox exists only for support accounts: anyone else is redirected by the router. */}
+      <Stack.Protected guard={status === 'ready' && canOpenSupportRoutes}>
+        <Stack.Screen name="support/feedback" />
       </Stack.Protected>
       <Stack.Protected guard={__DEV__}>
         <Stack.Screen name="(dev)/ui-kit" />

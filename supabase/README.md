@@ -213,6 +213,17 @@ Vedi `docs/notifications.md` per il flusso completo. Oggetti nuovi (migration `2
 5. Le push remote non funzionano in Expo Go su Android: servono il dev client o una build.
 6. Applicare la migration al progetto remoto (`supabase db push`) quando Luca lo decide.
 
+### Feedback al supporto nell'app (migration `20261121000100_feedback_support.sql`)
+
+- `profiles.is_support` (mai scrivibile dai client, mai esposta), categoria notifiche `support` (canale push `supporto`), trigger `feedback_notify_support` che accoda una push per ogni account support, RPC `get_support_feedback(before, limit)` e `get_feedback_screenshot_paths(ids)` (solo `is_support`, `NOT_SUPPORT` altrimenti).
+- Edge Function `feedback-screenshot-urls` (JWT utente, firma 1 ora i path del bucket `feedback`).
+
+#### Azioni manuali per Luca
+
+1. `npx supabase db push` e `npx supabase functions deploy feedback-screenshot-urls` (nessun secret nuovo). Se non l'hai ancora fatto dopo questa modifica, ridistribuisci anche `send-push` (accetta il canale `supporto`): `npx supabase functions deploy send-push --no-verify-jwt`.
+2. Rendere supporto un account: `update public.profiles set is_support = true where handle = '…';`
+3. Dettagli e privacy in `docs/feedback.md`.
+
 ### @handle scelto dall'utente (migration `20261117000100_custom_handle.sql`)
 
 Nessuna azione manuale oltre `npx supabase db push`. Regole, blocklist, limite e privacy in `docs/handles.md`. Aggiunge `private.is_valid_handle(text)` (l'unica regola di formato, usata anche dal check `profiles_handle_format`; è eseguibile da `authenticated` perché il check gira a ogni update del profilo), `private.normalize_handle`, `private.handle_blocked`, la tabella `private.handle_blocklist` e le RPC `set_handle(handle)` e `is_handle_available(handle)`. `regenerate_handle()` segue lo stesso limite di 30 giorni. Errori: `INVALID_HANDLE`, `HANDLE_NOT_ALLOWED`, `HANDLE_TAKEN`, `HANDLE_CHANGE_TOO_SOON` (sostituisce `HANDLE_ALREADY_CHANGED`). `generate_handle()` ora non supera i 20 caratteri.

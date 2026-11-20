@@ -12,6 +12,8 @@ const STATIC_ROUTES: Record<string, string> = {
   'friends/requests': '/friends',
   chat: '/chat',
   map: '/map',
+  // the support inbox: the route itself redirects anyone who is not support
+  'support/feedback': '/support/feedback',
 };
 
 // Notification URLs come from the server (or from outside): anything not recognised opens the map.

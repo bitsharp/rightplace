@@ -7,7 +7,14 @@ import { Platform } from 'react-native';
 
 import { shouldPresentInForeground } from './domain/foreground';
 
-export const ANDROID_CHANNELS = ['promemoria', 'amici', 'chat', 'feed', 'creator'] as const;
+export const ANDROID_CHANNELS = [
+  'promemoria',
+  'amici',
+  'chat',
+  'feed',
+  'creator',
+  'supporto',
+] as const;
 export type AndroidChannelId = (typeof ANDROID_CHANNELS)[number];
 
 function notificationUrl(data: unknown): string | undefined {

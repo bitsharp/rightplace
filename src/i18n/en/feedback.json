@@ -12,5 +12,12 @@
   "privacyNote": "The screenshot may show other users' content: only support can see it and it is deleted after 180 days.",
   "send": "Send",
   "cancel": "Cancel",
-  "thanks": "Thanks for your feedback"
+  "thanks": "Thanks for your feedback",
+  "support": {
+    "title": "Feedback received",
+    "empty": "No feedback received yet.",
+    "loadError": "Could not load the feedback. Pull down to try again.",
+    "noComment": "(no comment)",
+    "screenshotA11y": "Open the screenshot full screen"
+  }
 }

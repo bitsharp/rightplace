@@ -55,7 +55,8 @@
     "save": "Save",
     "saved": "Profile saved.",
     "creatorProfile": "Your creator profile",
-    "becomeCreator": "Become a creator"
+    "becomeCreator": "Become a creator",
+    "supportFeedback": "Feedback received"
   },
   "account": {
     "title": "Account",

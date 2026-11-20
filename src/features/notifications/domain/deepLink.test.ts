@@ -11,6 +11,7 @@ describe('routeForNotification', () => {
     ['rightplace://u/luca_97', '/u/luca_97'],
     ['rightplace://chat', '/chat'],
     ['rightplace://map', '/map'],
+    ['rightplace://support/feedback', '/support/feedback'],
   ])('%s apre %s', (url, route) => {
     expect(routeForNotification(url)).toBe(route);
   });

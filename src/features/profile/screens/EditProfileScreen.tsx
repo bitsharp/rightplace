@@ -76,6 +76,11 @@ export function EditProfileScreen() {
           {profile.isCreator ? t('app.creatorProfile') : t('app.becomeCreator')}
         </Link>
       ) : null}
+      {profile.isSupport ? (
+        <Link href="/support/feedback" style={styles.link}>
+          {t('app.supportFeedback')}
+        </Link>
+      ) : null}
       <EditSections profile={profile} email={email ?? ''} />
     </Screen>
   );

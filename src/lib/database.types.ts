@@ -735,6 +735,7 @@ export type Database = {
           handle_free_change_used: boolean;
           id: string;
           is_creator: boolean;
+          is_support: boolean;
           locale: string;
           location_opt_in: boolean;
           notification_prefs: NonNullable<Json>;
@@ -757,6 +758,7 @@ export type Database = {
           handle_free_change_used?: boolean;
           id: string;
           is_creator?: boolean;
+          is_support?: boolean;
           locale?: string;
           location_opt_in?: boolean;
           notification_prefs?: NonNullable<Json>;
@@ -778,6 +780,7 @@ export type Database = {
           handle_free_change_used?: boolean;
           id?: string;
           is_creator?: boolean;
+          is_support?: boolean;
           locale?: string;
           location_opt_in?: boolean;
           notification_prefs?: NonNullable<Json>;
@@ -1388,6 +1391,13 @@ export type Database = {
           visible_from: string;
         }[];
       };
+      get_feedback_screenshot_paths: {
+        Args: { p_ids: string[] };
+        Returns: {
+          feedback_id: string;
+          screenshot_path: string;
+        }[];
+      };
       get_follow_requests: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1572,6 +1582,21 @@ export type Database = {
           post_id: string;
           venue_name: string;
           visible_from: string;
+        }[];
+      };
+      get_support_feedback: {
+        Args: { p_before?: string; p_limit?: number };
+        Returns: {
+          app_version: string;
+          author_handle: string;
+          comment: string;
+          created_at: string;
+          has_screenshot: boolean;
+          id: string;
+          locale: string;
+          platform: string;
+          rating: number;
+          screen: string;
         }[];
       };
       get_user_posts: {

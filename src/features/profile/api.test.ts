@@ -30,6 +30,13 @@ describe('profile api', () => {
     });
   });
 
+  it('legge se il profilo è del supporto (false di default)', async () => {
+    setFakeTable('profiles', [fakeProfileRow()]);
+    await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ isSupport: false });
+    setFakeTable('profiles', [fakeProfileRow({ is_support: true })]);
+    await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ isSupport: true });
+  });
+
   it('espone lo slug della città del proprio profilo, null se non ne ha', async () => {
     setFakeTable('profiles', [fakeProfileRow({ cities: { slug: 'las-palmas' } })]);
     await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ citySlug: 'las-palmas' });

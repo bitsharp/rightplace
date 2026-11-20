@@ -16,7 +16,8 @@
     "amici": "Amici",
     "chat": "Chat e serate",
     "feed": "Feed",
-    "creator": "Creator"
+    "creator": "Creator",
+    "supporto": "Feedback ricevuti"
   },
   "prePermission": {
     "label": "NOTIFICHE",
@@ -51,6 +52,10 @@
       "creator": {
         "title": "Creator",
         "description": "Adesioni alle tue serate, mai per singola persona."
+      },
+      "support": {
+        "title": "Feedback ricevuti",
+        "description": "Un avviso quando qualcuno invia un feedback."
       }
     },
     "days": {

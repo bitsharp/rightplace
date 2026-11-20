@@ -212,6 +212,7 @@ export function fakeProfileRow(overrides: Record<string, unknown> = {}): Record<
     location_opt_in: false,
     contacts_opt_in: false,
     is_creator: false,
+    is_support: false,
     deleted_at: null,
     cities: { slug: 'milano' },
     ...overrides,

@@ -9,6 +9,8 @@ import { createQueryWrapper } from '@/test/queryWrapper';
 
 import { NotificationSettings } from './NotificationSettings';
 
+const mockSession: { profile: { isSupport: boolean } } = { profile: { isSupport: false } };
+jest.mock('@/features/auth/useSession', () => ({ useSession: () => mockSession }));
 const mockCreator = { showCreatorProfileLink: true };
 jest.mock('@/features/creator/useCreatorUi', () => ({ useCreatorUi: () => mockCreator }));
 
@@ -41,6 +43,7 @@ const renderSettings = () =>
 describe('NotificationSettings', () => {
   beforeEach(() => {
     mockCreator.showCreatorProfileLink = true;
+    mockSession.profile.isSupport = false;
     jest.mocked(Notifications.getPermissionsAsync).mockResolvedValue(permissionResponse('granted'));
   });
 
@@ -76,6 +79,25 @@ describe('NotificationSettings', () => {
     expect(
       screen.queryByRole('switch', { name: 'notifications:settings.categories.creator.title' }),
     ).toBeNull();
+  });
+
+  it('la categoria Feedback ricevuti compare solo per il supporto', async () => {
+    seed({ support: true });
+    await renderSettings();
+    await screen.findByRole('switch', { name: 'notifications:settings.categories.chat.title' });
+    expect(
+      screen.queryByRole('switch', { name: 'notifications:settings.categories.support.title' }),
+    ).toBeNull();
+    await screen.unmount();
+
+    mockSession.profile.isSupport = true;
+    await renderSettings();
+    await fireEvent.press(
+      await screen.findByRole('switch', {
+        name: 'notifications:settings.categories.support.title',
+      }),
+    );
+    await waitFor(() => expect(setCalls().at(-1)?.[1]).toEqual({ p_prefs: { support: false } }));
   });
 
   it('i giorni del promemoria si scelgono con i chip', async () => {

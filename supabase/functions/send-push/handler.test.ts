@@ -150,6 +150,16 @@ Deno.test('url che non iniziano con rightplace:// sono rifiutati', async () => {
   assertEquals(batches.length, 0);
 });
 
+Deno.test('il canale supporto è accettato', async () => {
+  const { deps, batches } = makeDeps();
+  const response = await handleSendPush(
+    request({ messages: [message({ channel_id: 'supporto' })] }),
+    deps,
+  );
+  assertEquals(response.status, 200);
+  assertEquals(batches[0][0].channelId, 'supporto');
+});
+
 Deno.test(
   'body non valido: canale sconosciuto, testo troppo lungo, uuid errati, troppi utenti',
   async () => {
