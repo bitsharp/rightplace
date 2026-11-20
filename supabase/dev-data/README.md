@@ -2,10 +2,10 @@
 
 Due script SQL per far vedere ai tester una **mappa generale** non vuota. **Non lanciarli in produzione.**
 
-| File | Cosa fa |
-|---|---|
-| `demo_map.sql` | Crea 60 utenti demo e le loro dichiarazioni di stasera su ~8 locali reali di Milano. Idempotente. |
-| `demo_map_cleanup.sql` | Rimuove tutto ciò che ha creato `demo_map.sql` e verifica che non resti nulla. |
+| File                   | Cosa fa                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `demo_map.sql`         | Crea 60 utenti demo e le loro dichiarazioni di stasera su ~8 locali reali di Milano. Idempotente. |
+| `demo_map_cleanup.sql` | Rimuove tutto ciò che ha creato `demo_map.sql` e verifica che non resti nulla.                    |
 
 ## Cosa crea `demo_map.sql`
 
