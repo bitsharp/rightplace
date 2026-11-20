@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { filterEvents } from '@/features/events/domain/eventList';
 import { useCityEvents } from '@/features/events/hooks';
 import { useWhenLabel } from '@/features/events/useEventLabels';
+import { useCurrentCity } from '@/features/map/useCurrentCity';
 import { useMapStore } from '@/features/map/store/mapStore';
 
 import { withoutCatalogDuplicates } from './domain/googleResults';
@@ -38,8 +39,9 @@ function useEventRows(citySlug: string, kind: VenueKind | null, query: string) {
 
 export function useVenueSearch() {
   const router = useRouter();
-  // Same city as the map: one source of truth in the persisted map store.
-  const { citySlug, setCitySlug } = useMapStore();
+  // Same city as the map (useCurrentCity); picking one here is an explicit choice, like in the profile.
+  const citySlug = useCurrentCity();
+  const setCitySlug = useMapStore((state) => state.setCityPreference);
   const [kind, setKind] = useState<VenueKind | null>(null);
   const [query, setQuery] = useState('');
   const cities = useActiveCities();

@@ -38,6 +38,11 @@
       "en": "English"
     }
   },
+  "city": {
+    "title": "Map city",
+    "auto": "Automatic (from your location)",
+    "autoOff": "Turn on location to pick the city automatically; otherwise we use {{city}}."
+  },
   "handle": {
     "step": "03 / 03 · Your @tag",
     "title": "Choose your @tag",

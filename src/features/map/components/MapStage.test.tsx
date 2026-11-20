@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+import { cityRegion } from '../domain/region';
 import { MapStage } from './MapStage';
 
 const baseProps = {
@@ -54,5 +55,19 @@ describe('MapStage compatta', () => {
     await fireEvent(screen.getByTestId('map-view'), 'regionChangeComplete', region);
     await fireEvent.press(screen.getByRole('button', { name: 'map:fullscreen.open' }));
     expect(screen.getByTestId('map-view').props.initialRegion).toEqual(region);
+  });
+  it('quando la città cambia la mappa si ricentra sulla nuova città, anche se avevi spostato la vista', async () => {
+    const panned = { latitude: 45.4, longitude: 9.1, latitudeDelta: 0.02, longitudeDelta: 0.03 };
+    const lasPalmas = {
+      slug: 'las-palmas',
+      name: 'Las Palmas',
+      lat: 28.1235,
+      lng: -15.4134,
+      defaultZoom: 13,
+    };
+    const { rerender } = await render(<MapStage {...baseProps} />);
+    await fireEvent(screen.getByTestId('map-view'), 'regionChangeComplete', panned);
+    await rerender(<MapStage {...baseProps} city={lasPalmas} />);
+    expect(screen.getByTestId('map-view').props.initialRegion).toEqual(cityRegion(lasPalmas));
   });
 });

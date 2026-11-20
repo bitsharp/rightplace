@@ -7,7 +7,7 @@ import { AppState } from 'react-native';
 import { useSession } from '@/features/auth/useSession';
 import { useMyChatRooms } from '@/features/chat/hooks';
 import { useMyDeclaration } from '@/features/map/hooks';
-import { useMapStore } from '@/features/map/store/mapStore';
+import { useCurrentCity } from '@/features/map/useCurrentCity';
 
 import {
   fetchActivity,
@@ -71,7 +71,7 @@ export function useActivity(enabled = true) {
 export const cityTimezoneKey = (citySlug: string) => ['cityTimezone', citySlug] as const;
 
 export function useCityTimezone() {
-  const citySlug = useMapStore((state) => state.citySlug);
+  const citySlug = useCurrentCity();
   return useQuery({
     queryKey: cityTimezoneKey(citySlug),
     queryFn: () => fetchCityTimezone(citySlug),

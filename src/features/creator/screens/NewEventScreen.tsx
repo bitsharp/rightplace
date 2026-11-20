@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
-import { useMapStore } from '@/features/map/store/mapStore';
+import { useCurrentCity } from '@/features/map/useCurrentCity';
 import { useCityVenues } from '@/features/venues/hooks';
 import { spacing } from '@/theme/tokens';
 
@@ -16,7 +16,7 @@ import { useEventForm } from '../useEventForm';
 export function NewEventScreen() {
   const { t } = useTranslation('creator');
   const { goBack } = useCreatorNavigation();
-  const { citySlug } = useMapStore();
+  const citySlug = useCurrentCity();
   const venues = useCityVenues(citySlug);
   const form = useEventForm({ onDone: goBack });
   return (

@@ -53,7 +53,10 @@ export function MapStage({
 }: Props) {
   const [fullScreen, setFullScreen] = useState(false);
   // Local framing only (never persisted), shared by both maps: whichever moved last wins.
-  const [region, setRegion] = useState<MapRegion | undefined>(undefined);
+  // Tied to its city: when the city changes the map goes back to the new city centre.
+  const [framing, setFraming] = useState<{ slug: string; region: MapRegion } | null>(null);
+  const region = framing && framing.slug === city?.slug ? framing.region : undefined;
+  const setRegion = (next: MapRegion) => city && setFraming({ slug: city.slug, region: next });
   return (
     <View testID="map-box" style={styles.box}>
       {city ? (

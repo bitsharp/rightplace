@@ -16,6 +16,7 @@ import { colors, spacing } from '@/theme/tokens';
 import { typography } from '@/theme/typography';
 
 import { setLocale, type MyProfile, type ProfileInput } from '../api';
+import { CityPicker } from '../components/CityPicker';
 import { AccountSection } from '../components/AccountSection';
 import { BlockedSection } from '../components/BlockedSection';
 import { FindMeByPhone } from '../components/FindMeByPhone';
@@ -58,6 +59,7 @@ export function ProfileTabScreen() {
         onLanguageChange={(locale) => void setLocale(locale).catch(() => setResult('NETWORK'))}
         errorMessage={result && result !== 'saved' ? t(`errors:rpc.${result}`) : undefined}
       />
+      <CityPicker locationOn={profile.locationOptIn} />
       {result === 'saved' ? <Toast tone="success" message={t('app.saved')} /> : null}
       {showCreatorProfileLink ? (
         <Link href="/creator" style={styles.link}>

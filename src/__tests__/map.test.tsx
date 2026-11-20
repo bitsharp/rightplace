@@ -151,8 +151,8 @@ describe('mappa', () => {
       expect(screen.queryByRole('button', { name: /Locale Fantasma/ })).toBeNull();
     });
 
-    it('chiede la mappa della città salvata nello store', async () => {
-      useMapStore.setState({ citySlug: 'las-palmas' });
+    it('chiede la mappa della città scelta nello store', async () => {
+      useMapStore.setState({ cityPreference: 'las-palmas' });
       await renderApp('ready', '/map');
       await waitFor(() =>
         expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_city_map', {

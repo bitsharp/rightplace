@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import type { MyDeclaration } from '@/features/map/api';
 import { MY_DECLARATION_KEY } from '@/features/map/hooks';
-import { useMapStore } from '@/features/map/store/mapStore';
+import { useCurrentCity } from '@/features/map/useCurrentCity';
 import { FALLBACK_TIMEZONE } from '@/features/notifications/api';
 import { stopDayAfterReminder } from '@/features/notifications/dayAfter';
 import { cityTimezoneKey } from '@/features/notifications/hooks';
@@ -22,7 +22,7 @@ export function useNewPost() {
   const target = usePostTarget();
   const create = useCreatePost();
   const queryClient = useQueryClient();
-  const citySlug = useMapStore((state) => state.citySlug);
+  const citySlug = useCurrentCity();
   const [caption, setCaption] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const photoFlow = usePhotoFlow(setPhotoUri);

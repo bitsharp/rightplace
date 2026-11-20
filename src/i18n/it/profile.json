@@ -38,6 +38,11 @@
       "en": "English"
     }
   },
+  "city": {
+    "title": "Città della mappa",
+    "auto": "Automatica (dalla tua posizione)",
+    "autoOff": "Attiva la posizione per scegliere la città in automatico; altrimenti usiamo {{city}}."
+  },
   "handle": {
     "step": "03 / 03 · Il tuo @tag",
     "title": "Scegli il tuo @tag",

@@ -22,6 +22,7 @@ import {
 import { buildOwnSpot, coordsOfVenue, type OwnSpot } from './domain/ownSpot';
 import { useCityMap, useMyDeclaration, useRecommendedVenue } from './hooks';
 import { useMapStore, type MapViewMode } from './store/mapStore';
+import { useCurrentCity } from './useCurrentCity';
 
 const NO_ROWS: readonly MapVenue[] = [];
 const NO_FRIEND_VENUES: FriendVenue[] = [];
@@ -91,7 +92,8 @@ function useMapLayers(citySlug: string, view: MapViewMode) {
 export function useMapScreen() {
   const router = useRouter();
   const { profile } = useSession();
-  const { view, setView, citySlug } = useMapStore();
+  const { view, setView } = useMapStore();
+  const citySlug = useCurrentCity();
   const cities = useActiveCities();
   const { layers, generalRows, loaded, loadFailed } = useMapLayers(citySlug, view);
   const eventSpots = useEventSpots(citySlug, view, layers.hotSpots);
