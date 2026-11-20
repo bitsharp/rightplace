@@ -93,11 +93,16 @@ export function setProfileCity(citySlug: string): Promise<void> {
   return callRpc('set_profile_city', { p_city_slug: citySlug });
 }
 
-export function completeProfile(input: ProfileInput): Promise<void> {
+// citySlug is the city already on the profile (or the one resolved on the device): saving the profile
+// must never reset it to the launch default.
+export function completeProfile(
+  input: ProfileInput,
+  citySlug: string = DEFAULT_CITY_SLUG,
+): Promise<void> {
   return callRpc('complete_profile', {
     p_birth_date: input.birthDate,
     p_gender: input.gender,
-    p_city_slug: DEFAULT_CITY_SLUG,
+    p_city_slug: citySlug,
     p_locale: input.locale,
     p_location_opt_in: input.locationOptIn,
     p_contacts_opt_in: input.contactsOptIn,

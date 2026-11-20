@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 
+import { useCurrentCity } from '@/features/map/useCurrentCity';
 import { useSession } from '@/features/auth/useSession';
 import { RpcError, type RpcErrorCode } from '@/lib/rpcError';
 
@@ -12,10 +13,12 @@ import { myProfileKey } from './hooks';
 // Saves through complete_profile (the only write path for age/gender/creator) and refreshes the session.
 export function useSaveProfile() {
   const queryClient = useQueryClient();
-  const { userId } = useSession();
+  const { userId, profile } = useSession();
+  // Last resort is the default city, which useCurrentCity falls back to (new user at onboarding).
+  const citySlug = useCurrentCity();
   return async (input: ProfileInput): Promise<RpcErrorCode | null> => {
     try {
-      await completeProfile(input);
+      await completeProfile(input, profile?.citySlug ?? citySlug);
       // Turning contacts off also withdraws the hash of my number, so nobody can find me by it.
       if (!input.contactsOptIn) {
         await clearMyPhoneHash();
