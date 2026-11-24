@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 
 import { YouMarker } from '@/components/app/YouMarker';
@@ -14,6 +14,7 @@ import { cityRegion, type CityCenter, type MapRegion } from '../domain/region';
 import { mapAppearance } from '../mapStyle';
 import type { MapViewMode } from '../store/mapStore';
 
+import { MapVignette } from './MapVignette';
 import {
   EventMarkers,
   HotSpotMarkers,
@@ -121,12 +122,21 @@ export function MapCanvas({
       ) : null}
     </MapView>
   );
-  if (!onPickSpot) return map;
   return (
-    <SpotPressSurface mapRef={mapRef} onPick={onPickSpot}>
-      {map}
-    </SpotPressSurface>
+    <View style={styles.canvas}>
+      {onPickSpot ? (
+        <SpotPressSurface mapRef={mapRef} onPick={onPickSpot}>
+          {map}
+        </SpotPressSurface>
+      ) : (
+        map
+      )}
+      <MapVignette />
+    </View>
   );
 }
 
-const styles = StyleSheet.create({ map: StyleSheet.absoluteFill });
+const styles = StyleSheet.create({
+  canvas: StyleSheet.absoluteFill,
+  map: StyleSheet.absoluteFill,
+});

@@ -86,6 +86,18 @@ describe('MapFullScreen', () => {
     expect(screen.getByRole('button', { name: 'map:fullscreen.close' })).toBeOnTheScreen();
   });
 
+  it('a schermo intero la mappa ha il velo, che non copre hint e legenda (restano sopra, senza tocchi)', async () => {
+    await render(<MapFullScreen {...baseProps} />);
+    expect(screen.getByTestId('map-vignette', { includeHiddenElements: true })).toBeOnTheScreen();
+    const map = screen.getByTestId('map-fullscreen-map');
+    const order = (id: string) =>
+      map.children.findIndex(
+        (child) => (child as { props?: { testID?: string } }).props?.testID === id,
+      );
+    expect(order('map-hint-overlay')).toBeGreaterThan(-1);
+    expect(order('map-legend-overlay')).toBeGreaterThan(-1);
+  });
+
   it('il selettore cambia la vista', async () => {
     await render(<MapFullScreen {...baseProps} />);
     await fireEvent.press(screen.getByRole('button', { name: 'map:view.friends' }));

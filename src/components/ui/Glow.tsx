@@ -8,20 +8,24 @@ type Props = {
   color?: string;
   // Radius in points: the view is 2 × radius wide and tall.
   radius?: number;
+  // 1 = the base halo; above 1 it is brighter, same size.
+  intensity?: number;
   style?: ViewStyle;
   testID?: string;
 };
 
-export function glowStops(color: string) {
+// Intensity scales the opacity of every stop (capped at 1) and never changes the halo's size.
+export function glowStops(color: string, intensity = 1) {
+  const level = (opacity: number) => Math.min(1, opacity * intensity);
   return [
-    { offset: 0, color, opacity: 0.9 },
-    { offset: 0.45, color, opacity: 0.35 },
+    { offset: 0, color, opacity: level(0.9) },
+    { offset: 0.45, color, opacity: level(0.35) },
     { offset: 1, color, opacity: 0 },
   ] as const;
 }
 
 // Radial halo drawn with SVG (no native gradient/blur dependency). Purely decorative: it never takes touches.
-export function Glow({ color = colors.primary, radius = 60, style, testID }: Props) {
+export function Glow({ color = colors.primary, radius = 60, intensity = 1, style, testID }: Props) {
   const size = radius * 2;
   const gradientId = `glow-${color.replace('#', '')}`;
   return (
@@ -35,7 +39,7 @@ export function Glow({ color = colors.primary, radius = 60, style, testID }: Pro
       <Svg width={size} height={size}>
         <Defs>
           <RadialGradient id={gradientId} cx="50%" cy="50%" r="50%">
-            {glowStops(color).map((stop) => (
+            {glowStops(color, intensity).map((stop) => (
               <Stop
                 key={stop.offset}
                 offset={stop.offset}

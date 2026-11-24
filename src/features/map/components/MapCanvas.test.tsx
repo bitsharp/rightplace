@@ -43,6 +43,16 @@ describe('MapCanvas', () => {
     expect(screen.getByTestId('map-view')).toHaveProp('userInterfaceStyle', 'dark');
   });
 
+  it('mette il velo luminoso sopra la mappa, senza intercettare i gesti, con e senza pressione lunga', async () => {
+    const layers = { hotSpots: [], typicalDots: [], spots: [] };
+    const { rerender } = await render(<MapCanvas {...baseProps} layers={layers} />);
+    const veil = () => screen.getByTestId('map-vignette', { includeHiddenElements: true });
+    expect(veil().props.pointerEvents).toBe('none');
+    await rerender(<MapCanvas {...baseProps} layers={layers} onPickSpot={jest.fn()} />);
+    expect(veil().props.pointerEvents).toBe('none');
+    expect(screen.getByTestId('map-press-surface')).toBeOnTheScreen();
+  });
+
   it('parte dal centro della città', async () => {
     await render(
       <MapCanvas {...baseProps} layers={{ hotSpots: [], typicalDots: [], spots: [] }} />,

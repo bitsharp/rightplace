@@ -40,6 +40,8 @@ const INTENT_STYLE: Record<
 const INNER_SCALE = 0.42;
 // The halo is part of the marker bitmap on Android: the box must be as big as the halo or it is cut.
 const GLOW_SCALE = 1.9;
+// Brighter than the base halo, as in the mock-up; the size per band stays the same.
+const GLOW_INTENSITY = 1.6;
 
 function hotSpotLayout(goingBand: Band, maybeBand: Band) {
   const main = dominantIntent(goingBand, maybeBand);
@@ -74,7 +76,12 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
       onPress={onPress}
       style={[styles.center, { width: box, height: box }]}
     >
-      <Glow testID="hot-spot-glow" color={INTENT_STYLE[main].shadowColor} radius={box / 2} />
+      <Glow
+        testID="hot-spot-glow"
+        color={INTENT_STYLE[main].shadowColor}
+        radius={box / 2}
+        intensity={GLOW_INTENSITY}
+      />
       <View
         testID="hot-spot-outer"
         style={[styles.circle, styles.center, glow, INTENT_STYLE[main], circle(diameter)]}

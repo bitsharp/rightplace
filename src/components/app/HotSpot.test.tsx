@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
+import { Glow } from '@/components/ui/Glow';
+import { gradientStops } from '@/test/svgGradient';
 import { colors } from '@/theme/tokens';
 
 import { HotSpot } from './HotSpot';
@@ -105,5 +107,22 @@ describe('HotSpot', () => {
     const [container] = [screen.getByRole('button', { hidden: true })];
     const flat = (style: unknown) => Object.assign({}, ...[style].flat(Infinity));
     expect(flat(container.props.style).width).toBeGreaterThanOrEqual(flat(glow.props.style).width);
+  });
+
+  it('il bagliore è più acceso di quello di base, a parità di dimensioni per fascia', async () => {
+    const opacities = (testID: string) =>
+      gradientStops(screen.getByTestId(testID, { includeHiddenElements: true }))[0]?.map(
+        (stop) => stop.alpha,
+      ) ?? [];
+    await render(
+      <>
+        <HotSpot venueName="A" goingBand="30–50" maybeBand="pochi" onPress={jest.fn()} />
+        <Glow testID="base-glow" radius={10} />
+      </>,
+    );
+    const hot = opacities('hot-spot-glow');
+    const base = opacities('base-glow');
+    expect(hot[1] ?? 0).toBeGreaterThan(base[1] ?? 1);
+    expect(hot[0] ?? 2).toBeLessThanOrEqual(1);
   });
 });

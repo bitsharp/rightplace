@@ -22,6 +22,11 @@ describe('MapStage compatta', () => {
     expect(screen.queryByText('map:legend.usually')).toBeNull();
   });
 
+  it('la mappa compatta ha il velo luminoso', async () => {
+    await render(<MapStage {...baseProps} />);
+    expect(screen.getByTestId('map-vignette', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+
   it('ha un solo bottone, con icona e senza testo visibile, per aprire lo schermo intero', async () => {
     await render(<MapStage {...baseProps} />);
     const open = screen.getByRole('button', { name: 'map:fullscreen.open' });

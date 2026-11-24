@@ -27,3 +27,16 @@ describe('Glow', () => {
     expect(stops[stops.length - 1]).toMatchObject({ offset: 1, opacity: 0 });
   });
 });
+
+describe('glowStops: intensità', () => {
+  it('con intensità maggiore è più luminoso a ogni passo, senza superare l’opacità piena', () => {
+    const base = glowStops(colors.going);
+    const bright = glowStops(colors.going, 1.6);
+    bright.forEach((stop, index) => {
+      expect(stop.opacity).toBeLessThanOrEqual(1);
+      expect(stop.opacity).toBeGreaterThanOrEqual(base[index]?.opacity ?? 0);
+    });
+    expect(bright[1]?.opacity).toBeGreaterThan(base[1]?.opacity ?? 1);
+    expect(bright[bright.length - 1]?.opacity).toBe(0);
+  });
+});
