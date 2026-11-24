@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
+import { DEFAULT_MAX_FACES } from '@/components/app/FriendFaces';
 import { isTonight } from '@/features/creator/domain/eventRow';
 import { useCityEvents } from '@/features/events/hooks';
 import { useSession } from '@/features/auth/useSession';
@@ -17,6 +18,7 @@ import {
   buildGeneralLayers,
   featuredHotSpot,
   mapBanner,
+  shownFaceIds,
   type FriendVenue,
   type HotSpotVenue,
   type MapVenue,
@@ -120,7 +122,7 @@ export function useMapScreen() {
   const { layers, generalRows, loaded, loadFailed } = useMapLayers(citySlug, view);
   // One batch for the whole screen (top bar and friends map); the general map asks for no friend photo at all.
   const friendIds = useMemo(
-    () => (view === 'friends' ? layers.friendVenues.flatMap((venue) => venue.friendIds) : NO_IDS),
+    () => (view === 'friends' ? shownFaceIds(layers.friendVenues, DEFAULT_MAX_FACES) : NO_IDS),
     [view, layers.friendVenues],
   );
   const topBar = useTopBar(friendIds);

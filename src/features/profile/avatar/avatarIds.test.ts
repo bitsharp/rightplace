@@ -5,10 +5,10 @@ describe('normalizeAvatarIds', () => {
     expect(normalizeAvatarIds(['b', '', 'a', 'b', undefined, null])).toEqual(['a', 'b']);
   });
 
-  it('non supera il massimo accettato dal server (100)', () => {
+  it('non scarta nessuna persona oltre 100: il server accetta 100 id a richiesta, le richieste si dividono', () => {
     const many = Array.from({ length: 150 }, (_, i) => `u${String(i).padStart(3, '0')}`);
     expect(MAX_AVATAR_IDS).toBe(100);
-    expect(normalizeAvatarIds(many)).toHaveLength(100);
+    expect(normalizeAvatarIds(many)).toHaveLength(150);
   });
 
   it('una lista vuota resta vuota', () => {

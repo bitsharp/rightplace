@@ -1,9 +1,9 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 
 import { EventSpot } from '@/components/app/EventSpot';
-import { FriendFaces } from '@/components/app/FriendFaces';
+import { DEFAULT_MAX_FACES, FriendFaces } from '@/components/app/FriendFaces';
 import { HotSpot } from '@/components/app/HotSpot';
 import { OwnSpot } from '@/components/app/OwnSpot';
 import { SpotMarker } from '@/components/app/SpotMarker';
@@ -25,6 +25,8 @@ type MarkerProps = {
   contentKey: string;
   coordinate: LatLng;
   zIndex: number;
+  // Photos still downloading inside the marker: keep capturing until they are drawn (see usePhotoWait).
+  waitingForPhotos?: boolean;
   anchor?: { x: number; y: number };
   onPress?: () => void;
   children: ReactNode;
@@ -34,7 +36,13 @@ type MarkerProps = {
 const FIRST_RENDER_MS = 250;
 
 // The bitmap is frozen shortly after each content change: tracking all the time slows 30 markers.
-export function MapMarker({ coordinate, contentKey, children, ...props }: MarkerProps) {
+export function MapMarker({
+  coordinate,
+  contentKey,
+  waitingForPhotos = false,
+  children,
+  ...props
+}: MarkerProps) {
   const [settledKey, setSettledKey] = useState<string | null>(null);
   useEffect(() => {
     const timer = setTimeout(() => setSettledKey(contentKey), FIRST_RENDER_MS);
@@ -44,7 +52,7 @@ export function MapMarker({ coordinate, contentKey, children, ...props }: Marker
     <Marker
       coordinate={{ latitude: coordinate.lat, longitude: coordinate.lng }}
       anchor={{ x: 0.5, y: 0.5 }}
-      tracksViewChanges={settledKey !== contentKey}
+      tracksViewChanges={settledKey !== contentKey || waitingForPhotos}
       {...props}
     >
       {children}
@@ -59,37 +67,86 @@ type AvatarUrls = Record<string, string>;
 
 const facesOf = (venue: MapVenue) => friendFacesOf(venue.friendsGoing ?? [], venue.friendIds);
 
-// Re-capture the marker bitmap when a photo arrives (the faces are part of it).
-const facesKey = (venue: MapVenue, view: MapViewMode, urls: AvatarUrls) =>
-  view === 'friends'
-    ? facesOf(venue)
-        .map((face) => (urls[face.userId] ? 1 : 0))
-        .join('')
-    : '';
+// A photo that never answers must not keep the marker tracking (30 markers slow the map): after this we
+// freeze it with the initial.
+export const PHOTO_WAIT_MS = 3000;
 
-// Faces only on the friends map (principle 1: a photo is for accepted follows): the general map never draws one.
-// The spacer above balances the faces below, so the marker stays centred on the venue.
-function WithFriendFaces({
-  venue,
-  view,
-  urls,
-  children,
-}: {
+type FaceState = 'initial' | 'loading' | 'drawn';
+
+// Photos are part of the marker bitmap. The bitmap is frozen shortly after a content change, but a photo
+// arrives later (signed URL, then the download): without waiting, the marker keeps the initial for good.
+function usePhotoWait(faces: readonly { userId: string }[], urls: AvatarUrls) {
+  const [drawn, setDrawn] = useState<ReadonlySet<string>>(new Set());
+  const [gaveUp, setGaveUp] = useState('');
+  const withPhoto = faces.slice(0, DEFAULT_MAX_FACES).filter((face) => urls[face.userId]);
+  const stateOf = (userId: string): FaceState =>
+    !urls[userId] ? 'initial' : drawn.has(`${userId}|${urls[userId]}`) ? 'drawn' : 'loading';
+  const pendingIds = withPhoto
+    .filter((face) => stateOf(face.userId) === 'loading')
+    .map((face) => `${face.userId}|${urls[face.userId]}`)
+    .join(',');
+  useEffect(() => {
+    if (!pendingIds) return;
+    const timer = setTimeout(() => setGaveUp(pendingIds), PHOTO_WAIT_MS);
+    return () => clearTimeout(timer);
+  }, [pendingIds]);
+  const onFaceSettled = useCallback(
+    (userId: string) => setDrawn((prev) => new Set(prev).add(`${userId}|${urls[userId]}`)),
+    [urls],
+  );
+  // Part of contentKey: when a photo is drawn the bitmap is captured again.
+  const key = faces
+    .slice(0, DEFAULT_MAX_FACES)
+    .map((face) => stateOf(face.userId)[0])
+    .join('');
+  return { waiting: pendingIds !== '' && gaveUp !== pendingIds, key, onFaceSettled };
+}
+
+type FaceMarkerProps = {
   venue: MapVenue;
   view: MapViewMode;
   urls: AvatarUrls;
+  testID: string;
+  contentKey: string;
+  zIndex: number;
+  onOpenVenue: (venueId: string) => void;
   children: ReactNode;
-}) {
+};
+
+// A venue marker; on the friends map (principle 1: a photo is for accepted follows, the general map never
+// draws one) it carries the faces of the friends going. The spacer above balances the faces below, so the
+// marker stays centred on the venue.
+function VenueMarker({
+  venue,
+  view,
+  urls,
+  contentKey,
+  onOpenVenue,
+  children,
+  ...props
+}: FaceMarkerProps) {
   const faces = view === 'friends' ? facesOf(venue) : [];
-  if (faces.length === 0) return children;
+  const photos = usePhotoWait(faces, urls);
   return (
-    <View style={styles.stack}>
-      <View style={styles.faces} />
-      {children}
-      <View style={styles.faces}>
-        <FriendFaces friends={faces} urls={urls} />
-      </View>
-    </View>
+    <MapMarker
+      contentKey={`${contentKey}:${photos.key}`}
+      waitingForPhotos={photos.waiting}
+      coordinate={venue}
+      onPress={() => onOpenVenue(venue.venueId)}
+      {...props}
+    >
+      {faces.length === 0 ? (
+        children
+      ) : (
+        <View style={styles.stack}>
+          <View style={styles.faces} />
+          {children}
+          <View style={styles.faces}>
+            <FriendFaces friends={faces} urls={urls} onFaceSettled={photos.onFaceSettled} />
+          </View>
+        </View>
+      )}
+    </MapMarker>
   );
 }
 
@@ -141,31 +198,30 @@ export function HotSpotMarkers({
   onOpenVenue: (venueId: string) => void;
 }) {
   return hotSpots.map((venue) => (
-    <MapMarker
+    <VenueMarker
       key={venue.venueId}
+      venue={venue}
+      view={view}
+      urls={urls}
       contentKey={[
         venue.venueId,
         venue.goingBand,
         venue.maybeBand,
         view,
         venue.friendsCount ?? '',
-        facesKey(venue, view, urls),
       ].join(':')}
       testID={`marker-hot-${venue.venueId}`}
-      coordinate={venue}
       zIndex={Z_INDEX.hotSpot}
-      onPress={() => onOpenVenue(venue.venueId)}
+      onOpenVenue={onOpenVenue}
     >
-      <WithFriendFaces venue={venue} view={view} urls={urls}>
-        <HotSpot
-          venueName={venue.name}
-          goingBand={venue.goingBand}
-          maybeBand={venue.maybeBand}
-          caption={friendsCaption(venue, view)}
-          onPress={() => onOpenVenue(venue.venueId)}
-        />
-      </WithFriendFaces>
-    </MapMarker>
+      <HotSpot
+        venueName={venue.name}
+        goingBand={venue.goingBand}
+        maybeBand={venue.maybeBand}
+        caption={friendsCaption(venue, view)}
+        onPress={() => onOpenVenue(venue.venueId)}
+      />
+    </VenueMarker>
   ));
 }
 
@@ -181,28 +237,22 @@ export function SpotMarkers({
   onOpenVenue: (venueId: string) => void;
 }) {
   return spots.map((venue) => (
-    <MapMarker
+    <VenueMarker
       key={venue.venueId}
-      contentKey={[
-        venue.venueId,
-        venue.name,
-        view,
-        venue.friendsCount ?? '',
-        facesKey(venue, view, urls),
-      ].join(':')}
+      venue={venue}
+      view={view}
+      urls={urls}
+      contentKey={[venue.venueId, venue.name, view, venue.friendsCount ?? ''].join(':')}
       testID={`marker-spot-${venue.venueId}`}
-      coordinate={venue}
       zIndex={Z_INDEX.spot}
-      onPress={() => onOpenVenue(venue.venueId)}
+      onOpenVenue={onOpenVenue}
     >
-      <WithFriendFaces venue={venue} view={view} urls={urls}>
-        <SpotMarker
-          name={venue.name}
-          caption={friendsCaption(venue, view)}
-          onPress={() => onOpenVenue(venue.venueId)}
-        />
-      </WithFriendFaces>
-    </MapMarker>
+      <SpotMarker
+        name={venue.name}
+        caption={friendsCaption(venue, view)}
+        onPress={() => onOpenVenue(venue.venueId)}
+      />
+    </VenueMarker>
   ));
 }
 

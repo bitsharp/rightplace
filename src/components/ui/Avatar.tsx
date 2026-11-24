@@ -18,6 +18,8 @@ type Props = {
   size?: number;
   // Only passed when the server returned a URL, i.e. the viewer is allowed to see the photo.
   photo?: AvatarPhoto;
+  // The picture finished loading or failed: a map marker (a frozen bitmap) waits for this to capture it.
+  onPhotoSettled?: () => void;
 };
 
 const INTENT_COLORS: Record<AvatarIntent, { borderColor: string; backgroundColor: string }> = {
@@ -35,7 +37,7 @@ function usePhotoFailed(uri: string | undefined) {
   };
 }
 
-export function Avatar({ intent, initial, size = 44, photo }: Props) {
+export function Avatar({ intent, initial, size = 44, photo, onPhotoSettled }: Props) {
   const { failed, markFailed } = usePhotoFailed(photo?.uri);
   const showPhoto = photo !== undefined && !failed;
   return (
@@ -55,7 +57,11 @@ export function Avatar({ intent, initial, size = 44, photo }: Props) {
           source={{ uri: photo.uri, cacheKey: photo.cacheKey }}
           cachePolicy="memory"
           contentFit="cover"
-          onError={markFailed}
+          onLoad={onPhotoSettled}
+          onError={() => {
+            markFailed();
+            onPhotoSettled?.();
+          }}
           style={StyleSheet.absoluteFill}
         />
       ) : initial ? (

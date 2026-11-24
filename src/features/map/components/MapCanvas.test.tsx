@@ -268,6 +268,67 @@ describe('MapCanvas', () => {
       expect(tracks('hot-hot')).toBe(false);
     });
 
+    describe('foto degli amici', () => {
+      const friendsLayers = () => ({
+        hotSpots: [
+          venue({
+            venueId: 'hot',
+            friendsCount: 2,
+            friendsGoing: ['volpe.viola', 'orso.grigio'],
+            friendIds: ['u-volpe', 'u-orso'],
+          }),
+        ],
+        typicalDots: [],
+        spots: [],
+      });
+      const urls = { 'u-volpe': 'https://signed.test/v', 'u-orso': 'https://signed.test/o' };
+      const renderFriends = () =>
+        render(
+          <MapCanvas {...baseProps} view="friends" layers={friendsLayers()} avatarUrls={urls} />,
+        );
+      const photo = (index: number) =>
+        screen.getAllByTestId('avatar-image', { includeHiddenElements: true })[index]!;
+
+      it('resta in tracking finché tutte le foto non sono caricate, poi si ferma', async () => {
+        await renderFriends();
+        await settle();
+        expect(tracks('hot-hot')).toBe(true);
+        await fireEvent(photo(0), 'load', { nativeEvent: {} });
+        await settle();
+        expect(tracks('hot-hot')).toBe(true);
+        await fireEvent(photo(1), 'load', { nativeEvent: {} });
+        expect(tracks('hot-hot')).toBe(true);
+        await settle();
+        expect(tracks('hot-hot')).toBe(false);
+      });
+
+      it('una foto che non si carica (onError) lascia l’iniziale e ferma il tracking', async () => {
+        await renderFriends();
+        await fireEvent(photo(0), 'load', { nativeEvent: {} });
+        await fireEvent(photo(1), 'error', { nativeEvent: { error: 'x' } });
+        await settle();
+        expect(tracks('hot-hot')).toBe(false);
+        expect(screen.getByText('O', { includeHiddenElements: true })).toBeOnTheScreen();
+      });
+
+      it('dopo 3 secondi smette comunque di tracciare (la rete può non rispondere mai)', async () => {
+        await renderFriends();
+        await act(async () => jest.advanceTimersByTime(2900));
+        expect(tracks('hot-hot')).toBe(true);
+        await act(async () => jest.advanceTimersByTime(300));
+        await settle();
+        expect(tracks('hot-hot')).toBe(false);
+      });
+
+      it('senza foto firmate (nessun legame) non aspetta nulla: iniziale e bitmap ferma', async () => {
+        await render(
+          <MapCanvas {...baseProps} view="friends" layers={friendsLayers()} avatarUrls={{}} />,
+        );
+        await settle();
+        expect(tracks('hot-hot')).toBe(false);
+      });
+    });
+
     it('con dati identici resta fermo', async () => {
       const layers = () => ({ hotSpots: [venue({ venueId: 'hot' })], typicalDots: [], spots: [] });
       const { rerender } = await render(<MapCanvas {...baseProps} layers={layers()} />);

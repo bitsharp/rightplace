@@ -3,6 +3,7 @@ import {
   buildGeneralLayers,
   featuredHotSpot,
   friendFacesOf,
+  shownFaceIds,
   mapBanner,
   type HotSpotVenue,
   type MapVenue,
@@ -80,6 +81,13 @@ describe('friendFacesOf', () => {
 
   it('senza id (vista generale) non produce volti', () => {
     expect(friendFacesOf(['volpe.viola'], null)).toEqual([]);
+  });
+});
+
+describe('shownFaceIds', () => {
+  it('chiede solo le foto che le righe disegnano (i primi due volti), non tutti gli amici', () => {
+    const rows = [{ friendIds: ['a', 'b', 'c'] }, { friendIds: ['d'] }, { friendIds: null }];
+    expect(shownFaceIds(rows, 2)).toEqual(['a', 'b', 'd']);
   });
 });
 

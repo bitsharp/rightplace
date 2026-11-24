@@ -10,6 +10,22 @@ jest.mock('@/lib/photos/photos', () => ({
 const invoke = fakeSupabase.functions.invoke;
 
 describe('fetchAvatarUrls', () => {
+  it('oltre 100 id divide in più richieste e unisce i risultati (nessuna foto scartata)', async () => {
+    const ids = Array.from({ length: 130 }, (_, i) => `u${String(i).padStart(3, '0')}`);
+    invoke.mockImplementation(async (_name: string, options?: unknown) => {
+      const { body } = options as { body: { userIds: string[] } };
+      return {
+        data: {
+          urls: body.userIds.slice(-1).map((userId) => ({ userId, url: `https://s/${userId}` })),
+        },
+        error: null,
+      };
+    });
+    const urls = await fetchAvatarUrls(ids);
+    expect(invoke).toHaveBeenCalledTimes(2);
+    expect(Object.keys(urls).sort()).toEqual(['u099', 'u129']);
+  });
+
   it('chiede alla Edge Function solo gli id e restituisce una mappa id -> URL', async () => {
     invoke.mockResolvedValueOnce({
       data: { urls: [{ userId: 'u1', url: 'https://signed.test/u1' }] },

@@ -116,3 +116,12 @@ export function mapBanner(layers: MapLayers): MapBanner {
   if (layers.hotSpots.length > 0 || layers.spots.length > 0) return 'none';
   return layers.typicalDots.length > 0 ? 'typicalOnly' : 'empty';
 }
+
+// The people whose photo a row or marker draws (the first faces only): the batch asks for these, so a venue
+// with many friends never pushes the visible ones out of the request.
+export function shownFaceIds(
+  rows: readonly { friendIds: readonly string[] | null }[],
+  perRow: number,
+): string[] {
+  return rows.flatMap((row) => (row.friendIds ?? []).slice(0, perRow));
+}

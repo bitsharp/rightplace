@@ -25,6 +25,12 @@ La regola vive nel database, non nel client:
 - Le URL firmate cambiano a ogni richiesta: `expo-image` le tiene solo in memoria (`cachePolicy: 'memory'`, chiave = id utente), le query hanno `meta: { persist: false }` e `staleTime` di 50 minuti. Nessuna foto altrui va su disco.
 - Eliminazione account: `delete_my_account()` accoda l'avatar e azzera `avatar_path`.
 
+## Foto degli amici su mappa e liste: se non si vede
+
+- **Vedo l'iniziale**: è il comportamento corretto quando la persona non ha caricato una foto o non c'è un follow accettato con me in nessuna delle due direzioni (`private.is_linked`), oppure c'è un blocco. Il server non firma l'URL e il client non può "indovinarlo".
+- **Vedo l'iniziale ma la foto c'è e il legame c'è**: sui marker della mappa la bitmap viene congelata; `MapMarkers` tiene il tracking acceso finché le foto dei volti non hanno chiamato `onLoad`/`onError` (tetto 3 s, `PHOTO_WAIT_MS`). Se la rete è lenta oltre il tetto, il marker resta con l'iniziale fino al prossimo cambio di contenuto.
+- Gli URL sono in cache per singolo utente (50 minuti, solo memoria, `['avatarUrls','user',id]`): dopo cambio o rimozione foto vengono dimenticati. Una lista con più di 100 persone si divide in più richieste a `avatar-urls`.
+
 ## Moderazione (principio 7)
 
 Nessuna superficie nuova da moderare in modo diverso:

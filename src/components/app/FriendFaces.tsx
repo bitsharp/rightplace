@@ -15,12 +15,23 @@ type Props = {
   urls: Record<string, string>;
   max?: number;
   size?: number;
+  // A face's photo loaded or failed (see Avatar.onPhotoSettled): the map marker bitmap needs to know.
+  onFaceSettled?: (userId: string) => void;
 };
 
 const OVERLAP = 8;
 
+// How many faces a row or marker draws unless told otherwise: only these photos are ever requested.
+export const DEFAULT_MAX_FACES = 2;
+
 // A few overlapping faces plus "+N": the friends of one venue on the friends map, no numbers about strangers.
-export function FriendFaces({ friends, urls, max = 2, size = 28 }: Props) {
+export function FriendFaces({
+  friends,
+  urls,
+  max = DEFAULT_MAX_FACES,
+  size = 28,
+  onFaceSettled,
+}: Props) {
   if (friends.length === 0) return null;
   const shown = friends.slice(0, max);
   const more = friends.length - shown.length;
@@ -33,6 +44,7 @@ export function FriendFaces({ friends, urls, max = 2, size = 28 }: Props) {
             initial={friend.handle.charAt(0)}
             size={size}
             photo={avatarPhotoFor(urls, friend.userId)}
+            onPhotoSettled={onFaceSettled ? () => onFaceSettled(friend.userId) : undefined}
           />
         </View>
       ))}

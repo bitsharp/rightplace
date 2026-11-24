@@ -278,7 +278,8 @@ describe('mappa', () => {
       );
       expect(withFriends).toHaveLength(1);
       expect(withFriends[0]?.[1]).toEqual({
-        body: { userIds: ['u-gatto', 'u-orso', 'u-volpe', 'user-1'] },
+        // my own photo was already asked for with the top bar: nobody is requested twice
+        body: { userIds: ['u-gatto', 'u-orso', 'u-volpe'] },
       });
     });
 

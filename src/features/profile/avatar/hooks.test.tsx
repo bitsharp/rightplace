@@ -35,6 +35,66 @@ describe('useAvatarUrls', () => {
     expect(query?.observers[0]?.options.staleTime).toBe(50 * 60 * 1000);
   });
 
+  it('un altro elenco con gli stessi utenti trova subito gli URL già noti, senza nuova richiesta', async () => {
+    invoke.mockResolvedValue({
+      data: { urls: [{ userId: 'a', url: 'https://signed.test/a' }] },
+      error: null,
+    });
+    const { Wrapper } = createQueryWrapper();
+    const first = await renderHook(() => useAvatarUrls(['a', 'b']), { wrapper: Wrapper });
+    await waitFor(() => expect(first.result.current).toEqual({ a: 'https://signed.test/a' }));
+    const second = await renderHook(() => useAvatarUrls(['a']), { wrapper: Wrapper });
+    expect(second.result.current).toEqual({ a: 'https://signed.test/a' });
+    const third = await renderHook(() => useAvatarUrls(['b', 'a']), { wrapper: Wrapper });
+    expect(third.result.current).toEqual({ a: 'https://signed.test/a' });
+    expect(invoke).toHaveBeenCalledTimes(1);
+  });
+
+  it('chiede solo i nuovi quando l’elenco cresce e intanto mostra gli URL già noti', async () => {
+    invoke
+      .mockResolvedValueOnce({
+        data: { urls: [{ userId: 'a', url: 'https://signed.test/a' }] },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { urls: [{ userId: 'c', url: 'https://signed.test/c' }] },
+        error: null,
+      });
+    const { Wrapper } = createQueryWrapper();
+    const { result, rerender } = await renderHook(
+      ({ ids }: { ids: string[] }) => useAvatarUrls(ids),
+      { wrapper: Wrapper, initialProps: { ids: ['a'] } },
+    );
+    await waitFor(() => expect(result.current).toEqual({ a: 'https://signed.test/a' }));
+    await rerender({ ids: ['a', 'c'] });
+    expect(result.current).toEqual({ a: 'https://signed.test/a' });
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        a: 'https://signed.test/a',
+        c: 'https://signed.test/c',
+      }),
+    );
+    expect(invoke).toHaveBeenLastCalledWith('avatar-urls', { body: { userIds: ['c'] } });
+  });
+
+  it('gli URL per singolo utente non si salvano su disco', async () => {
+    invoke.mockResolvedValue({
+      data: { urls: [{ userId: 'a', url: 'https://signed.test/a' }] },
+      error: null,
+    });
+    const { client, Wrapper } = createQueryWrapper();
+    await renderHook(() => useAvatarUrls(['a']), { wrapper: Wrapper });
+    await waitFor(() => expect(invoke).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(
+        client.getQueryCache().findAll({ queryKey: [...AVATAR_URLS_ROOT_KEY, 'user'] }),
+      ).not.toHaveLength(0),
+    );
+    for (const query of client.getQueryCache().findAll({ queryKey: AVATAR_URLS_ROOT_KEY })) {
+      expect(query.meta).toEqual({ persist: false });
+    }
+  });
+
   it('senza id non parte nessuna richiesta', async () => {
     const { Wrapper } = createQueryWrapper();
     const { result } = await renderHook(() => useAvatarUrls([undefined]), { wrapper: Wrapper });

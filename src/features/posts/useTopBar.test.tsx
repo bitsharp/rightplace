@@ -100,8 +100,11 @@ describe('useTopBar', () => {
       uri: 'https://signed.test/a/u2',
       cacheKey: 'u2',
     });
-    const last = fakeSupabase.functions.invoke.mock.calls.at(-1);
-    expect(last).toEqual(['avatar-urls', { body: { userIds: ['me', 'u2'] } }]);
+    // each person is asked for once: the later request carries only who was not known yet
+    const asked = fakeSupabase.functions.invoke.mock.calls.flatMap(
+      ([, options]) => (options as { body: { userIds: string[] } }).body.userIds,
+    );
+    expect(asked.sort()).toEqual(['me', 'u2']);
   });
 
   it('espone la mia foto per la barra, nella stessa richiesta degli id extra della schermata', async () => {
