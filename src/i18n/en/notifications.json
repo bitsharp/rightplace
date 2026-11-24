@@ -17,7 +17,8 @@
     "chat": "Chats and nights",
     "feed": "Feed",
     "creator": "Creator",
-    "supporto": "Feedback received"
+    "supporto": "Feedback received",
+    "messaggi": "Messages"
   },
   "prePermission": {
     "label": "NOTIFICATIONS",
@@ -56,6 +57,10 @@
       "support": {
         "title": "Feedback received",
         "description": "A notice when someone sends feedback."
+      },
+      "dm": {
+        "title": "Messages",
+        "description": "A notice when a friend writes to you. Never the text of the message."
       }
     },
     "days": {

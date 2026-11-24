@@ -12,7 +12,12 @@ import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 import { BackHeader } from '@/features/profile/components/BackHeader';
 import { isProfileOpen } from '@/features/profile/summary/profileOpen';
 import { useProfileSummary } from '@/features/profile/summary/hooks';
+import { canMessage } from '@/features/dm/domain/linked';
+import { useStartDm } from '@/features/dm/useStartDm';
+import { Toast } from '@/components/ui/Toast';
 import { colors, spacing } from '@/theme/tokens';
+
+import type { DmError as DmErrorCode } from '@/features/dm/api';
 
 import type { SearchResult } from '../api';
 import { PersonSheet } from '../components/PersonSheet';
@@ -33,6 +38,7 @@ export function PublicProfileScreen({ handle }: { handle: string }) {
   const grid = useProfileGrid(person?.userId ?? '', open);
   const avatars = useAvatarUrls([person?.userId]);
   const [moderating, setModerating] = useState(false);
+  const dm = useStartDm();
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
@@ -51,6 +57,11 @@ export function PublicProfileScreen({ handle }: { handle: string }) {
               avatarPhoto={avatarPhotoFor(avatars, person.userId)}
               onAction={actions.run}
               onMore={() => setModerating(true)}
+              onMessage={
+                canMessage(person)
+                  ? () => dm.start({ handle: person.handle, userId: person.userId })
+                  : undefined
+              }
             />
           }
           empty={<GridEmpty person={person} open={open} failed={grid.posts.isError} />}
@@ -59,6 +70,7 @@ export function PublicProfileScreen({ handle }: { handle: string }) {
           onLoadMore={grid.posts.loadMore}
         />
       ) : null}
+      <DmError error={dm.error} />
       <ProfileGridOverlays grid={grid} />
       <PersonSheet
         person={moderating ? (person ?? null) : null}
@@ -66,6 +78,15 @@ export function PublicProfileScreen({ handle }: { handle: string }) {
         onDone={() => setModerating(false)}
       />
     </SafeAreaView>
+  );
+}
+
+function DmError({ error }: { error: DmErrorCode | null }) {
+  const { t } = useTranslation('dm');
+  const { t: tErrors } = useTranslation('errors');
+  if (error === null) return null;
+  return (
+    <Toast message={error === 'NOT_LINKED' ? tErrors('rpc.NOT_LINKED') : t('profile.openError')} />
   );
 }
 

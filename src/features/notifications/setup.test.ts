@@ -44,9 +44,17 @@ describe('foreground behavior', () => {
 });
 
 describe('ensureAndroidChannels', () => {
-  const names = { promemoria: 'P', amici: 'A', chat: 'C', feed: 'F', creator: 'K', supporto: 'S' };
+  const names = {
+    promemoria: 'P',
+    amici: 'A',
+    chat: 'C',
+    feed: 'F',
+    creator: 'K',
+    supporto: 'S',
+    messaggi: 'M',
+  };
 
-  it('crea i sei canali su Android con i nomi tradotti', async () => {
+  it('crea i sette canali su Android con i nomi tradotti', async () => {
     Platform.OS = 'android';
     await ensureAndroidChannels(names);
     const ids = jest.mocked(Notifications.setNotificationChannelAsync).mock.calls.map(([id]) => id);

@@ -13,6 +13,7 @@ describe('routeForNotification', () => {
     ['rightplace://chat', '/chat'],
     ['rightplace://map', '/map'],
     ['rightplace://support/feedback', '/support/feedback'],
+    ['rightplace://dm/9f1c-22ab', '/dm/9f1c-22ab'],
   ])('%s apre %s', (url, route) => {
     expect(routeForNotification(url)).toBe(route);
   });
@@ -24,6 +25,8 @@ describe('routeForNotification', () => {
     expect(routeForNotification('rightplace://u/NON VALIDO')).toBe('/map');
     expect(routeForNotification('rightplace://post/../x')).toBe('/map');
     expect(routeForNotification('rightplace://post/a/b')).toBe('/map');
+    expect(routeForNotification('rightplace://dm/../x')).toBe('/map');
+    expect(routeForNotification('rightplace://dm/a/b')).toBe('/map');
     expect(routeForNotification('')).toBe('/map');
     expect(routeForNotification(null)).toBe('/map');
     expect(routeForNotification(undefined)).toBe('/map');

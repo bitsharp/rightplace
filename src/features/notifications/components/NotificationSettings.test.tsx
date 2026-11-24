@@ -71,6 +71,15 @@ describe('NotificationSettings', () => {
     );
   });
 
+  it('la categoria Messaggi è sempre visibile e si spegne da sola', async () => {
+    seed();
+    await renderSettings();
+    await fireEvent.press(
+      await screen.findByRole('switch', { name: 'notifications:settings.categories.dm.title' }),
+    );
+    await waitFor(() => expect(setCalls().at(-1)?.[1]).toEqual({ p_prefs: { dm: false } }));
+  });
+
   it('la categoria Creator c’è solo se l’area creator è visibile', async () => {
     mockCreator.showCreatorProfileLink = false;
     seed();

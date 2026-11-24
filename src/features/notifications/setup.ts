@@ -14,6 +14,7 @@ export const ANDROID_CHANNELS = [
   'feed',
   'creator',
   'supporto',
+  'messaggi',
 ] as const;
 export type AndroidChannelId = (typeof ANDROID_CHANNELS)[number];
 

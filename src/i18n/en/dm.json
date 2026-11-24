@@ -1,0 +1,42 @@
+{
+  "title": "Messages",
+  "tabs": {
+    "nights": "Nights",
+    "messages": "Messages",
+    "a11y": "Night chat or direct messages"
+  },
+  "inbox": {
+    "empty": "No conversations yet. To write to a friend, open their profile and tap Message.",
+    "loadError": "We can't load your messages. Try again shortly.",
+    "you": "You: {{text}}",
+    "unread": "Unread messages"
+  },
+  "thread": {
+    "banner": "Messages are deleted 7 days after they are sent.",
+    "placeholder": "Write a message",
+    "send": "Send",
+    "closed": "You can no longer message each other.",
+    "loadOlder": "Show earlier messages",
+    "loadError": "We can't load this conversation. Try again shortly.",
+    "back": "Back",
+    "openProfile": "Open profile",
+    "unknownPerson": "Messages"
+  },
+  "actions": {
+    "title": "Actions on {{handle}}",
+    "report": "Report message",
+    "block": "Block user",
+    "cancel": "Cancel",
+    "blockTitle": "Block {{handle}}?",
+    "blockBody": "You will no longer see each other: you stop following each other and the conversation closes.",
+    "blockConfirm": "Block",
+    "reported": "Report sent. Thank you.",
+    "blocked": "User blocked.",
+    "copyText": "Copy text",
+    "copyTitle": "Message actions"
+  },
+  "profile": {
+    "message": "Message",
+    "openError": "We couldn't open the conversation."
+  }
+}

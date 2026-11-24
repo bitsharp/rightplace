@@ -3,6 +3,7 @@ import enChat from './en/chat.json';
 import enCommon from './en/common.json';
 import enCreator from './en/creator.json';
 import enDev from './en/dev.json';
+import enDm from './en/dm.json';
 import enErrors from './en/errors.json';
 import enEvent from './en/event.json';
 import enFeed from './en/feed.json';
@@ -22,6 +23,7 @@ import itChat from './it/chat.json';
 import itCommon from './it/common.json';
 import itCreator from './it/creator.json';
 import itDev from './it/dev.json';
+import itDm from './it/dm.json';
 import itErrors from './it/errors.json';
 import itEvent from './it/event.json';
 import itFeed from './it/feed.json';
@@ -44,6 +46,7 @@ export const resources = {
     map: itMap,
     friends: itFriends,
     chat: itChat,
+    dm: itDm,
     feed: itFeed,
     feedback: itFeedback,
     notifications: itNotifications,
@@ -65,6 +68,7 @@ export const resources = {
     map: enMap,
     friends: enFriends,
     chat: enChat,
+    dm: enDm,
     feed: enFeed,
     feedback: enFeedback,
     notifications: enNotifications,

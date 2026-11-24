@@ -2,8 +2,12 @@ import { supabase } from '@/lib/supabase';
 
 import { backoffMs } from './realtime';
 
+// Where the INSERTs come from; the night chat by default, direct messages pass their own.
+type Source = { table: string; column: string; channel: string };
+
 type Options = {
   roomId: string;
+  source?: Source;
   onInsert: (row: unknown) => void;
   // Called after any gap in the connection: messages sent meanwhile were never delivered, so reload them.
   onRecovered: () => void;
@@ -49,15 +53,20 @@ class RoomChannel implements RoomConnection {
   private open() {
     const mine = ++this.generation;
     const { roomId, onInsert } = this.options;
+    const { table, column, channel } = this.options.source ?? {
+      table: 'chat_messages',
+      column: 'room_id',
+      channel: `room:${roomId}`,
+    };
     this.channel = supabase
-      .channel(`room:${roomId}`)
+      .channel(channel)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'chat_messages',
-          filter: `room_id=eq.${roomId}`,
+          table,
+          filter: `${column}=eq.${roomId}`,
         },
         (payload) => onInsert(payload.new),
       )

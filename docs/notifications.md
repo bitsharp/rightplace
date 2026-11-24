@@ -50,3 +50,10 @@ Mai il testo di un messaggio, mai una foto, mai un numero esatto: solo ids, hand
 - Le push remote **non funzionano in Expo Go su Android**: serve il dev client (o una build). Su Expo Go la registrazione del token fallisce senza crash e senza log del token.
 - Se la rete manca al logout, il token resta registrato all'account finché un altro account sullo stesso telefono lo registra (viene riassegnato) o `send-push` lo cancella per `DeviceNotRegistered`.
 - Il coalescing è per "giro" del dispatcher (1 minuto): una raffica a cavallo di due giri produce la prima push subito e il resto dopo 10 minuti.
+
+## Messaggi diretti (prompt 23)
+
+- Categoria `dm` (preferenza `dm`, attiva di default, toggle "Messaggi" in Profilo → Notifiche) e canale Android `messaggi`.
+- Una riga in coda per messaggio, `group_key = dm:<thread_id>`: più messaggi dello stesso thread diventano **una** push ("@handle ti ha scritto" / "N nuovi messaggi da @handle"; in inglese "@handle sent you a message" / "N new messages from @handle").
+- **Mai il testo del messaggio** nella push né nella coda: solo `thread_id` e handle del mittente. Deep link `rightplace://dm/<thread_id>`.
+- Nessuna push al mittente, a chi ha bloccato o è bloccato, a chi ha spento la categoria. Dettagli in `docs/direct-messages.md`.

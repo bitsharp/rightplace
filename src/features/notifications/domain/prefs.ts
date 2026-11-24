@@ -8,6 +8,7 @@ export const NOTIFICATION_CATEGORIES = [
   'feed',
   'creator',
   'support',
+  'dm',
 ] as const;
 export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 
@@ -27,6 +28,7 @@ export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
   feed: true,
   creator: true,
   support: true,
+  dm: true,
   reminderDays: [0, 1, 2, 3, 4, 5, 6],
   reminderTime: '18:00',
 };
@@ -40,6 +42,8 @@ const serverPrefsSchema = z.object({
   creator: z.boolean(),
   // only present for support accounts (set by the user); the server default has no such key
   support: z.boolean().optional(),
+  // absent until the server migration for direct messages is applied
+  dm: z.boolean().optional(),
   reminder_days: z.array(z.number().int().min(0).max(6)),
   reminder_time: z.string().regex(/^([01]\d|2[0-3]):(00|15|30|45)$/),
 });
@@ -54,6 +58,7 @@ export function parseNotificationPrefs(raw: unknown): NotificationPrefs {
     feed: row.feed,
     creator: row.creator,
     support: row.support ?? true,
+    dm: row.dm ?? true,
     reminderDays: [...row.reminder_days].sort((a, b) => a - b),
     reminderTime: row.reminder_time,
   };

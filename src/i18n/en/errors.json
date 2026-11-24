@@ -53,6 +53,10 @@
     "INVALID_SCREENSHOT": "The screenshot is not valid. Remove it and try again.",
     "INVALID_PLATFORM": "Unsupported platform.",
     "FEEDBACK_LIMIT": "You have already sent a lot of feedback today. Try again tomorrow.",
-    "INVALID_AVATAR_PATH": "We couldn't save your profile photo. Please try again."
+    "INVALID_AVATAR_PATH": "We couldn't save your profile photo. Please try again.",
+    "NOT_LINKED": "You can no longer message each other: an accepted follow between you is required.",
+    "RATE_LIMITED": "You are writing too fast. Try again shortly.",
+    "INVALID_TEXT": "The message must be 1 to 1000 characters.",
+    "SELF": "You cannot message yourself."
   }
 }

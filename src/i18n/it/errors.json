@@ -53,6 +53,10 @@
     "INVALID_SCREENSHOT": "Lo screenshot non è valido. Rimuovilo e riprova.",
     "INVALID_PLATFORM": "Piattaforma non supportata.",
     "FEEDBACK_LIMIT": "Hai già inviato molti feedback oggi. Riprova domani.",
-    "INVALID_AVATAR_PATH": "Non è stato possibile salvare la foto profilo. Riprova."
+    "INVALID_AVATAR_PATH": "Non è stato possibile salvare la foto profilo. Riprova.",
+    "NOT_LINKED": "Non potete più scrivervi: serve un follow accettato tra voi.",
+    "RATE_LIMITED": "Stai scrivendo troppo in fretta. Riprova tra poco.",
+    "INVALID_TEXT": "Il messaggio deve avere da 1 a 1000 caratteri.",
+    "SELF": "Non puoi scrivere a te stesso."
   }
 }

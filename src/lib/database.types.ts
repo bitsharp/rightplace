@@ -287,6 +287,148 @@ export type Database = {
           },
         ];
       };
+      dm_messages: {
+        Row: {
+          created_at: string;
+          id: string;
+          sender_id: string;
+          text: string;
+          thread_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          sender_id: string;
+          text: string;
+          thread_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          sender_id?: string;
+          text?: string;
+          thread_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dm_messages_sender_id_fkey';
+            columns: ['sender_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dm_messages_sender_id_fkey';
+            columns: ['sender_id'];
+            isOneToOne: false;
+            referencedRelation: 'public_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dm_messages_thread_id_fkey';
+            columns: ['thread_id'];
+            isOneToOne: false;
+            referencedRelation: 'dm_threads';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      dm_reads: {
+        Row: {
+          last_read_at: string;
+          thread_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          last_read_at: string;
+          thread_id: string;
+          user_id: string;
+        };
+        Update: {
+          last_read_at?: string;
+          thread_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dm_reads_thread_id_fkey';
+            columns: ['thread_id'];
+            isOneToOne: false;
+            referencedRelation: 'dm_threads';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dm_reads_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dm_reads_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'public_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      dm_threads: {
+        Row: {
+          created_at: string;
+          id: string;
+          last_message_at: string | null;
+          user_a: string;
+          user_b: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          last_message_at?: string | null;
+          user_a: string;
+          user_b: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          last_message_at?: string | null;
+          user_a?: string;
+          user_b?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dm_threads_user_a_fkey';
+            columns: ['user_a'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dm_threads_user_a_fkey';
+            columns: ['user_a'];
+            isOneToOne: false;
+            referencedRelation: 'public_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dm_threads_user_b_fkey';
+            columns: ['user_b'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dm_threads_user_b_fkey';
+            columns: ['user_b'];
+            isOneToOne: false;
+            referencedRelation: 'public_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       events: {
         Row: {
           cancelled_at: string | null;
@@ -1332,6 +1474,29 @@ export type Database = {
           radius_m: number;
         }[];
       };
+      get_dm_messages: {
+        Args: { p_before?: string; p_limit?: number; p_thread: string };
+        Returns: {
+          created_at: string;
+          id: string;
+          sender_id: string;
+          sender_is_me: boolean;
+          text: string;
+        }[];
+      };
+      get_dm_threads: {
+        Args: { p_limit?: number };
+        Returns: {
+          last_message_at: string;
+          last_sender_is_me: boolean;
+          last_text: string;
+          other_handle: string;
+          other_user_id: string;
+          thread_id: string;
+          unread: boolean;
+        }[];
+      };
+      get_dm_unread_count: { Args: Record<PropertyKey, never>; Returns: number };
       get_event_attendance: {
         Args: { p_event_id: string };
         Returns: {
@@ -1697,6 +1862,7 @@ export type Database = {
       is_adult: { Args: { p_birth_date: string }; Returns: boolean };
       is_handle_available: { Args: { p_handle: string }; Returns: string };
       level_from_avg: { Args: { p_avg: number }; Returns: number };
+      mark_dm_read: { Args: { p_thread: string }; Returns: undefined };
       match_contacts: {
         Args: { p_hashes: string[] };
         Returns: {
@@ -1709,6 +1875,7 @@ export type Database = {
       };
       night_date_at: { Args: { p_at: string; p_city_id: string }; Returns: string };
       night_end: { Args: { p_night_date: string; p_timezone: string }; Returns: string };
+      open_dm_thread: { Args: { p_handle: string }; Returns: string };
       regenerate_handle: { Args: Record<PropertyKey, never>; Returns: string };
       register_push_token: { Args: { p_platform: string; p_token: string }; Returns: undefined };
       remember_venue: { Args: { p_venue_id: string }; Returns: undefined };
@@ -1749,6 +1916,13 @@ export type Database = {
         Returns: {
           created_at: string;
           message_id: string;
+        }[];
+      };
+      send_dm: {
+        Args: { p_text: string; p_thread: string };
+        Returns: {
+          created_at: string;
+          id: string;
         }[];
       };
       set_avatar: { Args: { p_path: string }; Returns: undefined };

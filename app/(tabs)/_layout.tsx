@@ -2,6 +2,7 @@ import { Tabs, type BottomTabBarProps } from 'expo-router/js-tabs';
 
 import { isTabName, TAB_NAMES, TabBar } from '@/components/app/TabBar';
 import { useFollowRequestsCount } from '@/features/friends/hooks';
+import { useDmUnreadCount } from '@/features/dm/hooks';
 import { useUnreadChatCount } from '@/features/notifications/hooks';
 
 function RouterTabBar({ state, navigateToTab }: BottomTabBarProps) {
@@ -11,7 +12,7 @@ function RouterTabBar({ state, navigateToTab }: BottomTabBarProps) {
     if (route) navigateToTab(route.key);
   };
   const requests = useFollowRequestsCount();
-  const unreadChats = useUnreadChatCount();
+  const unreadChats = useUnreadChatCount() + useDmUnreadCount();
   return (
     <TabBar
       active={isTabName(current) ? current : 'map'}

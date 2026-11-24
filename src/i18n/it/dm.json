@@ -1,0 +1,42 @@
+{
+  "title": "Messaggi",
+  "tabs": {
+    "nights": "Serate",
+    "messages": "Messaggi",
+    "a11y": "Chat della serata o messaggi diretti"
+  },
+  "inbox": {
+    "empty": "Nessuna conversazione. Per scrivere a un amico apri il suo profilo e tocca Messaggio.",
+    "loadError": "Non riusciamo a caricare i messaggi. Riprova tra poco.",
+    "you": "Tu: {{text}}",
+    "unread": "Messaggi non letti"
+  },
+  "thread": {
+    "banner": "I messaggi si cancellano 7 giorni dopo l'invio.",
+    "placeholder": "Scrivi un messaggio",
+    "send": "Invia",
+    "closed": "Non potete più scrivervi.",
+    "loadOlder": "Mostra messaggi precedenti",
+    "loadError": "Non riusciamo a caricare la conversazione. Riprova tra poco.",
+    "back": "Indietro",
+    "openProfile": "Apri il profilo",
+    "unknownPerson": "Messaggi"
+  },
+  "actions": {
+    "title": "Azioni su {{handle}}",
+    "report": "Segnala messaggio",
+    "block": "Blocca utente",
+    "cancel": "Annulla",
+    "blockTitle": "Bloccare {{handle}}?",
+    "blockBody": "Non vi vedrete più: smettete di seguirvi e la conversazione si chiude.",
+    "blockConfirm": "Blocca",
+    "reported": "Segnalazione inviata. Grazie.",
+    "blocked": "Utente bloccato.",
+    "copyText": "Copia testo",
+    "copyTitle": "Azioni sul messaggio"
+  },
+  "profile": {
+    "message": "Messaggio",
+    "openError": "Non riusciamo ad aprire la conversazione."
+  }
+}

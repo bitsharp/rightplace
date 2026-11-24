@@ -37,6 +37,7 @@ describe('parseNotificationPrefs', () => {
       feed: true,
       creator: false,
       support: true,
+      dm: true,
       reminderDays: [4, 5, 6],
       reminderTime: '19:30',
     });
@@ -55,6 +56,22 @@ describe('parseNotificationPrefs', () => {
     };
     expect(parseNotificationPrefs({ ...base, support: false }).support).toBe(false);
     expect(toServerPrefs({ support: false })).toEqual({ support: false });
+  });
+
+  it('la categoria dm vale true se il server non la conosce ancora e si scrive con la stessa chiave', () => {
+    const old = {
+      reminder: true,
+      day_after: true,
+      friends: true,
+      chat: true,
+      feed: true,
+      creator: true,
+      reminder_days: [0],
+      reminder_time: '18:00',
+    };
+    expect(parseNotificationPrefs(old).dm).toBe(true);
+    expect(parseNotificationPrefs({ ...old, dm: false }).dm).toBe(false);
+    expect(toServerPrefs({ dm: false })).toEqual({ dm: false });
   });
 
   it('rifiuta un contenuto che non rispetta il contratto', () => {

@@ -119,6 +119,7 @@ const READY_SCREENS = [
   { name: 'venue/[id]' },
   { name: 'event/[id]' },
   { name: 'night/[id]/chat' },
+  { name: 'dm/[threadId]' },
   { name: 'post/new', options: MODAL },
   { name: 'post/[id]' },
   { name: 'story/[userId]', options: { presentation: 'fullScreenModal' } as const },

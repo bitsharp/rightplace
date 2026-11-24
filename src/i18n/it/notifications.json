@@ -17,7 +17,8 @@
     "chat": "Chat e serate",
     "feed": "Feed",
     "creator": "Creator",
-    "supporto": "Feedback ricevuti"
+    "supporto": "Feedback ricevuti",
+    "messaggi": "Messaggi"
   },
   "prePermission": {
     "label": "NOTIFICHE",
@@ -56,6 +57,10 @@
       "support": {
         "title": "Feedback ricevuti",
         "description": "Un avviso quando qualcuno invia un feedback."
+      },
+      "dm": {
+        "title": "Messaggi",
+        "description": "Un avviso quando un amico ti scrive. Mai il testo del messaggio."
       }
     },
     "days": {

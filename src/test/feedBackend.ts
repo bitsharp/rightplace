@@ -72,6 +72,8 @@ type Options = {
   activity?: Record<string, unknown>[];
   users?: FakeUser[];
   accepted?: string[];
+  // people who follow me (accepted): follows_me in search results
+  followers?: string[];
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -103,7 +105,7 @@ export function seedFeedBackend(options: Options = {}) {
   const findPost = (args: unknown) =>
     posts.find((p) => p.post_id === (args as { p_post_id: string }).p_post_id);
   seedFriendsBackend(
-    { users: options.users ?? [], accepted: options.accepted },
+    { users: options.users ?? [], accepted: options.accepted, followers: options.followers },
     {
       get_feed: () => posts,
       get_my_activity: options.activity ?? [],

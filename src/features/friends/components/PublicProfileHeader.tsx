@@ -20,12 +20,22 @@ type Props = {
   avatarPhoto?: AvatarPhoto;
   onAction: (userId: string, action: FollowAction) => void;
   onMore: () => void;
+  // Only for people linked to me by an accepted follow; absent = no button.
+  onMessage?: () => void;
 };
 
 // Public identity (handle, age band, gender) for everyone; counters only if the server released them (accepted
 // follow) and never as links: the lists of other people are not mine to open.
-export function PublicProfileHeader({ person, summary, avatarPhoto, onAction, onMore }: Props) {
+export function PublicProfileHeader({
+  person,
+  summary,
+  avatarPhoto,
+  onAction,
+  onMore,
+  onMessage,
+}: Props) {
   const { t } = useTranslation('friends');
+  const { t: tDm } = useTranslation('dm');
   const meta = usePersonMeta();
   return (
     <ProfileHeader
@@ -54,6 +64,14 @@ export function PublicProfileHeader({ person, summary, avatarPhoto, onAction, on
           followsMe={person.followsMe}
           onAction={(action) => onAction(person.userId, action)}
         />
+        {onMessage ? (
+          <Button
+            label={tDm('profile.message')}
+            variant="secondary"
+            size="md"
+            onPress={onMessage}
+          />
+        ) : null}
         <Button label={t('publicProfile.more')} variant="ghost" size="md" onPress={onMore} />
       </View>
     </ProfileHeader>
