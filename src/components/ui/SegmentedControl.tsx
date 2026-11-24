@@ -36,7 +36,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
   };
 
   return (
-    <View style={styles.track}>
+    <View testID="segmented-track" style={styles.track}>
       {options.map((option) => {
         const active = option.value === value;
         return (
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   track: {
     flexDirection: 'row',
     padding: 3,
-    borderRadius: radius.segmented,
+    borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   segment: {
     flex: 1,
     height: heights.segmented,
-    borderRadius: radius.segmentedInner,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
-import { colors, heights } from '@/theme/tokens';
+import { colors, heights, radius } from '@/theme/tokens';
 
 import { Button } from './Button';
 
@@ -23,13 +23,29 @@ describe('Button', () => {
     });
   });
 
-  it('è ciano con bordo nella variante secondaria e alto 44 in misura media', async () => {
+  it('è una pill in tutte le misure', async () => {
+    const { rerender } = await render(<Button label="x" onPress={jest.fn()} />);
+    expect(screen.getByRole('button')).toHaveStyle({ borderRadius: radius.pill });
+    await rerender(<Button label="x" size="md" onPress={jest.fn()} />);
+    expect(screen.getByRole('button')).toHaveStyle({ borderRadius: radius.pill });
+  });
+
+  it('è solo a contorno viola, senza riempimento, nella variante secondaria e alto 44 in misura media', async () => {
     await render(<Button label="x" variant="secondary" size="md" onPress={jest.fn()} />);
-    expect(screen.getByRole('button')).toHaveStyle({
-      borderColor: colors.maybe,
-      backgroundColor: colors.maybeTint,
+    const button = screen.getByRole('button');
+    expect(button).toHaveStyle({
+      borderWidth: 1.5,
+      borderColor: colors.primary,
       height: heights.buttonMedium,
     });
+    expect(button).not.toHaveStyle({ backgroundColor: colors.going });
+  });
+
+  it('è piena ciano nella variante creator e a contorno neutro nella variante ghost', async () => {
+    const { rerender } = await render(<Button label="x" variant="creator" onPress={jest.fn()} />);
+    expect(screen.getByRole('button')).toHaveStyle({ backgroundColor: colors.maybe });
+    await rerender(<Button label="x" variant="ghost" onPress={jest.fn()} />);
+    expect(screen.getByRole('button')).toHaveStyle({ borderColor: colors.border });
   });
 
   it('non esegue l’azione se disabilitato', async () => {

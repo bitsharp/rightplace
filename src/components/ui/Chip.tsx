@@ -16,8 +16,8 @@ type Props = {
 };
 
 const SELECTED = {
-  going: { borderColor: colors.going, backgroundColor: colors.goingTint },
-  maybe: { borderColor: colors.maybe, backgroundColor: colors.maybeTint },
+  going: { borderColor: colors.going, backgroundColor: colors.going },
+  maybe: { borderColor: colors.maybe, backgroundColor: colors.maybe },
 } as const;
 
 // 36 pt tall like the mock-up; hitSlop brings the touch area to 44.
@@ -33,7 +33,9 @@ export function Chip({ label, selected, onPress, tone = 'going', accessibilityLa
       onPress={onPress}
       style={[styles.chip, selected ? SELECTED[tone] : styles.idle]}
     >
-      <Text variant={selected ? 'body13Medium' : 'body13'}>{label}</Text>
+      <Text variant={selected ? 'body13Medium' : 'body13'} color={selected ? 'onAccent' : 'text'}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

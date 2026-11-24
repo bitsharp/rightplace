@@ -8,7 +8,7 @@ import { Divider } from './Divider';
 import { EmptyState } from './EmptyState';
 
 describe('Card', () => {
-  it('è una superficie con bordo e raggio 16', async () => {
+  it('è una superficie con bordo e raggio 20', async () => {
     await render(
       <Card testID="card">
         <Text>contenuto</Text>
@@ -20,6 +20,11 @@ describe('Card', () => {
       borderRadius: radius.card,
     });
     expect(screen.getByText('contenuto')).toBeOnTheScreen();
+  });
+
+  it('ha gli angoli tondi del nuovo stile (20–24)', () => {
+    expect(radius.card).toBeGreaterThanOrEqual(20);
+    expect(radius.cardLarge).toBeLessThanOrEqual(24);
   });
 
   it('evidenzia il bordo nel tono "going"', async () => {

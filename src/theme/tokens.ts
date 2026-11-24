@@ -3,7 +3,7 @@ const palette = {
   background: '#0B0B12',
   surface: '#15151F',
   border: '#2A2A3A',
-  violet: '#9D6BFF',
+  violet: '#B14CFF',
   cyan: '#4ED9C7',
   text: '#F2F1F8',
   textSecondary: '#A3A1B8',
@@ -59,12 +59,10 @@ export type ColorToken = keyof typeof colors;
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32 } as const;
 
 export const radius = {
-  card: 16,
-  cardLarge: 18,
+  card: 20,
+  cardLarge: 24,
   button: 14,
-  buttonLarge: 16,
   segmented: 12,
-  segmentedInner: 9,
   pill: 999,
 } as const;
 
@@ -95,7 +93,10 @@ export const photoScenes = [
 ] as const;
 
 export const fonts = {
-  display: 'Unbounded_700Bold',
+  // Big titles: condensed, heavy, italic (set uppercase in typography.ts).
+  display: 'BarlowCondensed_800ExtraBold_Italic',
+  // Subtitles and @handles: same family, upright, so names stay readable as typed.
+  displayUpright: 'BarlowCondensed_700Bold',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodyStrong: 'Inter_600SemiBold',

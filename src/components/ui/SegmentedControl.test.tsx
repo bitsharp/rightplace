@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
-import { colors } from '@/theme/tokens';
+import { colors, radius } from '@/theme/tokens';
 
 import { SegmentedControl } from './SegmentedControl';
 
@@ -33,6 +33,14 @@ describe('SegmentedControl', () => {
     expect(screen.getByRole('button', { name: 'venue:all' })).toHaveStyle({
       backgroundColor: colors.text,
     });
+  });
+
+  it('è una pill: pista e voci hanno raggio pieno', async () => {
+    await render(<SegmentedControl options={OPTIONS} value="going" onChange={jest.fn()} />);
+    expect(screen.getByRole('button', { name: 'ui:intent.goingAction' })).toHaveStyle({
+      borderRadius: radius.pill,
+    });
+    expect(screen.getByTestId('segmented-track')).toHaveStyle({ borderRadius: radius.pill });
   });
 
   it('notifica la nuova voce con un feedback aptico', async () => {

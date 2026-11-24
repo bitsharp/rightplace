@@ -1,9 +1,26 @@
 import { typography } from './typography';
 
 describe('typography', () => {
-  it('usa Unbounded per i titoli nelle misure del mock-up', () => {
-    expect(typography.display30).toMatchObject({ fontFamily: 'Unbounded_700Bold', fontSize: 30 });
-    expect(typography.display17).toMatchObject({ fontFamily: 'Unbounded_700Bold', fontSize: 17 });
+  it('usa Barlow Condensed ExtraBold Italic in maiuscolo per i titoli grandi', () => {
+    for (const variant of ['display30', 'display26', 'display24'] as const) {
+      expect(typography[variant]).toMatchObject({
+        fontFamily: 'BarlowCondensed_800ExtraBold_Italic',
+        textTransform: 'uppercase',
+      });
+    }
+  });
+
+  it('usa Barlow Condensed Bold dritto, senza maiuscolo forzato, per i sottotitoli e gli @handle', () => {
+    for (const variant of ['display22', 'display17'] as const) {
+      expect(typography[variant]).toMatchObject({ fontFamily: 'BarlowCondensed_700Bold' });
+      expect(typography[variant]).not.toHaveProperty('textTransform');
+    }
+  });
+
+  it('ingrandisce i titoli rispetto al vecchio display perché il condensato è più stretto', () => {
+    expect(typography.display30.fontSize).toBeGreaterThan(30);
+    expect(typography.display30.fontSize).toBeGreaterThan(typography.display26.fontSize ?? 0);
+    expect(typography.display17.fontSize).toBeGreaterThanOrEqual(20);
   });
 
   it('usa Inter per il testo', () => {

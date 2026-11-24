@@ -23,10 +23,7 @@ type Props = {
 
 const VARIANTS: Record<ButtonVariant, { container: ViewStyle; text: ColorToken }> = {
   primary: { container: { backgroundColor: colors.going }, text: 'onAccent' },
-  secondary: {
-    container: { backgroundColor: colors.maybeTint, borderWidth: 1, borderColor: colors.maybe },
-    text: 'text',
-  },
+  secondary: { container: { borderWidth: 1.5, borderColor: colors.primary }, text: 'text' },
   creator: { container: { backgroundColor: colors.maybe }, text: 'onAccent' },
   ghost: { container: { borderWidth: 1, borderColor: colors.border }, text: 'text' },
   danger: { container: { backgroundColor: colors.text }, text: 'onAccent' },
@@ -85,8 +82,8 @@ function ButtonContent({ label, size, loading, color }: ContentProps) {
 
 const styles = StyleSheet.create({
   base: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.xl },
-  lg: { height: heights.button, borderRadius: radius.buttonLarge },
-  md: { height: heights.buttonMedium, borderRadius: radius.segmented },
+  lg: { height: heights.button, borderRadius: radius.pill },
+  md: { height: heights.buttonMedium, borderRadius: radius.pill },
   pressed: { opacity: 0.85 },
   disabled: { opacity: 0.4 },
 });

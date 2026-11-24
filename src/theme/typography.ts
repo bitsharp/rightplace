@@ -2,10 +2,19 @@ import type { TextStyle } from 'react-native';
 
 import { fonts } from './tokens';
 
+// Barlow Condensed is narrow and has a small x-height: sizes run ~35% above the old Unbounded scale.
 const display = (fontSize: number): TextStyle => ({
   fontFamily: fonts.display,
   fontSize,
+  lineHeight: Math.round(fontSize * 1.05),
+  letterSpacing: 0.5,
+  textTransform: 'uppercase',
+});
+const subtitle = (fontSize: number): TextStyle => ({
+  fontFamily: fonts.displayUpright,
+  fontSize,
   lineHeight: Math.round(fontSize * 1.2),
+  letterSpacing: 0.2,
 });
 const body = (fontSize: number, fontFamily: string = fonts.body): TextStyle => ({
   fontFamily,
@@ -19,11 +28,11 @@ const label = (fontSize: number, letterSpacing: number): TextStyle => ({
 });
 
 export const typography = {
-  display30: display(30),
-  display26: display(26),
-  display24: display(24),
-  display22: display(22),
-  display17: display(17),
+  display30: display(42),
+  display26: display(36),
+  display24: display(32),
+  display22: subtitle(28),
+  display17: subtitle(22),
   body16: body(16),
   body16Strong: body(16, fonts.bodyStrong),
   body15: body(15),

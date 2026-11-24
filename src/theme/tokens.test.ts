@@ -12,9 +12,9 @@ describe('theme tokens', () => {
       background: '#0B0B12',
       surface: '#15151F',
       border: '#2A2A3A',
-      going: '#9D6BFF',
+      going: '#B14CFF',
       maybe: '#4ED9C7',
-      primary: '#9D6BFF',
+      primary: '#B14CFF',
       secondary: '#4ED9C7',
       text: '#F2F1F8',
       textSecondary: '#A3A1B8',
@@ -29,12 +29,10 @@ describe('theme tokens', () => {
 
   it('fissa raggi e altezze del mock-up', () => {
     expect(radius).toMatchObject({
-      card: 16,
-      cardLarge: 18,
+      card: 20,
+      cardLarge: 24,
       button: 14,
-      buttonLarge: 16,
       segmented: 12,
-      segmentedInner: 9,
       pill: 999,
     });
     expect(heights).toMatchObject({
@@ -49,8 +47,8 @@ describe('theme tokens', () => {
 
 describe('withAlpha', () => {
   it('aggiunge l’opacità in esadecimale come nel mock-up', () => {
-    expect(withAlpha('#9D6BFF', 0.2)).toBe('#9D6BFF33');
+    expect(withAlpha('#B14CFF', 0.2)).toBe('#B14CFF33');
     expect(withAlpha('#4ED9C7', 0.1)).toBe('#4ED9C71A');
-    expect(withAlpha('#9D6BFF', 0.4)).toBe('#9D6BFF66');
+    expect(withAlpha('#B14CFF', 0.4)).toBe('#B14CFF66');
   });
 });

@@ -61,7 +61,7 @@ App mobile (iOS + Android) per scoprire **dove va la gente stasera**. L'utente d
 - AI ("Chiedi all'AI"): Edge Function che chiama l'API Claude (modello economico) con i dati del locale; mai la chiave nel client.
 - Variabili d'ambiente in `.env` con prefisso `EXPO_PUBLIC_`. **Mai** committare `service_role`, Places key, Anthropic key, Stripe/RevenueCat secret: vivono solo in Supabase Edge Function secrets / EAS secrets.
 - Stile: `StyleSheet` + token in `src/theme`. Niente Tailwind/NativeWind.
-- Font: Unbounded (display), Inter (body), Space Mono (label mono) via `@expo-google-fonts`.
+- Font: Barlow Condensed (display: ExtraBold Italic per i titoli grandi in maiuscolo, Bold per sottotitoli e @handle), Inter (body), Space Mono (label mono) via `@expo-google-fonts`.
 - **i18n**: `i18next` + `react-i18next` + `expo-localization`; namespace per feature; chiavi in `src/i18n/it/*.json` e `src/i18n/en/*.json`; **nessuna stringa UI hardcoded**, nemmeno nei test (si testa per chiave o con `t` mockato). Date, numeri e plurali via `Intl`. Il contenuto generato dall'AI e le notifiche push rispettano la lingua dell'utente (`profiles.locale`).
 - Test: `jest-expo` + `@testing-library/react-native`; SQL con `pgTAP`; e2e con Maestro.
 - Lint/format: ESLint (config expo) + Prettier. Zero warning al commit.
@@ -69,7 +69,7 @@ App mobile (iOS + Android) per scoprire **dove va la gente stasera**. L'utente d
 ## Design system (dal mock-up)
 
 - Dark-first. Background `#0B0B12`, superfici `#15151F`, bordi `#2A2A3A`.
-- **Viola `#9D6BFF`** = "Ci vado" / primario / sponsorizzata. **Ciano `#4ED9C7`** = "Forse" / secondario / label informative.
+- **Viola `#B14CFF`** = "Ci vado" / primario / sponsorizzata. **Ciano `#4ED9C7`** = "Forse" / secondario / label informative.
 - Testo `#F2F1F8`, secondario `#A3A1B8`. Genere nelle barre: donne `#F2B1CB`, uomini `#86B6E3`.
 - Label maiuscole in Space Mono 10–12 px con letter-spacing 1.2–1.5 (es. `SPONSORIZZATA`, `SOLO CHI HA DICHIARATO`).
 - Radius: card 16–18, bottoni 14–16, segmented 12 (interno 9), pill 999. Bottone primario alto 56, tap target ≥ 44.
