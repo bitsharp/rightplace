@@ -25,6 +25,7 @@ export function routeForNotification(url: string | null | undefined): string {
   const [first, id, last, ...extra] = path.split('/');
   if (extra.length > 0) return FALLBACK;
   if (first === 'night' && last === 'chat' && id && ID.test(id)) return `/night/${id}/chat`;
+  if (first === 'post' && id && last === undefined && ID.test(id)) return `/post/${id}`;
   if (first === 'u' && id && last === undefined && isHandleShaped(id)) return `/u/${id}`;
   return FALLBACK;
 }

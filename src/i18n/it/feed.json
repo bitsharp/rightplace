@@ -58,5 +58,13 @@
   "followMore": "Segui altre persone per vedere più foto",
   "grid": {
     "open": "Apri il post di {{handle}}"
+  },
+  "post": {
+    "title": "Post",
+    "unavailable": "Questo post non è più disponibile.",
+    "loadError": "Non riusciamo a caricare il post. Riprova.",
+    "likedBy": "Piace a",
+    "noLikes": "Nessuno ha ancora messo like.",
+    "likersError": "Non riusciamo a caricare chi ha messo like."
   }
 }

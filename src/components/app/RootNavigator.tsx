@@ -113,6 +113,7 @@ const READY_SCREENS = [
   { name: 'event/[id]' },
   { name: 'night/[id]/chat' },
   { name: 'post/new', options: MODAL },
+  { name: 'post/[id]' },
   { name: 'story/[userId]', options: { presentation: 'fullScreenModal' } as const },
 ];
 

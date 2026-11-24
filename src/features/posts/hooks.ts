@@ -4,6 +4,8 @@ import {
   COMMENTS_PAGE_SIZE,
   fetchComments,
   fetchFeedPage,
+  fetchPost,
+  fetchPostLikers,
   fetchPostPhotoUrls,
   fetchPostTarget,
   fetchStoryPosts,
@@ -17,6 +19,8 @@ import {
   commentsKey,
   FEED_KEY,
   POST_TARGET_KEY,
+  postKey,
+  postLikersKey,
   postPhotoUrlsKey,
   storyPostsKey,
   userPostsKey,
@@ -84,6 +88,26 @@ export function useUserPosts(userId: string, enabled = true) {
       await query.refetch();
     },
   };
+}
+
+// One post on its own page: null when the server shows it to me no more (expired, unfollowed, blocked, deleted).
+export function usePost(postId: string) {
+  return useQuery({
+    queryKey: postKey(postId),
+    queryFn: () => fetchPost(postId),
+    enabled: postId !== '',
+    meta: PRIVATE,
+  });
+}
+
+// Who liked my post: only the author may ask (the server answers NOT_FOUND to anyone else).
+export function usePostLikers(postId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: postLikersKey(postId),
+    queryFn: () => fetchPostLikers(postId),
+    enabled: enabled && postId !== '',
+    meta: PRIVATE,
+  });
 }
 
 export function useStoryPosts(userId: string, enabled = true) {

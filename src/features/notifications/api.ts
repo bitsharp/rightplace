@@ -36,6 +36,8 @@ export type ActivityItem = {
   // Only to ask for the actor's photo: the server decides whether I may see it.
   actorId: string | null;
   postId: string | null;
+  // Only on comments: the one to scroll to; null on rows from a database that does not send it yet.
+  commentId: string | null;
   createdAt: string;
 };
 
@@ -45,6 +47,7 @@ const activitySchema = z.array(
     actor_handle: z.string(),
     actor_id: z.string().nullish(),
     post_id: z.string().nullable(),
+    comment_id: z.string().nullish(),
     created_at: z.string(),
   }),
 );
@@ -57,6 +60,7 @@ export async function fetchActivity(): Promise<ActivityItem[]> {
     actorHandle: row.actor_handle,
     actorId: row.actor_id ?? null,
     postId: row.post_id,
+    commentId: row.comment_id ?? null,
     createdAt: row.created_at,
   }));
 }

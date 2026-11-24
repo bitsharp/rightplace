@@ -8,6 +8,8 @@ import {
   deletePost,
   fetchComments,
   fetchFeedPage,
+  fetchPost,
+  fetchPostLikers,
   fetchPostPhotoUrls,
   fetchPostTarget,
   fetchStoryPosts,
@@ -194,6 +196,37 @@ describe('fetchStoryPosts', () => {
     respondWith([postRow()]);
     await expect(fetchStoryPosts('u1')).resolves.toEqual([feedPost]);
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_story_posts', { p_user_id: 'u1' });
+  });
+});
+
+describe('fetchPost', () => {
+  it('chiede un solo post e lo restituisce come quelli del feed', async () => {
+    respondWith([postRow()]);
+    await expect(fetchPost('p1')).resolves.toEqual(feedPost);
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_post', { p_post_id: 'p1' });
+  });
+
+  it('se il server non restituisce righe (scaduto o non visibile) risponde null', async () => {
+    respondWith([]);
+    await expect(fetchPost('p1')).resolves.toBeNull();
+  });
+});
+
+describe('fetchPostLikers', () => {
+  it('restituisce chi ha messo like (id, handle, quando)', async () => {
+    respondWith([{ user_id: 'u2', handle: 'gatto.blu', liked_at: '2026-11-09T10:00:00Z' }]);
+    await expect(fetchPostLikers('p1')).resolves.toEqual([
+      { userId: 'u2', handle: 'gatto.blu', likedAt: '2026-11-09T10:00:00Z' },
+    ]);
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_post_likers', {
+      p_post_id: 'p1',
+      p_limit: 100,
+    });
+  });
+
+  it('propaga NOT_FOUND per chi non è l’autore', async () => {
+    respondWith(null, { message: 'NOT_FOUND' });
+    await expect(fetchPostLikers('p1')).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });
 });
 

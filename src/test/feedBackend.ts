@@ -19,6 +19,8 @@ export type FakePost = {
   is_mine?: boolean;
 };
 
+export type FakeLiker = { user_id: string; handle: string; liked_at: string };
+
 export type FakeComment = {
   comment_id: string;
   user_id: string;
@@ -64,6 +66,10 @@ type Options = {
   storyPosts?: Record<string, FakePost[]>;
   target?: { room_id?: string | null; venue_name?: string; night_date?: string | null } | null;
   comments?: FakeComment[];
+  // by post id: what get_post_likers answers (the real rule, author only, lives in SQL)
+  likers?: Record<string, FakeLiker[]>;
+  // what get_my_activity ("Novità") answers
+  activity?: Record<string, unknown>[];
   users?: FakeUser[];
   accepted?: string[];
 };
@@ -100,6 +106,10 @@ export function seedFeedBackend(options: Options = {}) {
     { users: options.users ?? [], accepted: options.accepted },
     {
       get_feed: () => posts,
+      get_my_activity: options.activity ?? [],
+      get_post: (args: unknown) => posts.filter((p) => p === findPost(args)),
+      get_post_likers: (args: unknown) =>
+        options.likers?.[(args as { p_post_id: string }).p_post_id] ?? [],
       get_profile_summary: (args: unknown) => {
         const summary = options.summaries?.[(args as { p_user_id: string }).p_user_id];
         return summary ? [summaryRow(summary)] : [];

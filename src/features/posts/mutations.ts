@@ -18,6 +18,7 @@ import { applyLike } from './domain/likes';
 import {
   commentsKey,
   FEED_KEY,
+  POST_ROOT_KEY,
   STORIES_KEY,
   STORY_POSTS_ROOT_KEY,
   USER_POSTS_ROOT_KEY,
@@ -62,6 +63,7 @@ export function useToggleLike() {
       await Promise.all([
         queryClient.cancelQueries({ queryKey: FEED_KEY }),
         queryClient.cancelQueries({ queryKey: STORY_POSTS_ROOT_KEY }),
+        queryClient.cancelQueries({ queryKey: POST_ROOT_KEY }),
       ]);
       const snapshot = snapshotPosts(queryClient);
       patchPost(queryClient, postId, (post) => applyLike(post, liked));

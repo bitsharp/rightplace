@@ -34,4 +34,6 @@ export type PostComment = {
   canDelete: boolean;
 };
 
+export type PostLiker = { userId: string; handle: string; likedAt: string };
+
 export type FeedCursor = { beforeVisible: string; beforeId: string };

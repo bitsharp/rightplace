@@ -1,7 +1,7 @@
 import type { InfiniteData, QueryClient, QueryKey } from '@tanstack/react-query';
 
 import type { FeedCursor, FeedPost } from './domain/types';
-import { FEED_KEY, STORY_POSTS_ROOT_KEY, USER_POSTS_ROOT_KEY } from './keys';
+import { FEED_KEY, POST_ROOT_KEY, STORY_POSTS_ROOT_KEY, USER_POSTS_ROOT_KEY } from './keys';
 
 export type FeedData = InfiniteData<FeedPost[], FeedCursor | undefined>;
 export type Snapshot = [QueryKey, unknown][];
@@ -17,6 +17,10 @@ function mapEverywhere(queryClient: QueryClient, change: (posts: FeedPost[]) => 
   );
   queryClient.setQueriesData<FeedPost[]>({ queryKey: STORY_POSTS_ROOT_KEY }, (posts) =>
     posts ? change(posts) : posts,
+  );
+  // A post opened on its own page (null = no longer visible): a removed post becomes "not available".
+  queryClient.setQueriesData<FeedPost | null>({ queryKey: POST_ROOT_KEY }, (post) =>
+    post ? (change([post])[0] ?? null) : post,
   );
 }
 
@@ -42,6 +46,7 @@ export function snapshotPosts(queryClient: QueryClient): Snapshot {
     ...queryClient.getQueriesData({ queryKey: FEED_KEY }),
     ...queryClient.getQueriesData({ queryKey: USER_POSTS_ROOT_KEY }),
     ...queryClient.getQueriesData({ queryKey: STORY_POSTS_ROOT_KEY }),
+    ...queryClient.getQueriesData({ queryKey: POST_ROOT_KEY }),
   ];
 }
 

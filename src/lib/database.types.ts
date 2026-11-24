@@ -1441,6 +1441,7 @@ export type Database = {
         Returns: {
           actor_handle: string;
           actor_id: string;
+          comment_id: string;
           created_at: string;
           kind: string;
           post_id: string;
@@ -1496,6 +1497,24 @@ export type Database = {
         }[];
       };
       get_my_notification_prefs: { Args: Record<PropertyKey, never>; Returns: Json };
+      get_post: {
+        Args: { p_post_id: string };
+        Returns: {
+          author_handle: string;
+          author_id: string;
+          caption: string;
+          comment_count: number;
+          expires_at: string;
+          has_photo: boolean;
+          is_mine: boolean;
+          like_count: number;
+          liked_by_me: boolean;
+          night_date: string;
+          post_id: string;
+          venue_name: string;
+          visible_from: string;
+        }[];
+      };
       get_post_comments: {
         Args: { p_before?: string; p_limit?: number; p_post_id: string };
         Returns: {
@@ -1505,6 +1524,14 @@ export type Database = {
           handle: string;
           is_mine: boolean;
           text: string;
+          user_id: string;
+        }[];
+      };
+      get_post_likers: {
+        Args: { p_limit?: number; p_post_id: string };
+        Returns: {
+          handle: string;
+          liked_at: string;
           user_id: string;
         }[];
       };

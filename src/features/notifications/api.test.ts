@@ -65,6 +65,31 @@ describe('notifications api', () => {
     ]);
   });
 
+  it('porta il comment_id dei commenti e tollera la sua assenza (database non aggiornato)', async () => {
+    setFakeRpc({
+      get_my_activity: [
+        {
+          kind: 'comment',
+          actor_handle: 'volpe.viola',
+          actor_id: 'u-volpe.viola',
+          post_id: 'p1',
+          comment_id: 'c9',
+          created_at: '2026-11-13T10:00:00Z',
+        },
+        {
+          kind: 'comment',
+          actor_handle: 'orso.grigio',
+          post_id: 'p1',
+          created_at: '2026-11-13T09:00:00Z',
+        },
+      ],
+    });
+    await expect(fetchActivity()).resolves.toMatchObject([
+      { kind: 'comment', commentId: 'c9' },
+      { kind: 'comment', commentId: null },
+    ]);
+  });
+
   it('legge le novità senza alcun testo dei commenti', async () => {
     setFakeRpc({
       get_my_activity: [
@@ -90,6 +115,7 @@ describe('notifications api', () => {
         actorHandle: 'volpe.viola',
         actorId: 'u-volpe.viola',
         postId: 'p1',
+        commentId: null,
         createdAt: '2026-11-13T10:00:00Z',
       },
       {
@@ -97,6 +123,7 @@ describe('notifications api', () => {
         actorHandle: 'orso.grigio',
         actorId: 'u-orso.grigio',
         postId: null,
+        commentId: null,
         createdAt: '2026-11-13T11:00:00Z',
       },
     ]);

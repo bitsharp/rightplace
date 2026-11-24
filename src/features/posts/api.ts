@@ -4,7 +4,7 @@ import { callRpc } from '@/lib/callRpc';
 import { RpcError, toRpcErrorCode } from '@/lib/rpcError';
 import { supabase } from '@/lib/supabase';
 
-import type { FeedCursor, FeedPost, PostComment, PostTarget } from './domain/types';
+import type { FeedCursor, FeedPost, PostComment, PostLiker, PostTarget } from './domain/types';
 
 export const FEED_PAGE_SIZE = 20;
 export const COMMENTS_PAGE_SIZE = 30;
@@ -141,6 +141,23 @@ export async function fetchStoryPosts(userId: string): Promise<FeedPost[]> {
     .array(postSchema)
     .parse(await callRpc<unknown>('get_story_posts', { p_user_id: userId }));
   return rows.map(toPost);
+}
+
+// One post, if I may see it: no row (expired, not followed, blocked, unknown id) is null, never an error.
+export async function fetchPost(postId: string): Promise<FeedPost | null> {
+  const rows = z.array(postSchema).parse(await callRpc<unknown>('get_post', { p_post_id: postId }));
+  const [row] = rows;
+  return row ? toPost(row) : null;
+}
+
+const likerSchema = z.object({ user_id: z.string(), handle: z.string(), liked_at: z.string() });
+
+// Only the author of the post gets the list (the server answers NOT_FOUND to anyone else).
+export async function fetchPostLikers(postId: string): Promise<PostLiker[]> {
+  const rows = z
+    .array(likerSchema)
+    .parse(await callRpc<unknown>('get_post_likers', { p_post_id: postId, p_limit: 100 }));
+  return rows.map((row) => ({ userId: row.user_id, handle: row.handle, likedAt: row.liked_at }));
 }
 
 export async function setPostLike(postId: string, liked: boolean) {

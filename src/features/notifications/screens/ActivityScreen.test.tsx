@@ -98,7 +98,7 @@ describe('ActivityScreen', () => {
     expect(mockPush).toHaveBeenCalledWith('/friends');
   });
 
-  it('il tocco sull’@handle di chi ha messo like apre il suo profilo, la riga resta sul feed', async () => {
+  it('il tocco sull’@handle di chi ha messo like apre il suo profilo, la riga porta al post', async () => {
     setFakeRpc({ get_my_activity: ITEMS });
     await render(<ActivityScreen />, { wrapper: createQueryWrapper().Wrapper });
     await fireEvent.press(
@@ -109,7 +109,27 @@ describe('ActivityScreen', () => {
     await fireEvent.press(
       screen.getByText('notifications:activity.items.like({"handle":"@volpe.viola"})'),
     );
-    expect(mockPush).toHaveBeenCalledWith('/feed');
+    expect(mockPush).toHaveBeenCalledWith('/post/p1');
+  });
+
+  it('un commento porta al post con i commenti aperti sul commento', async () => {
+    setFakeRpc({
+      get_my_activity: [
+        {
+          kind: 'comment',
+          actor_handle: 'volpe.viola',
+          actor_id: 'u-volpe.viola',
+          post_id: 'p1',
+          comment_id: 'c7',
+          created_at: '2026-11-13T12:00:00Z',
+        },
+      ],
+    });
+    await render(<ActivityScreen />, { wrapper: createQueryWrapper().Wrapper });
+    await fireEvent.press(
+      await screen.findByText('notifications:activity.items.comment({"handle":"@volpe.viola"})'),
+    );
+    expect(mockPush).toHaveBeenCalledWith('/post/p1?comments=1&comment=c7');
   });
 
   it('senza novità mostra lo stato vuoto', async () => {
