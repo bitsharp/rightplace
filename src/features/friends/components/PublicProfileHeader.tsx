@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { FollowStateButton, type FollowAction } from '@/components/app/FriendRow';
 import { Avatar, type AvatarPhoto } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { EnlargeablePhoto } from '@/features/profile/components/EnlargeablePhoto';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
 import { formatHandle } from '@/features/profile/domain/handle';
 import type { ProfileSummary } from '@/features/profile/summary/api';
@@ -31,12 +32,14 @@ export function PublicProfileHeader({ person, summary, avatarPhoto, onAction, on
       handle={person.handle}
       meta={meta(person)}
       avatar={
-        <Avatar
-          intent={avatarIntent(person.handle)}
-          initial={formatHandle(person.handle).charAt(1)}
-          size={86}
-          photo={avatarPhoto}
-        />
+        <EnlargeablePhoto photo={avatarPhoto} size={86}>
+          <Avatar
+            intent={avatarIntent(person.handle)}
+            initial={formatHandle(person.handle).charAt(1)}
+            size={86}
+            photo={avatarPhoto}
+          />
+        </EnlargeablePhoto>
       }
       counters={{
         posts: summary?.postsCount ?? null,

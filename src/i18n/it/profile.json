@@ -135,10 +135,11 @@
     }
   },
   "avatar": {
-    "change": "Cambia la foto profilo",
+    "change": "Cambia foto profilo",
     "title": "Foto profilo",
     "hint": "La vedono solo tu e le persone con cui hai un follow accettato (chi ti segue e chi segui). Gli altri vedono l'iniziale.",
-    "remove": "Rimuovi foto"
+    "remove": "Rimuovi foto",
+    "enlarge": "Ingrandisci foto profilo"
   },
   "header": {
     "posts": "post",

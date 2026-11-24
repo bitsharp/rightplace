@@ -39,12 +39,40 @@ function Harness() {
 const renderEditor = () => render(<Harness />, { wrapper: createQueryWrapper().Wrapper });
 
 describe('AvatarEditor', () => {
-  it('senza foto mostra l’iniziale e toccando l’avatar apre il foglio', async () => {
+  it('senza foto mostra l’iniziale e la matita apre il foglio', async () => {
     await renderEditor();
     expect(screen.getByText('L', { includeHiddenElements: true })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'profile:avatar.change' }));
     expect(screen.getByText('ui:photoSource.library')).toBeOnTheScreen();
     expect(screen.queryByText('profile:avatar.remove')).toBeNull();
+  });
+
+  it('con solo l’iniziale il tap sull’avatar non apre nulla', async () => {
+    await renderEditor();
+    expect(screen.queryByRole('button', { name: 'profile:avatar.enlarge' })).toBeNull();
+    expect(screen.queryByTestId('photo-viewer-list')).toBeNull();
+    expect(screen.queryByText('ui:photoSource.library')).toBeNull();
+  });
+
+  it('con una foto il tap la ingrandisce a schermo intero senza aprire il foglio', async () => {
+    invoke.mockResolvedValue(urls([{ userId: 'me', url: 'https://signed.test/me' }]));
+    await renderEditor();
+    await screen.findByTestId('avatar-image', { includeHiddenElements: true });
+    expect(screen.queryByTestId('photo-viewer-list')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'profile:avatar.enlarge' }));
+    expect(screen.getByTestId('photo-viewer-list').props.data).toEqual([
+      expect.objectContaining({ uri: 'https://signed.test/me' }),
+    ]);
+    expect(screen.queryByText('ui:photoSource.library')).toBeNull();
+  });
+
+  it('il tocco lungo sull’avatar apre il foglio di modifica', async () => {
+    invoke.mockResolvedValue(urls([{ userId: 'me', url: 'https://signed.test/me' }]));
+    await renderEditor();
+    await screen.findByTestId('avatar-image', { includeHiddenElements: true });
+    await fireEvent(screen.getByRole('button', { name: 'profile:avatar.enlarge' }), 'longPress');
+    expect(screen.getByText('ui:photoSource.library')).toBeOnTheScreen();
+    expect(screen.queryByTestId('photo-viewer-list')).toBeNull();
   });
 
   it('con una foto la mostra e offre Rimuovi foto', async () => {

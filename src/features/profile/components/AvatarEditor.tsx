@@ -10,10 +10,11 @@ import { colors, heights } from '@/theme/tokens';
 import type { AvatarEditorState } from '../avatar/useAvatarEditor';
 import { formatHandle } from '../domain/handle';
 import { AvatarSheet } from './AvatarSheet';
+import { EnlargeablePhoto } from './EnlargeablePhoto';
 
 type Props = { handle: string; editor: AvatarEditorState; size?: number };
 
-// The avatar of my own profile: a tap opens the sheet to change or remove the photo (visible only to me and to my
+// The avatar of my own profile: a tap enlarges the photo, the pencil badge (or a long press) opens the sheet to change or remove it (visible only to me and to my
 // accepted followers). Without a photo it shows the initial, as everywhere else. The state comes from the parent
 // (useAvatarEditor) so the notices can be drawn where there is room for them (AvatarEditorNotice).
 export function AvatarEditor({ handle, editor, size = 86 }: Props) {
@@ -25,12 +26,11 @@ export function AvatarEditor({ handle, editor, size = 86 }: Props) {
       : undefined;
   return (
     <View>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('avatar.change')}
+      <EnlargeablePhoto
+        photo={photo}
+        size={size}
         disabled={editor.busy}
-        onPress={photoFlow.openSheet}
-        style={{ width: size, height: size }}
+        onLongPress={photoFlow.openSheet}
       >
         <Avatar
           intent={avatarIntent(handle)}
@@ -38,13 +38,20 @@ export function AvatarEditor({ handle, editor, size = 86 }: Props) {
           size={size}
           photo={photo}
         />
-        <View style={styles.badge}>
-          {editor.busy ? (
-            <ActivityIndicator size="small" color={colors.onAccent} />
-          ) : (
-            <Icon name="camera" size={14} color="onAccent" />
-          )}
-        </View>
+      </EnlargeablePhoto>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('avatar.change')}
+        disabled={editor.busy}
+        onPress={photoFlow.openSheet}
+        hitSlop={(heights.minTapTarget - BADGE) / 2}
+        style={styles.badge}
+      >
+        {editor.busy ? (
+          <ActivityIndicator size="small" color={colors.onAccent} />
+        ) : (
+          <Icon name="pencil" size={14} color="onAccent" />
+        )}
       </Pressable>
       <AvatarSheet
         visible={photoFlow.sheetOpen}

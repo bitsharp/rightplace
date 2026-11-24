@@ -75,6 +75,10 @@ const GLYPHS = {
   ],
   clock: [<Circle key="c" cx="12" cy="12" r="8.5" />, <Path key="p" d="M12 7.5V12l3 2" />],
   bell: [<Path key="p" d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z" />, <Path key="q" d="M10 21h4" />],
+  pencil: [
+    <Path key="p" d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />,
+    <Path key="q" d="M14.5 6.5l3 3" />,
+  ],
   camera: [
     <Rect key="r" x="3" y="6" width="18" height="14" rx="3" />,
     <Circle key="c" cx="12" cy="13" r="3.5" />,

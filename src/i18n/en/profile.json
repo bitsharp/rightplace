@@ -135,10 +135,11 @@
     }
   },
   "avatar": {
-    "change": "Change your profile photo",
+    "change": "Change profile photo",
     "title": "Profile photo",
     "hint": "Only you and people you have an accepted follow with (who follow you and whom you follow) can see it. Everyone else sees your initial.",
-    "remove": "Remove photo"
+    "remove": "Remove photo",
+    "enlarge": "Enlarge profile photo"
   },
   "header": {
     "posts": "posts",
