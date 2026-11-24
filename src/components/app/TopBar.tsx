@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import type { AvatarIntent, AvatarPhoto } from '@/components/ui/Avatar';
+import { Avatar, type AvatarIntent, type AvatarPhoto } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
@@ -26,6 +26,8 @@ export type Story = {
 
 type Props = {
   handle: string;
+  // My own signed photo (visible to me by definition); the initial otherwise.
+  myPhoto?: AvatarPhoto;
   canPost: boolean;
   hasNews: boolean;
   stories: Story[];
@@ -38,6 +40,7 @@ type Props = {
 
 export function TopBar({
   handle,
+  myPhoto,
   canPost,
   hasNews,
   stories,
@@ -60,6 +63,7 @@ export function TopBar({
           onPress={onOpenProfile}
           style={styles.handle}
         >
+          <Avatar intent="neutral" initial={handle.charAt(0)} size={24} photo={myPhoto} />
           <Text variant="display17">{formatHandle(handle)}</Text>
           <Icon name="chevronDown" size={12} strokeWidth={2.6} />
         </Pressable>

@@ -177,9 +177,10 @@ describe('tab Profilo in stile Instagram', () => {
     signUrls([ME]);
     seed();
     await renderApp('ready', '/profile');
+    // the header of the profile and, next to my @handle, the top bar
     expect(
-      await screen.findByTestId('avatar-image', { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
+      await screen.findAllByTestId('avatar-image', { includeHiddenElements: true }),
+    ).toHaveLength(2);
   });
 
   describe('Condividi', () => {

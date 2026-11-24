@@ -104,6 +104,29 @@ describe('useTopBar', () => {
     expect(last).toEqual(['avatar-urls', { body: { userIds: ['me', 'u2'] } }]);
   });
 
+  it('espone la mia foto per la barra, nella stessa richiesta degli id extra della schermata', async () => {
+    seed({});
+    fakeSupabase.functions.invoke.mockResolvedValue({
+      data: {
+        urls: [
+          { userId: 'me', url: 'https://signed.test/a/me' },
+          { userId: 'u-amico', url: 'https://signed.test/a/u-amico' },
+        ],
+      },
+      error: null,
+    });
+    const { Wrapper } = createQueryWrapper();
+    const { result } = await renderHook(() => useTopBar(['u-amico']), { wrapper: Wrapper });
+    await waitFor(() =>
+      expect(result.current.myPhoto).toEqual({ uri: 'https://signed.test/a/me', cacheKey: 'me' }),
+    );
+    expect(result.current.avatarUrls['u-amico']).toBe('https://signed.test/a/u-amico');
+    const calls = fakeSupabase.functions.invoke.mock.calls.filter(
+      ([name]) => name === 'avatar-urls',
+    );
+    expect(calls.at(-1)).toEqual(['avatar-urls', { body: { userIds: ['me', 'u-amico'] } }]);
+  });
+
   it('senza URL firmato la storia resta senza foto (iniziale)', async () => {
     seed({ get_stories: [STORY] });
     fakeSupabase.functions.invoke.mockResolvedValue({ data: { urls: [] }, error: null });
@@ -131,6 +154,7 @@ describe('useTopBar', () => {
         {
           kind: 'like',
           actor_handle: 'volpe.viola',
+          actor_id: 'u-volpe.viola',
           post_id: 'p1',
           created_at: '2026-11-13T10:00:00Z',
         },

@@ -19,6 +19,7 @@ type Props = {
   loadFailed: boolean;
   banner: MapBannerKind;
   friendVenues: FriendVenue[];
+  avatarUrls: Record<string, string>;
   sponsored: MapVenue | null;
   recommended: RecommendedVenue | null;
   declaration: MyDeclaration | null;
@@ -39,7 +40,7 @@ export function MapBottomPanel(props: Props) {
         </Text>
       ) : null}
       {view === 'friends' && loaded ? (
-        <FriendVenueList venues={props.friendVenues} onOpen={onOpenVenue} />
+        <FriendVenueList venues={props.friendVenues} urls={props.avatarUrls} onOpen={onOpenVenue} />
       ) : null}
       {view === 'general' ? (
         <>

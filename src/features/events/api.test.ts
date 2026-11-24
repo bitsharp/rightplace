@@ -47,7 +47,15 @@ const detailRow = (overrides: Record<string, unknown> = {}) => ({
   female_pct: 60,
   male_pct: 40,
   other_pct: 0,
-  friends: [{ handle: 'volpe.viola', age_band: '18-24', gender: 'female', intent: 'going' }],
+  friends: [
+    {
+      user_id: 'u-volpe',
+      handle: 'volpe.viola',
+      age_band: '18-24',
+      gender: 'female',
+      intent: 'going',
+    },
+  ],
   is_mine: false,
   creator_handle: 'lince.rosso',
   ...overrides,
@@ -115,7 +123,13 @@ describe('fetchEventDetail', () => {
       creatorHandle: 'lince.rosso',
     });
     expect(detail.friends).toEqual([
-      { handle: 'volpe.viola', ageBand: '18-24', gender: 'female', intent: 'going' },
+      {
+        userId: 'u-volpe',
+        handle: 'volpe.viola',
+        ageBand: '18-24',
+        gender: 'female',
+        intent: 'going',
+      },
     ]);
   });
 

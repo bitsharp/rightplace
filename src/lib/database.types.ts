@@ -1305,6 +1305,7 @@ export type Database = {
         Returns: {
           friends_count: number;
           friends_going: string[];
+          friends_going_ids: string[];
           going_band: string;
           is_declarable: boolean;
           is_hot_spot: boolean;
@@ -1439,6 +1440,7 @@ export type Database = {
         Args: { p_since?: string };
         Returns: {
           actor_handle: string;
+          actor_id: string;
           created_at: string;
           kind: string;
           post_id: string;

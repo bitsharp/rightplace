@@ -34,6 +34,7 @@ type Props = {
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;
   onPickSpot?: (point: LatLng) => void;
+  avatarUrls?: Record<string, string>;
 };
 
 type BarProps = Pick<Props, 'view' | 'onChangeView' | 'onClose'>;
@@ -78,6 +79,7 @@ function FullScreenContent(props: ContentProps) {
           onOpenEvent={props.onOpenEvent}
           ownSpot={props.ownSpot}
           onPickSpot={props.onPickSpot}
+          avatarUrls={props.avatarUrls}
         />
         <View testID="map-hint-overlay" pointerEvents="none" style={styles.hint}>
           <MapHint view={props.view} />

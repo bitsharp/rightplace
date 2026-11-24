@@ -15,6 +15,7 @@ const mapRow = (overrides: Record<string, unknown> = {}) => ({
   is_hot_spot: true,
   is_sponsored: false,
   friends_going: null,
+  friends_going_ids: null,
   friends_count: null,
   is_spot: false,
   is_declarable: false,
@@ -26,7 +27,13 @@ const respondWith = (data: unknown, error: unknown = null) =>
 
 describe('fetchCityMap', () => {
   it('chiama get_city_map con città e vista e converte le righe', async () => {
-    respondWith([mapRow({ friends_going: ['volpe.viola'], friends_count: 1 })]);
+    respondWith([
+      mapRow({
+        friends_going: ['volpe.viola'],
+        friends_going_ids: ['u-volpe'],
+        friends_count: 1,
+      }),
+    ]);
     await expect(fetchCityMap('milano', 'friends')).resolves.toEqual([
       {
         venueId: 'v1',
@@ -40,6 +47,7 @@ describe('fetchCityMap', () => {
         isHotSpot: true,
         isSponsored: false,
         friendsGoing: ['volpe.viola'],
+        friendIds: ['u-volpe'],
         friendsCount: 1,
         isSpot: false,
       },

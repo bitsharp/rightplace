@@ -5,13 +5,17 @@ import { useMyChatRooms } from '@/features/chat/hooks';
 import { useMyDeclaration } from '@/features/map/hooks';
 import { isGooglePlaceId } from '@/features/venues/domain/googleMaps';
 
-import type { VenueDetail } from './api';
+import { useAvatarUrls } from '@/features/profile/avatar/hooks';
+
+import type { VenueDetail, VenueFriend } from './api';
 import { declarationFor } from './domain/declarationState';
 import { closingTimeTonight } from './domain/openingHours';
 import { openTransportLink } from './domain/openTransportLink';
 import { statsView, type StatsSegment } from './domain/statsState';
 import { buildTransportLinks, type TransportDirection } from './domain/transport';
 import { useRefreshVenueDetails, useVenueDetail, useVenueStats } from './hooks';
+
+const NO_FRIENDS: VenueFriend[] = [];
 
 export function linksFor(venue: VenueDetail, direction: TransportDirection) {
   return buildTransportLinks({
@@ -40,6 +44,8 @@ export function useVenueScreen(venueId: string) {
   const [direction, setDirection] = useState<TransportDirection>('there');
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  const friends = stats.data?.friends ?? NO_FRIENDS;
+  const avatarUrls = useAvatarUrls(friends.map((friend) => friend.userId));
   const venue = detail.data ?? null;
   const links = venue ? linksFor(venue, direction) : [];
   // While the next segment loads, the previous numbers must not pose as the new segment's.
@@ -53,7 +59,9 @@ export function useVenueScreen(venueId: string) {
     loadFailed: detail.isError,
     bands: stats.data ?? null,
     statsView: current ? statsView(current, segment) : null,
-    friends: stats.data?.friends ?? [],
+    friends,
+    // One request for the people listed here; only the photos I may see come back.
+    avatarUrls,
     segment,
     setSegment,
     direction,

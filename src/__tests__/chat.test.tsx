@@ -70,6 +70,42 @@ describe('chat di serata', () => {
 
   const open = () => renderApp('ready', '/night/r1/chat');
 
+  it('foto accanto all’handle solo per chi il server firma, una sola richiesta, nessun avatar per me', async () => {
+    fakeSupabase.functions.invoke.mockImplementation(async (name: string, options?: unknown) => {
+      if (name !== 'avatar-urls') return { data: null, error: null };
+      const ids = (options as { body: { userIds: string[] } }).body.userIds;
+      const visible = ids.filter((id) => id === VOLPE.id);
+      const urls = visible.map((userId) => ({ userId, url: `https://signed.test/a/${userId}` }));
+      return { data: { urls }, error: null };
+    });
+    seedChatBackend({
+      rooms: [ARENA],
+      messages: [
+        message('m1', VOLPE, 'ciao da volpe', 1),
+        message('m2', GATTO, 'amico di amico', 2),
+        {
+          ...message('m3', { id: 'user-1', handle: 'lince.rosso' }, 'ciao da me', 3),
+          is_mine: true,
+        },
+      ],
+      users: [VOLPE, GATTO],
+      accepted: ['u-volpe'],
+    });
+    await open();
+    await screen.findByText('ciao da volpe');
+    await waitFor(() =>
+      expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(
+        1,
+      ),
+    );
+    expect(screen.getByText('G', { includeHiddenElements: true })).toBeOnTheScreen();
+    const calls = fakeSupabase.functions.invoke.mock.calls.filter(
+      ([name]) => name === 'avatar-urls',
+    );
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.[1]).toEqual({ body: { userIds: [GATTO.id, VOLPE.id] } });
+  });
+
   it('mostra tutto ciò che restituisce la RPC, compreso un amico di amico che non seguo (nessun filtro nel client)', async () => {
     seedChatBackend({
       rooms: [ARENA],

@@ -4,6 +4,7 @@ import { FlatList, StyleSheet } from 'react-native';
 import { MessageBubble } from '@/components/app/MessageBubble';
 import { Button } from '@/components/ui/Button';
 import { MonoLabel } from '@/components/ui/MonoLabel';
+import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { spacing } from '@/theme/tokens';
 
@@ -12,6 +13,8 @@ import type { ChatMessage } from '../domain/messages';
 type Props = {
   messages: ChatMessage[];
   photoUrls: Record<string, string>;
+  // Signed profile photos by user id; missing = the initial.
+  avatarUrls: Record<string, string>;
   hasMore: boolean;
   onLoadOlder: () => void;
   onRetry: (messageId: string) => void;
@@ -23,6 +26,7 @@ type Props = {
 export function MessageList({
   messages,
   photoUrls,
+  avatarUrls,
   hasMore,
   onLoadOlder,
   onRetry,
@@ -42,6 +46,7 @@ export function MessageList({
         <MessageItem
           message={item}
           photoUri={photoUrls[item.id]}
+          avatarUrls={avatarUrls}
           onRetry={onRetry}
           onLongPress={onLongPress}
           onOpenPhoto={onOpenPhoto}
@@ -63,6 +68,7 @@ export function MessageList({
 type ItemProps = {
   message: ChatMessage;
   photoUri: string | undefined;
+  avatarUrls: Record<string, string>;
   onRetry: (messageId: string) => void;
   onLongPress: (message: ChatMessage) => void;
   onOpenPhoto: (messageId: string) => void;
@@ -73,12 +79,27 @@ function canOpenActions(message: ChatMessage): boolean {
   return !message.isMine || message.kind === 'text';
 }
 
-function MessageItem({ message, photoUri, onRetry, onLongPress, onOpenPhoto }: ItemProps) {
+function MessageItem({
+  message,
+  photoUri,
+  avatarUrls,
+  onRetry,
+  onLongPress,
+  onOpenPhoto,
+}: ItemProps) {
   const sending = message.pending === true;
   return (
     <MessageBubble
       author={message.isMine ? 'me' : 'other'}
       senderName={message.isMine ? undefined : formatHandle(message.handle)}
+      senderAvatar={
+        message.isMine
+          ? undefined
+          : {
+              initial: message.handle.replace(/^@/, '').charAt(0),
+              photo: avatarPhotoFor(avatarUrls, message.userId),
+            }
+      }
       status={message.failed ? 'failed' : sending ? 'sending' : undefined}
       onRetry={() => onRetry(message.id)}
       // delivered messages only: copy (mine included) and, on other people's, moderation

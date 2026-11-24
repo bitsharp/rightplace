@@ -55,22 +55,31 @@ describe('notifications api', () => {
         {
           kind: 'like',
           actor_handle: 'volpe.viola',
+          actor_id: 'u-volpe.viola',
           post_id: 'p1',
           created_at: '2026-11-13T10:00:00Z',
         },
         {
           kind: 'follow_request',
           actor_handle: 'orso.grigio',
+          actor_id: 'u-orso.grigio',
           post_id: null,
           created_at: '2026-11-13T11:00:00Z',
         },
       ],
     });
     await expect(fetchActivity()).resolves.toEqual([
-      { kind: 'like', actorHandle: 'volpe.viola', postId: 'p1', createdAt: '2026-11-13T10:00:00Z' },
+      {
+        kind: 'like',
+        actorHandle: 'volpe.viola',
+        actorId: 'u-volpe.viola',
+        postId: 'p1',
+        createdAt: '2026-11-13T10:00:00Z',
+      },
       {
         kind: 'follow_request',
         actorHandle: 'orso.grigio',
+        actorId: 'u-orso.grigio',
         postId: null,
         createdAt: '2026-11-13T11:00:00Z',
       },
@@ -80,7 +89,13 @@ describe('notifications api', () => {
   it('rifiuta un tipo di novità sconosciuto', async () => {
     setFakeRpc({
       get_my_activity: [
-        { kind: 'boh', actor_handle: 'x.y', post_id: null, created_at: '2026-11-13T10:00:00Z' },
+        {
+          kind: 'boh',
+          actor_handle: 'x.y',
+          actor_id: 'u-x.y',
+          post_id: null,
+          created_at: '2026-11-13T10:00:00Z',
+        },
       ],
     });
     await expect(fetchActivity()).rejects.toThrow();

@@ -36,6 +36,7 @@ export function NightChatScreen({ roomId }: { roomId: string }) {
         <MessageList
           messages={screen.messages}
           photoUrls={screen.photoUrls}
+          avatarUrls={screen.avatarUrls}
           hasMore={screen.hasMore}
           onLoadOlder={() => void screen.loadOlder()}
           onRetry={screen.retry}

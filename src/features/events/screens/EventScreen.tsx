@@ -51,7 +51,7 @@ function Body({ screen }: { screen: Screen }) {
         <RangeStat intent="maybe" band={event.maybeBand} />
       </View>
       <EventWhoIsGoing view={screen.statsView} />
-      <FriendsGoing friends={event.friends} />
+      <FriendsGoing friends={event.friends} urls={screen.avatarUrls} />
       {screen.chatRoomId ? <OpenChatButton onPress={screen.openChat} /> : null}
       <EventVenueCard name={event.venueName} kind={event.venueKind} onPress={screen.openVenue} />
       {venue ? (

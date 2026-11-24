@@ -11,6 +11,8 @@ import { usePhotoFlow } from '@/lib/photos/usePhotoFlow';
 
 import { chatExpiryHours } from './domain/ttl';
 import { mentionableHandles } from './domain/mentions';
+import { useAvatarUrls } from '@/features/profile/avatar/hooks';
+
 import type { ChatMessage } from './domain/messages';
 import { usePhotoUrls, useMyChatRooms, useRoomMessages, useSendMessage } from './hooks';
 import { useFollowByHandle } from './useFollowByHandle';
@@ -40,6 +42,10 @@ export function useNightChatScreen(roomId: string) {
   useMarkRoomRead(roomId, messages[0]?.createdAt ?? null);
   const sender = useSendMessage(roomId, me);
   const photoFlow = usePhotoFlow((cleanUri) => sender.send({ cleanUri }));
+  // One request for the authors in the room (not me): only the photos the server lets me see come back.
+  const avatarUrls = useAvatarUrls(
+    messages.filter((message) => !message.isMine).map((message) => message.userId),
+  );
   const photos = messages.filter((m) => m.kind === 'photo' && !m.pending && !m.failed);
   const photoUrls = usePhotoUrls(
     roomId,
@@ -57,6 +63,7 @@ export function useNightChatScreen(roomId: string) {
     messages,
     photos: photos.map((m) => ({ id: m.id, handle: m.handle, uri: photoUrls[m.id] })),
     photoUrls,
+    avatarUrls,
     loadFailed: loaded.isError,
     hasMore: loaded.hasMore,
     loadOlder: loaded.loadOlder,

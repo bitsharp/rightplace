@@ -11,6 +11,8 @@ import type { TransportDirection } from '@/features/venue/domain/transport';
 import { useVenueDetail } from '@/features/venue/hooks';
 import { linksFor } from '@/features/venue/useVenueScreen';
 
+import { useAvatarUrls } from '@/features/profile/avatar/hooks';
+
 import { useEventDetail } from './hooks';
 import { useTargetLabel, useWhenLabel } from './useEventLabels';
 
@@ -31,6 +33,8 @@ export function useEventScreen(eventId: string) {
   const event = detail.data ?? null;
   // The venue catalog gives country, Google place and taxi number for "Andare e tornare".
   const venue = useVenueDetail(event?.venueId ?? '', event !== null).data ?? null;
+  // One request for the friends listed on the page: only the photos I may see come back.
+  const avatarUrls = useAvatarUrls(event?.friends.map((friend) => friend.userId) ?? []);
   const mine = useMyDeclaration();
   const room = useMyChatRooms().data?.find((candidate) => candidate.eventId === eventId);
   const transport = useTransport(venue);
@@ -44,6 +48,7 @@ export function useEventScreen(eventId: string) {
   return {
     event,
     venue,
+    avatarUrls,
     loadFailed: detail.isError,
     cancelled,
     canDeclare: event !== null && !cancelled && !ended,

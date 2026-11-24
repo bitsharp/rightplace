@@ -26,6 +26,7 @@ import { useCurrentCity } from './useCurrentCity';
 
 const NO_ROWS: readonly MapVenue[] = [];
 const NO_FRIEND_VENUES: FriendVenue[] = [];
+const NO_IDS: string[] = [];
 // Marker and child both report a tap on some devices: one navigation per venue is enough.
 const DOUBLE_TAP_MS = 600;
 
@@ -96,6 +97,12 @@ export function useMapScreen() {
   const citySlug = useCurrentCity();
   const cities = useActiveCities();
   const { layers, generalRows, loaded, loadFailed } = useMapLayers(citySlug, view);
+  // One batch for the whole screen (top bar and friends map); the general map asks for no friend photo at all.
+  const friendIds = useMemo(
+    () => (view === 'friends' ? layers.friendVenues.flatMap((venue) => venue.friendIds) : NO_IDS),
+    [view, layers.friendVenues],
+  );
+  const topBar = useTopBar(friendIds);
   const eventSpots = useEventSpots(citySlug, view, layers.hotSpots);
   const declaration = useMyDeclaration();
   const recommended = useRecommendedVenue(citySlug);
@@ -120,7 +127,8 @@ export function useMapScreen() {
     sponsored: generalRows.find((row) => row.isSponsored) ?? null,
     recommended: recommended.data ?? null,
     declaration: declaration.data ?? null,
-    topBar: useTopBar(),
+    topBar,
+    avatarUrls: topBar.avatarUrls,
     openVenue,
     spotPoint,
     pickSpot: setSpotPoint,

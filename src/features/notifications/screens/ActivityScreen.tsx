@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Avatar } from '@/components/ui/Avatar';
+import { Avatar, type AvatarPhoto } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { ProfileLink } from '@/components/ui/ProfileLink';
 import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
+import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
+import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { useOpenProfile } from '@/features/profile/useOpenProfile';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
@@ -33,9 +35,17 @@ function useMarkActivitySeen(items: readonly ActivityItem[] | undefined) {
   }, [items, markSeen]);
 }
 
-type RowProps = { item: ActivityItem; onPress: () => void; onOpenActor: () => void };
+type RowProps = {
+  item: ActivityItem;
+  photo?: AvatarPhoto;
+  onPress: () => void;
+  onOpenActor: () => void;
+};
 
-function ActivityRow({ item, onPress, onOpenActor }: RowProps) {
+// A pending requester is not linked to me yet: their photo is never visible, so it is not even requested.
+const hasVisiblePhoto = (item: ActivityItem) => item.kind !== 'follow_request';
+
+function ActivityRow({ item, photo, onPress, onOpenActor }: RowProps) {
   const { t, i18n } = useTranslation('notifications');
   const when = new Intl.DateTimeFormat(i18n.language, {
     dateStyle: 'short',
@@ -45,7 +55,12 @@ function ActivityRow({ item, onPress, onOpenActor }: RowProps) {
     <View style={styles.row}>
       {/* The row leads to what happened; the actor's avatar leads to their profile. */}
       <ProfileLink handle={item.actorHandle} onPress={onOpenActor}>
-        <Avatar intent="going" size={36} initial={item.actorHandle.replace(/^@/, '').charAt(0)} />
+        <Avatar
+          intent="going"
+          size={36}
+          initial={item.actorHandle.replace(/^@/, '').charAt(0)}
+          photo={photo}
+        />
       </ProfileLink>
       <Pressable accessibilityRole="button" onPress={onPress} style={styles.target}>
         <View style={styles.body}>
@@ -68,6 +83,10 @@ export function ActivityScreen() {
   const openProfile = useOpenProfile();
   const activity = useActivity();
   useMarkActivitySeen(activity.data);
+  // One request for the whole list: the server returns only the photos I may see.
+  const avatars = useAvatarUrls(
+    activity.data?.filter(hasVisiblePhoto).map((item) => item.actorId) ?? [],
+  );
   return (
     <Screen scroll>
       <View style={styles.header}>
@@ -89,6 +108,7 @@ export function ActivityScreen() {
         <ActivityRow
           key={`${item.kind}:${item.actorHandle}:${item.postId ?? ''}:${item.createdAt}`}
           item={item}
+          photo={hasVisiblePhoto(item) ? avatarPhotoFor(avatars, item.actorId) : undefined}
           onPress={() => router.push(activityRoute(item) as Href)}
           onOpenActor={() => openProfile({ handle: item.actorHandle, isMine: false })}
         />

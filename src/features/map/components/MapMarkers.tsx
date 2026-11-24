@@ -1,7 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 
 import { EventSpot } from '@/components/app/EventSpot';
+import { FriendFaces } from '@/components/app/FriendFaces';
 import { HotSpot } from '@/components/app/HotSpot';
 import { OwnSpot } from '@/components/app/OwnSpot';
 import { SpotMarker } from '@/components/app/SpotMarker';
@@ -9,7 +11,7 @@ import { TypicalDot } from '@/components/app/TypicalDot';
 import type { LatLng } from '@/features/profile/domain/coarsen';
 
 import type { EventSpotPlacement } from '../domain/eventSpots';
-import type { HotSpotVenue, MapVenue } from '../domain/mapLayers';
+import { friendFacesOf, type HotSpotVenue, type MapVenue } from '../domain/mapLayers';
 import type { OwnSpot as OwnSpotData } from '../domain/ownSpot';
 import { isVisibleTypical } from '../domain/typical';
 import type { MapViewMode } from '../store/mapStore';
@@ -50,6 +52,52 @@ export function MapMarker({ coordinate, contentKey, children, ...props }: Marker
   );
 }
 
+const FACES_HEIGHT = 30;
+const NO_URLS: AvatarUrls = {};
+
+type AvatarUrls = Record<string, string>;
+
+const facesOf = (venue: MapVenue) => friendFacesOf(venue.friendsGoing ?? [], venue.friendIds);
+
+// Re-capture the marker bitmap when a photo arrives (the faces are part of it).
+const facesKey = (venue: MapVenue, view: MapViewMode, urls: AvatarUrls) =>
+  view === 'friends'
+    ? facesOf(venue)
+        .map((face) => (urls[face.userId] ? 1 : 0))
+        .join('')
+    : '';
+
+// Faces only on the friends map (principle 1: a photo is for accepted follows): the general map never draws one.
+// The spacer above balances the faces below, so the marker stays centred on the venue.
+function WithFriendFaces({
+  venue,
+  view,
+  urls,
+  children,
+}: {
+  venue: MapVenue;
+  view: MapViewMode;
+  urls: AvatarUrls;
+  children: ReactNode;
+}) {
+  const faces = view === 'friends' ? facesOf(venue) : [];
+  if (faces.length === 0) return children;
+  return (
+    <View style={styles.stack}>
+      <View style={styles.faces} />
+      {children}
+      <View style={styles.faces}>
+        <FriendFaces friends={faces} urls={urls} />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  stack: { alignItems: 'center' },
+  faces: { height: FACES_HEIGHT, alignItems: 'center', justifyContent: 'center' },
+});
+
 function friendsCaption(venue: MapVenue, view: MapViewMode): string | undefined {
   return view === 'friends' ? String(venue.friendsCount ?? 0) : undefined;
 }
@@ -84,10 +132,12 @@ export function TypicalMarkers({
 export function HotSpotMarkers({
   hotSpots,
   view,
+  urls = NO_URLS,
   onOpenVenue,
 }: {
   hotSpots: HotSpotVenue[];
   view: MapViewMode;
+  urls?: AvatarUrls;
   onOpenVenue: (venueId: string) => void;
 }) {
   return hotSpots.map((venue) => (
@@ -99,19 +149,22 @@ export function HotSpotMarkers({
         venue.maybeBand,
         view,
         venue.friendsCount ?? '',
+        facesKey(venue, view, urls),
       ].join(':')}
       testID={`marker-hot-${venue.venueId}`}
       coordinate={venue}
       zIndex={Z_INDEX.hotSpot}
       onPress={() => onOpenVenue(venue.venueId)}
     >
-      <HotSpot
-        venueName={venue.name}
-        goingBand={venue.goingBand}
-        maybeBand={venue.maybeBand}
-        caption={friendsCaption(venue, view)}
-        onPress={() => onOpenVenue(venue.venueId)}
-      />
+      <WithFriendFaces venue={venue} view={view} urls={urls}>
+        <HotSpot
+          venueName={venue.name}
+          goingBand={venue.goingBand}
+          maybeBand={venue.maybeBand}
+          caption={friendsCaption(venue, view)}
+          onPress={() => onOpenVenue(venue.venueId)}
+        />
+      </WithFriendFaces>
     </MapMarker>
   ));
 }
@@ -119,26 +172,36 @@ export function HotSpotMarkers({
 export function SpotMarkers({
   spots,
   view,
+  urls = NO_URLS,
   onOpenVenue,
 }: {
   spots: MapVenue[];
   view: MapViewMode;
+  urls?: AvatarUrls;
   onOpenVenue: (venueId: string) => void;
 }) {
   return spots.map((venue) => (
     <MapMarker
       key={venue.venueId}
-      contentKey={[venue.venueId, venue.name, view, venue.friendsCount ?? ''].join(':')}
+      contentKey={[
+        venue.venueId,
+        venue.name,
+        view,
+        venue.friendsCount ?? '',
+        facesKey(venue, view, urls),
+      ].join(':')}
       testID={`marker-spot-${venue.venueId}`}
       coordinate={venue}
       zIndex={Z_INDEX.spot}
       onPress={() => onOpenVenue(venue.venueId)}
     >
-      <SpotMarker
-        name={venue.name}
-        caption={friendsCaption(venue, view)}
-        onPress={() => onOpenVenue(venue.venueId)}
-      />
+      <WithFriendFaces venue={venue} view={view} urls={urls}>
+        <SpotMarker
+          name={venue.name}
+          caption={friendsCaption(venue, view)}
+          onPress={() => onOpenVenue(venue.venueId)}
+        />
+      </WithFriendFaces>
     </MapMarker>
   ));
 }

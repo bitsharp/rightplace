@@ -75,6 +75,7 @@ export async function fetchVenueDetail(venueId: string): Promise<VenueDetail> {
 const bandSchema = z.enum(BANDS);
 
 const friendSchema = z.object({
+  user_id: z.string(),
   handle: z.string(),
   age_band: z.enum(['18-24', '25-34', '35-44', '45+']),
   gender: z.enum(['female', 'male', 'other']),
@@ -92,6 +93,7 @@ const statsRowSchema = z.object({
 });
 
 export type VenueFriend = {
+  userId: string;
   handle: string;
   ageBand: '18-24' | '25-34' | '35-44' | '45+';
   gender: 'female' | 'male' | 'other';
@@ -121,6 +123,7 @@ export async function fetchVenueStats(venueId: string, segment: StatsSegment): P
     femalePct: row.female_pct,
     malePct: row.male_pct,
     friends: row.friends.map((friend) => ({
+      userId: friend.user_id,
       handle: friend.handle,
       ageBand: friend.age_band,
       gender: friend.gender,

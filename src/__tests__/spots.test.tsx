@@ -28,6 +28,7 @@ const spotRow = (overrides: Record<string, unknown> = {}) => ({
   is_hot_spot: false,
   is_sponsored: false,
   friends_going: null,
+  friends_going_ids: null,
   friends_count: null,
   is_spot: true,
   is_declarable: true,

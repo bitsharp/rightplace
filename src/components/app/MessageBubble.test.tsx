@@ -28,6 +28,40 @@ describe('MessageBubble', () => {
     expect(screen.getByTestId('bubble')).toHaveStyle({ backgroundColor: colors.surface });
   });
 
+  it('accanto all’handle mostra la foto del mittente se visibile, altrimenti l’iniziale', async () => {
+    const photo = { uri: 'https://signed.test/a/volpe', cacheKey: 'u-volpe' };
+    const { rerender } = await render(
+      <MessageBubble
+        author="other"
+        senderName="@volpe.viola"
+        senderAvatar={{ initial: 'v', photo }}
+        content={{ kind: 'text', text: 'ci sono' }}
+      />,
+    );
+    expect(screen.getByTestId('avatar-image', { includeHiddenElements: true })).toBeOnTheScreen();
+    await rerender(
+      <MessageBubble
+        author="other"
+        senderName="@volpe.viola"
+        senderAvatar={{ initial: 'v' }}
+        content={{ kind: 'text', text: 'ci sono' }}
+      />,
+    );
+    expect(screen.queryByTestId('avatar-image', { includeHiddenElements: true })).toBeNull();
+    expect(screen.getByText('V', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+
+  it('i miei messaggi non hanno avatar', async () => {
+    await render(
+      <MessageBubble
+        author="me"
+        senderAvatar={{ initial: 'l' }}
+        content={{ kind: 'text', text: 'ciao' }}
+      />,
+    );
+    expect(screen.queryByTestId('avatar')).toBeNull();
+  });
+
   it('per le mie foto ricorda che le vedono solo i follower', async () => {
     await render(<MessageBubble author="me" content={{ kind: 'photo', caption: 'che serata' }} />);
     expect(screen.getByText('che serata')).toBeOnTheScreen();

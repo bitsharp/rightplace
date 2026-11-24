@@ -49,6 +49,7 @@ const ROOM = {
 const LIKE = {
   kind: 'like',
   actor_handle: 'volpe.viola',
+  actor_id: 'u-volpe.viola',
   post_id: 'p1',
   created_at: '2026-11-13T10:00:00Z',
 };

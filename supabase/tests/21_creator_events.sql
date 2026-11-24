@@ -306,7 +306,8 @@ create temp table soon_detail as select * from get_event_detail(:'soon');
 select is((select name || '|' || venue_name || '|' || creator_handle from soon_detail), 'Domani Sera|Arena Club|lince.rosso', 'nome, locale e handle del creator');
 select is((select jsonb_array_length(friends) from soon_detail), 1, 'amici: solo follow accettati');
 select is((select friends -> 0 ->> 'handle' from soon_detail), 'orso.verde', 'amico accettato');
-select is((select (friends -> 0) ? 'user_id' from soon_detail), false, 'gli amici non espongono id');
+-- prompt 22 (blocco 2): l'id dell'amico accettato serve a chiedere la foto con avatar-urls (il server ricontrolla la visibilità)
+select is((select friends -> 0 ->> 'user_id' from soon_detail), :'friend'::text, 'gli amici portano il proprio id (solo accettati)');
 select is((select going_band || '|' || maybe_band from soon_detail), '3–10|pochi', 'bande');
 select is((select avg_age from soon_detail), null, '4 going + 1 maybe: statistiche nascoste (k per sottogruppo)');
 select is((select is_mine from soon_detail), false, 'is_mine falso per un altro utente');

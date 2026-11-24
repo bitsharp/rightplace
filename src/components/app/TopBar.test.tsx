@@ -40,6 +40,21 @@ describe('TopBar: foto delle storie', () => {
   });
 });
 
+describe('TopBar: la mia foto accanto al mio @handle', () => {
+  it('mostra la mia foto quando c’è', async () => {
+    const myPhoto = { uri: 'https://signed.test/a/me', cacheKey: 'me' };
+    await render(<TopBar {...baseProps} canPost={false} myPhoto={myPhoto} stories={[]} />);
+    expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(1);
+    expect(screen.getByText('@lince.rosso')).toBeOnTheScreen();
+  });
+
+  it('senza foto resta l’iniziale del mio handle', async () => {
+    await render(<TopBar {...baseProps} canPost={false} stories={[]} />);
+    expect(screen.queryByTestId('avatar-image', { includeHiddenElements: true })).toBeNull();
+    expect(screen.getByText('L', { includeHiddenElements: true })).toBeOnTheScreen();
+  });
+});
+
 describe('TopBar', () => {
   it('nasconde il "+" finché l’utente non ha dichiarato la serata', async () => {
     await render(<TopBar {...baseProps} canPost={false} />);

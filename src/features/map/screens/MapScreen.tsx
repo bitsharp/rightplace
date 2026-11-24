@@ -13,7 +13,7 @@ import { useMapScreen } from '../useMapScreen';
 
 export function MapScreen() {
   const map = useMapScreen();
-  const { topBar } = map;
+  const { avatarUrls, ...topBar } = map.topBar;
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
       <TopBar {...topBar} />
@@ -32,6 +32,7 @@ export function MapScreen() {
         onOpenVenue={map.openVenue}
         onOpenEvent={map.openEvent}
         onPickSpot={map.pickSpot}
+        avatarUrls={avatarUrls}
       />
       <MapBottomPanel
         view={map.view}
@@ -39,6 +40,7 @@ export function MapScreen() {
         loadFailed={map.loadFailed}
         banner={map.banner}
         friendVenues={map.layers.friendVenues}
+        avatarUrls={avatarUrls}
         sponsored={map.sponsored}
         recommended={map.recommended}
         declaration={map.declaration}

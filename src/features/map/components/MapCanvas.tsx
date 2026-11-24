@@ -43,6 +43,8 @@ type Props = {
   ownSpot?: OwnSpotData | null;
   // A 3 s press on the map picked this point: the caller opens the "serata in questo punto" sheet.
   onPickSpot?: (point: LatLng) => void;
+  // Signed photos of the friends on the friends map (one batch per screen); never used on the general map.
+  avatarUrls?: Record<string, string>;
 };
 
 const NO_EVENTS: readonly EventSpotPlacement[] = [];
@@ -59,6 +61,7 @@ export function MapCanvas({
   onOpenEvent,
   ownSpot = null,
   onPickSpot,
+  avatarUrls,
 }: Props) {
   const { t } = useTranslation('map');
   const mapRef = useRef<MapView>(null);
@@ -76,9 +79,14 @@ export function MapCanvas({
       {...mapAppearance}
     >
       <TypicalMarkers dots={layers.typicalDots} onOpenVenue={onOpenVenue} />
-      <SpotMarkers spots={layers.spots} view={view} onOpenVenue={onOpenVenue} />
+      <SpotMarkers spots={layers.spots} view={view} urls={avatarUrls} onOpenVenue={onOpenVenue} />
       <EventMarkers events={events} onOpenEvent={onOpenEvent} />
-      <HotSpotMarkers hotSpots={layers.hotSpots} view={view} onOpenVenue={onOpenVenue} />
+      <HotSpotMarkers
+        hotSpots={layers.hotSpots}
+        view={view}
+        urls={avatarUrls}
+        onOpenVenue={onOpenVenue}
+      />
       {ownSpot ? <OwnMarker spot={ownSpot} onOpenVenue={onOpenVenue} /> : null}
       {you ? (
         <MapMarker

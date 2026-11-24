@@ -60,9 +60,10 @@ describe('foto profilo nel feed', () => {
       posts: [post('p1', { id: ME, handle: 'lince.rosso' }, { is_mine: true })],
     });
     await renderApp('ready', '/feed');
+    // the post and, next to my @handle, the top bar
     expect(
-      await screen.findByTestId('avatar-image', { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
+      await screen.findAllByTestId('avatar-image', { includeHiddenElements: true }),
+    ).toHaveLength(2);
   });
 
   it('senza foto visibili resta l’iniziale', async () => {

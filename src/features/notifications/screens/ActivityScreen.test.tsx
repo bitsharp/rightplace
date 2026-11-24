@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
-import { setFakeRpc } from '@/test/fakeSupabase';
+import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
 import { useNotificationStore } from '../store/notificationStore';
@@ -14,16 +14,24 @@ jest.mock('expo-router', () => ({
 }));
 
 const ITEMS = [
-  { kind: 'like', actor_handle: 'volpe.viola', post_id: 'p1', created_at: '2026-11-13T12:00:00Z' },
+  {
+    kind: 'like',
+    actor_handle: 'volpe.viola',
+    actor_id: 'u-volpe.viola',
+    post_id: 'p1',
+    created_at: '2026-11-13T12:00:00Z',
+  },
   {
     kind: 'follow_request',
     actor_handle: 'orso.grigio',
+    actor_id: 'u-orso.grigio',
     post_id: null,
     created_at: '2026-11-13T11:00:00Z',
   },
   {
     kind: 'follow_accepted',
     actor_handle: 'gatto.nero',
+    actor_id: 'u-gatto.nero',
     post_id: null,
     created_at: '2026-11-13T10:00:00Z',
   },
@@ -44,6 +52,26 @@ describe('ActivityScreen', () => {
     expect(
       screen.getByText('notifications:activity.items.follow_accepted({"handle":"@gatto.nero"})'),
     ).toBeOnTheScreen();
+  });
+
+  it('foto per chi è visibile, una sola richiesta, e le richieste di follow restano con l’iniziale', async () => {
+    setFakeRpc({ get_my_activity: ITEMS });
+    fakeSupabase.functions.invoke.mockResolvedValue({
+      data: { urls: [{ userId: 'u-volpe.viola', url: 'https://signed.test/a/volpe' }] },
+      error: null,
+    });
+    await render(<ActivityScreen />, { wrapper: createQueryWrapper().Wrapper });
+    await waitFor(() =>
+      expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(
+        1,
+      ),
+    );
+    const calls = fakeSupabase.functions.invoke.mock.calls.filter(
+      ([name]) => name === 'avatar-urls',
+    );
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.[1]).toEqual({ body: { userIds: ['u-gatto.nero', 'u-volpe.viola'] } });
+    expect(screen.getByText('O', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   it('all’apertura segna tutto come visto (il pallino della campanella si spegne)', async () => {

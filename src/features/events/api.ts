@@ -75,6 +75,7 @@ export async function fetchCityEvents(
 }
 
 const friendSchema = z.object({
+  user_id: z.string(),
   handle: z.string(),
   age_band: z.enum(['18-24', '25-34', '35-44', '45+']),
   gender: z.enum(['female', 'male', 'other']),
@@ -154,6 +155,7 @@ export async function fetchEventDetail(eventId: string): Promise<EventDetail> {
     femalePct: row.female_pct,
     malePct: row.male_pct,
     friends: row.friends.map((friend) => ({
+      userId: friend.user_id,
       handle: friend.handle,
       ageBand: friend.age_band,
       gender: friend.gender,

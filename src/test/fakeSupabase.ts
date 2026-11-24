@@ -117,6 +117,11 @@ export const fakeStorageUpload = jest.fn(
   }),
 );
 
+// By default no profile photo is visible to the viewer (the Edge Function returns an empty list).
+async function defaultInvoke(name: string, _options?: unknown): Promise<Result> {
+  return { data: name === 'avatar-urls' ? { urls: [] } : null, error: null };
+}
+
 export const fakeSupabase = {
   auth: {
     getSession: jest.fn(async () => ({ data: { session: state.session }, error: null })),
@@ -152,10 +157,7 @@ export const fakeSupabase = {
   removeChannel: jest.fn(async (_channel: FakeChannel) => 'ok'),
   storage: { from: jest.fn((_bucket: string) => ({ upload: fakeStorageUpload })) },
   functions: {
-    invoke: jest.fn(async (_name: string, _options?: unknown): Promise<Result> => ({
-      data: null,
-      error: null,
-    })),
+    invoke: jest.fn(defaultInvoke),
   },
 };
 
@@ -225,4 +227,6 @@ export function resetFakeSupabase(): void {
   state.tables = {};
   state.listeners.clear();
   jest.clearAllMocks();
+  // a test that stubbed the Edge Functions must not leak into the next one
+  fakeSupabase.functions.invoke.mockImplementation(defaultInvoke);
 }

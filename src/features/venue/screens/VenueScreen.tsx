@@ -93,7 +93,7 @@ function VenueBody({ screen }: BodyProps) {
       <VenueWebsite url={venue.websiteUri} />
       <Bands screen={screen} />
       <WhoIsGoing segment={screen.segment} onSegment={screen.setSegment} view={screen.statsView} />
-      <FriendsGoing friends={screen.friends} />
+      <FriendsGoing friends={screen.friends} urls={screen.avatarUrls} />
       {screen.chatRoomId ? <OpenChatButton onPress={screen.openChat} /> : null}
       <GettingThere
         venueName={venue.name}

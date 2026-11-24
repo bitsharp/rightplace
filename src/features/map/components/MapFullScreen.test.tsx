@@ -35,6 +35,7 @@ const hot: HotSpotVenue = {
   isHotSpot: true,
   isSponsored: false,
   friendsGoing: null,
+  friendIds: null,
   friendsCount: null,
   isSpot: false,
 };

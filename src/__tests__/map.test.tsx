@@ -26,6 +26,7 @@ const mapRow = (overrides: Record<string, unknown>) => ({
   is_hot_spot: false,
   is_sponsored: false,
   friends_going: null,
+  friends_going_ids: null,
   friends_count: null,
   ...overrides,
 });
@@ -43,6 +44,7 @@ const hidden = mapRow({ venue_id: 'hidden', name: 'Locale Fantasma', typical_lev
 const friendArena = mapRow({
   ...arena,
   friends_going: ['volpe.viola', 'orso.grigio'],
+  friends_going_ids: ['u-volpe', 'u-orso'],
   friends_count: 2,
 });
 const friendTerrace = mapRow({
@@ -50,6 +52,7 @@ const friendTerrace = mapRow({
   name: 'Terrazza',
   kind: 'rooftop',
   friends_going: ['gatto.blu'],
+  friends_going_ids: ['u-gatto'],
   friends_count: 1,
 });
 
@@ -240,6 +243,56 @@ describe('mappa', () => {
     it('ricorda la vista scelta', async () => {
       await openFriendsView();
       expect(useMapStore.getState().view).toBe('friends');
+    });
+  });
+
+  describe('foto degli amici', () => {
+    // Like the Edge Function: only the ids in `visible` come back signed.
+    const signAvatars = (visible: string[]) =>
+      fakeSupabase.functions.invoke.mockImplementation(async (name: string, options?: unknown) => {
+        if (name !== 'avatar-urls') return { data: null, error: null };
+        const ids = (options as { body: { userIds: string[] } }).body.userIds;
+        const urls = ids
+          .filter((id) => visible.includes(id))
+          .map((userId) => ({ userId, url: `https://signed.test/a/${userId}` }));
+        return { data: { urls }, error: null };
+      });
+    const avatarCalls = () =>
+      fakeSupabase.functions.invoke.mock.calls.filter(([name]) => name === 'avatar-urls');
+
+    it('nella mappa amici: foto per chi il server firma, iniziale per gli altri, una sola richiesta', async () => {
+      signAvatars(['u-volpe']);
+      await renderApp('ready', '/map');
+      await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') });
+      await fireEvent.press(screen.getByRole('button', { name: 'map:view.friends' }));
+      await screen.findByText('ui:friendsGoing({"count":2}) · @volpe.viola, @orso.grigio');
+      // the marker of the venue and its row in the list
+      await waitFor(() =>
+        expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(
+          2,
+        ),
+      );
+      expect(screen.getAllByText('O', { includeHiddenElements: true }).length).toBeGreaterThan(0);
+      const withFriends = avatarCalls().filter(([, options]) =>
+        (options as { body: { userIds: string[] } }).body.userIds.includes('u-volpe'),
+      );
+      expect(withFriends).toHaveLength(1);
+      expect(withFriends[0]?.[1]).toEqual({
+        body: { userIds: ['u-gatto', 'u-orso', 'u-volpe', 'user-1'] },
+      });
+    });
+
+    it('nella mappa generale non compare nessun volto e nessuna richiesta di foto di amici', async () => {
+      signAvatars(['u-volpe', 'u-orso', 'u-gatto']);
+      await renderApp('ready', '/map');
+      await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') });
+      expect(screen.queryByTestId('friend-faces', { includeHiddenElements: true })).toBeNull();
+      expect(screen.queryByTestId('avatar-image', { includeHiddenElements: true })).toBeNull();
+      const friendIds = ['u-volpe', 'u-orso', 'u-gatto'];
+      const asked = avatarCalls().flatMap(
+        ([, options]) => (options as { body: { userIds: string[] } }).body.userIds,
+      );
+      expect(asked.filter((id) => friendIds.includes(id))).toEqual([]);
     });
   });
 

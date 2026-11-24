@@ -32,7 +32,15 @@ const statsRow = (overrides: Record<string, unknown> = {}) => ({
   female_pct: 52,
   male_pct: 48,
   other_pct: 0,
-  friends: [{ handle: 'volpe.viola', age_band: '18-24', gender: 'female', intent: 'going' }],
+  friends: [
+    {
+      user_id: 'u-volpe',
+      handle: 'volpe.viola',
+      age_band: '18-24',
+      gender: 'female',
+      intent: 'going',
+    },
+  ],
   is_sponsored: false,
   ...overrides,
 });
@@ -137,7 +145,15 @@ describe('fetchVenueStats', () => {
       avgAge: 23,
       femalePct: 52,
       malePct: 48,
-      friends: [{ handle: 'volpe.viola', ageBand: '18-24', gender: 'female', intent: 'going' }],
+      friends: [
+        {
+          userId: 'u-volpe',
+          handle: 'volpe.viola',
+          ageBand: '18-24',
+          gender: 'female',
+          intent: 'going',
+        },
+      ],
     });
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_venue_stats', {
       p_venue_id: 'v1',
@@ -162,7 +178,9 @@ describe('fetchVenueStats', () => {
 
   it('rifiuta un amico con dati fuori contratto', async () => {
     respondWith([
-      statsRow({ friends: [{ handle: 'x.y', age_band: '33', gender: 'f', intent: 'going' }] }),
+      statsRow({
+        friends: [{ user_id: 'u-xy', handle: 'x.y', age_band: '33', gender: 'f', intent: 'going' }],
+      }),
     ]);
     await expect(fetchVenueStats('v1', 'all')).rejects.toThrow();
   });

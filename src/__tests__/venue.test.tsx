@@ -53,6 +53,7 @@ const mapRow = {
   is_hot_spot: true,
   is_sponsored: false,
   friends_going: null,
+  friends_going_ids: null,
   friends_count: null,
 };
 
@@ -157,12 +158,67 @@ describe('dettaglio locale e dichiarazione', () => {
       });
     });
 
+    // Like the Edge Function: only the ids in `visible` come back signed.
+    const signAvatars = (visible: string[]) =>
+      fakeSupabase.functions.invoke.mockImplementation(async (name: string, options?: unknown) => {
+        if (name !== 'avatar-urls') return { data: null, error: null };
+        const ids = (options as { body: { userIds: string[] } }).body.userIds;
+        const urls = ids
+          .filter((id) => visible.includes(id))
+          .map((userId) => ({ userId, url: `https://signed.test/a/${userId}` }));
+        return { data: { urls }, error: null };
+      });
+
+    it('le foto degli amici: firmata per chi la rende visibile, iniziale per gli altri, una sola richiesta', async () => {
+      signAvatars(['u-volpe']);
+      seedBackend({
+        stats: () =>
+          stats({
+            friends: [
+              {
+                user_id: 'u-volpe',
+                handle: 'volpe.viola',
+                age_band: '18-24',
+                gender: 'female',
+                intent: 'going',
+              },
+              {
+                user_id: 'u-orso',
+                handle: 'orso.grigio',
+                age_band: '25-34',
+                gender: 'male',
+                intent: 'maybe',
+              },
+            ],
+          }),
+      });
+      await renderApp('ready', '/venue/arena');
+      await screen.findByText('@orso.grigio');
+      await waitFor(() =>
+        expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(
+          1,
+        ),
+      );
+      expect(screen.getByText('O', { includeHiddenElements: true })).toBeOnTheScreen();
+      const calls = fakeSupabase.functions.invoke.mock.calls.filter(
+        ([name]) => name === 'avatar-urls',
+      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0]?.[1]).toEqual({ body: { userIds: ['u-orso', 'u-volpe'] } });
+    });
+
     it('elenca gli amici che ci vanno', async () => {
       seedBackend({
         stats: () =>
           stats({
             friends: [
-              { handle: 'volpe.viola', age_band: '18-24', gender: 'female', intent: 'going' },
+              {
+                user_id: 'u-volpe',
+                handle: 'volpe.viola',
+                age_band: '18-24',
+                gender: 'female',
+                intent: 'going',
+              },
             ],
           }),
       });

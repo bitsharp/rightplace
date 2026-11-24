@@ -17,6 +17,8 @@ export type MapVenue = {
   isHotSpot: boolean;
   isSponsored: boolean;
   friendsGoing: string[] | null;
+  // Aligned with friendsGoing; only used to ask for their photos (the server decides who is visible).
+  friendIds: string[] | null;
   friendsCount: number | null;
   isSpot: boolean;
 };
@@ -24,7 +26,13 @@ export type MapVenue = {
 // A hot spot always has bands: the type says so, so no marker can print a made-up "pochi".
 export type HotSpotVenue = MapVenue & { goingBand: Band; maybeBand: Band };
 
-export type FriendVenue = { venueId: string; name: string; handles: string[]; count: number };
+export type FriendVenue = {
+  venueId: string;
+  name: string;
+  handles: string[];
+  friendIds: string[];
+  count: number;
+};
 
 export type MapLayers = { hotSpots: HotSpotVenue[]; spots: MapVenue[]; typicalDots: MapVenue[] };
 export type FriendsMapLayers = MapLayers & { friendVenues: FriendVenue[] };
@@ -56,6 +64,7 @@ function toFriendVenue(row: MapVenue): FriendVenue {
     venueId: row.venueId,
     name: row.name,
     handles: row.friendsGoing ?? [],
+    friendIds: row.friendIds ?? [],
     count: friendsOf(row),
   };
 }
@@ -76,6 +85,17 @@ export function buildFriendsLayers(
       .map(toFriendVenue)
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'it')),
   };
+}
+
+// Handles and ids come aligned from get_city_map; a mismatch (older server) just shows fewer faces.
+export function friendFacesOf(
+  handles: readonly string[],
+  friendIds: readonly string[] | null,
+): { userId: string; handle: string }[] {
+  const ids = friendIds ?? [];
+  return handles
+    .slice(0, ids.length)
+    .map((handle, index) => ({ userId: ids[index] ?? '', handle }));
 }
 
 export function mapBanner(layers: MapLayers): MapBanner {

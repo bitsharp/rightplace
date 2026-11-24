@@ -22,7 +22,8 @@ const latestVisibleFrom = (posts: readonly { visibleFrom: string }[] | undefined
   ) ?? null;
 
 // One TopBar for every tab: handle, "+" (only with a recent declaration), news bell and stories.
-export function useTopBar() {
+// `extraAvatarIds` lets a screen add its own people (e.g. the friends map) to the same batch request.
+export function useTopBar(extraAvatarIds: readonly string[] = []) {
   const router = useRouter();
   const { profile, userId } = useSession();
   const target = usePostTarget();
@@ -34,10 +35,17 @@ export function useTopBar() {
   const handle = profile?.handle ?? '';
   const entries = stories.data ?? [];
   // One request for my photo and everyone in the strip: only the ones I may see come back.
-  const avatars = useAvatarUrls([userId, ...entries.map((entry) => entry.userId)]);
+  const avatars = useAvatarUrls([
+    userId,
+    ...entries.map((entry) => entry.userId),
+    ...extraAvatarIds,
+  ]);
 
   return {
     handle,
+    myPhoto: avatarPhotoFor(avatars, userId),
+    // The whole batch, for the screen that asked for extra ids.
+    avatarUrls: avatars,
     canPost: canPost(target.data),
     // the bell: new stories, or likes, comments and follow requests I have not opened yet
     hasNews: unseenActivity > 0 || entries.some((entry) => isUnseen(entry, seenKeys)),

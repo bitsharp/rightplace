@@ -1,6 +1,7 @@
 import {
   buildFriendsLayers,
   buildGeneralLayers,
+  friendFacesOf,
   mapBanner,
   type HotSpotVenue,
   type MapVenue,
@@ -17,6 +18,7 @@ const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => 
   isHotSpot: false,
   isSponsored: false,
   friendsGoing: null,
+  friendIds: null,
   friendsCount: null,
   isSpot: false,
   ...overrides,
@@ -67,6 +69,19 @@ describe('buildGeneralLayers', () => {
   });
 });
 
+describe('friendFacesOf', () => {
+  it('abbina handle e id nello stesso ordine', () => {
+    expect(friendFacesOf(['volpe.viola', 'orso.grigio'], ['u-volpe', 'u-orso'])).toEqual([
+      { userId: 'u-volpe', handle: 'volpe.viola' },
+      { userId: 'u-orso', handle: 'orso.grigio' },
+    ]);
+  });
+
+  it('senza id (vista generale) non produce volti', () => {
+    expect(friendFacesOf(['volpe.viola'], null)).toEqual([]);
+  });
+});
+
 describe('buildFriendsLayers', () => {
   const friendRows = [
     venue({
@@ -74,9 +89,22 @@ describe('buildFriendsLayers', () => {
       name: 'Arena',
       friendsCount: 2,
       friendsGoing: ['volpe.viola', 'orso.grigio'],
+      friendIds: ['u-volpe', 'u-orso'],
     }),
-    venue({ venueId: 'bar', name: 'Bar', friendsCount: 1, friendsGoing: ['gatto.blu'] }),
-    venue({ venueId: 'club', name: 'Club', friendsCount: 1, friendsGoing: ['panda.rosa'] }),
+    venue({
+      venueId: 'bar',
+      name: 'Bar',
+      friendsCount: 1,
+      friendsGoing: ['gatto.blu'],
+      friendIds: ['u-gatto'],
+    }),
+    venue({
+      venueId: 'club',
+      name: 'Club',
+      friendsCount: 1,
+      friendsGoing: ['panda.rosa'],
+      friendIds: ['u-panda'],
+    }),
     venue({ venueId: 'nobody', friendsCount: 0, friendsGoing: [] }),
   ];
 
@@ -98,9 +126,15 @@ describe('buildFriendsLayers', () => {
   it('elenca i locali degli amici per numero di amici decrescente, poi per nome', () => {
     const layers = buildFriendsLayers(friendRows, []);
     expect(layers.friendVenues).toEqual([
-      { venueId: 'arena', name: 'Arena', handles: ['volpe.viola', 'orso.grigio'], count: 2 },
-      { venueId: 'bar', name: 'Bar', handles: ['gatto.blu'], count: 1 },
-      { venueId: 'club', name: 'Club', handles: ['panda.rosa'], count: 1 },
+      {
+        venueId: 'arena',
+        name: 'Arena',
+        handles: ['volpe.viola', 'orso.grigio'],
+        friendIds: ['u-volpe', 'u-orso'],
+        count: 2,
+      },
+      { venueId: 'bar', name: 'Bar', handles: ['gatto.blu'], friendIds: ['u-gatto'], count: 1 },
+      { venueId: 'club', name: 'Club', handles: ['panda.rosa'], friendIds: ['u-panda'], count: 1 },
     ]);
   });
 

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Avatar, type AvatarPhoto } from '@/components/ui/Avatar';
 import { LinkedText } from '@/components/ui/LinkedText';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
@@ -16,6 +17,8 @@ type Props = {
   author: 'me' | 'other';
   content: Content;
   senderName?: string;
+  // Small face next to the handle of other people's messages: the photo only when the server signed it for me.
+  senderAvatar?: { initial: string; photo?: AvatarPhoto };
   // Only for my own messages while they are being sent (optimistic) or when sending failed.
   status?: 'sending' | 'failed';
   onRetry?: () => void;
@@ -29,6 +32,7 @@ export function MessageBubble({
   author,
   content,
   senderName,
+  senderAvatar,
   status,
   onRetry,
   onLongPress,
@@ -41,9 +45,19 @@ export function MessageBubble({
   return (
     <View testID="bubble-wrap" style={[styles.wrap, mine ? styles.mine : styles.theirs]}>
       {!mine && senderName ? (
-        <Text variant="body12" color="maybe">
-          {senderName}
-        </Text>
+        <View style={styles.sender}>
+          {senderAvatar ? (
+            <Avatar
+              intent="neutral"
+              size={SENDER_AVATAR}
+              initial={senderAvatar.initial}
+              photo={senderAvatar.photo}
+            />
+          ) : null}
+          <Text variant="body12" color="maybe">
+            {senderName}
+          </Text>
+        </View>
       ) : null}
       <Pressable
         accessibilityRole={failed || opensPhoto ? 'button' : undefined}
@@ -103,7 +117,10 @@ function PhotoBubble({
   );
 }
 
+const SENDER_AVATAR = 20;
+
 const styles = StyleSheet.create({
+  sender: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2 },
   wrap: { maxWidth: '82%', gap: spacing.xs },
   mine: { alignSelf: 'flex-end', alignItems: 'flex-end' },
   theirs: { alignSelf: 'flex-start' },

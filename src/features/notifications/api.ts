@@ -33,6 +33,8 @@ export type ActivityKind = 'like' | 'comment' | 'follow_request' | 'follow_accep
 export type ActivityItem = {
   kind: ActivityKind;
   actorHandle: string;
+  // Only to ask for the actor's photo: the server decides whether I may see it.
+  actorId: string;
   postId: string | null;
   createdAt: string;
 };
@@ -41,6 +43,7 @@ const activitySchema = z.array(
   z.object({
     kind: z.enum(['like', 'comment', 'follow_request', 'follow_accepted']),
     actor_handle: z.string(),
+    actor_id: z.string(),
     post_id: z.string().nullable(),
     created_at: z.string(),
   }),
@@ -52,6 +55,7 @@ export async function fetchActivity(): Promise<ActivityItem[]> {
   return rows.map((row) => ({
     kind: row.kind,
     actorHandle: row.actor_handle,
+    actorId: row.actor_id,
     postId: row.post_id,
     createdAt: row.created_at,
   }));

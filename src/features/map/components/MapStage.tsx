@@ -25,6 +25,7 @@ type Props = {
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;
   onPickSpot?: (point: { lat: number; lng: number }) => void;
+  avatarUrls?: Record<string, string>;
 };
 
 function ExpandButton({ onPress }: { onPress: () => void }) {
