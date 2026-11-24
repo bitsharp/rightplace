@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 import MapView from 'react-native-maps';
@@ -45,7 +45,15 @@ type Props = {
   onPickSpot?: (point: LatLng) => void;
   // Signed photos of the friends on the friends map (one batch per screen); never used on the general map.
   avatarUrls?: Record<string, string>;
+  focus?: MapFocus;
 };
+
+// A request to centre on a point (the coarse "Tu" cell). The object itself is the request: a new object
+// asks again for the same point, a re-render with the same object does not fight the user's panning.
+export type MapFocus = { point: LatLng };
+
+const FOCUS_DELTA = 0.02;
+const FOCUS_MS = 400;
 
 const NO_EVENTS: readonly EventSpotPlacement[] = [];
 
@@ -62,9 +70,22 @@ export function MapCanvas({
   ownSpot = null,
   onPickSpot,
   avatarUrls,
+  focus,
 }: Props) {
   const { t } = useTranslation('map');
   const mapRef = useRef<MapView>(null);
+  useEffect(() => {
+    if (!focus) return;
+    mapRef.current?.animateToRegion(
+      {
+        latitude: focus.point.lat,
+        longitude: focus.point.lng,
+        latitudeDelta: FOCUS_DELTA,
+        longitudeDelta: FOCUS_DELTA,
+      },
+      FOCUS_MS,
+    );
+  }, [focus]);
   const map = (
     <MapView
       ref={mapRef}

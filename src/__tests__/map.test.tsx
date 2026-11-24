@@ -496,6 +496,130 @@ describe('mappa', () => {
     });
   });
 
+  describe('titolo, barra in basso e card del locale (restyle 22)', () => {
+    const tocqueville = mapRow({
+      venue_id: 'tocq',
+      name: 'Tocqueville',
+      going_band: '20–30',
+      maybe_band: '10–20',
+      is_hot_spot: true,
+      // Anche se il server mandasse amici sulla riga generale, la mappa generale non disegna volti.
+      friends_going: ['volpe.viola'],
+      friends_going_ids: ['u-volpe'],
+      friends_count: 1,
+    });
+    const DETAIL = [
+      {
+        venue_id: 'tocq',
+        name: 'Tocqueville',
+        kind: 'club',
+        address: 'Via Tocqueville 13',
+        opening_hours: null,
+        google_place_id: 'p1',
+        lat: 45.4642,
+        lng: 9.19,
+        city_slug: 'milano',
+        city_name: 'Milano',
+        country: 'IT',
+        timezone: 'Europe/Rome',
+        taxi_number: null,
+        photo_url: 'https://img.example/tocq.jpg',
+      },
+    ];
+    const withTocqueville = () =>
+      seedBackend({
+        get_city_map: [arena, tocqueville],
+        get_venue_detail: DETAIL,
+      });
+
+    it('scrive "STASERA {città}" con la città della mappa e il sottotitolo', async () => {
+      await renderApp('ready', '/map');
+      expect(await screen.findByText(/map:header\.title/)).toBeOnTheScreen();
+      expect(screen.getByTestId('map-title-city')).toHaveTextContent('Milano');
+      expect(screen.getByText('map:header.subtitle')).toBeOnTheScreen();
+    });
+
+    it('l’icona dei filtri apre la ricerca: la mappa non ha filtri propri', async () => {
+      await renderApp('ready', '/map');
+      await fireEvent.press(await screen.findByRole('button', { name: 'map:header.filters' }));
+      expect(await screen.findByLabelText('venues:searchLabel')).toBeOnTheScreen();
+    });
+
+    it('la card del locale scrive la fascia e mai un numero esatto, con la foto di copertina', async () => {
+      withTocqueville();
+      await renderApp('ready', '/map');
+      const card = await screen.findByRole('button', {
+        name: 'map:card.a11y({"venue":"Tocqueville","band":"20–30 ui:people"})',
+      });
+      expect(within(card).getByText('20–30 ui:people')).toBeOnTheScreen();
+      expect(await screen.findByTestId('featured-venue-photo')).toBeOnTheScreen();
+      expect(within(card).queryByText(/km/)).toBeNull();
+    });
+
+    it('sotto la soglia la card scrive "pochi" e nessuna cifra', async () => {
+      seedBackend({
+        get_city_map: [
+          mapRow({
+            venue_id: 'few',
+            name: 'Piccolo',
+            going_band: 'pochi',
+            is_hot_spot: true,
+          }),
+        ],
+        get_venue_detail: [],
+      });
+      await renderApp('ready', '/map');
+      const card = await screen.findByRole('button', {
+        name: 'map:card.a11y({"venue":"Piccolo","band":"ui:band.few"})',
+      });
+      expect(within(card).getByText('ui:band.few')).toBeOnTheScreen();
+      expect(within(card).queryByText(/\d/)).toBeNull();
+    });
+
+    it('la card apre il dettaglio del locale', async () => {
+      withTocqueville();
+      await renderApp('ready', '/map');
+      await fireEvent.press(
+        await screen.findByRole('button', {
+          name: 'map:card.a11y({"venue":"Tocqueville","band":"20–30 ui:people"})',
+        }),
+      );
+      expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
+    });
+
+    it('nella mappa generale nessun volto, nemmeno con amici sulla riga', async () => {
+      withTocqueville();
+      await renderApp('ready', '/map');
+      await screen.findByTestId('marker-hot-tocq', { includeHiddenElements: true });
+      expect(screen.queryByTestId('friend-faces', { includeHiddenElements: true })).toBeNull();
+    });
+
+    it('senza posizione: barra con la città, niente "vai alla mia posizione", niente distanza, niente permessi', async () => {
+      withTocqueville();
+      await renderApp('ready', '/map');
+      const bar = await screen.findByRole('button', { name: 'map:searchPlaceholder' });
+      expect(within(bar).getByText('Milano')).toBeOnTheScreen();
+      await screen.findByTestId('marker-hot-tocq', { includeHiddenElements: true });
+      expect(screen.queryByRole('button', { name: 'map:locate' })).toBeNull();
+      expect(screen.queryByText(/map:card\.distance/)).toBeNull();
+      expect(Location.requestForegroundPermissionsAsync).not.toHaveBeenCalled();
+    });
+
+    it('con la posizione attiva compaiono il bottone "vai alla mia posizione" e la distanza dalla cella', async () => {
+      jest
+        .mocked(Location.getForegroundPermissionsAsync)
+        .mockResolvedValue({ granted: true } as never);
+      jest
+        .mocked(Location.getCurrentPositionAsync)
+        .mockResolvedValue({ coords: { latitude: 45.4641, longitude: 9.1901 } } as never);
+      withTocqueville();
+      await renderApp('ready', '/map', { location_opt_in: true });
+      expect(await screen.findByRole('button', { name: 'map:locate' })).toBeOnTheScreen();
+      expect(await screen.findByText(/map:card\.distance/)).toBeOnTheScreen();
+      expect(Location.requestForegroundPermissionsAsync).not.toHaveBeenCalled();
+    });
+  });
+
   describe('marker "Tu" e permessi', () => {
     it('senza posizione attiva il "Tu" non c’è e la mappa non tocca i permessi', async () => {
       await renderApp('ready', '/map');

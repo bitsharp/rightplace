@@ -1,9 +1,16 @@
 {
   "title": "Map",
   "searchPlaceholder": "Search for a night or a venue",
+  "header": {
+    "title": "TONIGHT {{city}}",
+    "titleNoCity": "TONIGHT",
+    "subtitle": "Find where to go, with whom and what's on tonight.",
+    "filters": "Filters and search"
+  },
+  "locate": "Go to my location",
   "view": {
-    "general": "General map",
-    "friends": "Friends map"
+    "general": "Maps",
+    "friends": "Friends"
   },
   "hint": {
     "general": "Tap a hot spot · pinch to zoom",
@@ -47,5 +54,9 @@
   "spot": {
     "label": "SPOT",
     "a11y": "Declared spot: {{name}}. Open its page"
+  },
+  "card": {
+    "distance": "{{km}} km",
+    "a11y": "{{venue}}, {{band}}. Open the details"
   }
 }

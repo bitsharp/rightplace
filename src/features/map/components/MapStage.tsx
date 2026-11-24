@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -11,8 +11,9 @@ import type { OwnSpot } from '../domain/ownSpot';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
 
-import { MapCanvas, type MapCity } from './MapCanvas';
+import { MapCanvas, type MapCity, type MapFocus } from './MapCanvas';
 import { MapFullScreen } from './MapFullScreen';
+import { MapSearchEntry } from './MapSearchEntry';
 
 type Props = {
   city: MapCity | null;
@@ -26,6 +27,9 @@ type Props = {
   ownSpot?: OwnSpot | null;
   onPickSpot?: (point: { lat: number; lng: number }) => void;
   avatarUrls?: Record<string, string>;
+  // Title drawn over the top of the compact map.
+  header?: ReactNode;
+  onOpenSearch?: () => void;
 };
 
 function ExpandButton({ onPress }: { onPress: () => void }) {
@@ -50,9 +54,12 @@ export function MapStage({
   you,
   onChangeView,
   onOpenVenue,
+  header,
+  onOpenSearch,
   ...eventProps
 }: Props) {
   const [fullScreen, setFullScreen] = useState(false);
+  const [focus, setFocus] = useState<MapFocus | undefined>(undefined);
   // Local framing only (never persisted), shared by both maps: whichever moved last wins.
   // Tied to its city: when the city changes the map goes back to the new city centre.
   const [framing, setFraming] = useState<{ slug: string; region: MapRegion } | null>(null);
@@ -73,6 +80,7 @@ export function MapStage({
               initialRegion={region}
               onRegionChange={setRegion}
               onOpenVenue={onOpenVenue}
+              focus={focus}
               {...eventProps}
             />
           )}
@@ -89,12 +97,27 @@ export function MapStage({
             onOpenVenue={onOpenVenue}
             {...eventProps}
           />
+          <View pointerEvents="box-none" style={styles.top}>
+            {header}
+          </View>
           <ExpandButton onPress={() => setFullScreen(true)} />
+          {onOpenSearch ? (
+            <View style={styles.bottom}>
+              <MapSearchEntry
+                cityName={city.name}
+                onPress={onOpenSearch}
+                onLocate={you ? () => setFocus({ point: you }) : undefined}
+              />
+            </View>
+          ) : null}
         </>
       ) : null}
     </View>
   );
 }
+
+// Header padding + filters button + a gap: keeps the expand button clear of the filters button.
+const EXPAND_TOP = spacing.lg + heights.minTapTarget + spacing.sm;
 
 const styles = StyleSheet.create({
   box: {
@@ -106,9 +129,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     overflow: 'hidden',
   },
+  top: { position: 'absolute', top: 0, left: 0, right: 0 },
+  bottom: { position: 'absolute', left: spacing.md, right: spacing.md, bottom: spacing.md },
+  // Under the header's filters button, which sits in the top right corner.
   expand: {
     position: 'absolute',
-    top: spacing.md,
+    top: EXPAND_TOP,
     right: spacing.md,
     width: heights.minTapTarget,
     height: heights.minTapTarget,

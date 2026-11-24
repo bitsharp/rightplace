@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md + 2,
-    borderRadius: radius.button,
+    borderRadius: radius.card,
     borderWidth: 1,
     backgroundColor: colors.surface,
   },

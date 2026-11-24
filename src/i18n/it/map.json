@@ -1,9 +1,16 @@
 {
   "title": "Mappa",
   "searchPlaceholder": "Cerca una serata o un locale",
+  "header": {
+    "title": "STASERA {{city}}",
+    "titleNoCity": "STASERA",
+    "subtitle": "Scopri dove andare, con chi e cosa c'è stasera.",
+    "filters": "Filtri e ricerca"
+  },
+  "locate": "Vai alla mia posizione",
   "view": {
-    "general": "Mappa generale",
-    "friends": "Mappa amici"
+    "general": "Mappe",
+    "friends": "Amici"
   },
   "hint": {
     "general": "Tocca un punto caldo · pizzica per zoom",
@@ -47,5 +54,9 @@
   "spot": {
     "label": "SPOT",
     "a11y": "Spot dichiarato: {{name}}. Apri la scheda"
+  },
+  "card": {
+    "distance": "{{km}} km",
+    "a11y": "{{venue}}, {{band}}. Apri il dettaglio"
   }
 }

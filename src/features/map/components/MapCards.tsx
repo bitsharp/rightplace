@@ -6,14 +6,23 @@ import { useBandLabel } from '@/components/ui/useBandLabel';
 import { spacing } from '@/theme/tokens';
 
 import type { MyDeclaration, RecommendedVenue } from '../api';
-import type { MapVenue } from '../domain/mapLayers';
+import type { LatLng } from '@/features/profile/domain/coarsen';
+
+import type { HotSpotVenue, MapVenue } from '../domain/mapLayers';
 import { isVisibleTypical, typicalLabelKey } from '../domain/typical';
 
+import { FeaturedVenueCard } from './FeaturedVenueCard';
 import { OwnNightCard } from './OwnNightCard';
+
+export type FeaturedCard = { venue: HotSpotVenue; photoUrl: string | null };
 
 type Props = {
   // My own declaration tonight: always first (it is mine, whatever the turnout).
   own: MyDeclaration | null;
+  // The busiest hot spot not already covered by another card (general map only).
+  featured?: FeaturedCard | null;
+  // The coarse cell, only when the location toggle is on: it is what makes the card say a distance.
+  you?: LatLng | null;
   sponsored: MapVenue | null;
   recommended: RecommendedVenue | null;
   onOpen: (venueId: string) => void;
@@ -36,10 +45,17 @@ function useSponsoredMeta() {
   };
 }
 
-export function MapCards({ own, sponsored, recommended, onOpen }: Props) {
+export function MapCards({
+  own,
+  featured = null,
+  you = null,
+  sponsored,
+  recommended,
+  onOpen,
+}: Props) {
   const { t } = useTranslation('map');
   const sponsoredMeta = useSponsoredMeta();
-  if (!own && !sponsored && !recommended) return null;
+  if (!own && !featured && !sponsored && !recommended) return null;
   return (
     <ScrollView
       horizontal
@@ -49,6 +65,16 @@ export function MapCards({ own, sponsored, recommended, onOpen }: Props) {
       {own ? (
         <View style={styles.slot}>
           <OwnNightCard declaration={own} onPress={onOpen} />
+        </View>
+      ) : null}
+      {featured ? (
+        <View style={styles.slot}>
+          <FeaturedVenueCard
+            venue={featured.venue}
+            photoUrl={featured.photoUrl}
+            you={you}
+            onPress={onOpen}
+          />
         </View>
       ) : null}
       {sponsored ? (

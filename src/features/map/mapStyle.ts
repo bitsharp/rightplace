@@ -2,10 +2,12 @@ import type { MapStyleElement } from 'react-native-maps';
 
 import { colors } from '@/theme/tokens';
 
-// Google Maps (Android) dark style matching the mock-up palette; iOS Apple Maps uses userInterfaceStyle.
+// Google Maps (Android) dark style of the 24/11 mock-up: black ground, faint violet streets.
+// iOS Apple Maps ignores it and keeps its own dark look through userInterfaceStyle (no native change).
 // Hex values below are map-only shades with no UI counterpart, so they live here (allowed by prompt 03).
-const ROAD = '#23233A';
-const ROAD_MINOR = '#1B1B2C';
+const ROAD = '#3A2358';
+const ROAD_MINOR = '#2A1A41';
+const ROAD_MAJOR = '#5B3A8C';
 const WATER = '#0D1424';
 const PARK = '#121A1A';
 
@@ -20,7 +22,7 @@ export const darkMapStyle: MapStyleElement[] = [
   { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: PARK }] },
   { featureType: 'road', elementType: 'geometry', stylers: [{ color: ROAD_MINOR }] },
   { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: ROAD }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: ROAD }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: ROAD_MAJOR }] },
   { featureType: 'transit', elementType: 'geometry', stylers: [{ color: ROAD_MINOR }] },
   {
     featureType: 'transit.station',

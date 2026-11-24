@@ -1,4 +1,4 @@
-import type { Band } from '@/features/nights/domain/band';
+import { bandRank, type Band } from '@/features/nights/domain/band';
 import type { VenueKind } from '@/features/venues/domain/venueList';
 
 import type { TypicalLevel } from './typical';
@@ -96,6 +96,20 @@ export function friendFacesOf(
   return handles
     .slice(0, ids.length)
     .map((handle, index) => ({ userId: ids[index] ?? '', handle }));
+}
+
+// The venue the bottom card talks about: the busiest by "Ci vado" band, then by name so it does not flip
+// between refreshes. Venues already shown by another card are skipped.
+export function featuredHotSpot(
+  hotSpots: readonly HotSpotVenue[],
+  excludeIds: readonly string[],
+): HotSpotVenue | null {
+  const [first] = hotSpots
+    .filter((spot) => !excludeIds.includes(spot.venueId))
+    .sort(
+      (a, b) => bandRank(b.goingBand) - bandRank(a.goingBand) || a.name.localeCompare(b.name, 'it'),
+    );
+  return first ?? null;
 }
 
 export function mapBanner(layers: MapLayers): MapBanner {

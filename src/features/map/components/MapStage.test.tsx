@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Text } from 'react-native';
 
 import { cityRegion } from '../domain/region';
 import { MapStage } from './MapStage';
@@ -69,5 +70,34 @@ describe('MapStage compatta', () => {
     await fireEvent(screen.getByTestId('map-view'), 'regionChangeComplete', panned);
     await rerender(<MapStage {...baseProps} city={lasPalmas} />);
     expect(screen.getByTestId('map-view').props.initialRegion).toEqual(cityRegion(lasPalmas));
+  });
+
+  it('mette titolo e barra in basso sopra la mappa compatta', async () => {
+    await render(
+      <MapStage {...baseProps} header={<Text>intestazione</Text>} onOpenSearch={jest.fn()} />,
+    );
+    expect(screen.getByText('intestazione')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'map:searchPlaceholder' })).toBeOnTheScreen();
+  });
+
+  it('la barra apre la ricerca', async () => {
+    const onOpenSearch = jest.fn();
+    await render(<MapStage {...baseProps} onOpenSearch={onOpenSearch} />);
+    await fireEvent.press(screen.getByRole('button', { name: 'map:searchPlaceholder' }));
+    expect(onOpenSearch).toHaveBeenCalledTimes(1);
+  });
+
+  it('"vai alla mia posizione" compare solo con la posizione attiva e centra la mappa sulla cella', async () => {
+    const animateToRegion = jest.requireMock<{ __animateToRegion: jest.Mock }>(
+      'react-native-maps',
+    ).__animateToRegion;
+    animateToRegion.mockClear();
+    const { rerender } = await render(<MapStage {...baseProps} onOpenSearch={jest.fn()} />);
+    expect(screen.queryByRole('button', { name: 'map:locate' })).toBeNull();
+    await rerender(
+      <MapStage {...baseProps} you={{ lat: 45.47, lng: 9.2 }} onOpenSearch={jest.fn()} />,
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));
+    expect(animateToRegion.mock.calls[0]?.[0]).toMatchObject({ latitude: 45.47, longitude: 9.2 });
   });
 });

@@ -6,7 +6,7 @@ import { SpotSheet } from '@/features/spots/components/SpotSheet';
 import { colors, spacing } from '@/theme/tokens';
 
 import { MapBottomPanel } from '../components/MapBottomPanel';
-import { MapSearchEntry } from '../components/MapSearchEntry';
+import { MapHeader } from '../components/MapHeader';
 import { MapStage } from '../components/MapStage';
 import { MapViewSwitch } from '../components/MapViewSwitch';
 import { useMapScreen } from '../useMapScreen';
@@ -18,7 +18,6 @@ export function MapScreen() {
     <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
       <TopBar {...topBar} />
       <View style={styles.controls}>
-        <MapSearchEntry onPress={map.openSearch} />
         <MapViewSwitch view={map.view} onChange={map.setView} />
       </View>
       <MapStage
@@ -33,6 +32,8 @@ export function MapScreen() {
         onOpenEvent={map.openEvent}
         onPickSpot={map.pickSpot}
         avatarUrls={avatarUrls}
+        header={<MapHeader cityName={map.city?.name ?? null} onOpenFilters={map.openSearch} />}
+        onOpenSearch={map.openSearch}
       />
       <MapBottomPanel
         view={map.view}
@@ -41,6 +42,8 @@ export function MapScreen() {
         banner={map.banner}
         friendVenues={map.layers.friendVenues}
         avatarUrls={avatarUrls}
+        featured={map.featured}
+        you={map.you}
         sponsored={map.sponsored}
         recommended={map.recommended}
         declaration={map.declaration}
@@ -53,5 +56,5 @@ export function MapScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
-  controls: { gap: spacing.sm + 2, paddingHorizontal: spacing.xl, paddingBottom: spacing.sm + 2 },
+  controls: { paddingHorizontal: spacing.xl, paddingBottom: spacing.sm + 2 },
 });

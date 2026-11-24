@@ -15,11 +15,14 @@ import { placeEventSpots, type EventSpotPlacement } from './domain/eventSpots';
 import {
   buildFriendsLayers,
   buildGeneralLayers,
+  featuredHotSpot,
   mapBanner,
   type FriendVenue,
+  type HotSpotVenue,
   type MapVenue,
 } from './domain/mapLayers';
 import { buildOwnSpot, coordsOfVenue, type OwnSpot } from './domain/ownSpot';
+import type { FeaturedCard } from './components/MapCards';
 import { useCityMap, useMyDeclaration, useRecommendedVenue } from './hooks';
 import { useMapStore, type MapViewMode } from './store/mapStore';
 import { useCurrentCity } from './useCurrentCity';
@@ -71,6 +74,24 @@ function useOwnSpot(
   return buildOwnSpot(mine, fromMap ?? fromDetail);
 }
 
+// The card under the map: the busiest hot spot that no other card already shows, with its cover photo
+// (catalog data from the venue detail, cached for an hour; never other people's data).
+function useFeatured(
+  view: MapViewMode,
+  hotSpots: readonly HotSpotVenue[],
+  covered: readonly (string | undefined)[],
+): FeaturedCard | null {
+  const venue =
+    view === 'general'
+      ? featuredHotSpot(
+          hotSpots,
+          covered.filter((id): id is string => id !== undefined),
+        )
+      : null;
+  const detail = useVenueDetail(venue?.venueId ?? '', venue !== null);
+  return venue ? { venue, photoUrl: detail.data?.photoUrl ?? null } : null;
+}
+
 function useMapLayers(citySlug: string, view: MapViewMode) {
   const general = useCityMap(citySlug, 'general');
   const friends = useCityMap(citySlug, 'friends', view === 'friends');
@@ -107,6 +128,11 @@ export function useMapScreen() {
   const declaration = useMyDeclaration();
   const recommended = useRecommendedVenue(citySlug);
   const ownSpot = useOwnSpot(declaration.data, generalRows);
+  const sponsored = generalRows.find((row) => row.isSponsored) ?? null;
+  const featured = useFeatured(view, layers.hotSpots, [
+    declaration.data?.venueId,
+    sponsored?.venueId,
+  ]);
   const coarseCell = useCoarsePositionStore((state) => state.cell);
   const openVenue = useOpenVenue();
   // The point chosen with a 3 s press: while set, the "serata in questo punto" sheet is open.
@@ -124,7 +150,8 @@ export function useMapScreen() {
     // Only a user who turned the toggle on ever has a cell; it is already ~500 m coarse.
     you: profile?.locationOptIn ? coarseCell : null,
     banner: view === 'general' && loaded ? mapBanner(layers) : 'none',
-    sponsored: generalRows.find((row) => row.isSponsored) ?? null,
+    featured,
+    sponsored,
     recommended: recommended.data ?? null,
     declaration: declaration.data ?? null,
     topBar,

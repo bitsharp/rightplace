@@ -131,3 +131,49 @@ describe('MapCards', () => {
     expect(onOpen).toHaveBeenLastCalledWith('v2');
   });
 });
+
+describe('MapCards: locale in evidenza', () => {
+  const featured = { ...sponsored, venueId: 'v9', name: 'Tocqueville 13', isSponsored: false };
+
+  it('la mostra nello stesso elenco, dopo la mia serata', async () => {
+    const mine = {
+      venueId: 'mine',
+      venueName: 'Arena Club',
+      eventId: null,
+      intent: 'going' as const,
+      expiresAt: '2026-11-14T05:00:00Z',
+    };
+    await render(
+      <MapCards
+        own={mine}
+        featured={{ venue: featured as never, photoUrl: null }}
+        you={null}
+        sponsored={null}
+        recommended={null}
+        onOpen={jest.fn()}
+      />,
+    );
+    const labels = screen
+      .getAllByRole('button')
+      .map((button) => button.props.accessibilityLabel as string);
+    expect(labels).toHaveLength(2);
+    expect(labels[0]).toContain('map:cards.own.a11y');
+    expect(labels[1]).toContain('Tocqueville 13');
+  });
+
+  it('con sola la card in evidenza apre il locale', async () => {
+    const onOpen = jest.fn();
+    await render(
+      <MapCards
+        own={null}
+        featured={{ venue: featured as never, photoUrl: null }}
+        you={null}
+        sponsored={null}
+        recommended={null}
+        onOpen={onOpen}
+      />,
+    );
+    await fireEvent.press(screen.getByText('Tocqueville 13'));
+    expect(onOpen).toHaveBeenCalledWith('v9');
+  });
+});

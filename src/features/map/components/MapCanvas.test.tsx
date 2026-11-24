@@ -453,3 +453,29 @@ describe('MapCanvas: pressione lunga per uno spot', () => {
     expect(onPickSpot).toHaveBeenCalledWith({ lat: 45.3, lng: 9.2 });
   });
 });
+
+describe('MapCanvas: vai alla mia posizione', () => {
+  const animateToRegion = jest.requireMock<{ __animateToRegion: jest.Mock }>(
+    'react-native-maps',
+  ).__animateToRegion;
+  const noLayers = { hotSpots: [], typicalDots: [], spots: [] };
+  const point = { lat: 45.47, lng: 9.2 };
+  beforeEach(() => animateToRegion.mockClear());
+
+  it('anima la mappa sulla cella indicata quando arriva una richiesta', async () => {
+    const { rerender } = await render(<MapCanvas {...baseProps} layers={noLayers} />);
+    expect(animateToRegion).not.toHaveBeenCalled();
+    await rerender(<MapCanvas {...baseProps} layers={noLayers} focus={{ point }} />);
+    expect(animateToRegion).toHaveBeenCalledTimes(1);
+    expect(animateToRegion.mock.calls[0]?.[0]).toMatchObject({ latitude: 45.47, longitude: 9.2 });
+  });
+
+  it('un rerender con la stessa richiesta non ri-anima; una nuova richiesta sì', async () => {
+    const first = { point };
+    const { rerender } = await render(<MapCanvas {...baseProps} layers={noLayers} focus={first} />);
+    await rerender(<MapCanvas {...baseProps} layers={noLayers} focus={first} />);
+    expect(animateToRegion).toHaveBeenCalledTimes(1);
+    await rerender(<MapCanvas {...baseProps} layers={noLayers} focus={{ point }} />);
+    expect(animateToRegion).toHaveBeenCalledTimes(2);
+  });
+});

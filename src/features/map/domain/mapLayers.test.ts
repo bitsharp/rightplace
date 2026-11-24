@@ -1,6 +1,7 @@
 import {
   buildFriendsLayers,
   buildGeneralLayers,
+  featuredHotSpot,
   friendFacesOf,
   mapBanner,
   type HotSpotVenue,
@@ -211,5 +212,29 @@ describe('spot (strato "stasera", mai con numeri sotto k)', () => {
 
   it('un banner "nessuna dichiarazione" non appare se c\'è almeno uno spot', () => {
     expect(mapBanner({ hotSpots: [], spots: [spot('s1')], typicalDots: [] })).toBe('none');
+  });
+});
+
+describe('featuredHotSpot', () => {
+  const hot = (venueId: string, goingBand: HotSpotVenue['goingBand'], name = venueId) =>
+    venue({ venueId, name, isHotSpot: true, goingBand, maybeBand: 'pochi' }) as HotSpotVenue;
+
+  it('sceglie il punto caldo con la fascia dei "Ci vado" più alta', () => {
+    const rows = [hot('a', '3–10'), hot('b', '30–50'), hot('c', '10–20')];
+    expect(featuredHotSpot(rows, [])?.venueId).toBe('b');
+  });
+
+  it('a parità di fascia vince il nome in ordine alfabetico, così la card non salta da un giro all’altro', () => {
+    const rows = [hot('z', '10–20', 'Zeta'), hot('a', '10–20', 'Alfa')];
+    expect(featuredHotSpot(rows, [])?.venueId).toBe('a');
+  });
+
+  it('salta i locali già mostrati da un’altra card (la mia serata, la sponsorizzata)', () => {
+    const rows = [hot('a', '30–50'), hot('b', '10–20')];
+    expect(featuredHotSpot(rows, ['a'])?.venueId).toBe('b');
+  });
+
+  it('senza punti caldi non c’è nessuna card', () => {
+    expect(featuredHotSpot([], [])).toBeNull();
   });
 });

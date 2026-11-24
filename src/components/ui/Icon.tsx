@@ -51,6 +51,14 @@ const GLYPHS = {
     <Path key="p" d="M4 4.5h16v12H9.5L4 20.5z" />,
     <Path key="q" d="M12 7.2l1.1 2.3 2.5.4-1.8 1.7.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.7 2.5-.4z" />,
   ],
+  // Two sliders: the "filters" button of the map header.
+  filters: [
+    <Path key="p" d="M4 8h9M17 8h3M4 16h3M11 16h9" />,
+    <Circle key="c" cx="15" cy="8" r="2" />,
+    <Circle key="d" cx="9" cy="16" r="2" />,
+  ],
+  // Paper-plane arrow: "go to my location".
+  locate: [<Path key="p" d="M20 4L4 11l7 2 2 7z" />],
   phone: [
     <Path
       key="p"

@@ -112,8 +112,10 @@ jest.mock('react-native-maps', () => {
     jest.requireActual<typeof import('react')>('react');
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   // A point (x, y) inside the map maps to a fixed, easy-to-assert coordinate: 45 + y / 1000, 9 + x / 1000.
+  const animateToRegion = jest.fn();
   const MapView = ({ children, ref, ...props }: Record<string, unknown>) => {
     useImperativeHandle(ref as never, () => ({
+      animateToRegion,
       coordinateForPoint: jest.fn(async (point: { x: number; y: number }) => ({
         latitude: 45 + point.y / 1000,
         longitude: 9 + point.x / 1000,
@@ -123,7 +125,7 @@ jest.mock('react-native-maps', () => {
   };
   const Marker = ({ children, ...props }: Record<string, unknown>) =>
     createElement(View, { testID: 'map-marker', ...props }, children as never);
-  return { __esModule: true, default: MapView, Marker };
+  return { __esModule: true, default: MapView, Marker, __animateToRegion: animateToRegion };
 });
 
 // expo-notifications is a native module: every call is a jest.fn() (calls are cleared before each test,

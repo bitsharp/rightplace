@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Glow } from '@/components/ui/Glow';
 import { Text } from '@/components/ui/Text';
 import { useBandLabel } from '@/components/ui/useBandLabel';
 import {
@@ -37,6 +38,8 @@ const INTENT_STYLE: Record<
 };
 
 const INNER_SCALE = 0.42;
+// The halo is part of the marker bitmap on Android: the box must be as big as the halo or it is cut.
+const GLOW_SCALE = 1.9;
 
 function hotSpotLayout(goingBand: Band, maybeBand: Band) {
   const main = dominantIntent(goingBand, maybeBand);
@@ -59,6 +62,7 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
   const { t } = useTranslation('ui');
   const bandLabel = useBandLabel();
   const { main, secondary, diameter, inner } = hotSpotLayout(goingBand, maybeBand);
+  const box = Math.round(diameter * GLOW_SCALE);
   return (
     <Pressable
       accessibilityRole="button"
@@ -68,8 +72,9 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
         maybe: bandLabel(maybeBand),
       })}
       onPress={onPress}
-      style={[styles.center, { width: diameter, height: diameter }]}
+      style={[styles.center, { width: box, height: box }]}
     >
+      <Glow testID="hot-spot-glow" color={INTENT_STYLE[main].shadowColor} radius={box / 2} />
       <View
         testID="hot-spot-outer"
         style={[styles.circle, styles.center, glow, INTENT_STYLE[main], circle(diameter)]}

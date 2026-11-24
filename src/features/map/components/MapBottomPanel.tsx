@@ -5,13 +5,15 @@ import { Text } from '@/components/ui/Text';
 import { spacing } from '@/theme/tokens';
 
 import type { MyDeclaration, RecommendedVenue } from '../api';
+import type { LatLng } from '@/features/profile/domain/coarsen';
+
 import type { FriendVenue, MapBanner as MapBannerKind, MapVenue } from '../domain/mapLayers';
 import type { MapViewMode } from '../store/mapStore';
 
 import { DeclarationPill } from './DeclarationPill';
 import { FriendVenueList } from './FriendVenueList';
 import { MapBanner } from './MapBanner';
-import { MapCards } from './MapCards';
+import { MapCards, type FeaturedCard } from './MapCards';
 
 type Props = {
   view: MapViewMode;
@@ -20,6 +22,8 @@ type Props = {
   banner: MapBannerKind;
   friendVenues: FriendVenue[];
   avatarUrls: Record<string, string>;
+  featured: FeaturedCard | null;
+  you: LatLng | null;
   sponsored: MapVenue | null;
   recommended: RecommendedVenue | null;
   declaration: MyDeclaration | null;
@@ -47,6 +51,8 @@ export function MapBottomPanel(props: Props) {
           <MapBanner kind={props.banner} />
           <MapCards
             own={props.declaration}
+            featured={props.featured}
+            you={props.you}
             sponsored={props.sponsored}
             recommended={props.recommended}
             onOpen={onOpenVenue}
