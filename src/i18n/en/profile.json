@@ -51,7 +51,6 @@
     "freeUntilContinue": "Until you tap Continue you can change your @tag as often as you like. After that, you can change it once every 30 days."
   },
   "app": {
-    "step": "Private profile",
     "save": "Save",
     "saved": "Profile saved.",
     "creatorProfile": "Your creator profile",
@@ -61,11 +60,8 @@
   "account": {
     "title": "Account",
     "email": "Email (not visible to others)",
-    "changePassword": "Change password",
     "signOut": "Sign out",
-    "delete": "Delete account",
-    "privacy": "Privacy",
-    "terms": "Terms"
+    "delete": "Delete account"
   },
   "delete": {
     "explainTitle": "Delete your account?",
@@ -160,5 +156,30 @@
   },
   "lists": {
     "back": "Back"
+  },
+  "settings": {
+    "groups": {
+      "account": "Account settings",
+      "help": "Help and support",
+      "info": "Information"
+    },
+    "rows": {
+      "language": "Language",
+      "notifications": "Notifications",
+      "privacy": "Privacy",
+      "city": "Map city",
+      "tag": "@tag",
+      "personal": "Personal data",
+      "password": "Change password",
+      "feedback": "Send feedback",
+      "about": "About us",
+      "terms": "Terms and conditions",
+      "privacyPolicy": "Privacy Policy"
+    }
+  },
+  "about": {
+    "title": "About us",
+    "appName": "RightPlace",
+    "version": "Version {{version}}"
   }
 }

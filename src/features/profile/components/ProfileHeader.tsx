@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
 
+import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { colors, spacing } from '@/theme/tokens';
 
@@ -22,6 +23,11 @@ type Props = {
   // Only given when the lists are mine to open; a null counter is never tappable.
   onOpenFollowers?: () => void;
   onOpenFollowing?: () => void;
+  // "row": photo and counters side by side (public profile); "centered": big photo on top, counters under the
+  // identity (my profile)
+  layout?: 'row' | 'centered';
+  // My own map city only: never shown for other people (principle 1)
+  city?: string | null;
   children?: ReactNode;
 };
 
@@ -34,30 +40,26 @@ export function ProfileHeader({
   counters,
   onOpenFollowers,
   onOpenFollowing,
+  layout = 'row',
+  city,
   children,
 }: Props) {
-  const { t } = useTranslation('profile');
+  const centered = layout === 'centered';
+  const counterRow = (
+    <Counters
+      counters={counters}
+      onOpenFollowers={onOpenFollowers}
+      onOpenFollowing={onOpenFollowing}
+      style={centered ? styles.countersCentered : styles.counters}
+    />
+  );
   return (
     <View style={styles.header}>
-      <View style={styles.top}>
+      <View testID="profile-header-top" style={centered ? styles.topCentered : styles.top}>
         {avatar}
-        <View style={styles.counters}>
-          <Counter value={counters.posts} label={t('header.posts')} />
-          <Counter
-            value={counters.followers}
-            label={t('header.followers')}
-            a11yLabel={(count) => t('header.a11yFollowers', { count })}
-            onPress={onOpenFollowers}
-          />
-          <Counter
-            value={counters.following}
-            label={t('header.following')}
-            a11yLabel={(count) => t('header.a11yFollowing', { count })}
-            onPress={onOpenFollowing}
-          />
-        </View>
+        {centered ? null : counterRow}
       </View>
-      <View style={styles.identity}>
+      <View style={centered ? styles.identityCentered : styles.identity}>
         <Text accessibilityRole="header" variant="display17">
           {formatHandle(handle)}
         </Text>
@@ -66,8 +68,46 @@ export function ProfileHeader({
             {meta}
           </Text>
         ) : null}
+        {city ? <CityLine city={city} /> : null}
       </View>
+      {centered ? counterRow : null}
       {children}
+    </View>
+  );
+}
+
+function CityLine({ city }: { city: string }) {
+  return (
+    <View style={styles.city}>
+      <Icon name="map" size={14} color="maybe" />
+      <Text variant="body13" color="textSecondary">
+        {city}
+      </Text>
+    </View>
+  );
+}
+
+type CountersProps = Pick<Props, 'counters' | 'onOpenFollowers' | 'onOpenFollowing'> & {
+  style: ViewStyle;
+};
+
+function Counters({ counters, onOpenFollowers, onOpenFollowing, style }: CountersProps) {
+  const { t } = useTranslation('profile');
+  return (
+    <View style={style}>
+      <Counter value={counters.posts} label={t('header.posts')} />
+      <Counter
+        value={counters.followers}
+        label={t('header.followers')}
+        a11yLabel={(count) => t('header.a11yFollowers', { count })}
+        onPress={onOpenFollowers}
+      />
+      <Counter
+        value={counters.following}
+        label={t('header.following')}
+        a11yLabel={(count) => t('header.a11yFollowing', { count })}
+        onPress={onOpenFollowing}
+      />
     </View>
   );
 }
@@ -109,7 +149,11 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   top: { flexDirection: 'row', alignItems: 'center', gap: spacing.xl },
+  topCentered: { flexDirection: 'column', alignItems: 'center' },
   counters: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
+  countersCentered: { flexDirection: 'row', justifyContent: 'space-around' },
   counter: { alignItems: 'center', gap: 2, minHeight: 44, justifyContent: 'center', flex: 1 },
   identity: { gap: 2 },
+  identityCentered: { gap: 2, alignItems: 'center' },
+  city: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 });

@@ -167,7 +167,7 @@ describe('profilo creator', () => {
     expect(await screen.findByText('creator:notCreator.title')).toBeOnTheScreen();
     expect(screen.queryByText('creator:events.title')).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'creator:notCreator.cta' }));
-    expect(await screen.findByText('profile:app.becomeCreator')).toBeOnTheScreen();
+    expect(await screen.findByRole('checkbox', { name: 'profile:form.creator' })).toBeOnTheScreen();
     expect(rpcCalls('get_my_creator_events')).toHaveLength(0);
   });
 

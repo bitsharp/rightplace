@@ -71,3 +71,33 @@ describe('ProfileHeader', () => {
     expect(screen.queryByRole('button')).toBeNull();
   });
 });
+
+describe('ProfileHeader centrato (il mio profilo)', () => {
+  const counters = { posts: 3, followers: 12, following: 30 };
+
+  it('mette la foto sopra, centrata, e i contatori sotto l’identità', async () => {
+    await render(<ProfileHeader {...base} counters={counters} layout="centered" />);
+    expect(screen.getByTestId('profile-header-top')).toHaveStyle({
+      flexDirection: 'column',
+      alignItems: 'center',
+    });
+    expect(screen.getByText('@volpe.viola')).toBeOnTheScreen();
+    expect(screen.getByText('12')).toBeOnTheScreen();
+  });
+
+  it('di default resta a riga: foto e contatori affiancati', async () => {
+    await render(<ProfileHeader {...base} counters={counters} />);
+    expect(screen.getByTestId('profile-header-top')).toHaveStyle({ flexDirection: 'row' });
+  });
+
+  it('mostra la città con l’icona del pin dopo fascia d’età · genere', async () => {
+    await render(<ProfileHeader {...base} counters={counters} layout="centered" city="Milano" />);
+    expect(screen.getByText('Milano')).toBeOnTheScreen();
+    expect(screen.getByTestId('icon-map', { includeHiddenElements: true })).toBeTruthy();
+  });
+
+  it('senza città non c’è il pin', async () => {
+    await render(<ProfileHeader {...base} counters={counters} layout="centered" />);
+    expect(screen.queryByTestId('icon-map', { includeHiddenElements: true })).toBeNull();
+  });
+});

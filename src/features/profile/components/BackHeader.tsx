@@ -7,7 +7,7 @@ import { Text } from '@/components/ui/Text';
 import { heights, spacing } from '@/theme/tokens';
 
 // The way back from the screens opened from a profile (edit, followers, following, a person's profile).
-type Props = { title: string; fallback?: '/profile' | '/friends' | '/feed' };
+type Props = { title: string; fallback?: '/profile' | '/profile/edit' | '/friends' | '/feed' };
 
 export function BackHeader({ title, fallback = '/profile' }: Props) {
   const { t } = useTranslation('profile');

@@ -92,6 +92,17 @@ const GLYPHS = {
     <Path key="p" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />,
     <Path key="q" d="M4 4l16 16" />,
   ],
+  lock: [
+    <Rect key="r" x="5" y="11" width="14" height="9" rx="2" />,
+    <Path key="p" d="M8 11V8a4 4 0 0 1 8 0v3" />,
+  ],
+  // "@": the handle.
+  at: [
+    <Circle key="c" cx="12" cy="12" r="4" />,
+    <Path key="p" d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1" />,
+  ],
+  info: [<Circle key="c" cx="12" cy="12" r="8.5" />, <Path key="p" d="M12 11v5M12 8v.01" />],
+  document: [<Path key="p" d="M7 3h7l4 4v14H7z" />, <Path key="q" d="M14 3v4h4M10 12h5M10 16h5" />],
 } as const;
 
 export type IconName = keyof typeof GLYPHS;

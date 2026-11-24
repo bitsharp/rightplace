@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { renderApp } from '@/test/appFlows';
-import { fakeSupabase } from '@/test/fakeSupabase';
+import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { seedFeedBackend, type FakePost } from '@/test/feedBackend';
 import { seedFriendsBackend } from '@/test/friendsBackend';
 
@@ -83,12 +83,30 @@ describe('tab Profilo in stile Instagram', () => {
     );
   });
 
-  it('Modifica profilo apre il form con tutte le impostazioni', async () => {
+  it('Modifica profilo apre l’elenco delle impostazioni', async () => {
     seed();
     await renderApp('ready', '/profile');
     await fireEvent.press(await screen.findByRole('button', { name: 'profile:header.edit' }));
-    expect(await screen.findByRole('button', { name: 'profile:app.save' })).toBeOnTheScreen();
-    expect(screen.getByText('profile:handleEditor.warning')).toBeOnTheScreen();
+    expect(await screen.findByText('profile:settings.groups.account')).toBeOnTheScreen();
+    expect(screen.getByText('profile:settings.groups.info')).toBeOnTheScreen();
+  });
+
+  it('l’intestazione mostra la città della mappa con il pin, e nessun nome reale', async () => {
+    seed();
+    setFakeRpc({
+      get_active_cities: [
+        { slug: 'milano', name: 'Milano', country: 'IT', lat: 45.46, lng: 9.19, default_zoom: 13 },
+      ],
+      get_profile_summary: [SUMMARY],
+      get_user_posts: [],
+    });
+    await renderApp('ready', '/profile');
+    expect(await screen.findByText('Milano')).toBeOnTheScreen();
+    expect(
+      screen.getAllByTestId('icon-map', { includeHiddenElements: true }).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText('@lince.rosso').length).toBeGreaterThan(0);
+    expect(screen.getByTestId('profile-header-top')).toHaveStyle({ flexDirection: 'column' });
   });
 
   it('toccando i follower apre l’elenco, dove Rimuovi funziona ancora', async () => {

@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { usePersonMeta } from '@/features/friends/usePersonMeta';
+import { useCurrentCityName } from '@/features/map/useCurrentCityName';
 import { spacing } from '@/theme/tokens';
 
 import { useAvatarEditor } from '../avatar/useAvatarEditor';
@@ -13,13 +14,17 @@ import { AvatarEditor, AvatarEditorNotice } from './AvatarEditor';
 import { ProfileHeader } from './ProfileHeader';
 import { ShareHandleButton } from './ShareHandleButton';
 
+const AVATAR_SIZE = 120;
+
 type Props = { handle: string; summary: ProfileSummary | null | undefined };
 
-// My profile header: editable photo, my counters (the lists open from them), "Edit profile" and, if enabled, "Share".
+// My profile header (centered, as in the mock-up): big editable photo, @handle (never a real name), age band · gender,
+// the map city, my my counters (the lists open from them), "Edit profile" and, if enabled, "Share".
 export function MyProfileHeader({ handle, summary }: Props) {
   const { t } = useTranslation('profile');
   const router = useRouter();
   const meta = usePersonMeta();
+  const city = useCurrentCityName();
   const avatar = useAvatarEditor();
   const { showShareHandle } = useShareUi();
   return (
@@ -30,7 +35,9 @@ export function MyProfileHeader({ handle, summary }: Props) {
           ? meta({ ageBand: summary.ageBand, gender: summary.gender })
           : null
       }
-      avatar={<AvatarEditor handle={handle} editor={avatar} />}
+      layout="centered"
+      city={city}
+      avatar={<AvatarEditor handle={handle} editor={avatar} size={AVATAR_SIZE} />}
       counters={{
         posts: summary?.postsCount ?? null,
         followers: summary?.followersCount ?? null,

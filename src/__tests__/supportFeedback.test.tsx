@@ -103,7 +103,7 @@ describe('Feedback ricevuti (supporto)', () => {
 
   it('nel profilo la voce "Feedback ricevuti" c’è solo per il supporto e apre la schermata', async () => {
     await renderApp('ready', '/profile/edit');
-    await screen.findByRole('button', { name: 'profile:app.save' });
+    await screen.findByText('profile:settings.groups.help');
     expect(screen.queryByText('profile:app.supportFeedback')).not.toBeOnTheScreen();
     await screen.unmount();
 

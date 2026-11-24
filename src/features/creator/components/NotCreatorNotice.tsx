@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
 import { spacing } from '@/theme/tokens';
 
-// Creator screens are only for creators: everyone else is sent to the profile toggle.
+// Creator screens are only for creators: everyone else is sent to the creator toggle (Personal data).
 export function NotCreatorNotice() {
   const { t } = useTranslation('creator');
   const router = useRouter();
@@ -21,7 +21,7 @@ export function NotCreatorNotice() {
         <Button
           label={t('notCreator.cta')}
           variant="creator"
-          onPress={() => router.replace('/profile/edit')}
+          onPress={() => router.replace('/profile/personal')}
         />
       </View>
     </Card>

@@ -99,6 +99,22 @@ export function LocationToggle({ value, onChange }: LocationToggleProps) {
   );
 }
 
+type ContactsToggleProps = { value: boolean; onChange: (value: boolean) => void };
+
+export function ContactsToggle({ value, onChange }: ContactsToggleProps) {
+  const { t } = useTranslation('profile');
+  return (
+    <Toggle
+      icon="contacts"
+      title={t('form.contacts.title')}
+      description={t('form.contacts.body')}
+      optional
+      value={value}
+      onValueChange={onChange}
+    />
+  );
+}
+
 const styles = StyleSheet.create({
   field: { gap: spacing.sm },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm + 2 },

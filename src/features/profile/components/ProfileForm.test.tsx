@@ -127,3 +127,34 @@ describe('ProfileForm con area creator spenta', () => {
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ isCreator: true }));
   });
 });
+
+describe('ProfileForm con solo i dati personali', () => {
+  it('mostra età, genere e creator; lingua, posizione e contatti hanno le loro schermate', async () => {
+    await render(
+      <ProfileForm initial={EMPTY} submitLabel="cta" onSubmit={jest.fn()} fields="personal" />,
+    );
+    expect(screen.getByLabelText('profile:form.day')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'profile:form.gender.male' })).toBeOnTheScreen();
+    expect(screen.getByRole('checkbox', { name: 'profile:form.creator' })).toBeOnTheScreen();
+    expect(screen.queryByRole('switch', { name: 'profile:form.location.title' })).toBeNull();
+    expect(screen.queryByRole('switch', { name: 'profile:form.contacts.title' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'profile:form.language.en' })).toBeNull();
+  });
+
+  it('salva comunque i valori di posizione, contatti e lingua che aveva il profilo', async () => {
+    const onSubmit = jest.fn(() => Promise.resolve());
+    await render(
+      <ProfileForm
+        initial={{ ...EMPTY, locale: 'en', locationOptIn: true, contactsOptIn: true }}
+        submitLabel="cta"
+        onSubmit={onSubmit}
+        fields="personal"
+      />,
+    );
+    await fillValidProfile();
+    await fireEvent.press(screen.getByRole('button', { name: 'cta' }));
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ locale: 'en', locationOptIn: true, contactsOptIn: true }),
+    );
+  });
+});

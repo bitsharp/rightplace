@@ -51,7 +51,6 @@
     "freeUntilContinue": "Finché non premi Continua puoi cambiare il tuo @tag quante volte vuoi. Dopo, potrai cambiarlo una volta ogni 30 giorni."
   },
   "app": {
-    "step": "Profilo privato",
     "save": "Salva",
     "saved": "Profilo salvato.",
     "creatorProfile": "Il tuo profilo creator",
@@ -61,11 +60,8 @@
   "account": {
     "title": "Account",
     "email": "Email (non visibile agli altri)",
-    "changePassword": "Cambia password",
     "signOut": "Esci",
-    "delete": "Elimina account",
-    "privacy": "Privacy",
-    "terms": "Termini"
+    "delete": "Elimina account"
   },
   "delete": {
     "explainTitle": "Eliminare l'account?",
@@ -160,5 +156,30 @@
   },
   "lists": {
     "back": "Indietro"
+  },
+  "settings": {
+    "groups": {
+      "account": "Impostazioni account",
+      "help": "Aiuto e supporto",
+      "info": "Informazioni"
+    },
+    "rows": {
+      "language": "Lingua",
+      "notifications": "Notifiche",
+      "privacy": "Privacy",
+      "city": "Città della mappa",
+      "tag": "@tag",
+      "personal": "Dati personali",
+      "password": "Cambia password",
+      "feedback": "Invia un feedback",
+      "about": "Chi siamo",
+      "terms": "Termini e condizioni",
+      "privacyPolicy": "Privacy Policy"
+    }
+  },
+  "about": {
+    "title": "Chi siamo",
+    "appName": "RightPlace",
+    "version": "Versione {{version}}"
   }
 }

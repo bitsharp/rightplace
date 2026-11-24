@@ -113,7 +113,7 @@ describe('città della mappa', () => {
     });
 
     it('scegliere Las Palmas nel profilo la salva sul server', async () => {
-      await renderApp('ready', '/profile/edit');
+      await renderApp('ready', '/profile/city');
       await fireEvent.press(await screen.findByRole('button', { name: 'Las Palmas' }));
       await waitFor(() => expect(savedCityCalls()).toEqual(['las-palmas']));
     });
@@ -132,7 +132,7 @@ describe('città della mappa', () => {
     const AUTO = 'profile:city.auto';
 
     it('elenca Automatica e le città attive, con Automatica scelta di default', async () => {
-      await renderApp('ready', '/profile/edit');
+      await renderApp('ready', '/profile/city');
       expect(await screen.findByRole('button', { name: AUTO })).toBeOnTheScreen();
       expect(screen.getByRole('button', { name: 'Las Palmas' })).toBeOnTheScreen();
       expect(screen.getByRole('button', { name: 'Milano' })).toBeOnTheScreen();
@@ -140,12 +140,12 @@ describe('città della mappa', () => {
     });
 
     it('con la posizione spenta spiega che si usa la città del profilo', async () => {
-      await renderApp('ready', '/profile/edit');
+      await renderApp('ready', '/profile/city');
       expect(await screen.findByText('profile:city.autoOff({"city":"Milano"})')).toBeOnTheScreen();
     });
 
     it('con la posizione spenta la nota mostra la città salvata nel profilo', async () => {
-      await renderApp('ready', '/profile/edit', { cities: { slug: 'las-palmas' } });
+      await renderApp('ready', '/profile/city', { cities: { slug: 'las-palmas' } });
       expect(
         await screen.findByText('profile:city.autoOff({"city":"Las Palmas"})'),
       ).toBeOnTheScreen();
@@ -153,18 +153,18 @@ describe('città della mappa', () => {
 
     it('la nota nomina la città del profilo anche con una scelta esplicita diversa', async () => {
       useMapStore.setState({ cityPreference: 'las-palmas' });
-      await renderApp('ready', '/profile/edit', { cities: { slug: 'milano' } });
+      await renderApp('ready', '/profile/city', { cities: { slug: 'milano' } });
       expect(await screen.findByText('profile:city.autoOff({"city":"Milano"})')).toBeOnTheScreen();
     });
 
     it('con la posizione accesa non mostra la nota', async () => {
-      await renderApp('ready', '/profile/edit', { location_opt_in: true });
+      await renderApp('ready', '/profile/city', { location_opt_in: true });
       await screen.findByRole('button', { name: AUTO });
       expect(screen.queryByText(/profile:city.autoOff/)).toBeNull();
     });
 
     it('scegliere una città la salva come preferenza e la mappa si ricentra lì', async () => {
-      await renderApp('ready', '/profile/edit');
+      await renderApp('ready', '/profile/city');
       await fireEvent.press(await screen.findByRole('button', { name: 'Las Palmas' }));
       expect(useMapStore.getState().cityPreference).toBe('las-palmas');
       await act(async () => router.push('/map'));
@@ -174,13 +174,13 @@ describe('città della mappa', () => {
 
     it('tornare ad Automatica azzera la scelta', async () => {
       useMapStore.setState({ cityPreference: 'las-palmas' });
-      await renderApp('ready', '/profile/edit');
+      await renderApp('ready', '/profile/city');
       await fireEvent.press(await screen.findByRole('button', { name: AUTO }));
       expect(useMapStore.getState().cityPreference).toBe('auto');
     });
 
     it('non chiede mai il permesso posizione', async () => {
-      await renderApp('ready', '/profile/edit');
+      await renderApp('ready', '/profile/city');
       await fireEvent.press(await screen.findByRole('button', { name: 'Las Palmas' }));
       expect(Location.requestForegroundPermissionsAsync).not.toHaveBeenCalled();
     });

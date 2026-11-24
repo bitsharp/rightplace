@@ -46,7 +46,7 @@ describe('profilo: follower e bloccati', () => {
 
   it('elenca i bloccati e Sblocca li riporta', async () => {
     const backend = seedFriendsBackend({ users: [LUPO], blocked: ['u-lupo'] });
-    await renderApp('ready', '/profile/edit');
+    await renderApp('ready', '/profile/privacy');
     expect(await screen.findByText('profile:blocked.title')).toBeOnTheScreen();
     expect(await screen.findByText('@lupo.verde')).toBeOnTheScreen();
     await fireEvent.press(
@@ -68,16 +68,16 @@ describe('profilo: condividi il mio @tag', () => {
   it('senza EXPO_PUBLIC_SHARE_ENABLED il bottone di condivisione non esiste', async () => {
     delete process.env.EXPO_PUBLIC_SHARE_ENABLED;
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit');
-    await screen.findByRole('button', { name: 'profile:app.save' });
+    await renderApp('ready', '/profile');
+    await screen.findByRole('button', { name: 'profile:header.edit' });
     expect(screen.queryByRole('button', { name: 'profile:share.cta' })).toBeNull();
   });
 
   it('con il flag a "false" il bottone non esiste', async () => {
     process.env.EXPO_PUBLIC_SHARE_ENABLED = 'false';
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit');
-    await screen.findByRole('button', { name: 'profile:app.save' });
+    await renderApp('ready', '/profile');
+    await screen.findByRole('button', { name: 'profile:header.edit' });
     expect(screen.queryByRole('button', { name: 'profile:share.cta' })).toBeNull();
   });
 
@@ -87,7 +87,7 @@ describe('profilo: condividi il mio @tag', () => {
     const share = jest
       .spyOn(Share, 'share')
       .mockResolvedValue({ action: 'sharedAction', activityType: undefined });
-    await renderApp('ready', '/profile/edit');
+    await renderApp('ready', '/profile');
     await fireEvent.press(await screen.findByRole('button', { name: 'profile:share.cta' }));
     const message = (share.mock.calls[0]?.[0] as { message: string }).message;
     expect(message).toContain('rightplace://u/lince.rosso');
@@ -101,14 +101,14 @@ describe('profilo: farsi trovare dal numero', () => {
 
   it('senza consenso contatti la sezione non c’è', async () => {
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit');
-    await screen.findByRole('button', { name: 'profile:app.save' });
+    await renderApp('ready', '/profile/privacy');
+    await screen.findByRole('switch', { name: 'profile:form.contacts.title' });
     expect(screen.queryByLabelText(NUMBER_FIELD)).toBeNull();
   });
 
   it('salva solo l’hash del numero E.164 e svuota il campo', async () => {
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit', { contacts_opt_in: true });
+    await renderApp('ready', '/profile/privacy', { contacts_opt_in: true });
     const field = await screen.findByLabelText(NUMBER_FIELD);
     await fireEvent.changeText(field, '345 123 4567');
     await fireEvent.press(screen.getByRole('button', { name: 'profile:findMe.save' }));
@@ -125,7 +125,7 @@ describe('profilo: farsi trovare dal numero', () => {
 
   it('un numero non valido non parte', async () => {
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit', { contacts_opt_in: true });
+    await renderApp('ready', '/profile/privacy', { contacts_opt_in: true });
     await fireEvent.changeText(await screen.findByLabelText(NUMBER_FIELD), 'abc');
     await fireEvent.press(screen.getByRole('button', { name: 'profile:findMe.save' }));
     expect(await screen.findByText('profile:findMe.invalid')).toBeOnTheScreen();
@@ -134,7 +134,7 @@ describe('profilo: farsi trovare dal numero', () => {
 
   it('"Rimuovi" cancella l’hash dal server', async () => {
     seedFriendsBackend({ users: [], phoneRegistered: true });
-    await renderApp('ready', '/profile/edit', { contacts_opt_in: true });
+    await renderApp('ready', '/profile/privacy', { contacts_opt_in: true });
     await fireEvent.press(await screen.findByRole('button', { name: 'profile:findMe.remove' }));
     await waitFor(() => expect(rpcCalls('clear_my_phone_hash')).toHaveLength(1));
     expect(await screen.findByText('profile:findMe.cleared')).toBeOnTheScreen();
@@ -142,7 +142,7 @@ describe('profilo: farsi trovare dal numero', () => {
 
   it('dopo il salvataggio la sezione mostra "Numero registrato" al posto del campo', async () => {
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit', { contacts_opt_in: true });
+    await renderApp('ready', '/profile/privacy', { contacts_opt_in: true });
     await fireEvent.changeText(await screen.findByLabelText(NUMBER_FIELD), '345 123 4567');
     await fireEvent.press(screen.getByRole('button', { name: 'profile:findMe.save' }));
     expect(await screen.findByText('profile:findMe.registered')).toBeOnTheScreen();
@@ -151,27 +151,26 @@ describe('profilo: farsi trovare dal numero', () => {
 
   it('un numero già registrato sul server risulta registrato anche dopo un riavvio', async () => {
     seedFriendsBackend({ users: [], phoneRegistered: true });
-    await renderApp('ready', '/profile/edit', { contacts_opt_in: true });
+    await renderApp('ready', '/profile/privacy', { contacts_opt_in: true });
     expect(await screen.findByText('profile:findMe.registered')).toBeOnTheScreen();
     expect(JSON.stringify(fakeSupabase.rpc.mock.calls)).not.toContain('set_my_phone_hash');
   });
 
-  it('disattivare il toggle contatti e salvare cancella anche l’hash del numero', async () => {
+  it('disattivare il toggle contatti salva subito e cancella anche l’hash del numero', async () => {
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit', { contacts_opt_in: true });
+    await renderApp('ready', '/profile/privacy', { contacts_opt_in: true });
     await fireEvent.press(
       await screen.findByRole('switch', { name: 'profile:form.contacts.title' }),
     );
-    await fireEvent.press(screen.getByRole('button', { name: 'profile:app.save' }));
     await waitFor(() => expect(rpcCalls('clear_my_phone_hash')).toHaveLength(1));
     expect(rpcCalls('complete_profile')[0]?.[1]).toMatchObject({ p_contacts_opt_in: false });
   });
 
   it('lasciare il toggle contatti spento non chiama nulla sul numero', async () => {
     seedFriendsBackend({ users: [] });
-    await renderApp('ready', '/profile/edit');
-    await fireEvent.press(await screen.findByRole('button', { name: 'profile:app.save' }));
-    await screen.findByText('profile:app.saved');
+    await renderApp('ready', '/profile/privacy');
+    await screen.findByRole('switch', { name: 'profile:form.contacts.title' });
     expect(rpcCalls('set_my_phone_hash')).toHaveLength(0);
+    expect(rpcCalls('complete_profile')).toHaveLength(0);
   });
 });
