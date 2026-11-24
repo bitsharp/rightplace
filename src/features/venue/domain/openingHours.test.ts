@@ -1,4 +1,4 @@
-import { closingTimeTonight } from './openingHours';
+import { closingTimeTonight, venueOpenStatus } from './openingHours';
 
 const ROME = 'Europe/Rome';
 const point = (day: number, hour: number, minute = 0) => ({ day, hour, minute });
@@ -58,5 +58,42 @@ describe('closingTimeTonight', () => {
   it('formatta i minuti con lo zero davanti', () => {
     const late = { periods: [{ open: point(5, 22), close: point(6, 3, 5) }] };
     expect(closingTimeTonight(late, new Date('2026-11-06T22:30:00Z'), ROME)).toBe('03:05');
+  });
+});
+
+describe('venueOpenStatus', () => {
+  it('con il locale aperto indica l’orario di chiusura', () => {
+    // 23:30 in Rome on Friday
+    expect(venueOpenStatus(club, new Date('2026-11-06T22:30:00Z'), ROME)).toEqual({
+      kind: 'open',
+      closesAt: '05:00',
+    });
+  });
+
+  it('a notte fonda, nel turno iniziato il giorno prima, è ancora aperto', () => {
+    expect(venueOpenStatus(club, new Date('2026-11-07T01:00:00Z'), ROME)).toEqual({
+      kind: 'open',
+      closesAt: '05:00',
+    });
+  });
+
+  it('nel pomeriggio, prima dell’apertura, è chiuso', () => {
+    expect(venueOpenStatus(club, new Date('2026-11-06T17:00:00Z'), ROME)).toEqual({
+      kind: 'closed',
+    });
+  });
+
+  it('un periodo senza chiusura è aperto 24 ore, senza orario di chiusura', () => {
+    const always = { periods: [{ open: point(0, 0) }] };
+    expect(venueOpenStatus(always, new Date('2026-11-06T17:00:00Z'), ROME)).toEqual({
+      kind: 'open',
+      closesAt: null,
+    });
+  });
+
+  it('senza orari noti non dice né aperto né chiuso', () => {
+    expect(venueOpenStatus(null, new Date(), ROME)).toBeNull();
+    expect(venueOpenStatus({ periods: [] }, new Date(), ROME)).toBeNull();
+    expect(venueOpenStatus({ nope: 1 }, new Date(), ROME)).toBeNull();
   });
 });

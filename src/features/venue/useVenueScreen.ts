@@ -1,15 +1,18 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import { useSession } from '@/features/auth/useSession';
 import { useMyChatRooms } from '@/features/chat/hooks';
+import { roundedDistanceKm } from '@/features/map/domain/distance';
 import { useMyDeclaration } from '@/features/map/hooks';
 import { isGooglePlaceId } from '@/features/venues/domain/googleMaps';
 
 import { useAvatarUrls } from '@/features/profile/avatar/hooks';
+import { useCoarsePositionStore } from '@/features/profile/location';
 
 import type { VenueDetail, VenueFriend } from './api';
 import { declarationFor } from './domain/declarationState';
-import { closingTimeTonight } from './domain/openingHours';
+import { venueOpenStatus } from './domain/openingHours';
 import { openTransportLink } from './domain/openTransportLink';
 import { statsView, type StatsSegment } from './domain/statsState';
 import { buildTransportLinks, type TransportDirection } from './domain/transport';
@@ -32,6 +35,10 @@ export function linksFor(venue: VenueDetail, direction: TransportDirection) {
 
 export function useVenueScreen(venueId: string) {
   const router = useRouter();
+  const { profile } = useSession();
+  // Only a user who turned the toggle on ever has a cell, and it is already ~500 m coarse (principle 3).
+  const coarseCell = useCoarsePositionStore((state) => state.cell);
+  const you = profile?.locationOptIn ? coarseCell : null;
   const detail = useVenueDetail(venueId);
   useRefreshVenueDetails(detail.data ?? null);
   const [segment, setSegment] = useState<StatsSegment>('going');
@@ -68,7 +75,12 @@ export function useVenueScreen(venueId: string) {
     setDirection,
     links,
     openLink: (link: Parameters<typeof openTransportLink>[0]) => void openTransportLink(link),
-    closingTime: venue ? closingTimeTonight(venue.openingHours, new Date(), venue.timezone) : null,
+    // Places data only: a spot's address is not ours to show (same rule as the header).
+    shownAddress: venue && isGooglePlaceId(venue.googlePlaceId) ? venue.address : null,
+    status: venue ? venueOpenStatus(venue.openingHours, new Date(), venue.timezone) : null,
+    distanceKm: venue && you ? roundedDistanceKm(you, venue) : null,
+    // The existing friends list (tab): where "Vedi tutti" goes.
+    openFriends: () => router.push('/friends'),
     declaration: declarationFor(mine.data ?? null, { kind: 'night', id: venueId }),
     chatRoomId: chatRoom?.roomId ?? null,
     openChat: () =>

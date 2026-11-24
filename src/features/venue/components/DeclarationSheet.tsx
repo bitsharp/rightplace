@@ -14,6 +14,7 @@ import type { DeclarationState, DeclarationTarget } from '../domain/declarationS
 import { formatTime } from '../domain/formatTime';
 import { AskAi } from './AskAi';
 import { ConfirmInline, DeclaredCard, DeclareChoice, RemoveIconLink } from './DeclarationControls';
+import { NightFriends, NightTransport, NightVenueCard, type NightContext } from './YourNight';
 import { useDeclarationActions } from './useDeclarationActions';
 
 type SheetVenue = {
@@ -33,6 +34,8 @@ type Props = {
   target: DeclarationTarget;
   venue: SheetVenue;
   state: DeclarationState;
+  // The venue page passes what "La tua serata" shows around my declaration; a creator's night has none.
+  night?: NightContext;
 };
 
 // Same body for a venue night and, from prompt 12, for a creator's event: only `target` differs.
@@ -44,21 +47,17 @@ export function DeclarationSheet({ visible, onClose, ...body }: Props) {
   );
 }
 
-function SheetBody({ onClose, target, venue, state }: Omit<Props, 'visible'>) {
-  const { t } = useTranslation('venue');
+function SheetBody({ onClose, target, venue, state, night }: Omit<Props, 'visible'>) {
   const { height } = useWindowDimensions();
   const actions = useDeclarationActions({ target, venue, state, onClose });
 
   return (
     <ScrollView style={{ maxHeight: height * 0.75 }} contentContainerStyle={styles.content}>
-      <MonoLabel tone="going">{t('declare.label')}</MonoLabel>
-      <Text variant="display22">{venue.title ?? venue.name}</Text>
-      {venue.goingBand !== null && venue.maybeBand !== null ? (
-        <View style={styles.bands}>
-          <RangeStat intent="going" band={venue.goingBand} />
-          <RangeStat intent="maybe" band={venue.maybeBand} />
-        </View>
-      ) : null}
+      {night && state.kind === 'here' ? (
+        <YourNightTop venue={venue} night={night} onOpenVenue={onClose} />
+      ) : (
+        <SheetTitle venue={venue} />
+      )}
       {state.kind === 'here' ? (
         <DeclaredCard
           intent={state.intent}
@@ -79,9 +78,56 @@ function SheetBody({ onClose, target, venue, state }: Omit<Props, 'visible'>) {
       ) : null}
       <ErrorLine code={actions.errorCode} />
       <ExpiryNote state={state} timeZone={venue.timezone} />
+      {night && state.kind === 'here' ? <YourNightBottom night={night} /> : null}
       <AskAi />
       {state.kind === 'here' ? <RemoveIconLink onPress={() => actions.ask('remove')} /> : null}
     </ScrollView>
+  );
+}
+
+function SheetTitle({ venue }: { venue: SheetVenue }) {
+  const { t } = useTranslation('venue');
+  return (
+    <>
+      <MonoLabel tone="going">{t('declare.label')}</MonoLabel>
+      <Text variant="display22">{venue.title ?? venue.name}</Text>
+      {venue.goingBand !== null && venue.maybeBand !== null ? (
+        <View style={styles.bands}>
+          <RangeStat intent="going" band={venue.goingBand} />
+          <RangeStat intent="maybe" band={venue.maybeBand} />
+        </View>
+      ) : null}
+    </>
+  );
+}
+
+type NightTopProps = { venue: SheetVenue; night: NightContext; onOpenVenue: () => void };
+
+// "LA TUA SERATA": the title and the venue card; the declared card (edit / cancel) follows as the main action.
+function YourNightTop({ venue, night, onOpenVenue }: NightTopProps) {
+  const { t } = useTranslation('venue');
+  return (
+    <>
+      <Text accessibilityRole="header" variant="display30">
+        {t('declare.label')}
+      </Text>
+      <NightVenueCard
+        name={venue.name}
+        photoUrl={night.photoUrl}
+        address={night.address}
+        status={night.status}
+        onPress={onOpenVenue}
+      />
+    </>
+  );
+}
+
+function YourNightBottom({ night }: { night: NightContext }) {
+  return (
+    <>
+      <NightTransport links={night.links} onOpen={night.onOpenLink} />
+      <NightFriends friends={night.friends} urls={night.urls} />
+    </>
   );
 }
 

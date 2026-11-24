@@ -49,6 +49,7 @@ export function useEventScreen(eventId: string) {
     event,
     venue,
     avatarUrls,
+    openFriends: () => router.push('/friends'),
     loadFailed: detail.isError,
     cancelled,
     canDeclare: event !== null && !cancelled && !ended,

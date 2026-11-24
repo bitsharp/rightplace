@@ -224,4 +224,87 @@ describe('DeclarationSheet', () => {
     expect(await screen.findByText('errors:rpc.VENUE_NOT_ACTIVE')).toBeOnTheScreen();
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  describe('"La tua serata" (dichiarazione qui, con il contesto del locale)', () => {
+    const night = {
+      photoUrl: null,
+      address: 'Via Test 1, Milano',
+      status: { kind: 'open', closesAt: '04:00' } as const,
+      links: [
+        { provider: 'taxi', primaryUrl: 'tel:+39028585' },
+        { provider: 'uber', primaryUrl: 'https://m.uber.com/x' },
+        { provider: 'transit', primaryUrl: 'https://www.google.com/maps/dir/' },
+      ] as const,
+      onOpenLink: jest.fn(),
+      friends: [
+        {
+          userId: 'u-volpe',
+          handle: 'volpe.viola',
+          ageBand: '18-24' as const,
+          gender: 'female' as const,
+          intent: 'going' as const,
+        },
+      ],
+      urls: {},
+    };
+
+    async function renderNight(state: DeclarationState, onClose = jest.fn()) {
+      const { Wrapper } = createQueryWrapper();
+      setFakeRpc({});
+      await render(
+        <DeclarationSheet
+          visible
+          onClose={onClose}
+          target={{ kind: 'night', id: 'v1' }}
+          venue={venue}
+          state={state}
+          night={night}
+        />,
+        { wrapper: Wrapper },
+      );
+      return onClose;
+    }
+
+    it('mostra titolo, card del locale, Andare e tornare senza tempi e Amici della serata', async () => {
+      await renderNight(hereGoing);
+      expect(screen.getByRole('header', { name: 'venue:declare.label' })).toBeOnTheScreen();
+      expect(screen.getByText('Arena Club')).toBeOnTheScreen();
+      expect(screen.getByText('Via Test 1, Milano')).toBeOnTheScreen();
+      expect(screen.getByText('venue:yourNight.transport.taxi')).toBeOnTheScreen();
+      expect(screen.getByText('venue:yourNight.transport.uber')).toBeOnTheScreen();
+      expect(screen.getByText('venue:yourNight.transport.transit')).toBeOnTheScreen();
+      expect(screen.getByText('venue:yourNight.friends({"count":1})')).toBeOnTheScreen();
+      expect(screen.queryByText(/min/i)).toBeNull();
+    });
+
+    it('non propone mai di condividere la posizione', async () => {
+      await renderNight(hereGoing);
+      expect(screen.queryByText(/share|condivid|position|posizione|location/i)).toBeNull();
+    });
+
+    it('Modifica e Annulla restano, con la stessa conferma di prima', async () => {
+      await renderNight(hereGoing);
+      expect(screen.getByRole('button', { name: /venue:declare.edit/ })).toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'venue:declare.cancel' }));
+      expect(screen.getByText('venue:declare.cancelConfirm')).toBeOnTheScreen();
+    });
+
+    it('il tocco su un servizio apre il link esistente', async () => {
+      await renderNight(hereGoing);
+      await fireEvent.press(screen.getByText('venue:yourNight.transport.uber'));
+      expect(night.onOpenLink).toHaveBeenCalledWith(night.links[1]);
+    });
+
+    it('la freccia della card chiude il foglio e riporta al locale', async () => {
+      const onClose = await renderNight(hereGoing);
+      await fireEvent.press(screen.getByRole('button', { name: 'venue:yourNight.openVenue' }));
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it('senza dichiarazione qui resta la scelta Ci vado / Forse, senza il blocco', async () => {
+      await renderNight(none);
+      expect(screen.getByRole('button', { name: 'venue:declare.going' })).toBeOnTheScreen();
+      expect(screen.queryByText('venue:yourNight.transport.uber')).toBeNull();
+    });
+  });
 });

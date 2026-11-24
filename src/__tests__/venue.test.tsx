@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as Location from 'expo-location';
 import { Linking } from 'react-native';
 
+import { useCoarsePositionStore } from '@/features/profile/location';
 import { renderApp } from '@/test/appFlows';
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 
@@ -255,6 +256,100 @@ describe('dettaglio locale e dichiarazione', () => {
       await renderApp('ready', '/venue/arena');
       expect(await screen.findByText('Arena Club')).toBeOnTheScreen();
       expect(screen.queryByTestId('venue-cover-photo')).toBeNull();
+    });
+  });
+
+  describe('layout a riquadri', () => {
+    beforeEach(() => useCoarsePositionStore.setState({ cell: null }));
+
+    it('mostra i due riquadri con le fasce, mai un numero esatto di persone', async () => {
+      seedBackend({ stats: () => stats({ going_band: '20–30', maybe_band: '3–10' }) });
+      await renderApp('ready', '/venue/arena');
+      expect(await screen.findByText('20–30')).toBeOnTheScreen();
+      expect(screen.getByText('3–10')).toBeOnTheScreen();
+      expect(screen.getByText('venue:tiles.going')).toBeOnTheScreen();
+      expect(screen.getByText('venue:tiles.maybe')).toBeOnTheScreen();
+      expect(screen.queryByText(/^\d+$/)).toBeNull();
+    });
+
+    it('con meno di 3 persone i riquadri dicono "pochi"', async () => {
+      seedBackend();
+      await renderApp('ready', '/venue/arena');
+      await screen.findByText('venue:tiles.going');
+      expect(screen.getAllByText('ui:band.few')).toHaveLength(2);
+    });
+
+    it('lo stato di apertura arriva dagli orari del locale', async () => {
+      seedBackend({ detail: { opening_hours: { periods: [{ open: { day: 0, hour: 0 } }] } } });
+      await renderApp('ready', '/venue/arena');
+      expect(await screen.findByText('venue:status.openNoClose')).toBeOnTheScreen();
+    });
+
+    it('senza posizione attiva non c’è la distanza', async () => {
+      useCoarsePositionStore.setState({ cell: { lat: 45.4641, lng: 9.1901 } });
+      seedBackend();
+      await renderApp('ready', '/venue/arena');
+      await screen.findByText('Via Test 1, Milano');
+      expect(screen.queryByText(/venue:distance/)).toBeNull();
+    });
+
+    it('con la posizione attiva la distanza è arrotondata a 500 m', async () => {
+      jest
+        .mocked(Location.getForegroundPermissionsAsync)
+        .mockResolvedValue({ granted: true } as never);
+      jest
+        .mocked(Location.getCurrentPositionAsync)
+        .mockResolvedValue({ coords: { latitude: 45.4641, longitude: 9.1901 } } as never);
+      seedBackend();
+      await renderApp('ready', '/venue/arena', { location_opt_in: true });
+      expect(
+        await screen.findByText('Via Test 1, Milano · venue:distance({"km":"0,5"})'),
+      ).toBeOnTheScreen();
+    });
+
+    it('"Vedi tutti" apre la lista amici', async () => {
+      seedBackend({
+        stats: () =>
+          stats({
+            friends: [
+              {
+                user_id: 'u-volpe',
+                handle: 'volpe.viola',
+                age_band: '18-24',
+                gender: 'female',
+                intent: 'going',
+              },
+            ],
+          }),
+      });
+      await renderApp('ready', '/venue/arena');
+      await fireEvent.press(await screen.findByRole('button', { name: 'venue:friends.seeAll' }));
+      expect(await screen.findByText('friends:hint')).toBeOnTheScreen();
+    });
+  });
+
+  describe('"La tua serata"', () => {
+    it('dopo la dichiarazione il foglio mostra titolo, card, Andare e tornare e amici della serata', async () => {
+      seedBackend({
+        mine: 'going',
+        stats: () =>
+          stats({
+            friends: [
+              {
+                user_id: 'u-volpe',
+                handle: 'volpe.viola',
+                age_band: '18-24',
+                gender: 'female',
+                intent: 'going',
+              },
+            ],
+          }),
+      });
+      await renderApp('ready', '/venue/arena');
+      await fireEvent.press(await screen.findByRole('button', { name: 'venue:cta' }));
+      expect(await screen.findByText('venue:yourNight.friends({"count":1})')).toBeOnTheScreen();
+      expect(screen.getByText('venue:yourNight.transport.uber')).toBeOnTheScreen();
+      expect(screen.queryByText(/condivid|share/i)).toBeNull();
     });
   });
 

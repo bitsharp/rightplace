@@ -78,3 +78,21 @@ export function closingTimeTonight(
   if (current) return current.closeClock;
   return shifts.find((shift) => opensLaterToday(shift, minute))?.closeClock ?? null;
 }
+
+export type OpenStatus = { kind: 'open'; closesAt: string | null } | { kind: 'closed' };
+
+// "Open now / closed" from the venue's own hours, on the venue's wall clock. Unknown hours say nothing
+// (null) rather than "closed": a missing schedule is not a closed venue.
+export function venueOpenStatus(
+  openingHours: unknown,
+  now: Date,
+  timeZone: string,
+): OpenStatus | null {
+  const parsed = hoursSchema.safeParse(openingHours);
+  if (!parsed.success || parsed.data.periods.length === 0) return null;
+  // A period without `close` is open around the clock.
+  if (parsed.data.periods.some((period) => !period.close)) return { kind: 'open', closesAt: null };
+  const minute = localWeekMinute(now, timeZone);
+  const current = toShifts(parsed.data.periods).find((shift) => isOpenAt(shift, minute));
+  return current ? { kind: 'open', closesAt: current.closeClock } : { kind: 'closed' };
+}

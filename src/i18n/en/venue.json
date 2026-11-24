@@ -3,7 +3,6 @@
   "eventTitle": "Event",
   "back": "Back",
   "loadError": "We can't load this venue. Try again shortly.",
-  "typeLine": "{{kind}} · Open until {{time}}",
   "gender": {
     "female": "Woman",
     "male": "Man",
@@ -25,9 +24,10 @@
     }
   },
   "friends": {
-    "title": "Friends going",
+    "title": "Your friends",
     "empty": "None of the friends you follow has declared this night yet.",
-    "meta": "{{age}} · {{gender}}"
+    "meta": "{{age}} · {{gender}}",
+    "seeAll": "See all"
   },
   "transport": {
     "title": "Getting there and back",
@@ -117,5 +117,26 @@
   "website": {
     "label": "Website",
     "open": "Open the website {{domain}}"
+  },
+  "status": {
+    "open": "Open · Closes at {{time}}",
+    "openNoClose": "Open",
+    "closed": "Closed"
+  },
+  "distance": "{{km}} km",
+  "tiles": {
+    "going": "Going",
+    "maybe": "Maybe"
+  },
+  "yourNight": {
+    "openVenue": "Open the venue",
+    "friends": "Night friends ({{count}})",
+    "transport": {
+      "taxi": "Taxi",
+      "uber": "Uber",
+      "freenow": "Free Now",
+      "cabify": "Cabify",
+      "transit": "Transit"
+    }
   }
 }

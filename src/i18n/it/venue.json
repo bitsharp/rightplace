@@ -3,7 +3,6 @@
   "eventTitle": "Serata",
   "back": "Indietro",
   "loadError": "Non riusciamo a caricare il locale. Riprova tra poco.",
-  "typeLine": "{{kind}} · Aperto fino alle {{time}}",
   "gender": {
     "female": "Donna",
     "male": "Uomo",
@@ -25,9 +24,10 @@
     }
   },
   "friends": {
-    "title": "Amici che ci vanno",
+    "title": "I tuoi amici",
     "empty": "Nessuno degli amici che segui ha ancora dichiarato questa serata.",
-    "meta": "{{age}} · {{gender}}"
+    "meta": "{{age}} · {{gender}}",
+    "seeAll": "Vedi tutti"
   },
   "transport": {
     "title": "Andare e tornare",
@@ -117,5 +117,26 @@
   "website": {
     "label": "Sito web",
     "open": "Apri il sito web {{domain}}"
+  },
+  "status": {
+    "open": "Aperto · Chiude alle {{time}}",
+    "openNoClose": "Aperto",
+    "closed": "Chiuso"
+  },
+  "distance": "{{km}} km",
+  "tiles": {
+    "going": "Ci vanno",
+    "maybe": "Forse"
+  },
+  "yourNight": {
+    "openVenue": "Apri il locale",
+    "friends": "Amici della serata ({{count}})",
+    "transport": {
+      "taxi": "Taxi",
+      "uber": "Uber",
+      "freenow": "Free Now",
+      "cabify": "Cabify",
+      "transit": "Mezzi"
+    }
   }
 }
