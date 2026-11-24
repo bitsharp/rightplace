@@ -106,6 +106,18 @@ describe('fetchCityEvents', () => {
   });
 });
 
+describe('fetchEventDetail: forma precedente della RPC', () => {
+  it('amici senza user_id (database non aggiornato): nessun errore, userId null', async () => {
+    respondWith([
+      detailRow({
+        friends: [{ handle: 'volpe.viola', age_band: '18-24', gender: 'female', intent: 'going' }],
+      }),
+    ]);
+    const detail = await fetchEventDetail('e1');
+    expect(detail.friends[0]).toMatchObject({ userId: null, handle: 'volpe.viola' });
+  });
+});
+
 describe('fetchEventDetail', () => {
   it('converte la riga, con amici e statistiche k-anonime', async () => {
     respondWith([detailRow()]);

@@ -49,6 +49,22 @@ describe('notifications api', () => {
     expect(unregister).toHaveBeenCalledWith({ p_token: 'ExponentPushToken[abc]' });
   });
 
+  it('novità senza actor_id (database non aggiornato): nessun errore, actorId null', async () => {
+    setFakeRpc({
+      get_my_activity: [
+        {
+          kind: 'like',
+          actor_handle: 'volpe.viola',
+          post_id: 'p1',
+          created_at: '2026-11-13T10:00:00Z',
+        },
+      ],
+    });
+    await expect(fetchActivity()).resolves.toMatchObject([
+      { actorHandle: 'volpe.viola', actorId: null },
+    ]);
+  });
+
   it('legge le novità senza alcun testo dei commenti', async () => {
     setFakeRpc({
       get_my_activity: [

@@ -25,6 +25,18 @@ const mapRow = (overrides: Record<string, unknown> = {}) => ({
 const respondWith = (data: unknown, error: unknown = null) =>
   fakeSupabase.rpc.mockResolvedValueOnce({ data, error });
 
+describe('fetchCityMap: forma precedente della RPC', () => {
+  it('senza friends_going_ids (database non aggiornato) non dà errore e non ha id', async () => {
+    const { friends_going_ids: _missing, ...oldShape } = mapRow({
+      friends_going: ['volpe.viola'],
+      friends_count: 1,
+    });
+    respondWith([oldShape]);
+    const rows = await fetchCityMap('milano', 'friends');
+    expect(rows[0]).toMatchObject({ friendsGoing: ['volpe.viola'], friendIds: null });
+  });
+});
+
 describe('fetchCityMap', () => {
   it('chiama get_city_map con città e vista e converte le righe', async () => {
     respondWith([

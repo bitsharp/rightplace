@@ -136,6 +136,20 @@ describe('fetchVenueStats: spot sotto k', () => {
   });
 });
 
+describe('fetchVenueStats: forma precedente della RPC', () => {
+  it('amici senza user_id (database non aggiornato): nessun errore, userId null', async () => {
+    respondWith([
+      statsRow({
+        friends: [{ handle: 'volpe.viola', age_band: '18-24', gender: 'female', intent: 'going' }],
+      }),
+    ]);
+    const stats = await fetchVenueStats('v1', 'going');
+    expect(stats.friends).toEqual([
+      { userId: null, handle: 'volpe.viola', ageBand: '18-24', gender: 'female', intent: 'going' },
+    ]);
+  });
+});
+
 describe('fetchVenueStats', () => {
   it('chiede il segmento al server e converte fasce, statistiche e amici', async () => {
     respondWith([statsRow()]);

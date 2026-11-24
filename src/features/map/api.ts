@@ -22,7 +22,8 @@ const mapRowSchema = z.object({
   is_sponsored: z.boolean(),
   friends_going: z.array(z.string()).nullable(),
   // Same order and length as friends_going; only for accepted follows, only in the friends view.
-  friends_going_ids: z.array(z.string()).nullable(),
+  // Optional: a database not yet migrated omits it and the friends simply show their initial.
+  friends_going_ids: z.array(z.string()).nullish(),
   friends_count: z.number().int().nullable(),
   is_spot: z.boolean().default(false),
 });
@@ -46,7 +47,7 @@ export async function fetchCityMap(citySlug: string, view: MapViewMode): Promise
       isHotSpot: row.is_hot_spot,
       isSponsored: row.is_sponsored,
       friendsGoing: row.friends_going,
-      friendIds: row.friends_going_ids,
+      friendIds: row.friends_going_ids ?? null,
       friendsCount: row.friends_count,
       isSpot: row.is_spot,
     }));

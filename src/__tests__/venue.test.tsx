@@ -169,6 +169,21 @@ describe('dettaglio locale e dichiarazione', () => {
         return { data: { urls }, error: null };
       });
 
+    it('con la forma precedente della RPC (amici senza user_id) la schermata si vede con le iniziali', async () => {
+      seedBackend({
+        stats: () =>
+          stats({
+            friends: [
+              { handle: 'volpe.viola', age_band: '18-24', gender: 'female', intent: 'going' },
+            ],
+          }),
+      });
+      await renderApp('ready', '/venue/arena');
+      expect(await screen.findByText('@volpe.viola')).toBeOnTheScreen();
+      expect(screen.getByText('V', { includeHiddenElements: true })).toBeOnTheScreen();
+      expect(screen.queryByTestId('avatar-image', { includeHiddenElements: true })).toBeNull();
+    });
+
     it('le foto degli amici: firmata per chi la rende visibile, iniziale per gli altri, una sola richiesta', async () => {
       signAvatars(['u-volpe']);
       seedBackend({

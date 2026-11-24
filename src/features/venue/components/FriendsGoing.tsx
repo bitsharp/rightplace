@@ -29,7 +29,7 @@ export function FriendsGoing({ friends, urls }: Props) {
       </View>
       {friends.length === 0 ? <EmptyState message={t('friends.empty')} /> : null}
       {friends.map((friend) => (
-        <FriendLine key={friend.userId} friend={friend} urls={urls} />
+        <FriendLine key={friend.handle} friend={friend} urls={urls} />
       ))}
     </View>
   );
