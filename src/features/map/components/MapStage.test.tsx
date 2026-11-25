@@ -77,19 +77,14 @@ describe('MapStage compatta', () => {
     expect(screen.getByTestId('map-view').props.initialRegion).toEqual(cityRegion(lasPalmas));
   });
 
-  it('mette titolo e barra in basso sopra la mappa compatta', async () => {
-    await render(
-      <MapStage {...baseProps} header={<Text>intestazione</Text>} onOpenSearch={jest.fn()} />,
-    );
+  it('mette il titolo sopra la mappa compatta', async () => {
+    await render(<MapStage {...baseProps} header={<Text>intestazione</Text>} />);
     expect(screen.getByText('intestazione')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'map:searchPlaceholder' })).toBeOnTheScreen();
   });
 
-  it('la barra apre la ricerca', async () => {
-    const onOpenSearch = jest.fn();
-    await render(<MapStage {...baseProps} onOpenSearch={onOpenSearch} />);
-    await fireEvent.press(screen.getByRole('button', { name: 'map:searchPlaceholder' }));
-    expect(onOpenSearch).toHaveBeenCalledTimes(1);
+  it('non c’è più la barra con il nome della città', async () => {
+    await render(<MapStage {...baseProps} />);
+    expect(screen.queryByRole('button', { name: 'map:searchPlaceholder' })).toBeNull();
   });
 
   describe('"vai alla mia posizione"', () => {
@@ -103,9 +98,7 @@ describe('MapStage compatta', () => {
     afterEach(() => jest.restoreAllMocks());
 
     it('con la posizione attiva centra la mappa sulla cella grossolana', async () => {
-      await render(
-        <MapStage {...baseProps} you={{ lat: 45.47, lng: 9.2 }} onOpenSearch={jest.fn()} />,
-      );
+      await render(<MapStage {...baseProps} you={{ lat: 45.47, lng: 9.2 }} />);
       await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));
       expect(animateToRegion().mock.calls[0]?.[0]).toMatchObject({
         latitude: 45.47,
@@ -114,15 +107,11 @@ describe('MapStage compatta', () => {
       expect(Alert.alert).not.toHaveBeenCalled();
     });
 
-    it('con la posizione spenta avvisa e offre di attivarla, senza muovere la mappa né aprire la ricerca', async () => {
-      const onOpenSearch = jest.fn();
+    it('con la posizione spenta avvisa e offre di attivarla, senza muovere la mappa', async () => {
       const onEnableLocation = jest.fn();
-      await render(
-        <MapStage {...baseProps} onOpenSearch={onOpenSearch} onEnableLocation={onEnableLocation} />,
-      );
+      await render(<MapStage {...baseProps} onEnableLocation={onEnableLocation} />);
       await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));
       expect(animateToRegion()).not.toHaveBeenCalled();
-      expect(onOpenSearch).not.toHaveBeenCalled();
       const [title, body, buttons] = jest.mocked(Alert.alert).mock.calls[0] ?? [];
       expect(title).toBe('map:locateOff.title');
       expect(body).toBe('map:locateOff.body');

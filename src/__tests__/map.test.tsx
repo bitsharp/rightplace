@@ -598,11 +598,10 @@ describe('mappa', () => {
       expect(screen.queryByTestId('friend-faces', { includeHiddenElements: true })).toBeNull();
     });
 
-    it('senza posizione: barra con la città, "vai alla mia posizione" avvisa senza chiedere permessi, niente distanza', async () => {
+    it('senza posizione: "vai alla mia posizione" avvisa senza chiedere permessi, niente distanza', async () => {
       withTocqueville();
       await renderApp('ready', '/map');
-      const bar = await screen.findByRole('button', { name: 'map:searchPlaceholder' });
-      expect(within(bar).getByText('Milano')).toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: 'map:searchPlaceholder' })).toBeNull();
       await screen.findByTestId('marker-hot-tocq', { includeHiddenElements: true });
       const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
       await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));

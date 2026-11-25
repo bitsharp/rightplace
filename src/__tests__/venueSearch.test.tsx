@@ -181,9 +181,9 @@ describe('ricerca locali', () => {
     expect(screen.queryByText('venues:recent')).not.toBeOnTheScreen();
   });
 
-  it('la tab Mappa ha il campo che apre la ricerca', async () => {
+  it('la tab Mappa apre la ricerca dal bottone dei filtri', async () => {
     await renderApp('ready', '/map');
-    await fireEvent.press(await screen.findByRole('button', { name: 'map:searchPlaceholder' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'map:header.filters' }));
     expect(await screen.findByLabelText('venues:searchLabel')).toBeOnTheScreen();
   });
 

@@ -14,7 +14,7 @@ import type { MapViewMode } from '../store/mapStore';
 import { MapCanvas, type MapCity, type MapFocus } from './MapCanvas';
 import { MapFullScreen } from './MapFullScreen';
 import type { OwnIdentity } from './OwnMarker';
-import { MapSearchEntry } from './MapSearchEntry';
+import { MapLocateButton } from './MapLocateButton';
 
 type Props = {
   city: MapCity | null;
@@ -31,7 +31,6 @@ type Props = {
   avatarUrls?: Record<string, string>;
   // Title drawn over the top of the compact map.
   header?: ReactNode;
-  onOpenSearch?: () => void;
   // Opens the existing location toggle (privacy settings) from the "location is off" notice.
   onEnableLocation?: () => void;
 };
@@ -76,7 +75,6 @@ export function MapStage({
   onChangeView,
   onOpenVenue,
   header,
-  onOpenSearch,
   onEnableLocation,
   ...eventProps
 }: Props) {
@@ -124,11 +122,9 @@ export function MapStage({
             {header}
           </View>
           <ExpandButton onPress={() => setFullScreen(true)} />
-          {onOpenSearch ? (
-            <View style={styles.bottom}>
-              <MapSearchEntry cityName={city.name} onPress={onOpenSearch} onLocate={locate} />
-            </View>
-          ) : null}
+          <View style={styles.locate}>
+            <MapLocateButton onPress={locate} />
+          </View>
         </>
       ) : null}
     </View>
@@ -137,6 +133,8 @@ export function MapStage({
 
 // Header padding + filters button + a gap: keeps the expand button clear of the filters button.
 const EXPAND_TOP = spacing.lg + heights.minTapTarget + spacing.sm;
+
+const LOCATE_TOP = EXPAND_TOP + heights.minTapTarget + spacing.sm;
 
 const styles = StyleSheet.create({
   box: {
@@ -149,7 +147,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   top: { position: 'absolute', top: 0, left: 0, right: 0 },
-  bottom: { position: 'absolute', left: spacing.md, right: spacing.md, bottom: spacing.md },
+  // Under the expand button.
+  locate: { position: 'absolute', top: LOCATE_TOP, right: spacing.md },
   // Under the header's filters button, which sits in the top right corner.
   expand: {
     position: 'absolute',
