@@ -74,7 +74,7 @@ type ContentProps = { label: string; size: Size; loading: boolean; color: ColorT
 function ButtonContent({ label, size, loading, color }: ContentProps) {
   if (loading) return <ActivityIndicator testID="button-spinner" color={colors[color]} />;
   return (
-    <Text variant={size === 'lg' ? 'body16Strong' : 'body14Medium'} color={color}>
+    <Text variant={size === 'lg' ? 'body16Strong' : 'body14Medium'} color={color} numberOfLines={1}>
       {label}
     </Text>
   );

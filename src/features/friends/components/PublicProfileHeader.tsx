@@ -1,14 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { FollowStateButton, type FollowAction } from '@/components/app/FriendRow';
 import { Avatar, type AvatarPhoto } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text';
 import { EnlargeablePhoto } from '@/features/profile/components/EnlargeablePhoto';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
 import { formatHandle } from '@/features/profile/domain/handle';
 import type { ProfileSummary } from '@/features/profile/summary/api';
-import { spacing } from '@/theme/tokens';
+import { colors, heights, spacing } from '@/theme/tokens';
 
 import type { SearchResult } from '../api';
 import { avatarIntent } from '../domain/avatarColor';
@@ -63,16 +64,27 @@ export function PublicProfileHeader({
           followState={person.followState}
           followsMe={person.followsMe}
           onAction={(action) => onAction(person.userId, action)}
+          layout="fill"
         />
         {onMessage ? (
           <Button
             label={tDm('profile.message')}
             variant="secondary"
             size="md"
+            style={styles.main}
             onPress={onMessage}
           />
         ) : null}
-        <Button label={t('publicProfile.more')} variant="ghost" size="md" onPress={onMore} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('publicProfile.more')}
+          onPress={onMore}
+          style={styles.more}
+        >
+          <Text variant="body16Strong" accessible={false}>
+            {'\u22EF'}
+          </Text>
+        </Pressable>
       </View>
     </ProfileHeader>
   );
@@ -80,4 +92,14 @@ export function PublicProfileHeader({
 
 const styles = StyleSheet.create({
   actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  main: { flex: 1, minWidth: 0, paddingHorizontal: spacing.md },
+  more: {
+    width: heights.minTapTarget,
+    height: heights.minTapTarget,
+    borderRadius: heights.minTapTarget / 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

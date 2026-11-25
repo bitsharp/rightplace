@@ -10,7 +10,7 @@ import {
   type FollowStatus,
 } from '@/features/friends/domain/followButton';
 import { formatHandle } from '@/features/profile/domain/handle';
-import { colors, spacing } from '@/theme/tokens';
+import { colors, heights, spacing } from '@/theme/tokens';
 
 import { rowStyles } from './VenueRow';
 
@@ -76,6 +76,7 @@ type FollowButtonProps = {
   publicHandle: string;
   button: FollowButtonState;
   onAction: (action: FollowAction) => void;
+  layout?: 'inline' | 'fill';
 };
 
 type FollowStateButtonProps = {
@@ -83,6 +84,8 @@ type FollowStateButtonProps = {
   followState: FollowStatus;
   followsMe?: boolean;
   onAction: (action: FollowAction) => void;
+  // 'fill' stretches the button to the space its parent gives it (two buttons side by side).
+  layout?: 'inline' | 'fill';
 };
 
 // The three-state follow button on its own (public profile): request, withdraw, or stop following.
@@ -91,12 +94,14 @@ export function FollowStateButton({
   followState,
   followsMe = false,
   onAction,
+  layout = 'inline',
 }: FollowStateButtonProps) {
   return (
     <FollowButton
       publicHandle={formatHandle(handle)}
       button={followButtonState(followState, followsMe)}
       onAction={onAction}
+      layout={layout}
     />
   );
 }
@@ -110,13 +115,13 @@ function useConfirmUnfollow(publicHandle: string, confirm: () => void) {
     ]);
 }
 
-function FollowButton({ publicHandle, button, onAction }: FollowButtonProps) {
+function FollowButton({ publicHandle, button, onAction, layout = 'inline' }: FollowButtonProps) {
   const { t } = useTranslation('ui');
   const isCallToAction = button.action === 'request';
   const confirmUnfollow = useConfirmUnfollow(publicHandle, () => onAction('unfollow'));
   const press = () => (button.action === 'unfollow' ? confirmUnfollow() : onAction(button.action));
   return (
-    <View style={styles.actions}>
+    <View style={[styles.actions, layout === 'fill' && styles.fill]}>
       {button.showFollowsYou ? (
         <Text variant="label10" color="textSecondary">
           {t('follow.followsYou')}
@@ -128,7 +133,11 @@ function FollowButton({ publicHandle, button, onAction }: FollowButtonProps) {
         accessibilityState={{ selected: button.action === 'unfollow' }}
         hitSlop={4}
         onPress={press}
-        style={[styles.button, isCallToAction ? styles.cta : styles.outline]}
+        style={[
+          styles.button,
+          isCallToAction ? styles.cta : styles.outline,
+          layout === 'fill' && styles.fillButton,
+        ]}
       >
         <Text
           variant={isCallToAction ? 'body13Medium' : 'body13'}
@@ -144,6 +153,12 @@ function FollowButton({ publicHandle, button, onAction }: FollowButtonProps) {
 
 const styles = StyleSheet.create({
   actions: { alignItems: 'flex-end', gap: spacing.xs, flexShrink: 0 },
+  fill: { flex: 1, minWidth: 0, alignItems: 'stretch' },
+  fillButton: {
+    height: heights.buttonMedium,
+    borderRadius: heights.buttonMedium / 2,
+    alignItems: 'center',
+  },
   button: {
     height: 36,
     paddingHorizontal: spacing.md + 2,
