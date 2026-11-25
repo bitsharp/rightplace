@@ -24,7 +24,12 @@ export function BlockedSection() {
         const handle = formatHandle(person.handle);
         return (
           <View key={person.userId} style={rowStyles.row}>
-            <Text variant="body15Strong" style={styles.handle}>
+            <Text
+              variant="body15Strong"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={styles.handle}
+            >
               {handle}
             </Text>
             <Button
@@ -43,5 +48,5 @@ export function BlockedSection() {
 
 const styles = StyleSheet.create({
   section: { gap: spacing.md },
-  handle: { flex: 1 },
+  handle: { flex: 1, minWidth: 0 },
 });

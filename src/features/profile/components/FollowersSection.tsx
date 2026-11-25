@@ -48,9 +48,11 @@ export function FollowersSection() {
                 initial={handle.charAt(1)}
                 photo={avatarPhotoFor(avatars, person.userId)}
               />
-              <View style={styles.texts}>
-                <Text variant="body15Strong">{handle}</Text>
-                <Text variant="body12" color="textSecondary">
+              <View style={rowStyles.texts}>
+                <Text variant="body15Strong" numberOfLines={1} ellipsizeMode="tail">
+                  {handle}
+                </Text>
+                <Text variant="body12" color="textSecondary" numberOfLines={1} ellipsizeMode="tail">
                   {meta(person)}
                 </Text>
               </View>
@@ -71,6 +73,5 @@ export function FollowersSection() {
 
 const styles = StyleSheet.create({
   section: { gap: spacing.md },
-  person: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  texts: { flex: 1, gap: 3 },
+  person: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: spacing.md },
 });
