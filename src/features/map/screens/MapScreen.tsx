@@ -34,6 +34,7 @@ export function MapScreen() {
         avatarUrls={avatarUrls}
         header={<MapHeader cityName={map.city?.name ?? null} onOpenFilters={map.openSearch} />}
         onOpenSearch={map.openSearch}
+        onEnableLocation={map.openLocationSettings}
       />
       <MapBottomPanel
         view={map.view}

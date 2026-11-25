@@ -8,6 +8,12 @@
     "filters": "Filters and search"
   },
   "locate": "Go to my location",
+  "locateOff": {
+    "title": "Location is off",
+    "body": "Turn location on to centre the map on you: we only use an area of about 500 m, never in the background.",
+    "enable": "Turn on",
+    "cancel": "Cancel"
+  },
   "view": {
     "general": "Maps",
     "friends": "Friends"

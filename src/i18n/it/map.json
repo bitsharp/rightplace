@@ -8,6 +8,12 @@
     "filters": "Filtri e ricerca"
   },
   "locate": "Vai alla mia posizione",
+  "locateOff": {
+    "title": "Posizione spenta",
+    "body": "Per centrare la mappa su di te attiva la posizione: useremo solo una zona di circa 500 m, mai in background.",
+    "enable": "Attiva",
+    "cancel": "Annulla"
+  },
   "view": {
     "general": "Mappe",
     "friends": "Amici"

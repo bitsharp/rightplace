@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
@@ -30,6 +30,8 @@ type Props = {
   // Title drawn over the top of the compact map.
   header?: ReactNode;
   onOpenSearch?: () => void;
+  // Opens the existing location toggle (privacy settings) from the "location is off" notice.
+  onEnableLocation?: () => void;
 };
 
 function ExpandButton({ onPress }: { onPress: () => void }) {
@@ -46,6 +48,23 @@ function ExpandButton({ onPress }: { onPress: () => void }) {
   );
 }
 
+// Principle 3: the map never asks for a permission by itself. With the toggle on it recentres on the coarse cell;
+// with it off it only points to the toggle.
+function useLocate(
+  you: { lat: number; lng: number } | null,
+  setFocus: (focus: MapFocus) => void,
+  onEnableLocation?: () => void,
+) {
+  const { t } = useTranslation('map');
+  return () => {
+    if (you) return setFocus({ point: you });
+    Alert.alert(t('locateOff.title'), t('locateOff.body'), [
+      { text: t('locateOff.cancel'), style: 'cancel' },
+      { text: t('locateOff.enable'), onPress: onEnableLocation },
+    ]);
+  };
+}
+
 // Compact map: markers only and one icon button. Hint and legend live in full screen.
 export function MapStage({
   city,
@@ -56,6 +75,7 @@ export function MapStage({
   onOpenVenue,
   header,
   onOpenSearch,
+  onEnableLocation,
   ...eventProps
 }: Props) {
   const [fullScreen, setFullScreen] = useState(false);
@@ -65,6 +85,7 @@ export function MapStage({
   const [framing, setFraming] = useState<{ slug: string; region: MapRegion } | null>(null);
   const region = framing && framing.slug === city?.slug ? framing.region : undefined;
   const setRegion = (next: MapRegion) => city && setFraming({ slug: city.slug, region: next });
+  const locate = useLocate(you, setFocus, onEnableLocation);
   return (
     <View testID="map-box" style={styles.box}>
       {city ? (
@@ -103,11 +124,7 @@ export function MapStage({
           <ExpandButton onPress={() => setFullScreen(true)} />
           {onOpenSearch ? (
             <View style={styles.bottom}>
-              <MapSearchEntry
-                cityName={city.name}
-                onPress={onOpenSearch}
-                onLocate={you ? () => setFocus({ point: you }) : undefined}
-              />
+              <MapSearchEntry cityName={city.name} onPress={onOpenSearch} onLocate={locate} />
             </View>
           ) : null}
         </>

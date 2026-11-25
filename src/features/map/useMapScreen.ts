@@ -165,5 +165,6 @@ export function useMapScreen() {
     openEvent: (eventId: string) =>
       router.push({ pathname: '/event/[id]', params: { id: eventId } }),
     openSearch: () => router.push('/search'),
+    openLocationSettings: () => router.push('/profile/privacy'),
   };
 }

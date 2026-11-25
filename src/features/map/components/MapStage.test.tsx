@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import { Alert, Text } from 'react-native';
 
 import { cityRegion } from '../domain/region';
 import { MapStage } from './MapStage';
@@ -92,17 +92,43 @@ describe('MapStage compatta', () => {
     expect(onOpenSearch).toHaveBeenCalledTimes(1);
   });
 
-  it('"vai alla mia posizione" compare solo con la posizione attiva e centra la mappa sulla cella', async () => {
-    const animateToRegion = jest.requireMock<{ __animateToRegion: jest.Mock }>(
-      'react-native-maps',
-    ).__animateToRegion;
-    animateToRegion.mockClear();
-    const { rerender } = await render(<MapStage {...baseProps} onOpenSearch={jest.fn()} />);
-    expect(screen.queryByRole('button', { name: 'map:locate' })).toBeNull();
-    await rerender(
-      <MapStage {...baseProps} you={{ lat: 45.47, lng: 9.2 }} onOpenSearch={jest.fn()} />,
-    );
-    await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));
-    expect(animateToRegion.mock.calls[0]?.[0]).toMatchObject({ latitude: 45.47, longitude: 9.2 });
+  describe('"vai alla mia posizione"', () => {
+    const animateToRegion = () =>
+      jest.requireMock<{ __animateToRegion: jest.Mock }>('react-native-maps').__animateToRegion;
+
+    beforeEach(() => {
+      animateToRegion().mockClear();
+      jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    });
+    afterEach(() => jest.restoreAllMocks());
+
+    it('con la posizione attiva centra la mappa sulla cella grossolana', async () => {
+      await render(
+        <MapStage {...baseProps} you={{ lat: 45.47, lng: 9.2 }} onOpenSearch={jest.fn()} />,
+      );
+      await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));
+      expect(animateToRegion().mock.calls[0]?.[0]).toMatchObject({
+        latitude: 45.47,
+        longitude: 9.2,
+      });
+      expect(Alert.alert).not.toHaveBeenCalled();
+    });
+
+    it('con la posizione spenta avvisa e offre di attivarla, senza muovere la mappa né aprire la ricerca', async () => {
+      const onOpenSearch = jest.fn();
+      const onEnableLocation = jest.fn();
+      await render(
+        <MapStage {...baseProps} onOpenSearch={onOpenSearch} onEnableLocation={onEnableLocation} />,
+      );
+      await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));
+      expect(animateToRegion()).not.toHaveBeenCalled();
+      expect(onOpenSearch).not.toHaveBeenCalled();
+      const [title, body, buttons] = jest.mocked(Alert.alert).mock.calls[0] ?? [];
+      expect(title).toBe('map:locateOff.title');
+      expect(body).toBe('map:locateOff.body');
+      const enable = buttons?.find((button) => button.text === 'map:locateOff.enable');
+      enable?.onPress?.();
+      expect(onEnableLocation).toHaveBeenCalledTimes(1);
+    });
   });
 });
