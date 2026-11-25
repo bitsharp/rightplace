@@ -152,21 +152,60 @@ describe('MapCanvas', () => {
     };
     const noLayers = { hotSpots: [], typicalDots: [], spots: [] };
 
-    it('segna il locale dichiarato con "Ci vai" anche se non è né punto caldo né typical dot', async () => {
-      await render(<MapCanvas {...baseProps} layers={noLayers} ownSpot={ownSpot} />);
+    const me = { userId: 'u-me', handle: 'lince.rosso' };
+
+    it('segna il locale dichiarato col mio volto (anello "Ci vado"), anche fuori da punti caldi e typical dot', async () => {
+      await render(<MapCanvas {...baseProps} layers={noLayers} ownSpot={ownSpot} me={me} />);
       expect(marker('own').props.coordinate).toEqual({ latitude: 45.47, longitude: 9.2 });
-      expect(screen.getByText('map:own.going', { includeHiddenElements: true })).toBeOnTheScreen();
+      expect(screen.getByLabelText('map:own.marker.going')).toBeOnTheScreen();
+      expect(screen.getByText('L', { includeHiddenElements: true })).toBeOnTheScreen();
+      expect(screen.queryByText('map:own.going', { includeHiddenElements: true })).toBeNull();
     });
 
-    it('con "Forse" mostra "Forse"', async () => {
+    it('con "Forse" l’anello è ciano', async () => {
       await render(
-        <MapCanvas {...baseProps} layers={noLayers} ownSpot={{ ...ownSpot, intent: 'maybe' }} />,
+        <MapCanvas
+          {...baseProps}
+          layers={noLayers}
+          ownSpot={{ ...ownSpot, intent: 'maybe' }}
+          me={me}
+        />,
       );
-      expect(screen.getByText('map:own.maybe', { includeHiddenElements: true })).toBeOnTheScreen();
+      expect(screen.getByLabelText('map:own.marker.maybe')).toBeOnTheScreen();
+    });
+
+    it('nella vista amici il mio volto è un marker a parte: i volti degli amici restano quelli del locale', async () => {
+      await render(
+        <MapCanvas
+          {...baseProps}
+          view="friends"
+          me={me}
+          ownSpot={ownSpot}
+          layers={{
+            hotSpots: [
+              venue({
+                venueId: 'mine',
+                friendsCount: 1,
+                friendsGoing: ['volpe.viola'],
+                friendIds: ['u-volpe'],
+              }),
+            ],
+            typicalDots: [],
+            spots: [],
+          }}
+        />,
+      );
+      expect(screen.getAllByTestId('friend-faces', { includeHiddenElements: true })).toHaveLength(
+        1,
+      );
+      expect(screen.queryByText('L', { includeHiddenElements: true })).toBeOnTheScreen();
+      expect(screen.getAllByText('V', { includeHiddenElements: true })).toHaveLength(1);
     });
 
     it('è disegnato anche nella vista amici', async () => {
-      await render(<MapCanvas {...baseProps} view="friends" layers={noLayers} ownSpot={ownSpot} />);
+      await render(
+        <MapCanvas {...baseProps} view="friends" layers={noLayers} ownSpot={ownSpot} me={me} />,
+      );
       expect(marker('own')).toBeOnTheScreen();
     });
 
@@ -177,6 +216,7 @@ describe('MapCanvas', () => {
           you={{ lat: 45.4625, lng: 9.1925 }}
           layers={{ hotSpots: [venue({ venueId: 'mine' })], typicalDots: [], spots: [] }}
           ownSpot={ownSpot}
+          me={me}
         />,
       );
       const z = (id: string) => Number(marker(id).props.zIndex);
@@ -187,7 +227,13 @@ describe('MapCanvas', () => {
     it('un tap apre il locale', async () => {
       const onOpenVenue = jest.fn();
       await render(
-        <MapCanvas {...baseProps} onOpenVenue={onOpenVenue} layers={noLayers} ownSpot={ownSpot} />,
+        <MapCanvas
+          {...baseProps}
+          onOpenVenue={onOpenVenue}
+          layers={noLayers}
+          ownSpot={ownSpot}
+          me={me}
+        />,
       );
       await fireEvent.press(marker('own'));
       expect(onOpenVenue).toHaveBeenCalledWith('mine');
@@ -266,6 +312,49 @@ describe('MapCanvas', () => {
       expect(tracks('hot-hot')).toBe(true);
       await settle();
       expect(tracks('hot-hot')).toBe(false);
+    });
+
+    describe('la mia foto', () => {
+      const own = {
+        venueId: 'mine',
+        name: 'Arena',
+        intent: 'going' as const,
+        lat: 45.47,
+        lng: 9.2,
+      };
+      const me = { userId: 'u-me', handle: 'lince.rosso' };
+      const renderOwn = () =>
+        render(
+          <MapCanvas
+            {...baseProps}
+            layers={{ hotSpots: [], typicalDots: [], spots: [] }}
+            ownSpot={own}
+            me={me}
+            avatarUrls={{ 'u-me': 'https://signed.test/me' }}
+          />,
+        );
+
+      it('resta in tracking finché la mia foto non è caricata, poi si ferma', async () => {
+        await renderOwn();
+        await settle();
+        expect(tracks('own')).toBe(true);
+        await fireEvent(
+          screen.getByTestId('avatar-image', { includeHiddenElements: true }),
+          'load',
+          {
+            nativeEvent: {},
+          },
+        );
+        await settle();
+        expect(tracks('own')).toBe(false);
+      });
+
+      it('dopo 3 secondi smette comunque di tracciare', async () => {
+        await renderOwn();
+        await act(async () => jest.advanceTimersByTime(3300));
+        await settle();
+        expect(tracks('own')).toBe(false);
+      });
     });
 
     describe('foto degli amici', () => {

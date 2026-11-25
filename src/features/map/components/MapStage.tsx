@@ -13,6 +13,7 @@ import type { MapViewMode } from '../store/mapStore';
 
 import { MapCanvas, type MapCity, type MapFocus } from './MapCanvas';
 import { MapFullScreen } from './MapFullScreen';
+import type { OwnIdentity } from './OwnMarker';
 import { MapSearchEntry } from './MapSearchEntry';
 
 type Props = {
@@ -25,6 +26,7 @@ type Props = {
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;
+  me?: OwnIdentity | null;
   onPickSpot?: (point: { lat: number; lng: number }) => void;
   avatarUrls?: Record<string, string>;
   // Title drawn over the top of the compact map.

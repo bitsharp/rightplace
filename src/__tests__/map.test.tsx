@@ -400,14 +400,17 @@ describe('mappa', () => {
     const ownCard = (venue: string, intent: 'going' | 'maybe') =>
       `map:cards.own.a11y({"venue":"${venue}","intent":"map:own.${intent}"})`;
 
-    it('un locale senza affluenza né typical (fuori dai punti caldi) è marcato "Ci vai"', async () => {
+    it('un locale senza affluenza né typical (fuori dai punti caldi) è marcato col mio volto "Ci vado"', async () => {
       seedBackend({ get_my_declaration: declarationAt('hidden', 'Locale Fantasma') });
       await renderApp('ready', '/map');
       const marker = await ownMarker();
       expect(marker.props.coordinate).toEqual({ latitude: 45.46, longitude: 9.19 });
       expect(
-        within(marker).getByText('map:own.going', { includeHiddenElements: true }),
+        within(marker).getByLabelText('map:own.marker.going', { includeHiddenElements: true }),
       ).toBeOnTheScreen();
+      expect(
+        within(marker).queryByText('map:own.going', { includeHiddenElements: true }),
+      ).toBeNull();
       expect(screen.queryByTestId('marker-hot-hidden', { includeHiddenElements: true })).toBeNull();
     });
 
@@ -420,7 +423,7 @@ describe('mappa', () => {
       const marker = await ownMarker();
       expect(marker.props.coordinate).toEqual({ latitude: 45.5, longitude: 9.25 });
       expect(
-        within(marker).getByText('map:own.maybe', { includeHiddenElements: true }),
+        within(marker).getByLabelText('map:own.marker.maybe', { includeHiddenElements: true }),
       ).toBeOnTheScreen();
     });
 

@@ -1,42 +1,59 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Text } from '@/components/ui/Text';
+import { Avatar, type AvatarPhoto } from '@/components/ui/Avatar';
+import { Glow } from '@/components/ui/Glow';
 import type { Intent } from '@/features/nights/domain/band';
-import { colors, fonts, glow, heights, radius, spacing } from '@/theme/tokens';
+import { colors } from '@/theme/tokens';
 
-type Props = { venueName: string; intent: Intent; onPress: () => void };
-
-const LOOK: Record<Intent, { borderColor: string; backgroundColor: string }> = {
-  going: { borderColor: colors.going, backgroundColor: colors.goingFill },
-  maybe: { borderColor: colors.maybe, backgroundColor: colors.maybeFill },
+type Props = {
+  intent: Intent;
+  // My own initial and photo: only I (and nobody else) see them here, so principle 1 holds.
+  initial: string;
+  photo?: AvatarPhoto;
+  onPress: () => void;
+  // The photo finished loading or failed: the marker bitmap waits for it (see usePhotoWait).
+  onPhotoSettled?: () => void;
 };
 
-// "My night" label on the venue I declared: shown to me whatever the turnout (it is my own data).
-export function OwnSpot({ venueName, intent, onPress }: Props) {
+const AVATAR = 40;
+const RING = 3;
+const GLOW_RADIUS = 36;
+
+const RING_COLOR: Record<Intent, string> = { going: colors.primary, maybe: colors.maybe };
+
+// "My night" on the venue I declared: my face in a thick ring (violet "going", cyan "maybe") so it is never
+// mistaken for a friend's face. Shown to me whatever the turnout (it is my own data).
+export function OwnSpot({ intent, initial, photo, onPress, onPhotoSettled }: Props) {
   const { t } = useTranslation('map');
-  const label = t(`own.${intent}`);
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t('own.a11y', { venue: venueName, intent: label })}
+      accessibilityLabel={t(`own.marker.${intent}`)}
       onPress={onPress}
-      style={[styles.chip, glow, LOOK[intent]]}
+      style={styles.box}
     >
-      <Text variant="label12" style={styles.label}>
-        {label}
-      </Text>
+      <Glow testID="own-glow" color={RING_COLOR[intent]} radius={GLOW_RADIUS} style={styles.glow} />
+      <View testID="own-ring" style={[styles.ring, { borderColor: RING_COLOR[intent] }]}>
+        <Avatar
+          intent={intent}
+          initial={initial}
+          size={AVATAR}
+          photo={photo}
+          onPhotoSettled={onPhotoSettled}
+        />
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  chip: {
-    minHeight: heights.minTapTarget,
+  box: {
+    width: GLOW_RADIUS * 2,
+    height: GLOW_RADIUS * 2,
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.pill,
-    borderWidth: 2,
   },
-  label: { fontFamily: fonts.monoBold, color: colors.text, textTransform: 'uppercase' },
+  glow: { top: 0, left: 0 },
+  ring: { padding: 0, borderWidth: RING, borderRadius: (AVATAR + RING * 2) / 2 },
 });

@@ -15,15 +15,17 @@ import { mapAppearance } from '../mapStyle';
 import type { MapViewMode } from '../store/mapStore';
 
 import { MapVignette } from './MapVignette';
+import { OwnMarker, type OwnIdentity } from './OwnMarker';
 import {
   EventMarkers,
   HotSpotMarkers,
   MapMarker,
-  OwnMarker,
   SpotMarkers,
   TypicalMarkers,
   Z_INDEX,
 } from './MapMarkers';
+
+const NO_URLS: Record<string, string> = {};
 
 export type MapCity = CityCenter & { slug: string; name: string };
 
@@ -42,6 +44,8 @@ type Props = {
   onOpenEvent?: (eventId: string) => void;
   // My own declaration tonight, drawn whatever the turnout ("stasera" layer); null when I have none.
   ownSpot?: OwnSpotData | null;
+  // Whose face the own marker draws; without it the declaration has no marker.
+  me?: OwnIdentity | null;
   // A 3 s press on the map picked this point: the caller opens the "serata in questo punto" sheet.
   onPickSpot?: (point: LatLng) => void;
   // Signed photos of the friends on the friends map (one batch per screen); never used on the general map.
@@ -69,6 +73,7 @@ export function MapCanvas({
   events = NO_EVENTS,
   onOpenEvent,
   ownSpot = null,
+  me = null,
   onPickSpot,
   avatarUrls,
   focus,
@@ -109,7 +114,9 @@ export function MapCanvas({
         urls={avatarUrls}
         onOpenVenue={onOpenVenue}
       />
-      {ownSpot ? <OwnMarker spot={ownSpot} onOpenVenue={onOpenVenue} /> : null}
+      {ownSpot && me ? (
+        <OwnMarker spot={ownSpot} me={me} urls={avatarUrls ?? NO_URLS} onOpenVenue={onOpenVenue} />
+      ) : null}
       {you ? (
         <MapMarker
           testID="marker-you"

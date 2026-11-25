@@ -115,7 +115,7 @@ function useMapLayers(citySlug: string, view: MapViewMode) {
 
 export function useMapScreen() {
   const router = useRouter();
-  const { profile } = useSession();
+  const { profile, userId } = useSession();
   const { view, setView } = useMapStore();
   const citySlug = useCurrentCity();
   const cities = useActiveCities();
@@ -147,6 +147,8 @@ export function useMapScreen() {
     layers,
     eventSpots,
     ownSpot,
+    // My own face on the marker of the night I declared: the handle initial, and my photo from the batch.
+    me: userId && profile ? { userId, handle: profile.handle } : null,
     loaded,
     loadFailed,
     // Only a user who turned the toggle on ever has a cell; it is already ~500 m coarse.

@@ -67,7 +67,13 @@ describe('MapFullScreen', () => {
       lat: 45.47,
       lng: 9.2,
     };
-    await render(<MapFullScreen {...baseProps} ownSpot={ownSpot} />);
+    await render(
+      <MapFullScreen
+        {...baseProps}
+        ownSpot={ownSpot}
+        me={{ userId: 'u-me', handle: 'lince.rosso' }}
+      />,
+    );
     expect(screen.getByTestId('marker-own', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 

@@ -11,6 +11,7 @@ import { colors, heights, radius, spacing } from '@/theme/tokens';
 import type { EventSpotPlacement } from '../domain/eventSpots';
 import type { MapLayers } from '../domain/mapLayers';
 import type { OwnSpot } from '../domain/ownSpot';
+import type { OwnIdentity } from './OwnMarker';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
 
@@ -33,6 +34,7 @@ type Props = {
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;
+  me?: OwnIdentity | null;
   onPickSpot?: (point: LatLng) => void;
   avatarUrls?: Record<string, string>;
 };
@@ -78,6 +80,7 @@ function FullScreenContent(props: ContentProps) {
           events={props.events}
           onOpenEvent={props.onOpenEvent}
           ownSpot={props.ownSpot}
+          me={props.me}
           onPickSpot={props.onPickSpot}
           avatarUrls={props.avatarUrls}
         />

@@ -25,6 +25,7 @@ export function MapScreen() {
         layers={map.layers}
         events={map.eventSpots}
         ownSpot={map.ownSpot}
+        me={map.me}
         view={map.view}
         you={map.you}
         onChangeView={map.setView}

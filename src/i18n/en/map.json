@@ -55,7 +55,10 @@
   "own": {
     "going": "You're going",
     "maybe": "Maybe",
-    "a11y": "Your night: {{venue}}, {{intent}}. Open the venue"
+    "marker": {
+      "going": "Your night: going",
+      "maybe": "Your night: maybe"
+    }
   },
   "spot": {
     "label": "SPOT",

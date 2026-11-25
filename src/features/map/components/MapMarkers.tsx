@@ -5,14 +5,12 @@ import { Marker } from 'react-native-maps';
 import { EventSpot } from '@/components/app/EventSpot';
 import { DEFAULT_MAX_FACES, FriendFaces } from '@/components/app/FriendFaces';
 import { HotSpot } from '@/components/app/HotSpot';
-import { OwnSpot } from '@/components/app/OwnSpot';
 import { SpotMarker } from '@/components/app/SpotMarker';
 import { TypicalDot } from '@/components/app/TypicalDot';
 import type { LatLng } from '@/features/profile/domain/coarsen';
 
 import type { EventSpotPlacement } from '../domain/eventSpots';
 import { friendFacesOf, type HotSpotVenue, type MapVenue } from '../domain/mapLayers';
-import type { OwnSpot as OwnSpotData } from '../domain/ownSpot';
 import { isVisibleTypical } from '../domain/typical';
 import type { MapViewMode } from '../store/mapStore';
 
@@ -75,7 +73,7 @@ type FaceState = 'initial' | 'loading' | 'drawn';
 
 // Photos are part of the marker bitmap. The bitmap is frozen shortly after a content change, but a photo
 // arrives later (signed URL, then the download): without waiting, the marker keeps the initial for good.
-function usePhotoWait(faces: readonly { userId: string }[], urls: AvatarUrls) {
+export function usePhotoWait(faces: readonly { userId: string }[], urls: AvatarUrls) {
   const [drawn, setDrawn] = useState<ReadonlySet<string>>(new Set());
   const [gaveUp, setGaveUp] = useState('');
   const withPhoto = faces.slice(0, DEFAULT_MAX_FACES).filter((face) => urls[face.userId]);
@@ -280,32 +278,4 @@ export function EventMarkers({
       />
     </MapMarker>
   ));
-}
-
-// The label sits just above the venue so it does not hide the hot spot circle under it.
-const OWN_ANCHOR = { x: 0.5, y: 1 } as const;
-
-export function OwnMarker({
-  spot,
-  onOpenVenue,
-}: {
-  spot: OwnSpotData;
-  onOpenVenue: (venueId: string) => void;
-}) {
-  return (
-    <MapMarker
-      testID="marker-own"
-      contentKey={`${spot.venueId}:${spot.intent}`}
-      coordinate={spot}
-      zIndex={Z_INDEX.own}
-      anchor={OWN_ANCHOR}
-      onPress={() => onOpenVenue(spot.venueId)}
-    >
-      <OwnSpot
-        venueName={spot.name}
-        intent={spot.intent}
-        onPress={() => onOpenVenue(spot.venueId)}
-      />
-    </MapMarker>
-  );
 }

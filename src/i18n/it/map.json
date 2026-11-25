@@ -55,7 +55,10 @@
   "own": {
     "going": "Ci vai",
     "maybe": "Forse",
-    "a11y": "La tua serata: {{venue}}, {{intent}}. Apri il locale"
+    "marker": {
+      "going": "La tua serata: Ci vado",
+      "maybe": "La tua serata: Forse"
+    }
   },
   "spot": {
     "label": "SPOT",
