@@ -19,14 +19,23 @@ type MapState = {
 };
 
 export const MAP_STORE_KEY = 'rightplace.map';
-const STORE_VERSION = 1;
+const STORE_VERSION = 2;
+
+type Persisted = { view?: MapViewMode; cityPreference?: CityPreference } | null;
 
 // v0 persisted `citySlug`, which was also the default 'milano' nobody had chosen: it cannot be told
-// apart from a real choice, so every old value goes back to automatic.
-function migrateMapState(persisted: unknown): Pick<MapState, 'view' | 'cityPreference'> {
-  const view = (persisted as { view?: MapViewMode } | null)?.view;
-  const valid = view === 'friends' || view === 'general';
-  return { view: valid ? view : DEFAULT_VIEW, cityPreference: AUTO_CITY };
+// apart from a real choice, so v0 goes back to automatic city.
+// v1 saved the whole state, so the old default 'general' is not a real choice either: every state
+// older than v2 moves to the Friends view once; from v2 on the saved choice is respected.
+function migrateMapState(
+  persisted: unknown,
+  version: number,
+): Pick<MapState, 'view' | 'cityPreference'> {
+  const saved = persisted as Persisted;
+  const cityPreference = version === 0 ? AUTO_CITY : (saved?.cityPreference ?? AUTO_CITY);
+  const valid = saved?.view === 'friends' || saved?.view === 'general';
+  const view = version >= STORE_VERSION && valid ? saved.view : DEFAULT_VIEW;
+  return { view: view ?? DEFAULT_VIEW, cityPreference };
 }
 
 // UI preferences only.

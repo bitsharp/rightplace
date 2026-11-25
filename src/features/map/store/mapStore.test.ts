@@ -7,10 +7,22 @@ describe('mapStore', () => {
     expect(useMapStore.getState()).toMatchObject({ view: 'friends', cityPreference: 'auto' });
   });
 
-  it('rispetta l’ultima scelta salvata, anche se è la mappa generale', async () => {
+  it('uno stato salvato con una versione precedente passa una volta sola ad Amici, tenendo la città', async () => {
     await AsyncStorage.setItem(
       MAP_STORE_KEY,
-      JSON.stringify({ state: { view: 'general', cityPreference: 'auto' }, version: 1 }),
+      JSON.stringify({ state: { view: 'general', cityPreference: 'las-palmas' }, version: 1 }),
+    );
+    await useMapStore.persist.rehydrate();
+    expect(useMapStore.getState()).toMatchObject({
+      view: 'friends',
+      cityPreference: 'las-palmas',
+    });
+  });
+
+  it('dalla versione nuova in poi rispetta l’ultima scelta salvata, anche se è la mappa generale', async () => {
+    await AsyncStorage.setItem(
+      MAP_STORE_KEY,
+      JSON.stringify({ state: { view: 'general', cityPreference: 'auto' }, version: 2 }),
     );
     await useMapStore.persist.rehydrate();
     expect(useMapStore.getState().view).toBe('general');
