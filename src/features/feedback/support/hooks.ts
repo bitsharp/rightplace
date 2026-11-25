@@ -1,5 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 
+import { useManualRefresh } from '@/lib/useManualRefresh';
+
 import { fetchSupportInboxPage } from './api';
 import { nextSupportCursor } from './domain/supportFeedback';
 
@@ -15,16 +17,15 @@ export function useSupportFeedback() {
     refetchOnWindowFocus: true,
     meta: { persist: false },
   });
+  const manual = useManualRefresh(query.refetch);
   return {
     items: query.data?.pages.flat() ?? [],
     isLoading: query.isLoading,
     isError: query.isError,
-    isRefreshing: query.isRefetching && !query.isFetchingNextPage,
+    isRefreshing: manual.isRefreshing,
     loadMore: () => {
       if (query.hasNextPage && !query.isFetchingNextPage) void query.fetchNextPage();
     },
-    refresh: async () => {
-      await query.refetch();
-    },
+    refresh: manual.refresh,
   };
 }

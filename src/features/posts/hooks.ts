@@ -1,5 +1,7 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
+import { useManualRefresh } from '@/lib/useManualRefresh';
+
 import {
   COMMENTS_PAGE_SIZE,
   fetchComments,
@@ -49,18 +51,17 @@ export function useFeed() {
     refetchOnWindowFocus: true,
     meta: PRIVATE,
   });
+  const manual = useManualRefresh(query.refetch);
   return {
     posts: query.data?.pages.flat() ?? [],
     isLoading: query.isLoading,
     isError: query.isError,
-    isRefreshing: query.isRefetching && !query.isFetchingNextPage,
+    isRefreshing: manual.isRefreshing,
     hasMore: query.hasNextPage,
     loadMore: () => {
       if (query.hasNextPage && !query.isFetchingNextPage) void query.fetchNextPage();
     },
-    refresh: async () => {
-      await query.refetch();
-    },
+    refresh: manual.refresh,
   };
 }
 
@@ -75,18 +76,17 @@ export function useUserPosts(userId: string, enabled = true) {
     enabled: enabled && userId !== '',
     meta: PRIVATE,
   });
+  const manual = useManualRefresh(query.refetch);
   return {
     posts: query.data?.pages.flat() ?? [],
     isLoading: query.isLoading,
     isError: query.isError,
-    isRefreshing: query.isRefetching && !query.isFetchingNextPage,
+    isRefreshing: manual.isRefreshing,
     hasMore: query.hasNextPage,
     loadMore: () => {
       if (query.hasNextPage && !query.isFetchingNextPage) void query.fetchNextPage();
     },
-    refresh: async () => {
-      await query.refetch();
-    },
+    refresh: manual.refresh,
   };
 }
 

@@ -113,6 +113,62 @@ describe('useFeed', () => {
   });
 });
 
+describe('indicatore di ricarica del feed', () => {
+  // A refetch the test can hold open, to observe the state while the request is in flight.
+  const holdNextFeedRequest = () => {
+    let release: () => void = () => undefined;
+    const held = new Promise<void>((resolve) => (release = resolve));
+    fakeSupabase.rpc.mockImplementationOnce(async () => {
+      await held;
+      return { data: [row('a')], error: null };
+    });
+    return release;
+  };
+  const setup = async () => {
+    setFakeRpc({ get_feed: [row('a')] });
+    const { Wrapper, client } = createQueryWrapper();
+    const rendered = await renderHook(() => useFeed(), { wrapper: Wrapper });
+    await waitFor(() => expect(rendered.result.current.posts).toHaveLength(1));
+    return { ...rendered, client };
+  };
+
+  it('un refetch in background (focus, invalidazione) non accende lo spinner di pull-to-refresh', async () => {
+    const { result, client } = await setup();
+    const release = holdNextFeedRequest();
+    void client.invalidateQueries({ queryKey: FEED_KEY });
+    await waitFor(() => expect(client.isFetching()).toBe(1));
+    expect(result.current.isRefreshing).toBe(false);
+    await act(async () => release());
+    await waitFor(() => expect(client.isFetching()).toBe(0));
+  });
+
+  it('il pull-to-refresh manuale lo accende e lo spegne a ricarica finita', async () => {
+    const { result, client } = await setup();
+    const release = holdNextFeedRequest();
+    let pending: Promise<void> = Promise.resolve();
+    await act(async () => {
+      pending = result.current.refresh();
+    });
+    await waitFor(() => expect(result.current.isRefreshing).toBe(true));
+    await act(async () => {
+      release();
+      await pending;
+    });
+    expect(result.current.isRefreshing).toBe(false);
+    expect(client.isFetching()).toBe(0);
+  });
+
+  it('un refresh fallito non lascia lo spinner acceso', async () => {
+    const { result } = await setup();
+    fakeSupabase.rpc.mockImplementationOnce(async () => ({
+      data: null,
+      error: { message: 'offline', code: '' },
+    }));
+    await act(async () => result.current.refresh());
+    expect(result.current.isRefreshing).toBe(false);
+  });
+});
+
 describe('useUserPosts', () => {
   it('con una pagina piena la successiva riparte dal cursore composto e non va su disco', async () => {
     const full = Array.from({ length: 30 }, (_, i) => row(`p${i}`));
