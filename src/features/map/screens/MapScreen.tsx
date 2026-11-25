@@ -33,7 +33,8 @@ export function MapScreen() {
         onOpenEvent={map.openEvent}
         onPickSpot={map.pickSpot}
         avatarUrls={avatarUrls}
-        header={<MapHeader cityName={map.city?.name ?? null} onOpenFilters={map.openSearch} />}
+        header={<MapHeader cityName={map.city?.name ?? null} />}
+        onOpenSearch={map.openSearch}
         onEnableLocation={map.openLocationSettings}
       />
       <MapBottomPanel

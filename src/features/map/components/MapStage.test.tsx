@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, within } from '@testing-library/react-native';
 import { Alert, Text } from 'react-native';
 
 import { cityRegion } from '../domain/region';
@@ -11,6 +11,7 @@ const baseProps = {
   you: null,
   onChangeView: jest.fn(),
   onOpenVenue: jest.fn(),
+  onOpenSearch: jest.fn(),
 };
 
 describe('MapStage compatta', () => {
@@ -85,6 +86,15 @@ describe('MapStage compatta', () => {
   it('non c’è più la barra con il nome della città', async () => {
     await render(<MapStage {...baseProps} />);
     expect(screen.queryByRole('button', { name: 'map:searchPlaceholder' })).toBeNull();
+  });
+
+  it('filtri, schermo intero e posizione sono nella stessa colonna di controlli', async () => {
+    const onOpenSearch = jest.fn();
+    await render(<MapStage {...baseProps} onOpenSearch={onOpenSearch} />);
+    const column = screen.getByTestId('map-controls');
+    expect(within(column).getAllByRole('button')).toHaveLength(3);
+    await fireEvent.press(screen.getByRole('button', { name: 'map:header.filters' }));
+    expect(onOpenSearch).toHaveBeenCalledTimes(1);
   });
 
   describe('"vai alla mia posizione"', () => {
