@@ -3,8 +3,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MAP_STORE_KEY, useMapStore } from './mapStore';
 
 describe('mapStore', () => {
-  it('parte dalla mappa generale con la città in automatico', () => {
-    expect(useMapStore.getState()).toMatchObject({ view: 'general', cityPreference: 'auto' });
+  it('parte dalla vista Amici con la città in automatico', () => {
+    expect(useMapStore.getState()).toMatchObject({ view: 'friends', cityPreference: 'auto' });
+  });
+
+  it('rispetta l’ultima scelta salvata, anche se è la mappa generale', async () => {
+    await AsyncStorage.setItem(
+      MAP_STORE_KEY,
+      JSON.stringify({ state: { view: 'general', cityPreference: 'auto' }, version: 1 }),
+    );
+    await useMapStore.persist.rehydrate();
+    expect(useMapStore.getState().view).toBe('general');
+  });
+
+  it('un valore salvato non valido torna alla vista predefinita (Amici)', async () => {
+    await AsyncStorage.setItem(
+      MAP_STORE_KEY,
+      JSON.stringify({ state: { view: 'boh' }, version: 0 }),
+    );
+    await useMapStore.persist.rehydrate();
+    expect(useMapStore.getState().view).toBe('friends');
   });
 
   it('cambia vista e preferenza di città', () => {

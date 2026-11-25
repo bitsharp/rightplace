@@ -114,11 +114,22 @@ describe('mappa', () => {
   afterEach(() => jest.restoreAllMocks());
 
   beforeEach(() => {
-    useCoarsePositionStore.setState({ cell: null });
+    useCoarsePositionStore.setState({ cell: null }); // These tests are about the general map: the user has already picked "Mappe".
+    useMapStore.setState({ view: 'general' });
+
     jest
       .mocked(Location.getForegroundPermissionsAsync)
       .mockResolvedValue({ granted: false } as never);
     seedBackend();
+  });
+
+  it('alla prima apertura la vista selezionata è Amici; "Mappe" resta una scelta ricordata', async () => {
+    useMapStore.setState({ view: useMapStore.getInitialState().view });
+    await renderApp('ready', '/map');
+    const friends = await screen.findByRole('button', { name: 'map:view.friends' });
+    expect(friends).toBeSelected();
+    await fireEvent.press(screen.getByRole('button', { name: 'map:view.general' }));
+    expect(useMapStore.getState().view).toBe('general');
   });
 
   describe('vista generale', () => {

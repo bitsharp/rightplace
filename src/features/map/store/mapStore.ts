@@ -6,6 +6,9 @@ import { AUTO_CITY, type CityPreference } from '../domain/cityChoice';
 
 export type MapViewMode = 'general' | 'friends';
 
+// Only the first-ever opening: afterwards the persisted last choice wins.
+const DEFAULT_VIEW: MapViewMode = 'friends';
+
 type MapState = {
   view: MapViewMode;
   // 'auto' (default) or the slug the user chose. The city actually shown comes from
@@ -22,14 +25,15 @@ const STORE_VERSION = 1;
 // apart from a real choice, so every old value goes back to automatic.
 function migrateMapState(persisted: unknown): Pick<MapState, 'view' | 'cityPreference'> {
   const view = (persisted as { view?: MapViewMode } | null)?.view;
-  return { view: view === 'friends' ? 'friends' : 'general', cityPreference: AUTO_CITY };
+  const valid = view === 'friends' || view === 'general';
+  return { view: valid ? view : DEFAULT_VIEW, cityPreference: AUTO_CITY };
 }
 
 // UI preferences only.
 export const useMapStore = create<MapState>()(
   persist(
     (set) => ({
-      view: 'general',
+      view: DEFAULT_VIEW,
       cityPreference: AUTO_CITY,
       setView: (view) => set({ view }),
       setCityPreference: (cityPreference) => set({ cityPreference }),
@@ -45,5 +49,5 @@ export const useMapStore = create<MapState>()(
 );
 
 export function resetMapStore(): void {
-  useMapStore.setState({ view: 'general', cityPreference: AUTO_CITY });
+  useMapStore.setState({ view: DEFAULT_VIEW, cityPreference: AUTO_CITY });
 }

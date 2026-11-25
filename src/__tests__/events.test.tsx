@@ -254,6 +254,11 @@ describe('serate nella ricerca', () => {
 });
 
 describe('serate sulla mappa', () => {
+  beforeEach(() => {
+    // These tests are about the general map: the user has already picked "Mappe".
+    useMapStore.setState({ view: 'general' });
+  });
+
   const marker = (id: string) =>
     screen.findByTestId(`marker-event-${id}`, { includeHiddenElements: true });
 
