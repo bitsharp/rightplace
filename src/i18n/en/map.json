@@ -1,6 +1,5 @@
 {
   "title": "Map",
-  "searchPlaceholder": "Search for a night or a venue",
   "header": {
     "title": "TONIGHT {{city}}",
     "titleNoCity": "TONIGHT",
@@ -27,10 +26,6 @@
     "usually": "Usually",
     "event": "Event",
     "spot": "Spot"
-  },
-  "banner": {
-    "typicalOnly": "No one has declared tonight yet: the grey dots show the usual crowd. Declare yours and invite friends.",
-    "empty": "Quiet night so far. Declare yours and invite friends."
   },
   "pill": {
     "text": "Tonight: {{venue}} · {{intent}}",

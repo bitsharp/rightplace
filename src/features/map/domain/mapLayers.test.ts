@@ -4,7 +4,6 @@ import {
   featuredHotSpot,
   friendFacesOf,
   shownFaceIds,
-  mapBanner,
   type HotSpotVenue,
   type MapVenue,
 } from './mapLayers';
@@ -155,24 +154,6 @@ describe('buildFriendsLayers', () => {
   });
 });
 
-describe('mapBanner', () => {
-  const hot = venue({ venueId: 'h', isHotSpot: true }) as HotSpotVenue;
-  const dot = venue({ venueId: 'd', typicalLevel: 1 });
-
-  it('nessun banner quando c’è almeno un punto caldo', () => {
-    expect(mapBanner({ hotSpots: [hot], spots: [], typicalDots: [dot] })).toBe('none');
-    expect(mapBanner({ hotSpots: [hot], spots: [], typicalDots: [] })).toBe('none');
-  });
-
-  it('"solo di solito" quando ci sono solo typical dot', () => {
-    expect(mapBanner({ hotSpots: [], spots: [], typicalDots: [dot] })).toBe('typicalOnly');
-  });
-
-  it('"vuoto" quando non c’è né uno né l’altro', () => {
-    expect(mapBanner({ hotSpots: [], spots: [], typicalDots: [] })).toBe('empty');
-  });
-});
-
 describe('spot (strato "stasera", mai con numeri sotto k)', () => {
   const spot = (id: string, overrides: Partial<MapVenue> = {}) =>
     venue({
@@ -216,10 +197,6 @@ describe('spot (strato "stasera", mai con numeri sotto k)', () => {
     expect(ids(layers.spots)).toEqual(['s1']);
     expect(ids(layers.hotSpots)).toEqual(['v']);
     expect(layers.friendVenues.map((row) => row.venueId)).toEqual(['v', 's1']);
-  });
-
-  it('un banner "nessuna dichiarazione" non appare se c\'è almeno uno spot', () => {
-    expect(mapBanner({ hotSpots: [], spots: [spot('s1')], typicalDots: [] })).toBe('none');
   });
 });
 

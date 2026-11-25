@@ -1,15 +1,12 @@
 import { resources } from '@/i18n/resources';
 
 const MAP_KEYS = [
-  'searchPlaceholder',
   'view.general',
   'view.friends',
   'hint.general',
   'hint.friends',
   'legend.tonight',
   'legend.usually',
-  'banner.typicalOnly',
-  'banner.empty',
   'pill.text',
   'pill.a11y',
   'cards.history',

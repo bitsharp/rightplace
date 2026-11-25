@@ -1,6 +1,5 @@
 {
   "title": "Mappa",
-  "searchPlaceholder": "Cerca una serata o un locale",
   "header": {
     "title": "STASERA {{city}}",
     "titleNoCity": "STASERA",
@@ -27,10 +26,6 @@
     "usually": "Di solito",
     "event": "Serata",
     "spot": "Spot"
-  },
-  "banner": {
-    "typicalOnly": "Ancora nessuna dichiarazione stasera: i punti grigi sono l'affluenza abituale. Dichiara la tua e invita amici.",
-    "empty": "Serata tranquilla finora. Dichiara la tua e invita amici."
   },
   "pill": {
     "text": "Stasera: {{venue}} · {{intent}}",

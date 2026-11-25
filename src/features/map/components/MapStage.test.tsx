@@ -83,11 +83,6 @@ describe('MapStage compatta', () => {
     expect(screen.getByText('intestazione')).toBeOnTheScreen();
   });
 
-  it('non c’è più la barra con il nome della città', async () => {
-    await render(<MapStage {...baseProps} />);
-    expect(screen.queryByRole('button', { name: 'map:searchPlaceholder' })).toBeNull();
-  });
-
   it('filtri, schermo intero e posizione sono nella stessa colonna di controlli', async () => {
     const onOpenSearch = jest.fn();
     await render(<MapStage {...baseProps} onOpenSearch={onOpenSearch} />);

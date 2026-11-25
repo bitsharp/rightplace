@@ -480,23 +480,19 @@ describe('mappa', () => {
     });
   });
 
-  describe('banner', () => {
-    it('con un punto caldo non c’è nessun banner', async () => {
+  describe('stato vuoto sotto la mappa', () => {
+    it('solo typical dot: nessuna card "nessuna dichiarazione"', async () => {
+      seedBackend({ get_city_map: [quiet] });
       await renderApp('ready', '/map');
-      await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') });
+      await screen.findByTestId('map-view');
       expect(screen.queryByText(/map:banner/)).toBeNull();
     });
 
-    it('solo typical dot: spiega che i punti grigi sono l’affluenza abituale', async () => {
-      seedBackend({ get_city_map: [quiet] });
-      await renderApp('ready', '/map');
-      expect(await screen.findByText('map:banner.typicalOnly')).toBeOnTheScreen();
-    });
-
-    it('né punti caldi né typical dot: serata tranquilla', async () => {
+    it('né punti caldi né typical dot: nessuna card', async () => {
       seedBackend({ get_city_map: [hidden] });
       await renderApp('ready', '/map');
-      expect(await screen.findByText('map:banner.empty')).toBeOnTheScreen();
+      await screen.findByTestId('map-view');
+      expect(screen.queryByText(/map:banner/)).toBeNull();
     });
   });
 
@@ -601,7 +597,6 @@ describe('mappa', () => {
     it('senza posizione: "vai alla mia posizione" avvisa senza chiedere permessi, niente distanza', async () => {
       withTocqueville();
       await renderApp('ready', '/map');
-      expect(screen.queryByRole('button', { name: 'map:searchPlaceholder' })).toBeNull();
       await screen.findByTestId('marker-hot-tocq', { includeHiddenElements: true });
       const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
       await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));

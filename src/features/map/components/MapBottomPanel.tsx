@@ -7,19 +7,17 @@ import { spacing } from '@/theme/tokens';
 import type { MyDeclaration, RecommendedVenue } from '../api';
 import type { LatLng } from '@/features/profile/domain/coarsen';
 
-import type { FriendVenue, MapBanner as MapBannerKind, MapVenue } from '../domain/mapLayers';
+import type { FriendVenue, MapVenue } from '../domain/mapLayers';
 import type { MapViewMode } from '../store/mapStore';
 
 import { DeclarationPill } from './DeclarationPill';
 import { FriendVenueList } from './FriendVenueList';
-import { MapBanner } from './MapBanner';
 import { MapCards, type FeaturedCard } from './MapCards';
 
 type Props = {
   view: MapViewMode;
   loaded: boolean;
   loadFailed: boolean;
-  banner: MapBannerKind;
   friendVenues: FriendVenue[];
   avatarUrls: Record<string, string>;
   featured: FeaturedCard | null;
@@ -32,7 +30,7 @@ type Props = {
 
 const MAX_HEIGHT = 230;
 
-// Everything under the map: friends list (friends view) or cards and banner (general view).
+// Everything under the map: friends list (friends view) or cards (general view).
 export function MapBottomPanel(props: Props) {
   const { t } = useTranslation('map');
   const { view, loaded, loadFailed, onOpenVenue } = props;
@@ -48,7 +46,6 @@ export function MapBottomPanel(props: Props) {
       ) : null}
       {view === 'general' ? (
         <>
-          <MapBanner kind={props.banner} />
           <MapCards
             own={props.declaration}
             featured={props.featured}

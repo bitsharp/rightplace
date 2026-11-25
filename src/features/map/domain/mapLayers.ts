@@ -36,7 +36,6 @@ export type FriendVenue = {
 
 export type MapLayers = { hotSpots: HotSpotVenue[]; spots: MapVenue[]; typicalDots: MapVenue[] };
 export type FriendsMapLayers = MapLayers & { friendVenues: FriendVenue[] };
-export type MapBanner = 'none' | 'typicalOnly' | 'empty';
 
 const hasTypical = (row: MapVenue) => row.typicalLevel >= 1;
 
@@ -110,11 +109,6 @@ export function featuredHotSpot(
       (a, b) => bandRank(b.goingBand) - bandRank(a.goingBand) || a.name.localeCompare(b.name, 'it'),
     );
   return first ?? null;
-}
-
-export function mapBanner(layers: MapLayers): MapBanner {
-  if (layers.hotSpots.length > 0 || layers.spots.length > 0) return 'none';
-  return layers.typicalDots.length > 0 ? 'typicalOnly' : 'empty';
 }
 
 // The people whose photo a row or marker draws (the first faces only): the batch asks for these, so a venue

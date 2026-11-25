@@ -17,7 +17,6 @@ import {
   buildFriendsLayers,
   buildGeneralLayers,
   featuredHotSpot,
-  mapBanner,
   shownFaceIds,
   type FriendVenue,
   type HotSpotVenue,
@@ -153,7 +152,6 @@ export function useMapScreen() {
     loadFailed,
     // Only a user who turned the toggle on ever has a cell; it is already ~500 m coarse.
     you: profile?.locationOptIn ? coarseCell : null,
-    banner: view === 'general' && loaded ? mapBanner(layers) : 'none',
     featured,
     sponsored,
     recommended: recommended.data ?? null,

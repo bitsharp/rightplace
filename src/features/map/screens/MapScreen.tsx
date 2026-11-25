@@ -41,7 +41,6 @@ export function MapScreen() {
         view={map.view}
         loaded={map.loaded}
         loadFailed={map.loadFailed}
-        banner={map.banner}
         friendVenues={map.layers.friendVenues}
         avatarUrls={avatarUrls}
         featured={map.featured}
