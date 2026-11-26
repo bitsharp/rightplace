@@ -49,6 +49,7 @@ export function MapScreen() {
         you={map.you}
         sponsored={map.sponsored}
         recommended={map.recommended}
+        busiest={map.busiest}
         declaration={map.declaration}
         onOpenVenue={map.openVenue}
       />

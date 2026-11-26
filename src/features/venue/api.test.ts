@@ -159,6 +159,7 @@ describe('fetchVenueStats', () => {
       avgAge: 23,
       femalePct: 52,
       malePct: 48,
+      isEstimate: false,
       friends: [
         {
           userId: 'u-volpe',
@@ -230,5 +231,15 @@ describe('declare e undeclare', () => {
     respondWith(null);
     await undeclare();
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('undeclare', undefined);
+  });
+});
+
+describe('fetchVenueStats: presenze stimate', () => {
+  it('is_estimate true arriva come isEstimate, con statistiche personali null', async () => {
+    respondWith([statsRow({ is_estimate: true, avg_age: null, female_pct: null, male_pct: null })]);
+    await expect(fetchVenueStats('v1', 'going')).resolves.toMatchObject({
+      isEstimate: true,
+      avgAge: null,
+    });
   });
 });

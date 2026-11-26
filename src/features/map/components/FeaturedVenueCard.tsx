@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { EstimateTag } from '@/components/app/EstimateTag';
 import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { useBandLabel } from '@/components/ui/useBandLabel';
@@ -66,6 +67,7 @@ export function FeaturedVenueCard({ venue, photoUrl, you, onPress }: Props) {
           <Text variant="body12" color="textSecondary">
             {bandText}
           </Text>
+          {venue.isEstimate ? <EstimateTag /> : null}
           {km === null ? null : (
             <Text variant="body12" color="textSecondary">
               {t('card.distance', { km: formatDistanceKm(km, i18n.language) })}

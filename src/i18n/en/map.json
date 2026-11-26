@@ -25,7 +25,8 @@
     "tonight": "Tonight",
     "usually": "Usually",
     "event": "Event",
-    "spot": "Spot"
+    "spot": "Spot",
+    "estimate": "≈ ESTIMATE: turnout estimated from the venue's habits, not real people"
   },
   "pill": {
     "text": "Tonight: {{venue}} · {{intent}}",
@@ -62,5 +63,8 @@
   "card": {
     "distance": "{{km}} km",
     "a11y": "{{venue}}, {{band}}. Open the details"
+  },
+  "busiest": {
+    "title": "Busiest this {{day}}"
   }
 }

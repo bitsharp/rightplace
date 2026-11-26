@@ -26,3 +26,12 @@ describe('AttendanceTiles', () => {
     },
   );
 });
+
+describe('AttendanceTiles: presenze stimate', () => {
+  it('con estimate mette STIMA su entrambi i riquadri; senza, su nessuno', async () => {
+    const { rerender } = await render(<AttendanceTiles going="20–30" maybe="3–10" estimate />);
+    expect(screen.getAllByText('ui:estimate.tag')).toHaveLength(2);
+    await rerender(<AttendanceTiles going="20–30" maybe="3–10" />);
+    expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
+  });
+});

@@ -11,7 +11,7 @@ import { useTopBar } from '@/features/posts/useTopBar';
 import { useVenueDetail } from '@/features/venue/hooks';
 import { useActiveCities } from '@/features/venues/hooks';
 
-import type { MyDeclaration } from './api';
+import type { BusiestVenue, MyDeclaration } from './api';
 import { placeEventSpots, type EventSpotPlacement } from './domain/eventSpots';
 import {
   buildFriendsLayers,
@@ -24,13 +24,14 @@ import {
 } from './domain/mapLayers';
 import { buildOwnSpot, coordsOfVenue, type OwnSpot } from './domain/ownSpot';
 import type { FeaturedCard } from './components/MapCards';
-import { useCityMap, useMyDeclaration, useRecommendedVenue } from './hooks';
+import { useBusiestTonight, useCityMap, useMyDeclaration, useRecommendedVenue } from './hooks';
 import { useMapStore, type MapViewMode } from './store/mapStore';
 import { useCurrentCity } from './useCurrentCity';
 
 const NO_ROWS: readonly MapVenue[] = [];
 const NO_FRIEND_VENUES: FriendVenue[] = [];
 const NO_IDS: string[] = [];
+const NO_BUSIEST: readonly BusiestVenue[] = [];
 // Marker and child both report a tap on some devices: one navigation per venue is enough.
 const DOUBLE_TAP_MS = 600;
 
@@ -128,6 +129,7 @@ export function useMapScreen() {
   const eventSpots = useEventSpots(citySlug, view, layers.hotSpots);
   const declaration = useMyDeclaration();
   const recommended = useRecommendedVenue(citySlug);
+  const busiest = useBusiestTonight(citySlug, view === 'general');
   const ownSpot = useOwnSpot(declaration.data, generalRows);
   const sponsored = generalRows.find((row) => row.isSponsored) ?? null;
   const featured = useFeatured(view, layers.hotSpots, [
@@ -155,6 +157,7 @@ export function useMapScreen() {
     featured,
     sponsored,
     recommended: recommended.data ?? null,
+    busiest: busiest.data ?? NO_BUSIEST,
     declaration: declaration.data ?? null,
     topBar,
     avatarUrls: topBar.avatarUrls,

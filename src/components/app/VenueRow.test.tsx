@@ -61,3 +61,20 @@ describe('FriendVenueRow', () => {
     ).toBeOnTheScreen();
   });
 });
+
+describe('VenueRow: presenze stimate', () => {
+  const rowProps = {
+    name: 'Bar Brera',
+    meta: 'Bar · Milano',
+    goingBand: '20–30',
+    maybeBand: 'pochi',
+    onPress: jest.fn(),
+  } as const;
+
+  it('con estimate mostra STIMA, senza no', async () => {
+    const { rerender } = await render(<VenueRow {...rowProps} estimate />);
+    expect(screen.getByText('ui:estimate.tag')).toBeOnTheScreen();
+    await rerender(<VenueRow {...rowProps} />);
+    expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
+  });
+});

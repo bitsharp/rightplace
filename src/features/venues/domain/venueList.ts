@@ -6,13 +6,24 @@ export type VenueKind = (typeof VENUE_KINDS)[number];
 
 export type CityVenue = { id: string; name: string; kind: VenueKind; cityName: string };
 
-export type VenueBands = { goingBand: Band; maybeBand: Band; isSponsored: boolean };
+export type VenueBands = {
+  goingBand: Band;
+  maybeBand: Band;
+  isSponsored: boolean;
+  // The bands include estimated presence (not people): shown as STIMA.
+  isEstimate: boolean;
+};
 
 export type VenueListItem = CityVenue & VenueBands;
 
 export type VenueFilter = { kind: VenueKind | null; query: string };
 
-const NO_BANDS: VenueBands = { goingBand: 'pochi', maybeBand: 'pochi', isSponsored: false };
+const NO_BANDS: VenueBands = {
+  goingBand: 'pochi',
+  maybeBand: 'pochi',
+  isSponsored: false,
+  isEstimate: false,
+};
 
 // Bands come from a separate (refetched) query: until they arrive, or for venues outside the top
 // results, the honest default is "pochi".

@@ -50,6 +50,7 @@ const bandRowSchema = z.object({
   going_band: bandSchema,
   maybe_band: bandSchema,
   is_sponsored: z.boolean(),
+  is_estimate: z.boolean().default(false),
 });
 
 async function selectRows(query: PromiseLike<{ data: unknown; error: unknown }>): Promise<unknown> {
@@ -103,7 +104,12 @@ export async function fetchVenueBands(citySlug: string): Promise<Map<string, Ven
   return new Map(
     rows.map((row) => [
       row.venue_id,
-      { goingBand: row.going_band, maybeBand: row.maybe_band, isSponsored: row.is_sponsored },
+      {
+        goingBand: row.going_band,
+        maybeBand: row.maybe_band,
+        isSponsored: row.is_sponsored,
+        isEstimate: row.is_estimate,
+      },
     ]),
   );
 }

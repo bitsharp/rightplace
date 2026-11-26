@@ -25,7 +25,8 @@
     "tonight": "Stasera",
     "usually": "Di solito",
     "event": "Serata",
-    "spot": "Spot"
+    "spot": "Spot",
+    "estimate": "≈ STIMA: affluenza stimata dalle abitudini del locale, non persone reali"
   },
   "pill": {
     "text": "Stasera: {{venue}} · {{intent}}",
@@ -62,5 +63,8 @@
   "card": {
     "distance": "{{km}} km",
     "a11y": "{{venue}}, {{band}}. Apri il dettaglio"
+  },
+  "busiest": {
+    "title": "I più animati del {{day}}"
   }
 }

@@ -16,7 +16,11 @@ describe('WhoIsGoing', () => {
     'con dati nascosti nel segmento %s spiega perché, senza mostrare numeri',
     async (segment) => {
       await render(
-        <WhoIsGoing segment={segment} onSegment={jest.fn()} view={{ kind: 'hidden', segment }} />,
+        <WhoIsGoing
+          segment={segment}
+          onSegment={jest.fn()}
+          view={{ kind: 'hidden', segment, estimate: false }}
+        />,
       );
       expect(screen.getByText(`venue:who.hidden.${segment}`)).toBeOnTheScreen();
       expect(screen.queryByTestId('gender-female')).toBeNull();
@@ -45,4 +49,21 @@ describe('WhoIsGoing', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'venue:who.segment.all' }));
     expect(onSegment).toHaveBeenCalledWith('all');
   });
+});
+
+describe('WhoIsGoing: presenze stimate', () => {
+  it.each(['going', 'maybe', 'all'] as const)(
+    'statistiche nascoste ma fascia con stime (%s): chiede dichiarazioni reali, non dice "meno di 3 persone"',
+    async (segment) => {
+      await render(
+        <WhoIsGoing
+          segment={segment}
+          onSegment={jest.fn()}
+          view={{ kind: 'hidden', segment, estimate: true }}
+        />,
+      );
+      expect(screen.getByText('venue:who.hiddenEstimate')).toBeOnTheScreen();
+      expect(screen.queryByText(`venue:who.hidden.${segment}`)).not.toBeOnTheScreen();
+    },
+  );
 });

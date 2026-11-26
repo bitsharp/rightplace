@@ -21,7 +21,8 @@
       "going": "Fewer than 3 people answered \"Going\": the data stays hidden to protect anonymity.",
       "maybe": "Fewer than 3 people answered \"Maybe\": the data stays hidden to protect anonymity.",
       "all": "Fewer than 3 people declared this night, or one group is too small: the data stays hidden to protect anonymity."
-    }
+    },
+    "hiddenEstimate": "Statistics are available with at least 3 real declarations."
   },
   "friends": {
     "title": "Your friends",

@@ -21,7 +21,8 @@
       "going": "Meno di 3 persone hanno risposto \"Ci vado\": i dati restano nascosti per tutelare l'anonimato.",
       "maybe": "Meno di 3 persone hanno risposto \"Forse\": i dati restano nascosti per tutelare l'anonimato.",
       "all": "Meno di 3 persone hanno dichiarato la serata, o un gruppo è troppo piccolo: i dati restano nascosti per tutelare l'anonimato."
-    }
+    },
+    "hiddenEstimate": "Statistiche disponibili con almeno 3 dichiarazioni reali."
   },
   "friends": {
     "title": "I tuoi amici",

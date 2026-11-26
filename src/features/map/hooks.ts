@@ -2,7 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useIsFocused } from 'expo-router';
 import { useEffect, useRef } from 'react';
 
-import { fetchCityMap, fetchMyDeclaration, fetchRecommendedVenue, fetchStories } from './api';
+import {
+  fetchBusiestTonight,
+  fetchCityMap,
+  fetchMyDeclaration,
+  fetchRecommendedVenue,
+  fetchStories,
+} from './api';
 import type { MapViewMode } from './store/mapStore';
 
 export const CITY_MAP_REFETCH_MS = 60 * 1000;
@@ -48,6 +54,17 @@ export function useRecommendedVenue(citySlug: string) {
   return useQuery({
     queryKey: ['recommendedVenue', citySlug],
     queryFn: () => fetchRecommendedVenue(citySlug),
+    meta: { persist: false },
+  });
+}
+
+// General map only: the friends map is about where friends go. Slower cadence than the map it sits under.
+export function useBusiestTonight(citySlug: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['busiestTonight', citySlug],
+    queryFn: () => fetchBusiestTonight(citySlug),
+    enabled,
+    refetchInterval: CITY_MAP_REFETCH_MS * 5,
     meta: { persist: false },
   });
 }

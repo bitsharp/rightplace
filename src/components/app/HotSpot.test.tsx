@@ -19,6 +19,37 @@ function glowColor(): unknown {
   return find(screen.getByTestId('hot-spot-glow', { includeHiddenElements: true }) as never);
 }
 
+describe('HotSpot: presenze stimate', () => {
+  it('con isEstimate mostra il piccolo segno ≈ e lo dice nell’etichetta accessibile', async () => {
+    await render(
+      <HotSpot
+        venueName="Navigli"
+        goingBand="20–30"
+        maybeBand="pochi"
+        isEstimate
+        onPress={jest.fn()}
+      />,
+    );
+    expect(
+      screen.getByTestId('hot-spot-estimate', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('≈', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: /ui:hotSpot.a11yEstimate/, includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
+
+  it('senza stime non c’è nessun segno', async () => {
+    await render(
+      <HotSpot venueName="Navigli" goingBand="20–30" maybeBand="pochi" onPress={jest.fn()} />,
+    );
+    expect(
+      screen.queryByTestId('hot-spot-estimate', { includeHiddenElements: true }),
+    ).not.toBeOnTheScreen();
+    expect(screen.queryByText('≈', { includeHiddenElements: true })).not.toBeOnTheScreen();
+  });
+});
+
 describe('HotSpot', () => {
   it('ha il diametro della fascia dominante e la mostra come label', async () => {
     await render(

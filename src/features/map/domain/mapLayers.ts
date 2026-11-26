@@ -21,6 +21,8 @@ export type MapVenue = {
   friendIds: string[] | null;
   friendsCount: number | null;
   isSpot: boolean;
+  // The bands include estimated presence (not people): the UI says STIMA wherever it shows them.
+  isEstimate: boolean;
 };
 
 // A hot spot always has bands: the type says so, so no marker can print a made-up "pochi".

@@ -207,6 +207,7 @@ export function HotSpotMarkers({
         venue.maybeBand,
         view,
         venue.friendsCount ?? '',
+        venue.isEstimate,
       ].join(':')}
       testID={`marker-hot-${venue.venueId}`}
       zIndex={Z_INDEX.hotSpot}
@@ -217,6 +218,7 @@ export function HotSpotMarkers({
         goingBand={venue.goingBand}
         maybeBand={venue.maybeBand}
         caption={friendsCaption(venue, view)}
+        isEstimate={venue.isEstimate}
         onPress={() => onOpenVenue(venue.venueId)}
       />
     </VenueMarker>

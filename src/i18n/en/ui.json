@@ -28,7 +28,8 @@
     "storyA11y": "New post from {{handle}}"
   },
   "hotSpot": {
-    "a11y": "{{venue}}: going {{going}}, maybe {{maybe}}. Open details"
+    "a11y": "{{venue}}: going {{going}}, maybe {{maybe}}. Open details",
+    "a11yEstimate": "{{venue}}: Going {{going}}, Maybe {{maybe}}. Includes estimated presence. Open details"
   },
   "labels": {
     "sponsored": "Sponsored",
@@ -143,5 +144,9 @@
       "wow": "surprised face",
       "laugh": "laughing face"
     }
+  },
+  "estimate": {
+    "tag": "ESTIMATE",
+    "a11y": "Estimate: includes estimated presence"
   }
 }

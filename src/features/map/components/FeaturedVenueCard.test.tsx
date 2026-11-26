@@ -19,6 +19,7 @@ const venue = (overrides: Partial<HotSpotVenue> = {}): HotSpotVenue => ({
   friendIds: null,
   friendsCount: null,
   isSpot: false,
+  isEstimate: false,
   ...overrides,
 });
 
@@ -74,5 +75,17 @@ describe('FeaturedVenueCard', () => {
       }),
     );
     expect(onPress).toHaveBeenCalledWith('v1');
+  });
+});
+
+describe('FeaturedVenueCard: presenze stimate', () => {
+  it('con isEstimate mostra STIMA accanto alla fascia', async () => {
+    await render(<FeaturedVenueCard venue={venue({ isEstimate: true })} {...props} />);
+    expect(screen.getByText('ui:estimate.tag')).toBeOnTheScreen();
+  });
+
+  it('senza stime non mostra STIMA', async () => {
+    await render(<FeaturedVenueCard venue={venue()} {...props} />);
+    expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
   });
 });

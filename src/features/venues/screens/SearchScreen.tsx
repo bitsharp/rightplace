@@ -60,6 +60,7 @@ export function SearchScreen() {
             goingBand={row.goingBand}
             maybeBand={row.maybeBand}
             sponsored={row.isSponsored}
+            estimate={row.isEstimate}
             onPress={() => search.openVenue(row.id)}
           />
         ))}

@@ -82,6 +82,7 @@ export function MapCards({
           <SponsoredCard
             name={sponsored.name}
             meta={sponsoredMeta(sponsored)}
+            estimate={sponsored.isHotSpot && sponsored.isEstimate}
             onPress={() => onOpen(sponsored.venueId)}
           />
         </View>
@@ -91,6 +92,7 @@ export function MapCards({
           <RecommendedCard
             name={recommended.name}
             meta={t(`cards.${recommended.reason}`)}
+            estimate={recommended.reason === 'hot' && recommended.isEstimate}
             onPress={() => onOpen(recommended.venueId)}
           />
         </View>

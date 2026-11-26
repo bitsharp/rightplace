@@ -50,7 +50,11 @@ export function WhoIsGoing({ segment, onSegment, view }: Props) {
 export function Breakdown({ view }: { view: StatsView | null }) {
   const { t } = useTranslation('venue');
   if (!view) return null;
-  if (view.kind === 'hidden') return <EmptyState message={t(`who.hidden.${view.segment}`)} />;
+  if (view.kind === 'hidden') {
+    // With estimated presence in the band, "fewer than 3 people" would be misleading: only real declarations count.
+    const key = view.estimate ? 'who.hiddenEstimate' : `who.hidden.${view.segment}`;
+    return <EmptyState message={t(key)} />;
+  }
   return (
     <View style={styles.cards}>
       <AgeStatCard averageAge={view.avgAge} />

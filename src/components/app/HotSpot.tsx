@@ -19,6 +19,8 @@ type Props = {
   maybeBand: Band;
   onPress: () => void;
   caption?: string;
+  // The bands include estimated presence: a small ≈ sign says so (the full STIMA label is on the cards).
+  isEstimate?: boolean;
 };
 
 const INTENT_STYLE: Record<
@@ -60,7 +62,14 @@ const circle = (size: number) => ({ width: size, height: size, borderRadius: siz
 
 // "Stasera" layer (CLAUDE.md principle 11): coloured, sized by band, never by an exact count.
 // Size and colour follow the dominant intent; the label is always the "Ci vado" band.
-export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: Props) {
+export function HotSpot({
+  venueName,
+  goingBand,
+  maybeBand,
+  onPress,
+  caption,
+  isEstimate = false,
+}: Props) {
   const { t } = useTranslation('ui');
   const bandLabel = useBandLabel();
   const { main, secondary, diameter, inner } = hotSpotLayout(goingBand, maybeBand);
@@ -68,7 +77,7 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t('hotSpot.a11y', {
+      accessibilityLabel={t(isEstimate ? 'hotSpot.a11yEstimate' : 'hotSpot.a11y', {
         venue: venueName,
         going: bandLabel(goingBand),
         maybe: bandLabel(maybeBand),
@@ -95,6 +104,13 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
         <Text variant="label12" style={styles.label}>
           {caption ?? bandLabel(goingBand)}
         </Text>
+        {isEstimate ? (
+          <View testID="hot-spot-estimate" style={styles.estimate}>
+            <Text variant="label10" color="maybe">
+              ≈
+            </Text>
+          </View>
+        ) : null}
       </View>
     </Pressable>
   );
@@ -105,4 +121,17 @@ const styles = StyleSheet.create({
   circle: { borderWidth: 2 },
   inner: { position: 'absolute', right: '22%', bottom: '22%', borderWidth: 1.5, shadowOpacity: 0 },
   label: { fontFamily: fonts.monoBold, color: colors.text },
+  estimate: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.maybe,
+    backgroundColor: colors.surface,
+  },
 });

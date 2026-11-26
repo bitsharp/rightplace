@@ -19,6 +19,7 @@ const sponsored: MapVenue = {
   friendIds: null,
   friendsCount: null,
   isSpot: false,
+  isEstimate: false,
 };
 
 const recommended = {
@@ -26,6 +27,7 @@ const recommended = {
   name: 'Sunset Rooftop',
   kind: 'rooftop' as const,
   reason: 'history' as const,
+  isEstimate: false,
 };
 
 describe('MapCards: la mia serata', () => {
@@ -175,5 +177,47 @@ describe('MapCards: locale in evidenza', () => {
     );
     await fireEvent.press(screen.getByText('Tocqueville 13'));
     expect(onOpen).toHaveBeenCalledWith('v9');
+  });
+});
+
+describe('MapCards: presenze stimate', () => {
+  it('la sponsorizzata con punto caldo stimato porta STIMA', async () => {
+    await render(
+      <MapCards
+        own={null}
+        sponsored={{ ...sponsored, isEstimate: true }}
+        recommended={null}
+        onOpen={jest.fn()}
+      />,
+    );
+    expect(screen.getByText('ui:estimate.tag')).toBeOnTheScreen();
+  });
+
+  it('la sponsorizzata senza stime non porta STIMA', async () => {
+    await render(
+      <MapCards own={null} sponsored={sponsored} recommended={null} onOpen={jest.fn()} />,
+    );
+    expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
+  });
+
+  it('la consigliata "più caldo" stimata porta STIMA; quella dalla cronologia no', async () => {
+    const { rerender } = await render(
+      <MapCards
+        own={null}
+        sponsored={null}
+        recommended={{ ...recommended, reason: 'hot', isEstimate: true }}
+        onOpen={jest.fn()}
+      />,
+    );
+    expect(screen.getByText('ui:estimate.tag')).toBeOnTheScreen();
+    await rerender(
+      <MapCards
+        own={null}
+        sponsored={null}
+        recommended={{ ...recommended, reason: 'history', isEstimate: true }}
+        onOpen={jest.fn()}
+      />,
+    );
+    expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
   });
 });

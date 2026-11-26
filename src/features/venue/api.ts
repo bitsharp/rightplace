@@ -91,6 +91,8 @@ const statsRowSchema = z.object({
   female_pct: z.number().nullable(),
   male_pct: z.number().nullable(),
   friends: z.array(friendSchema),
+  // Optional with a default: a database not yet migrated omits it.
+  is_estimate: z.boolean().default(false),
 });
 
 export type VenueFriend = {
@@ -107,6 +109,8 @@ export type VenueStats = {
   avgAge: number | null;
   femalePct: number | null;
   malePct: number | null;
+  // The bands include estimated presence; age and gender never do (real declarations only, k >= 3).
+  isEstimate: boolean;
   friends: VenueFriend[];
 };
 
@@ -123,6 +127,7 @@ export async function fetchVenueStats(venueId: string, segment: StatsSegment): P
     avgAge: row.avg_age,
     femalePct: row.female_pct,
     malePct: row.male_pct,
+    isEstimate: row.is_estimate,
     friends: row.friends.map((friend) => ({
       userId: friend.user_id ?? null,
       handle: friend.handle,

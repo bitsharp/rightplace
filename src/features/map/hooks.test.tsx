@@ -5,7 +5,7 @@ import { act } from 'react';
 import { fakeSupabase } from '@/test/fakeSupabase';
 import { createQueryWrapper } from '@/test/queryWrapper';
 
-import { CITY_MAP_REFETCH_MS, useCityMap } from './hooks';
+import { CITY_MAP_REFETCH_MS, useBusiestTonight, useCityMap } from './hooks';
 
 jest.mock('expo-router', () => ({ useIsFocused: jest.fn() }));
 
@@ -63,5 +63,23 @@ describe('useCityMap', () => {
     await waitFor(() => expect(mapCalls()).toBe(1));
     const query = client.getQueryCache().find({ queryKey: ['cityMap', 'milano', 'general'] });
     expect(query?.meta).toEqual({ persist: false });
+  });
+});
+
+describe('useBusiestTonight', () => {
+  it('chiede i più animati della città', async () => {
+    fakeSupabase.rpc.mockResolvedValue({ data: [], error: null });
+    const { Wrapper } = createQueryWrapper();
+    const { result } = await renderHook(() => useBusiestTonight('milano', true), {
+      wrapper: Wrapper,
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_busiest_tonight', { p_city_slug: 'milano' });
+  });
+
+  it('non chiede nulla quando non serve (mappa amici)', async () => {
+    const { Wrapper } = createQueryWrapper();
+    await renderHook(() => useBusiestTonight('milano', false), { wrapper: Wrapper });
+    expect(fakeSupabase.rpc).not.toHaveBeenCalledWith('get_busiest_tonight', expect.anything());
   });
 });

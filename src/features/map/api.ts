@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { BANDS } from '@/features/nights/domain/band';
+import { BANDS, type Band } from '@/features/nights/domain/band';
 import { VENUE_KINDS, type VenueKind } from '@/features/venues/domain/venueList';
 import { callRpc } from '@/lib/callRpc';
 
@@ -26,6 +26,8 @@ const mapRowSchema = z.object({
   friends_going_ids: z.array(z.string()).nullish(),
   friends_count: z.number().int().nullable(),
   is_spot: z.boolean().default(false),
+  // Optional with a default: a database not yet migrated omits it and the map shows no STIMA.
+  is_estimate: z.boolean().default(false),
 });
 
 // Bands and typical levels only: k-anonymity is enforced inside get_city_map (principles 2, 11).
@@ -50,6 +52,7 @@ export async function fetchCityMap(citySlug: string, view: MapViewMode): Promise
       friendIds: row.friends_going_ids ?? null,
       friendsCount: row.friends_count,
       isSpot: row.is_spot,
+      isEstimate: row.is_estimate,
     }));
 }
 
@@ -106,6 +109,7 @@ const recommendedRowSchema = z.object({
   name: z.string(),
   kind: z.enum(VENUE_KINDS),
   reason: z.enum(['history', 'hot']),
+  is_estimate: z.boolean().default(false),
 });
 
 export type RecommendedVenue = {
@@ -113,6 +117,7 @@ export type RecommendedVenue = {
   name: string;
   kind: VenueKind;
   reason: 'history' | 'hot';
+  isEstimate: boolean;
 };
 
 export async function fetchRecommendedVenue(citySlug: string): Promise<RecommendedVenue | null> {
@@ -121,5 +126,53 @@ export async function fetchRecommendedVenue(citySlug: string): Promise<Recommend
     .parse(await callRpc<unknown>('get_recommended_venue', { p_city_slug: citySlug }));
   const row = rows[0];
   if (!row) return null;
-  return { venueId: row.venue_id, name: row.name, kind: row.kind, reason: row.reason };
+  return {
+    venueId: row.venue_id,
+    name: row.name,
+    kind: row.kind,
+    reason: row.reason,
+    isEstimate: row.is_estimate,
+  };
+}
+
+const busiestRowSchema = z.object({
+  venue_id: z.string(),
+  name: z.string(),
+  kind: z.enum(VENUE_KINDS),
+  typical_level: z.union([z.literal(2), z.literal(3)]),
+  cover_photo_url: z.string().nullish(),
+  going_band: bandSchema,
+  maybe_band: bandSchema,
+  is_estimate: z.boolean().default(false),
+});
+
+export type BusiestVenue = {
+  venueId: string;
+  name: string;
+  kind: VenueKind;
+  // Only 2 ("animato") and 3 ("pieno"): the server lists nothing quieter.
+  typicalLevel: 2 | 3;
+  photoUrl: string | null;
+  goingBand: Band;
+  maybeBand: Band;
+  isEstimate: boolean;
+};
+
+// "I più animati": the "di solito" level of now and the next hours, plus tonight's bands. Catalog data and
+// bands only, no person (principles 2, 11); the bands may include estimated presence (isEstimate).
+export async function fetchBusiestTonight(citySlug: string): Promise<BusiestVenue[]> {
+  const data = await callRpc<unknown>('get_busiest_tonight', { p_city_slug: citySlug });
+  return z
+    .array(busiestRowSchema)
+    .parse(data)
+    .map((row) => ({
+      venueId: row.venue_id,
+      name: row.name,
+      kind: row.kind,
+      typicalLevel: row.typical_level,
+      photoUrl: row.cover_photo_url ?? null,
+      goingBand: row.going_band,
+      maybeBand: row.maybe_band,
+      isEstimate: row.is_estimate,
+    }));
 }

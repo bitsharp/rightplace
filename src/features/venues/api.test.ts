@@ -107,8 +107,29 @@ describe('venues api', () => {
     });
     const bands = await fetchVenueBands('milano');
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('search_venues', { p_city_slug: 'milano' });
-    expect(bands.get('v1')).toEqual({ goingBand: '20–30', maybeBand: 'pochi', isSponsored: true });
+    expect(bands.get('v1')).toEqual({
+      goingBand: '20–30',
+      maybeBand: 'pochi',
+      isSponsored: true,
+      isEstimate: false,
+    });
     expect(bands.get('v2')?.maybeBand).toBe('10–20');
+  });
+
+  it('is_estimate true arriva come isEstimate', async () => {
+    fakeSupabase.rpc.mockResolvedValueOnce({
+      data: [
+        {
+          venue_id: 'v1',
+          going_band: '20–30',
+          maybe_band: 'pochi',
+          is_sponsored: false,
+          is_estimate: true,
+        },
+      ],
+      error: null,
+    });
+    expect((await fetchVenueBands('milano')).get('v1')?.isEstimate).toBe(true);
   });
 
   it('rifiuta una fascia che non esiste (niente numeri esatti)', async () => {

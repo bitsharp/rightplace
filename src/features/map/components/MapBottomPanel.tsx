@@ -4,12 +4,13 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { Text } from '@/components/ui/Text';
 import { spacing } from '@/theme/tokens';
 
-import type { MyDeclaration, RecommendedVenue } from '../api';
+import type { BusiestVenue, MyDeclaration, RecommendedVenue } from '../api';
 import type { LatLng } from '@/features/profile/domain/coarsen';
 
 import type { FriendVenue, MapVenue } from '../domain/mapLayers';
 import type { MapViewMode } from '../store/mapStore';
 
+import { BusiestTonightCard } from './BusiestTonightCard';
 import { DeclarationPill } from './DeclarationPill';
 import { FriendVenueList } from './FriendVenueList';
 import { MapCards, type FeaturedCard } from './MapCards';
@@ -25,6 +26,10 @@ type Props = {
   sponsored: MapVenue | null;
   recommended: RecommendedVenue | null;
   declaration: MyDeclaration | null;
+  // "I più animati": general map only; empty hides the card.
+  busiest: readonly BusiestVenue[];
+  // Injected for tests.
+  busiestNow?: Date;
   onOpenVenue: (venueId: string) => void;
 };
 
@@ -54,6 +59,7 @@ export function MapBottomPanel(props: Props) {
             recommended={props.recommended}
             onOpen={onOpenVenue}
           />
+          <BusiestTonightCard venues={props.busiest} now={props.busiestNow} onOpen={onOpenVenue} />
         </>
       ) : null}
       <DeclarationPill declaration={props.declaration} onPress={onOpenVenue} />

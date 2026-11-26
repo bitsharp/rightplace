@@ -1,7 +1,13 @@
 import { RpcError } from '@/lib/rpcError';
 import { fakeSupabase } from '@/test/fakeSupabase';
 
-import { fetchCityMap, fetchMyDeclaration, fetchRecommendedVenue, fetchStories } from './api';
+import {
+  fetchBusiestTonight,
+  fetchCityMap,
+  fetchMyDeclaration,
+  fetchRecommendedVenue,
+  fetchStories,
+} from './api';
 
 const mapRow = (overrides: Record<string, unknown> = {}) => ({
   venue_id: 'v1',
@@ -24,6 +30,18 @@ const mapRow = (overrides: Record<string, unknown> = {}) => ({
 
 const respondWith = (data: unknown, error: unknown = null) =>
   fakeSupabase.rpc.mockResolvedValueOnce({ data, error });
+
+describe('fetchCityMap: presenze stimate', () => {
+  it('is_estimate true arriva come isEstimate', async () => {
+    respondWith([mapRow({ is_estimate: true })]);
+    expect((await fetchCityMap('milano', 'general'))[0]?.isEstimate).toBe(true);
+  });
+
+  it('senza is_estimate (database non aggiornato) vale false: nessun errore, nessuna STIMA', async () => {
+    respondWith([mapRow()]);
+    expect((await fetchCityMap('milano', 'general'))[0]?.isEstimate).toBe(false);
+  });
+});
 
 describe('fetchCityMap: forma precedente della RPC', () => {
   it('senza friends_going_ids (database non aggiornato) non dà errore e non ha id', async () => {
@@ -62,6 +80,7 @@ describe('fetchCityMap', () => {
         friendIds: ['u-volpe'],
         friendsCount: 1,
         isSpot: false,
+        isEstimate: false,
       },
     ]);
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_city_map', {
@@ -161,6 +180,7 @@ describe('fetchRecommendedVenue', () => {
       name: 'Sunset Rooftop',
       kind: 'rooftop',
       reason: 'history',
+      isEstimate: false,
     });
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_recommended_venue', {
       p_city_slug: 'milano',
@@ -175,5 +195,57 @@ describe('fetchRecommendedVenue', () => {
   it('rifiuta un motivo sconosciuto', async () => {
     respondWith([{ venue_id: 'v2', name: 'X', kind: 'bar', reason: 'ads' }]);
     await expect(fetchRecommendedVenue('milano')).rejects.toThrow();
+  });
+});
+
+describe('fetchRecommendedVenue: presenze stimate', () => {
+  it('is_estimate true arriva come isEstimate', async () => {
+    respondWith([{ venue_id: 'v2', name: 'X', kind: 'bar', reason: 'hot', is_estimate: true }]);
+    await expect(fetchRecommendedVenue('milano')).resolves.toMatchObject({ isEstimate: true });
+  });
+});
+
+const busyRow = (overrides: Record<string, unknown> = {}) => ({
+  venue_id: 'v1',
+  name: 'Arena Club',
+  kind: 'club',
+  typical_level: 3,
+  cover_photo_url: null,
+  going_band: '20–30',
+  maybe_band: '3–10',
+  is_estimate: true,
+  ...overrides,
+});
+
+describe('fetchBusiestTonight', () => {
+  it('chiama get_busiest_tonight con la città e converte le righe', async () => {
+    respondWith([busyRow({ cover_photo_url: 'https://lh3.googleusercontent.com/p/a' })]);
+    await expect(fetchBusiestTonight('milano')).resolves.toEqual([
+      {
+        venueId: 'v1',
+        name: 'Arena Club',
+        kind: 'club',
+        typicalLevel: 3,
+        photoUrl: 'https://lh3.googleusercontent.com/p/a',
+        goingBand: '20–30',
+        maybeBand: '3–10',
+        isEstimate: true,
+      },
+    ]);
+    expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_busiest_tonight', {
+      p_city_slug: 'milano',
+    });
+  });
+
+  it('is_estimate assente vale false e una foto assente è null', async () => {
+    const { is_estimate: _missing, ...row } = busyRow();
+    respondWith([row]);
+    const [first] = await fetchBusiestTonight('milano');
+    expect(first).toMatchObject({ isEstimate: false, photoUrl: null });
+  });
+
+  it('rifiuta una fascia che non esiste (niente numeri esatti)', async () => {
+    respondWith([busyRow({ going_band: '27' })]);
+    await expect(fetchBusiestTonight('milano')).rejects.toThrow();
   });
 });

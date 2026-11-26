@@ -30,6 +30,12 @@ describe('MapLegend', () => {
     expect(dot.borderRadius).not.toBe(999);
   });
 
+  it('spiega ≈ STIMA nella legenda, fuori dai due blocchi dei pallini', async () => {
+    await render(<MapLegend />);
+    expect(screen.getByText('map:legend.estimate')).toBeOnTheScreen();
+    expect(screen.getAllByTestId('legend-items')).toHaveLength(2);
+  });
+
   it('descrive lo strato grigio a parole: tranquillo · animato · pieno', async () => {
     await render(<MapLegend />);
     expect(screen.getByText('ui:typical.quiet')).toBeOnTheScreen();

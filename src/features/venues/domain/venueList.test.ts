@@ -13,6 +13,7 @@ const item = (overrides: Partial<VenueListItem> & { name: string }): VenueListIt
   goingBand: 'pochi',
   maybeBand: 'pochi',
   isSponsored: false,
+  isEstimate: false,
   ...overrides,
 });
 
@@ -85,22 +86,32 @@ describe('mergeVenueBands', () => {
 
   it('abbina le fasce ai locali per id', () => {
     const bands = new Map([
-      ['a', { goingBand: '20–30' as const, maybeBand: '3–10' as const, isSponsored: true }],
+      [
+        'a',
+        {
+          goingBand: '20–30' as const,
+          maybeBand: '3–10' as const,
+          isSponsored: true,
+          isEstimate: true,
+        },
+      ],
     ]);
     expect(mergeVenueBands(venues, bands)[0]).toEqual({
       ...venues[0],
       goingBand: '20–30',
       maybeBand: '3–10',
       isSponsored: true,
+      isEstimate: true,
     });
   });
 
-  it('senza fasce (ancora in caricamento o fuori dai primi 50) mostra "pochi" e non sponsorizzato', () => {
+  it('senza fasce (ancora in caricamento o fuori dai primi 50) mostra "pochi", non sponsorizzato e senza STIMA', () => {
     expect(mergeVenueBands(venues, new Map())[1]).toEqual({
       ...venues[1],
       goingBand: 'pochi',
       maybeBand: 'pochi',
       isSponsored: false,
+      isEstimate: false,
     });
   });
 });

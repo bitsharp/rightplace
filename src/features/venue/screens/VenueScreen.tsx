@@ -86,7 +86,7 @@ function Bands({ screen }: { screen: Screen }) {
   if (going && maybe) {
     return (
       <TourAnchor id="venue.bands">
-        <AttendanceTiles going={going} maybe={maybe} />
+        <AttendanceTiles going={going} maybe={maybe} estimate={screen.bands?.isEstimate ?? false} />
       </TourAnchor>
     );
   }

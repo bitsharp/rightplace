@@ -6,9 +6,13 @@ import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { colors, radius, spacing } from '@/theme/tokens';
 
+import { EstimateTag } from './EstimateTag';
+
 type CardProps = {
   name: string;
   meta: string;
+  // The meta line shows a band that includes estimated presence: add the STIMA label.
+  estimate?: boolean;
   onPress: () => void;
 };
 
@@ -27,6 +31,7 @@ export function PromoCard({
   borderColor,
   name,
   meta,
+  estimate = false,
   onPress,
   accessibilityLabel,
 }: BaseProps) {
@@ -43,6 +48,7 @@ export function PromoCard({
         <Text variant="body12" color="textSecondary">
           {meta}
         </Text>
+        {estimate ? <EstimateTag /> : null}
       </View>
       <Icon name="chevronRight" color="textSecondary" />
     </Pressable>
