@@ -1,13 +1,14 @@
-import { Image } from 'expo-image';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { FriendFaces } from '@/components/app/FriendFaces';
+import { VenueCoverImage } from '@/components/app/VenueCoverImage';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { colors, radius, spacing } from '@/theme/tokens';
+
+import type { VenueKind } from '@/features/venues/domain/venueList';
 
 import type { VenueFriend } from '../api';
 import type { OpenStatus } from '../domain/openingHours';
@@ -18,6 +19,7 @@ import { OpenStatusLine } from './OpenStatusLine';
 // Everything "La tua serata" adds around the declaration: the venue page already loaded all of it.
 export type NightContext = {
   photoUrl: string | null;
+  kind: VenueKind;
   address: string | null;
   status: OpenStatus | null;
   links: readonly TransportLink[];
@@ -34,29 +36,13 @@ const MAX_FACES = 7;
 type CardProps = {
   name: string;
   photoUrl: string | null;
+  kind: VenueKind;
   address: string | null;
   status: OpenStatus | null;
   onPress: () => void;
 };
 
-function Thumb({ url }: { url: string | null }) {
-  const { t } = useTranslation('venue');
-  const [failed, setFailed] = useState(false);
-  if (!url || failed) return <View testID="night-venue-placeholder" style={styles.placeholder} />;
-  return (
-    <Image
-      accessible
-      accessibilityLabel={t('cover.caption')}
-      source={{ uri: url }}
-      cachePolicy="memory-disk"
-      contentFit="cover"
-      onError={() => setFailed(true)}
-      style={styles.photo}
-    />
-  );
-}
-
-export function NightVenueCard({ name, photoUrl, address, status, onPress }: CardProps) {
+export function NightVenueCard({ name, photoUrl, kind, address, status, onPress }: CardProps) {
   const { t } = useTranslation('venue');
   return (
     <Pressable
@@ -65,7 +51,7 @@ export function NightVenueCard({ name, photoUrl, address, status, onPress }: Car
       onPress={onPress}
       style={styles.card}
     >
-      <Thumb url={photoUrl} />
+      <VenueCoverImage url={photoUrl} kind={kind} style={styles.photo} />
       <View style={styles.texts}>
         <Text variant="body15Strong" numberOfLines={1}>
           {name}

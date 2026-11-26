@@ -228,6 +228,7 @@ describe('DeclarationSheet', () => {
   describe('"La tua serata" (dichiarazione qui, con il contesto del locale)', () => {
     const night = {
       photoUrl: null,
+      kind: 'club' as const,
       address: 'Via Test 1, Milano',
       status: { kind: 'open', closesAt: '04:00' } as const,
       links: [

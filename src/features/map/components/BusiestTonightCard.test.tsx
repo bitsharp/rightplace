@@ -58,7 +58,7 @@ describe('BusiestTonightCard', () => {
     expect(screen.getAllByText('ui:estimate.tag')).toHaveLength(1);
   });
 
-  it('mostra la foto di copertina se c’è, altrimenti il blocco viola', async () => {
+  it('mostra la foto di copertina se c’è, altrimenti il segnaposto del tipo', async () => {
     await render(
       <BusiestTonightCard
         venues={[
@@ -69,7 +69,7 @@ describe('BusiestTonightCard', () => {
       />,
     );
     expect(screen.getAllByTestId('busiest-photo')).toHaveLength(1);
-    expect(screen.getAllByTestId('busiest-placeholder')).toHaveLength(1);
+    expect(screen.getAllByTestId(/^venue-cover-art-/)).toHaveLength(1);
   });
 
   it('un tap apre il dettaglio di quel locale', async () => {

@@ -3,22 +3,23 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { VenueCoverArt } from '@/components/app/VenueCoverArt';
 import { PhotoViewer } from '@/components/app/PhotoViewer';
 import { ScenePlaceholder } from '@/components/app/PhotoFrame';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { colors, spacing } from '@/theme/tokens';
 
-import { HeroBackdrop, HeroFade } from './HeroGradients';
+import { HeroFade } from './HeroGradients';
 
 const ASPECT_RATIO = 4 / 3;
 const PLACEHOLDER_HEIGHT = 240;
 
-type Props = { photoUrl: string | null };
+type Props = { photoUrl: string | null; kind: string };
 
 // Full-width cover of the venue page. The photo is public and third party (switchable server-side, caption
 // "Foto da Google Maps"); it can be cached on disk, unlike the ephemeral user photos (principle 5).
-// Absent or broken: a violet gradient with a halo, never an empty box.
-export function VenueCoverPhoto({ photoUrl }: Props) {
+// Absent or broken: the illustration of the venue kind (no caption: it is not a photo), never an empty box.
+export function VenueCoverPhoto({ photoUrl, kind }: Props) {
   const { t } = useTranslation('venue');
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -57,7 +58,10 @@ export function VenueCoverPhoto({ photoUrl }: Props) {
           />
         </>
       ) : (
-        <HeroBackdrop />
+        <>
+          <VenueCoverArt kind={kind} />
+          <HeroFade />
+        </>
       )}
     </View>
   );

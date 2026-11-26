@@ -2,7 +2,6 @@ import { useId } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-import { Glow } from '@/components/ui/Glow';
 import { colors } from '@/theme/tokens';
 
 type Stops = readonly { offset: number; color: string; opacity: number }[];
@@ -39,26 +38,3 @@ const FADE: Stops = [
 export function HeroFade() {
   return <Vertical testID="venue-hero-fade" stops={FADE} />;
 }
-
-const VIOLET: Stops = [
-  { offset: 0, color: colors.primary, opacity: 0.5 },
-  { offset: 0.7, color: colors.primary, opacity: 0.12 },
-  { offset: 1, color: colors.background, opacity: 1 },
-];
-
-// No photo: a violet gradient with a halo, so the page keeps its weight.
-export function HeroBackdrop() {
-  return (
-    <>
-      <Vertical testID="venue-hero-backdrop" stops={VIOLET} />
-      <View pointerEvents="none" style={styles.halo}>
-        <Glow testID="venue-hero-glow" radius={120} style={styles.glow} />
-      </View>
-    </>
-  );
-}
-
-const styles = StyleSheet.create({
-  halo: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
-  glow: { position: 'relative' },
-});

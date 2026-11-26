@@ -1,8 +1,8 @@
-import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { EstimateTag } from '@/components/app/EstimateTag';
+import { VenueCoverImage } from '@/components/app/VenueCoverImage';
 import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { useBandLabel } from '@/components/ui/useBandLabel';
@@ -14,7 +14,7 @@ import type { HotSpotVenue } from '../domain/mapLayers';
 
 type Props = {
   venue: HotSpotVenue;
-  // Third-party cover photo (switchable server-side); null shows the violet block.
+  // Third-party cover photo (switchable server-side); null shows the kind illustration.
   photoUrl: string | null;
   // The ~500 m cell, only when the location toggle is on (principle 3).
   you: LatLng | null;
@@ -22,21 +22,6 @@ type Props = {
 };
 
 const PHOTO_SIZE = 72;
-
-function Photo({ url, caption }: { url: string | null; caption: string }) {
-  if (!url) return <View testID="featured-venue-placeholder" style={styles.placeholder} />;
-  return (
-    <Image
-      testID="featured-venue-photo"
-      accessible
-      accessibilityLabel={caption}
-      source={{ uri: url }}
-      cachePolicy="memory-disk"
-      contentFit="cover"
-      style={styles.photo}
-    />
-  );
-}
 
 // "20–30 persone" or "pochi": the band as the server gave it, never an exact count (principle 2).
 function useBandText() {
@@ -57,7 +42,12 @@ export function FeaturedVenueCard({ venue, photoUrl, you, onPress }: Props) {
       onPress={() => onPress(venue.venueId)}
       style={styles.card}
     >
-      <Photo url={photoUrl} caption={t('venue:cover.caption')} />
+      <VenueCoverImage
+        url={photoUrl}
+        kind={venue.kind}
+        photoTestID="featured-venue-photo"
+        style={styles.photo}
+      />
       <View style={styles.texts}>
         <Text variant="body15Strong" numberOfLines={1}>
           {venue.name}
@@ -97,12 +87,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   photo: { width: PHOTO_SIZE, height: PHOTO_SIZE, borderRadius: radius.button },
-  placeholder: {
-    width: PHOTO_SIZE,
-    height: PHOTO_SIZE,
-    borderRadius: radius.button,
-    backgroundColor: colors.goingSoft,
-  },
   texts: { flex: 1, minWidth: 0, gap: 4 },
   meta: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.sm },
   tag: {

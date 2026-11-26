@@ -60,10 +60,10 @@ describe('FeaturedVenueCard', () => {
     expect(screen.getByLabelText('venue:cover.caption')).toBeOnTheScreen();
   });
 
-  it('senza foto mostra il riquadro viola al suo posto', async () => {
+  it('senza foto mostra il segnaposto del tipo di locale', async () => {
     await render(<FeaturedVenueCard venue={venue()} {...props} />);
     expect(screen.queryByTestId('featured-venue-photo')).toBeNull();
-    expect(screen.getByTestId('featured-venue-placeholder')).toBeOnTheScreen();
+    expect(screen.getByTestId('venue-cover-art-club')).toBeOnTheScreen();
   });
 
   it('è un bottone che apre il dettaglio del locale', async () => {

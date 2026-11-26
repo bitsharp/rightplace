@@ -55,6 +55,7 @@ export function VenueScreen({ venueId }: { venueId: string }) {
             state={screen.declaration}
             night={{
               photoUrl: venue.photoUrl,
+              kind: venue.kind,
               address: screen.shownAddress,
               status: screen.status,
               links: screen.links,
@@ -103,7 +104,7 @@ function VenueBody({ screen }: BodyProps) {
   if (!venue) return null;
   return (
     <>
-      <VenueCoverPhoto photoUrl={venue.photoUrl} />
+      <VenueCoverPhoto photoUrl={venue.photoUrl} kind={venue.kind} />
       <View style={[styles.pad, styles.body]}>
         <VenueHeader detail={venue} status={screen.status} distanceKm={screen.distanceKm} />
         <VenueWebsite url={venue.websiteUri} />

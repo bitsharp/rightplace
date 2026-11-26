@@ -114,6 +114,7 @@ function YourNightTop({ venue, night, onOpenVenue }: NightTopProps) {
       <NightVenueCard
         name={venue.name}
         photoUrl={night.photoUrl}
+        kind={night.kind}
         address={night.address}
         status={night.status}
         onPress={onOpenVenue}

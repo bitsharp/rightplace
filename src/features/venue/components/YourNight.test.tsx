@@ -19,6 +19,7 @@ describe('NightVenueCard', () => {
   const base = {
     name: 'Arena Club',
     photoUrl: null,
+    kind: 'bar' as const,
     address: 'Via Test 1, Milano',
     status: { kind: 'open', closesAt: '04:00' } as const,
     onPress: jest.fn(),
@@ -31,12 +32,12 @@ describe('NightVenueCard', () => {
     expect(screen.getByText('Via Test 1, Milano')).toBeOnTheScreen();
   });
 
-  it('con la foto di copertina la mostra con la didascalia a voce; senza, il blocco viola', async () => {
+  it('con la foto di copertina la mostra con la didascalia a voce; senza, il segnaposto del tipo', async () => {
     const url = 'https://lh3.googleusercontent.com/p/abc';
     await render(<NightVenueCard {...base} photoUrl={url} />);
     expect(screen.getByLabelText('venue:cover.caption')).toBeOnTheScreen();
     await screen.rerender(<NightVenueCard {...base} />);
-    expect(screen.getByTestId('night-venue-placeholder')).toBeOnTheScreen();
+    expect(screen.getByTestId('venue-cover-art-bar')).toBeOnTheScreen();
   });
 
   it('la freccia riporta al locale', async () => {

@@ -1,8 +1,8 @@
-import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { EstimateTag } from '@/components/app/EstimateTag';
+import { VenueCoverImage } from '@/components/app/VenueCoverImage';
 import { Text } from '@/components/ui/Text';
 import { useBandLabel } from '@/components/ui/useBandLabel';
 import { colors, radius, spacing } from '@/theme/tokens';
@@ -19,21 +19,6 @@ type Props = {
   timeZone?: string;
 };
 
-function Cover({ url, caption }: { url: string | null; caption: string }) {
-  if (!url) return <View testID="busiest-placeholder" style={[styles.cover, styles.placeholder]} />;
-  return (
-    <Image
-      testID="busiest-photo"
-      accessible
-      accessibilityLabel={caption}
-      source={{ uri: url }}
-      cachePolicy="memory-disk"
-      contentFit="cover"
-      style={styles.cover}
-    />
-  );
-}
-
 function MiniCard({ venue, onOpen }: { venue: BusiestVenue; onOpen: (venueId: string) => void }) {
   const { t } = useTranslation('map');
   const bandLabel = useBandLabel();
@@ -45,7 +30,12 @@ function MiniCard({ venue, onOpen }: { venue: BusiestVenue; onOpen: (venueId: st
       onPress={() => onOpen(venue.venueId)}
       style={styles.card}
     >
-      <Cover url={venue.photoUrl} caption={t('venue:cover.caption')} />
+      <VenueCoverImage
+        url={venue.photoUrl}
+        kind={venue.kind}
+        photoTestID="busiest-photo"
+        style={styles.cover}
+      />
       <View style={styles.texts}>
         <Text variant="body15Strong" numberOfLines={1}>
           {venue.name}
@@ -99,6 +89,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   cover: { width: '100%', height: 72 },
-  placeholder: { backgroundColor: colors.goingSoft },
   texts: { gap: 3, padding: spacing.sm + 2 },
 });
