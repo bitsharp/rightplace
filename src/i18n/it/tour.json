@@ -1,0 +1,55 @@
+{
+  "welcome": {
+    "skip": "Salta",
+    "close": "Chiudi",
+    "next": "Avanti",
+    "start": "Inizia",
+    "pageA11y": "Pagina {{page}} di {{total}}",
+    "reviewToast": "I suggerimenti ricompariranno nelle schermate",
+    "pages": {
+      "where": {
+        "title": "Dove va la gente stasera",
+        "body": "Sulla mappa vedi i punti caldi della città. Il grigio è dove di solito c'è movimento, il viola è dove la gente ha detto che andrà stasera."
+      },
+      "declare": {
+        "title": "Dichiara la tua serata",
+        "body": "Dalla mappa a «Ci vado» o «Forse» in 3 tap. I tuoi amici ti vedono sulla mappa amici."
+      },
+      "privacy": {
+        "title": "La tua privacy",
+        "points": {
+          "bands": "Mai numeri esatti: solo fasce, e «pochi» sotto le 3 persone.",
+          "photo": "La tua foto la vedono solo i tuoi amici.",
+          "chat": "La chat della serata si cancella dopo 2 giorni.",
+          "posts": "Post e messaggi si cancellano dopo 7 giorni.",
+          "location": "La posizione si usa solo se la attivi tu."
+        }
+      }
+    }
+  },
+  "tip": {
+    "gotIt": "Ho capito"
+  },
+  "tips": {
+    "map": {
+      "viewToggle": "Amici: dove vanno i tuoi amici. Mappe: i punti caldi della città.",
+      "hotSpot": "Tocca un locale per vedere chi ci va e dichiarare la serata."
+    },
+    "topbar": {
+      "plus": "Domani pubblica le foto della serata: si cancellano dopo 7 giorni."
+    },
+    "venue": {
+      "declare": "Dichiara la tua serata: Ci vado o Forse.",
+      "bands": "Contiamo a fasce, mai le singole persone."
+    },
+    "chat": {
+      "night": "La chat della serata si cancella dopo 2 giorni."
+    },
+    "friends": {
+      "search": "Cerca gli amici per @handle e manda una richiesta."
+    },
+    "profile": {
+      "message": "Scrivigli in privato: i messaggi durano 7 giorni."
+    }
+  }
+}

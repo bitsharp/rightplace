@@ -1,0 +1,55 @@
+{
+  "welcome": {
+    "skip": "Skip",
+    "close": "Close",
+    "next": "Next",
+    "start": "Start",
+    "pageA11y": "Page {{page}} of {{total}}",
+    "reviewToast": "Tips will show up again on each screen",
+    "pages": {
+      "where": {
+        "title": "Where everyone is going tonight",
+        "body": "The map shows the city's hot spots. Grey is where it is usually busy, purple is where people said they are going tonight."
+      },
+      "declare": {
+        "title": "Declare your night",
+        "body": "From the map to \"I'm going\" or \"Maybe\" in 3 taps. Your friends see you on the friends map."
+      },
+      "privacy": {
+        "title": "Your privacy",
+        "points": {
+          "bands": "Never exact numbers: only ranges, and \"few\" under 3 people.",
+          "photo": "Only your friends can see your photo.",
+          "chat": "The night chat is deleted after 2 days.",
+          "posts": "Posts and messages are deleted after 7 days.",
+          "location": "Your location is used only if you turn it on."
+        }
+      }
+    }
+  },
+  "tip": {
+    "gotIt": "Got it"
+  },
+  "tips": {
+    "map": {
+      "viewToggle": "Friends: where your friends are going. Maps: the city's hot spots.",
+      "hotSpot": "Tap a venue to see who is going and declare your night."
+    },
+    "topbar": {
+      "plus": "Tomorrow, post photos from the night: they are deleted after 7 days."
+    },
+    "venue": {
+      "declare": "Declare your night: I'm going or Maybe.",
+      "bands": "We count in ranges, never individual people."
+    },
+    "chat": {
+      "night": "The night chat is deleted after 2 days."
+    },
+    "friends": {
+      "search": "Find friends by @handle and send a request."
+    },
+    "profile": {
+      "message": "Message them privately: messages last 7 days."
+    }
+  }
+}

@@ -42,7 +42,8 @@ export const useTourStore = create<TourState>()(
       version: STORE_VERSION,
       migrate: migrateTourState,
       // Also validates data saved by this same version (corrupted storage): invalid -> defaults.
-      merge: (persisted, current) => ({ ...current, ...migrateTourState(persisted) }),
+      merge: (persisted, current) =>
+        persisted === undefined ? current : { ...current, ...migrateTourState(persisted) },
       storage: createJSONStorage(() => AsyncStorage),
       partialize: ({ welcomeSeen, seenSteps }) => ({ welcomeSeen, seenSteps }),
     },

@@ -15,6 +15,7 @@ import enNotifications from './en/notifications.json';
 import enPost from './en/post.json';
 import enProfile from './en/profile.json';
 import enSpots from './en/spots.json';
+import enTour from './en/tour.json';
 import enUi from './en/ui.json';
 import enVenue from './en/venue.json';
 import enVenues from './en/venues.json';
@@ -35,6 +36,7 @@ import itNotifications from './it/notifications.json';
 import itPost from './it/post.json';
 import itProfile from './it/profile.json';
 import itSpots from './it/spots.json';
+import itTour from './it/tour.json';
 import itUi from './it/ui.json';
 import itVenue from './it/venue.json';
 import itVenues from './it/venues.json';
@@ -57,6 +59,7 @@ export const resources = {
     venues: itVenues,
     creator: itCreator,
     event: itEvent,
+    tour: itTour,
     ui: itUi,
     dev: itDev,
     errors: itErrors,
@@ -79,6 +82,7 @@ export const resources = {
     venues: enVenues,
     creator: enCreator,
     event: enEvent,
+    tour: enTour,
     ui: enUi,
     dev: enDev,
     errors: enErrors,

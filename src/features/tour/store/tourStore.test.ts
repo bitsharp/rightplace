@@ -39,6 +39,13 @@ describe('tourStore', () => {
     expect(saved.state.seenSteps).toEqual(['chat.night']);
   });
 
+  it('un telefono senza stato salvato non cancella quello in memoria', async () => {
+    useTourStore.getState().markWelcomeSeen();
+    await AsyncStorage.removeItem(TOUR_STORE_KEY);
+    await useTourStore.persist.rehydrate();
+    expect(useTourStore.getState().welcomeSeen).toBe(true);
+  });
+
   describe('migrateTourState', () => {
     it('tiene i valori validi', () => {
       expect(migrateTourState({ welcomeSeen: true, seenSteps: ['map.hotSpot'] })).toEqual({

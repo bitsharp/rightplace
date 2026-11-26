@@ -102,6 +102,7 @@ function AppScreens({
 const MODAL = { presentation: 'modal' } as const;
 const READY_SCREENS = [
   { name: '(tabs)' },
+  { name: 'welcome' },
   { name: 'search' },
   { name: 'activity' },
   { name: 'friends/requests' },
