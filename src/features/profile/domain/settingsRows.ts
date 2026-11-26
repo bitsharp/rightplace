@@ -9,6 +9,7 @@ export type SettingsRowKey =
   | 'personal'
   | 'password'
   | 'creator'
+  | 'howItWorks'
   | 'feedback'
   | 'supportFeedback'
   | 'about'
@@ -28,8 +29,9 @@ export type SettingsTarget =
   | '/profile/about'
   | '/legal/terms'
   | '/legal/privacy'
-  // not a route: the feedback sheet over the current screen
-  | 'feedback';
+  // not routes: the feedback sheet over the current screen, and the guide shown again
+  | 'feedback'
+  | 'tour';
 
 export type SettingsRow = {
   key: SettingsRowKey;
@@ -72,6 +74,7 @@ function accountRows({ creatorEnabled, isCreator }: Context): SettingsRow[] {
 
 function helpRows({ isSupport }: Context): SettingsRow[] {
   return [
+    row('howItWorks', 'info', 'tour'),
     row('feedback', 'feedback', 'feedback'),
     ...(isSupport
       ? [row('supportFeedback', 'chat', '/support/feedback', 'app.supportFeedback')]

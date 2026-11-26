@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { useFeedback } from '@/features/feedback/store/feedbackStore';
+import { useTourStore } from '@/features/tour/store/tourStore';
 import { renderApp } from '@/test/appFlows';
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 import { seedFriendsBackend } from '@/test/friendsBackend';
@@ -121,6 +122,27 @@ describe('profilo: impostazioni a elenco', () => {
       await renderApp('ready', '/profile/edit', { is_support: true });
       await fireEvent.press(await screen.findByText('profile:app.supportFeedback'));
       await waitFor(() => expect(screen).toHavePathname('/support/feedback'));
+    });
+
+    it('Come funziona apre il benvenuto in modalità rivedi e azzera i suggerimenti', async () => {
+      useTourStore.setState({ seenSteps: ['map.hotSpot', 'chat.night'] });
+      await renderApp('ready', '/profile/edit');
+      await screen.findByText('profile:settings.groups.help');
+      await fireEvent.press(row('settings.rows.howItWorks'));
+      await waitFor(() => expect(screen).toHavePathname('/welcome'));
+      expect(await screen.findByText('tour:welcome.pages.where.title')).toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: 'tour:welcome.skip' })).toBeNull();
+      expect(useTourStore.getState().seenSteps).toEqual([]);
+    });
+
+    it('chiudere la guida rivista torna al profilo e conta come vista', async () => {
+      await renderApp('ready', '/profile/edit');
+      await screen.findByText('profile:settings.groups.help');
+      await fireEvent.press(row('settings.rows.howItWorks'));
+      await fireEvent.press(await screen.findByRole('button', { name: 'tour:welcome.close' }));
+      await waitFor(() => expect(screen).toHavePathname('/profile/edit'));
+      expect(useTourStore.getState().welcomeSeen).toBe(true);
+      expect(useTourStore.getState().seenSteps).toEqual([]);
     });
 
     it('Invia un feedback apre il foglio del feedback esistente', async () => {

@@ -7,6 +7,7 @@ import { MonoLabel } from '@/components/ui/MonoLabel';
 import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { useOpenFeedback } from '@/features/feedback/useOpenFeedback';
 import { useCurrentCityName } from '@/features/map/useCurrentCityName';
+import { useTourStore } from '@/features/tour/store/tourStore';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import type { MyProfile } from '../api';
@@ -21,8 +22,16 @@ export function SettingsList({ profile }: { profile: MyProfile }) {
   const openFeedback = useOpenFeedback();
   const { showCreatorProfileLink } = useCreatorUi();
   const values = useSettingsValues(profile);
-  const open = (row: Row) =>
-    row.target === 'feedback' ? void openFeedback() : router.push(row.target);
+  const resetTour = useTourStore((state) => state.resetTour);
+  const open = (row: Row) => {
+    if (row.target === 'feedback') return void openFeedback();
+    // The tips come back too: they show again the next time each screen opens.
+    if (row.target === 'tour') {
+      resetTour();
+      return router.push({ pathname: '/welcome', params: { mode: 'review' } });
+    }
+    router.push(row.target);
+  };
   const groups = settingsGroups({
     creatorEnabled: showCreatorProfileLink,
     isCreator: profile.isCreator,

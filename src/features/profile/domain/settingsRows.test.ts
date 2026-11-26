@@ -36,21 +36,35 @@ describe('settingsGroups', () => {
   });
 
   it('i feedback ricevuti compaiono solo per il supporto', () => {
-    expect(keys(settingsGroups(base), 'help')).toEqual(['feedback']);
+    expect(keys(settingsGroups(base), 'help')).toEqual(['howItWorks', 'feedback']);
     expect(keys(settingsGroups({ ...base, isSupport: true }), 'help')).toEqual([
+      'howItWorks',
       'feedback',
       'supportFeedback',
     ]);
+  });
+
+  it('“Come funziona” è la prima voce di aiuto, prima del feedback', () => {
+    const help = settingsGroups(base).find((group) => group.key === 'help');
+    expect(help?.rows[0]).toMatchObject({
+      key: 'howItWorks',
+      titleKey: 'settings.rows.howItWorks',
+      target: 'tour',
+    });
   });
 
   it('in informazioni ci sono chi siamo, termini e privacy policy', () => {
     expect(keys(settingsGroups(base), 'info')).toEqual(['about', 'terms', 'privacyPolicy']);
   });
 
-  it('ogni voce ha una destinazione: una rotta o il feedback', () => {
+  it('ogni voce ha una destinazione: una rotta, il feedback o la guida', () => {
     const rows = settingsGroups({ creatorEnabled: true, isCreator: true, isSupport: true }).flatMap(
       (group) => group.rows,
     );
-    expect(rows.every((row) => row.target === 'feedback' || row.target.startsWith('/'))).toBe(true);
+    expect(
+      rows.every(
+        (row) => row.target === 'feedback' || row.target === 'tour' || row.target.startsWith('/'),
+      ),
+    ).toBe(true);
   });
 });
