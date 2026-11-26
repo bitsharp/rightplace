@@ -24,15 +24,16 @@ Età media, % genere, amici e ogni statistica su persone si calcolano **solo sul
 
 `private.generate_night_bots(p_night date default <night corrente, Europe/Rome>)`: per ogni città attiva, i locali attivi non spot con
 **livello tipico di picco** della sera (massimo di `typical_level` sulle ore 21–02, stessa precedenza history > manual > apify) ≥ 2,
-ordinati per livello e poi con un ordine pseudo-casuale che cambia ogni giorno, **massimo 40 per città**. Numeri deterministici per
+**massimo 14 per città**: entrano tutti i locali di livello 3 (con un ordine pseudo-casuale che cambia ogni giorno, fino al massimo), poi i
+livello 2 scelti in modo deterministico per giorno (circa **1 su 3**, via hash di locale + data) fino al massimo. Numeri deterministici per
 (locale, data) con `hashtext`: stabili durante la serata, diversi ogni giorno. Idempotente (cancella e reinserisce la stessa night).
 
 | Livello di picco | `going` | `maybe` |
 | ---------------- | ------- | ------- |
-| 3 (pieno)        | 18–45   | 8–24    |
-| 2 (animato)      | 6–18    | 3–10    |
+| 3 (pieno)        | 10–35   | 4–14    |
+| 2 (animato)      | 3–12    | 1–6     |
 
-Costanti in testa alla funzione. Job pg_cron `generate-night-bots` ogni giorno alle **05:10 UTC** (06:10 a Roma in inverno, 07:10 in
+Costanti in testa alla funzione (tarate da `20261126000200_night_bots_tuning.sql`, test in `41_night_bots_tuning.sql`; la migration rigenera subito le stime di stasera). Job pg_cron `generate-night-bots` ogni giorno alle **05:10 UTC** (06:10 a Roma in inverno, 07:10 in
 estate: la night nuova inizia alle 06:00 locali, quindi tra le 06:00 e il job la night non ha ancora stime); lo stesso job cancella
 le righe più vecchie di 2 giorni.
 

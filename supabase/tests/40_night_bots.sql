@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(68);
+select plan(65);
 
 -- Fixtures ----------------------------------------------------------------------------------------------------
 insert into public.cities (slug, name, country, center, default_zoom, timezone, taxi_phone, is_active)
@@ -48,15 +48,10 @@ select is((select schedule from cron.job where jobname = 'generate-night-bots'),
 select private.generate_night_bots(:'night'::date) as written \gset
 select is(:'written'::int, (select count(*)::int from private.night_bot_presence where night_date = :'night'::date),
   'restituisce le righe scritte');
-select is((select count(*)::int from private.night_bot_presence where venue_id in (:'v3', :'v2')), 2, 'livello di picco 2 e 3 hanno presenze');
+select is((select count(*)::int from private.night_bot_presence where venue_id = :'v3'), 1, 'il livello di picco 3 ha presenze');
 select is((select count(*)::int from private.night_bot_presence where venue_id in (:'v1', :'vspot')), 0,
   'livello 1 e spot non ne hanno mai');
-select ok((select going between 18 and 45 and maybe between 8 and 24 from private.night_bot_presence where venue_id = :'v3'),
-  'livello 3: going 18-45, maybe 8-24');
-select ok((select going between 6 and 18 and maybe between 3 and 10 from private.night_bot_presence where venue_id = :'v2'),
-  'livello 2: going 6-18, maybe 3-10');
-select is((select count(*)::int from private.night_bot_presence p join big_city b using (venue_id)), 40,
-  'al massimo 40 locali per città');
+-- Ranges, cap and selection of level 2 are tested in 41_night_bots_tuning.sql.
 
 create temp table first_run as select venue_id, going, maybe from private.night_bot_presence where night_date = :'night'::date;
 select private.generate_night_bots(:'night'::date);
