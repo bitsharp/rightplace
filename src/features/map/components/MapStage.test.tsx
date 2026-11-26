@@ -35,13 +35,13 @@ describe('MapStage compatta', () => {
     expect(screen.queryByText('map:fullscreen.open')).toBeNull();
   });
 
-  it('il bottone apre lo schermo intero con hint e legenda, e "chiudi" lo richiude', async () => {
+  it('il bottone apre lo schermo intero con la legenda, e "chiudi" lo richiude', async () => {
     await render(<MapStage {...baseProps} />);
     await fireEvent.press(screen.getByRole('button', { name: 'map:fullscreen.open' }));
-    expect(screen.getByText('map:hint.general')).toBeOnTheScreen();
+    expect(screen.queryByText(/map:hint/)).toBeNull();
     expect(screen.getByText('map:legend.tonight')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'map:fullscreen.close' }));
-    expect(screen.queryByText('map:hint.general')).toBeNull();
+    expect(screen.queryByText('map:legend.tonight')).toBeNull();
   });
 
   it('con lo schermo intero aperto c’è una sola MapView; alla chiusura torna la compatta dove eri', async () => {

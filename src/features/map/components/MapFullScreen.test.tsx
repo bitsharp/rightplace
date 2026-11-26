@@ -81,19 +81,20 @@ describe('MapFullScreen', () => {
   it('chiuso non disegna niente', async () => {
     await render(<MapFullScreen {...baseProps} visible={false} />);
     expect(screen.queryByTestId('map-view')).toBeNull();
-    expect(screen.queryByText('map:hint.general')).toBeNull();
+    expect(screen.queryByText('map:legend.tonight')).toBeNull();
   });
 
-  it('aperto mostra hint, legenda, selettore di vista, bottone chiudi e la mappa', async () => {
+  it('aperto mostra la legenda, selettore di vista, bottone chiudi e la mappa', async () => {
     await render(<MapFullScreen {...baseProps} />);
     expect(screen.getByTestId('map-view')).toBeOnTheScreen();
-    expect(screen.getByText('map:hint.general')).toBeOnTheScreen();
+    expect(screen.queryByText(/map:hint/)).toBeNull();
+    expect(screen.queryByTestId('map-hint-overlay')).toBeNull();
     expect(screen.getByText('map:legend.tonight')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'map:view.friends' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'map:fullscreen.close' })).toBeOnTheScreen();
   });
 
-  it('a schermo intero la mappa ha il velo, che non copre hint e legenda (restano sopra, senza tocchi)', async () => {
+  it('a schermo intero la mappa ha il velo, che non copre la legenda (resta sopra, senza tocchi)', async () => {
     await render(<MapFullScreen {...baseProps} />);
     expect(screen.getByTestId('map-vignette', { includeHiddenElements: true })).toBeOnTheScreen();
     const map = screen.getByTestId('map-fullscreen-map');
@@ -101,7 +102,6 @@ describe('MapFullScreen', () => {
       map.children.findIndex(
         (child) => (child as { props?: { testID?: string } }).props?.testID === id,
       );
-    expect(order('map-hint-overlay')).toBeGreaterThan(-1);
     expect(order('map-legend-overlay')).toBeGreaterThan(-1);
   });
 
@@ -245,9 +245,9 @@ describe('MapFullScreen', () => {
     });
   });
 
-  it('hint e legenda hanno sia left sia right: non escono dallo schermo', async () => {
+  it('la legenda ha sia left sia right: non esce dallo schermo', async () => {
     await render(<MapFullScreen {...baseProps} />);
-    for (const id of ['map-hint-overlay', 'map-legend-overlay']) {
+    for (const id of ['map-legend-overlay']) {
       const style = StyleSheet.flatten(screen.getByTestId(id).props.style);
       expect(typeof style.left).toBe('number');
       expect(typeof style.right).toBe('number');
@@ -282,16 +282,6 @@ describe('MapFullScreen', () => {
       await render(<MapFullScreen {...baseProps} />);
       const legend = StyleSheet.flatten(screen.getByTestId('map-legend-overlay').props.style);
       expect(legend.bottom).toBe(spacing.md + 34);
-    });
-
-    it('l’hint sta nell’area della mappa, sotto la barra, e va a capo su due righe', async () => {
-      provideInsets({ top: 47, bottom: 34 });
-      await render(<MapFullScreen {...baseProps} />);
-      const hint = StyleSheet.flatten(screen.getByTestId('map-hint-overlay').props.style);
-      expect(hint.top).toBe(spacing.md);
-      expect(screen.getByText('map:hint.general').props.numberOfLines).toBe(2);
-      const mapArea = screen.getByTestId('map-fullscreen-map');
-      expect(mapArea.children).toContain(screen.getByTestId('map-hint-overlay'));
     });
   });
 });

@@ -17,17 +17,11 @@
     "general": "Maps",
     "friends": "Friends"
   },
-  "hint": {
-    "general": "Tap a hot spot · pinch to zoom",
-    "friends": "Where your friends are going · pinch to zoom"
-  },
   "legend": {
     "tonight": "Tonight",
     "usually": "Usually",
     "event": "Event",
-    "spot": "Spot",
-    "estimate": "Some turnouts are estimates based on venues' habits, not real people",
-    "brightness": "The brighter the colour, the more people"
+    "spot": "Spot"
   },
   "pill": {
     "text": "Tonight: {{venue}} · {{intent}}",

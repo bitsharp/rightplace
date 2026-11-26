@@ -175,18 +175,17 @@ describe('mappa', () => {
     it('nella vista compatta non ci sono scritte sovrapposte alla mappa', async () => {
       await renderApp('ready', '/map');
       await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') });
-      expect(screen.queryByText('map:hint.general')).toBeNull();
       expect(screen.queryByText('map:legend.tonight')).toBeNull();
     });
 
-    it('a schermo intero compaiono hint e legenda con i due strati, e si richiude', async () => {
+    it('a schermo intero compare la legenda con i due strati, e si richiude', async () => {
       await renderApp('ready', '/map');
       await fireEvent.press(await screen.findByRole('button', { name: 'map:fullscreen.open' }));
-      expect(screen.getByText('map:hint.general')).toBeOnTheScreen();
+      expect(screen.queryByText(/map:hint/)).toBeNull();
       expect(screen.getByText('map:legend.tonight')).toBeOnTheScreen();
       expect(screen.getByText('map:legend.usually')).toBeOnTheScreen();
       await fireEvent.press(screen.getByRole('button', { name: 'map:fullscreen.close' }));
-      expect(screen.queryByText('map:hint.general')).toBeNull();
+      expect(screen.queryByText('map:legend.tonight')).toBeNull();
     });
 
     it('a schermo intero il selettore cambia la vista (stesso store) e un tap sul marker apre il locale', async () => {
@@ -196,12 +195,11 @@ describe('mappa', () => {
       await fireEvent.press(await screen.findByRole('button', { name: 'map:fullscreen.open' }));
       await fireEvent.press(screen.getAllByRole('button', { name: 'map:view.friends' })[1]!);
       expect(useMapStore.getState().view).toBe('friends');
-      expect(await screen.findByText('map:hint.friends')).toBeOnTheScreen();
+      expect(screen.queryByText('map:hint.friends')).toBeNull();
       await fireEvent.press(
         (await screen.findAllByTestId('marker-hot-terrace', { includeHiddenElements: true }))[0]!,
       );
       expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
-      expect(screen.queryByText('map:hint.friends')).toBeNull();
     });
   });
 

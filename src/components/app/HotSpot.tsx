@@ -120,7 +120,13 @@ export function HotSpot({
           />
         ) : null}
         {tier === 'low' ? null : (
-          <Text variant="label12" style={styles.label}>
+          <Text
+            variant="label12"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
+            style={styles.label}
+          >
             {caption ?? bandLabel(goingBand)}
           </Text>
         )}

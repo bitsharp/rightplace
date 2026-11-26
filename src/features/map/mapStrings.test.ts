@@ -3,8 +3,6 @@ import { resources } from '@/i18n/resources';
 const MAP_KEYS = [
   'view.general',
   'view.friends',
-  'hint.general',
-  'hint.friends',
   'legend.tonight',
   'legend.usually',
   'pill.text',

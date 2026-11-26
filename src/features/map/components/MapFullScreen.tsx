@@ -16,7 +16,6 @@ import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
 
 import { MapCanvas, type MapCity } from './MapCanvas';
-import { MapHint } from './MapHint';
 import { MapLegend } from './MapLegend';
 import { MapViewSwitch } from './MapViewSwitch';
 
@@ -84,9 +83,6 @@ function FullScreenContent(props: ContentProps) {
           onPickSpot={props.onPickSpot}
           avatarUrls={props.avatarUrls}
         />
-        <View testID="map-hint-overlay" pointerEvents="none" style={styles.hint}>
-          <MapHint view={props.view} />
-        </View>
         <View
           testID="map-legend-overlay"
           pointerEvents="none"
@@ -101,7 +97,7 @@ function FullScreenContent(props: ContentProps) {
 
 type Destination = { kind: 'venue' | 'event'; id: string } | { kind: 'spot'; point: LatLng };
 
-// The only place where hint and legend are drawn over the map.
+// The only place where the legend is drawn over the map.
 export function MapFullScreen({
   visible,
   onOpenVenue,
@@ -171,6 +167,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   map: { flex: 1, backgroundColor: colors.mapCanvas },
-  hint: { position: 'absolute', top: spacing.md, left: spacing.md, right: spacing.md },
   legend: { position: 'absolute', left: spacing.md, right: spacing.md },
 });

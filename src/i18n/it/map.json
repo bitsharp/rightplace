@@ -17,17 +17,11 @@
     "general": "Mappe",
     "friends": "Amici"
   },
-  "hint": {
-    "general": "Tocca un punto caldo · pizzica per zoom",
-    "friends": "Dove vanno i tuoi amici · pizzica per zoom"
-  },
   "legend": {
     "tonight": "Stasera",
     "usually": "Di solito",
     "event": "Serata",
-    "spot": "Spot",
-    "estimate": "Alcune affluenze sono stime basate sulle abitudini dei locali, non persone reali",
-    "brightness": "Più il colore è acceso, più persone"
+    "spot": "Spot"
   },
   "pill": {
     "text": "Stasera: {{venue}} · {{intent}}",

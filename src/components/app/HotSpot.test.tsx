@@ -206,3 +206,15 @@ describe('HotSpot', () => {
     expect(hot[0] ?? 2).toBeLessThanOrEqual(1);
   });
 });
+
+describe('HotSpot: fascia su una riga', () => {
+  it('il testo della fascia sta su una riga e si rimpicciolisce invece di andare a capo', async () => {
+    await render(
+      <HotSpot venueName="Navigli" goingBand="10–20" maybeBand="pochi" onPress={jest.fn()} />,
+    );
+    const label = screen.getByText('10–20', { includeHiddenElements: true });
+    expect(label.props.numberOfLines).toBe(1);
+    expect(label.props.adjustsFontSizeToFit).toBe(true);
+    expect(label.props.minimumFontScale).toBeGreaterThanOrEqual(0.6);
+  });
+});

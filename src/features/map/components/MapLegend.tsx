@@ -83,13 +83,7 @@ export function MapLegend() {
   return (
     <View testID="map-legend" style={styles.box}>
       <LegendBlock title={t('legend.tonight')} entries={withEvent} />
-      <Text variant="label11" color="textSecondary">
-        {t('legend.brightness')}
-      </Text>
       <LegendBlock title={t('legend.usually')} entries={usually} />
-      <Text variant="label11" color="textSecondary">
-        {t('legend.estimate')}
-      </Text>
     </View>
   );
 }

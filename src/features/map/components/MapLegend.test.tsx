@@ -30,10 +30,10 @@ describe('MapLegend', () => {
     expect(dot.borderRadius).not.toBe(999);
   });
 
-  it('spiega le stime nella legenda senza simboli e che il colore più acceso vuol dire più persone, fuori dai due blocchi dei pallini', async () => {
+  it('contiene solo titoli e voci con simbolo: niente righe di spiegazione', async () => {
     await render(<MapLegend />);
-    expect(screen.getByText('map:legend.estimate')).toBeOnTheScreen();
-    expect(screen.getByText('map:legend.brightness')).toBeOnTheScreen();
+    expect(screen.queryByText('map:legend.estimate')).toBeNull();
+    expect(screen.queryByText('map:legend.brightness')).toBeNull();
     expect(screen.getAllByTestId('legend-items')).toHaveLength(2);
   });
 
