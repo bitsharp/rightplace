@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { EstimateTag } from '@/components/app/EstimateTag';
 import { VenueCoverImage } from '@/components/app/VenueCoverImage';
 import { Text } from '@/components/ui/Text';
 import { useBandLabel } from '@/components/ui/useBandLabel';
@@ -47,7 +46,6 @@ function MiniCard({ venue, onOpen }: { venue: BusiestVenue; onOpen: (venueId: st
         <Text variant="label11" color="going" numberOfLines={1}>
           {t('cards.tonightBand', { band: bandLabel(venue.goingBand) })}
         </Text>
-        {venue.isEstimate ? <EstimateTag /> : null}
       </View>
     </Pressable>
   );

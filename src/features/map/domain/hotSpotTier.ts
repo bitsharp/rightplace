@@ -1,7 +1,7 @@
 import { bandRank, type Band } from '@/features/nights/domain/band';
 
 // How "hot" a hot spot looks: the busiest venues light up, the quiet ones stay discreet so the map is readable.
-// Real and estimated turnout are treated the same (principle 2: only bands, never counts).
+// Real and server-side turnout are treated the same (principle 2: only bands, never counts).
 export type HotSpotTier = 'low' | 'mid' | 'high';
 
 const FIRST_MID = bandRank('10–20');

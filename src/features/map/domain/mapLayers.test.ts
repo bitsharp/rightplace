@@ -22,7 +22,6 @@ const venue = (overrides: Partial<MapVenue> & { venueId: string }): MapVenue => 
   friendIds: null,
   friendsCount: null,
   isSpot: false,
-  isEstimate: false,
   ...overrides,
 });
 
@@ -161,7 +160,6 @@ describe('spot (strato "stasera", mai con numeri sotto k)', () => {
       venueId: id,
       kind: 'spot',
       isSpot: true,
-      isEstimate: false,
       goingBand: null,
       maybeBand: null,
       ...overrides,

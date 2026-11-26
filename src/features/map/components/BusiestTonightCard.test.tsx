@@ -12,7 +12,6 @@ const venue = (overrides: Partial<BusiestVenue> = {}): BusiestVenue => ({
   photoUrl: null,
   goingBand: '20–30',
   maybeBand: '3–10',
-  isEstimate: false,
   ...overrides,
 });
 
@@ -45,17 +44,17 @@ describe('BusiestTonightCard', () => {
     expect(screen.queryByText(/^\d+$/)).not.toBeOnTheScreen();
   });
 
-  it('STIMA compare solo sulle card con is_estimate', async () => {
+  it('nessuna etichetta di stima nemmeno sulle card con is_estimate', async () => {
     await render(
       <BusiestTonightCard
         venues={[
-          venue({ venueId: 'a', name: 'Con stima', isEstimate: true }),
+          Object.assign(venue({ venueId: 'a', name: 'Con stima' }), { isEstimate: true }),
           venue({ venueId: 'b', name: 'Senza stima' }),
         ]}
         {...props}
       />,
     );
-    expect(screen.getAllByText('ui:estimate.tag')).toHaveLength(1);
+    expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
   });
 
   it('mostra la foto di copertina se c’è, altrimenti il segnaposto del tipo', async () => {

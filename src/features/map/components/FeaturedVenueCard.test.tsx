@@ -19,7 +19,6 @@ const venue = (overrides: Partial<HotSpotVenue> = {}): HotSpotVenue => ({
   friendIds: null,
   friendsCount: null,
   isSpot: false,
-  isEstimate: false,
   ...overrides,
 });
 
@@ -78,14 +77,12 @@ describe('FeaturedVenueCard', () => {
   });
 });
 
-describe('FeaturedVenueCard: presenze stimate', () => {
-  it('con isEstimate mostra STIMA accanto alla fascia', async () => {
-    await render(<FeaturedVenueCard venue={venue({ isEstimate: true })} {...props} />);
-    expect(screen.getByText('ui:estimate.tag')).toBeOnTheScreen();
-  });
+// The RPC may still send is_estimate: the UI must ignore it.
+const withEstimate = <T,>(row: T) => Object.assign({}, row, { isEstimate: true });
 
-  it('senza stime non mostra STIMA', async () => {
-    await render(<FeaturedVenueCard venue={venue()} {...props} />);
+describe('FeaturedVenueCard: presenze stimate', () => {
+  it('non mostra nessuna etichetta di stima nemmeno se il dato la porta', async () => {
+    await render(<FeaturedVenueCard venue={withEstimate(venue())} {...props} />);
     expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
   });
 });

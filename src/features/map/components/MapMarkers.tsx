@@ -221,7 +221,6 @@ export function HotSpotMarkers({
         goingBand={venue.goingBand}
         maybeBand={venue.maybeBand}
         caption={friendsCaption(venue, view)}
-        isEstimate={venue.isEstimate}
         onPress={() => onOpenVenue(venue.venueId)}
       />
     </VenueMarker>

@@ -7,7 +7,6 @@ import type { Band } from '@/features/nights/domain/band';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import { BandPair } from './BandPair';
-import { EstimateTag } from './EstimateTag';
 
 type Props = {
   name: string;
@@ -16,19 +15,9 @@ type Props = {
   maybeBand: Band;
   onPress: () => void;
   sponsored?: boolean;
-  // The bands include estimated presence: add the STIMA label.
-  estimate?: boolean;
 };
 
-export function VenueRow({
-  name,
-  meta,
-  goingBand,
-  maybeBand,
-  onPress,
-  sponsored = false,
-  estimate = false,
-}: Props) {
+export function VenueRow({ name, meta, goingBand, maybeBand, onPress, sponsored = false }: Props) {
   const { t } = useTranslation('ui');
   return (
     <Pressable
@@ -46,7 +35,6 @@ export function VenueRow({
       </View>
       <View style={styles.bands}>
         <BandPair goingBand={goingBand} maybeBand={maybeBand} layout="column" />
-        {estimate ? <EstimateTag /> : null}
       </View>
     </Pressable>
   );

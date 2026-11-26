@@ -28,8 +28,7 @@
     "storyA11y": "Nuovo post di {{handle}}"
   },
   "hotSpot": {
-    "a11y": "{{venue}}: Ci vado {{going}}, Forse {{maybe}}. Apri il dettaglio",
-    "a11yEstimate": "{{venue}}: Ci vado {{going}}, Forse {{maybe}}. Include presenze stimate. Apri il dettaglio"
+    "a11y": "{{venue}}: Ci vado {{going}}, Forse {{maybe}}. Apri il dettaglio"
   },
   "labels": {
     "sponsored": "Sponsorizzata",
@@ -144,10 +143,6 @@
       "wow": "faccia stupita",
       "laugh": "faccia che ride"
     }
-  },
-  "estimate": {
-    "tag": "STIMA",
-    "a11y": "Stima: include presenze stimate"
   },
   "coverArt": {
     "label": "Immagine illustrativa: {{kind}}",

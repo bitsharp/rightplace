@@ -10,8 +10,6 @@ export type VenueBands = {
   goingBand: Band;
   maybeBand: Band;
   isSponsored: boolean;
-  // The bands include estimated presence (not people): shown as STIMA.
-  isEstimate: boolean;
 };
 
 export type VenueListItem = CityVenue & VenueBands;
@@ -22,7 +20,6 @@ const NO_BANDS: VenueBands = {
   goingBand: 'pochi',
   maybeBand: 'pochi',
   isSponsored: false,
-  isEstimate: false,
 };
 
 // Bands come from a separate (refetched) query: until they arrive, or for venues outside the top

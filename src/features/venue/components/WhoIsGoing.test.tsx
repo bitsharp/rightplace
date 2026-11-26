@@ -51,9 +51,9 @@ describe('WhoIsGoing', () => {
   });
 });
 
-describe('WhoIsGoing: presenze stimate', () => {
+describe('WhoIsGoing: fasce non spiegabili con meno di 3 persone', () => {
   it.each(['going', 'maybe', 'all'] as const)(
-    'statistiche nascoste ma fascia con stime (%s): chiede dichiarazioni reali, non dice "meno di 3 persone"',
+    'statistiche nascoste ma fascia piena (%s): messaggio neutro, senza "meno di 3 persone" né dichiarazioni reali',
     async (segment) => {
       await render(
         <WhoIsGoing
@@ -62,8 +62,9 @@ describe('WhoIsGoing: presenze stimate', () => {
           view={{ kind: 'hidden', segment, estimate: true }}
         />,
       );
-      expect(screen.getByText('venue:who.hiddenEstimate')).toBeOnTheScreen();
+      expect(screen.getByText('venue:who.unavailable')).toBeOnTheScreen();
       expect(screen.queryByText(`venue:who.hidden.${segment}`)).not.toBeOnTheScreen();
+      expect(screen.queryByText('venue:who.hiddenEstimate')).not.toBeOnTheScreen();
     },
   );
 });

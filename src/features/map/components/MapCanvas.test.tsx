@@ -18,7 +18,6 @@ const venue = (overrides: Partial<HotSpotVenue> & { venueId: string }): HotSpotV
   friendIds: null,
   friendsCount: null,
   isSpot: false,
-  isEstimate: false,
   ...overrides,
 });
 
@@ -526,7 +525,6 @@ describe('MapCanvas', () => {
       ...venue({ venueId }),
       kind: 'spot',
       isSpot: true,
-      isEstimate: false,
       isHotSpot: false,
       goingBand: null,
       maybeBand: null,

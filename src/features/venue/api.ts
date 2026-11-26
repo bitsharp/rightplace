@@ -109,7 +109,7 @@ export type VenueStats = {
   avgAge: number | null;
   femalePct: number | null;
   malePct: number | null;
-  // The bands include estimated presence; age and gender never do (real declarations only, k >= 3).
+  // Bands may include server-side presence; age and gender never do (real declarations only, k >= 3): used only to word the hidden stats.
   isEstimate: boolean;
   friends: VenueFriend[];
 };

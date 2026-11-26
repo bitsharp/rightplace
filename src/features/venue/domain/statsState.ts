@@ -9,7 +9,7 @@ type Stats = {
 
 export type StatsView =
   | { kind: 'visible'; avgAge: number; femalePct: number; malePct: number }
-  // estimate: the bands include estimated presence, so a plain 'fewer than 3' would mislead (only real people count).
+  // estimate: the shown band can be higher than the real declarations, so 'fewer than 3 people' would contradict it.
   | { kind: 'hidden'; segment: StatsSegment; estimate: boolean };
 
 // k-anonymity (principle 2) is decided by the server: a null means "fewer than 3", and the

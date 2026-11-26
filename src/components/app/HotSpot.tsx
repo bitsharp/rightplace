@@ -20,8 +20,6 @@ type Props = {
   maybeBand: Band;
   onPress: () => void;
   caption?: string;
-  // The bands include estimated presence: only the accessibility label says so (the STIMA tag is on the cards).
-  isEstimate?: boolean;
 };
 
 const INTENT_STYLE: Record<
@@ -67,14 +65,7 @@ const circle = (size: number) => ({ width: size, height: size, borderRadius: siz
 
 // "Stasera" layer (CLAUDE.md principle 11): coloured, sized by band, never by an exact count.
 // Size and colour follow the dominant intent; the label is always the "Ci vado" band.
-export function HotSpot({
-  venueName,
-  goingBand,
-  maybeBand,
-  onPress,
-  caption,
-  isEstimate = false,
-}: Props) {
+export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: Props) {
   const { t } = useTranslation('ui');
   const bandLabel = useBandLabel();
   const layout = hotSpotLayout(goingBand, maybeBand);
@@ -86,7 +77,7 @@ export function HotSpot({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t(isEstimate ? 'hotSpot.a11yEstimate' : 'hotSpot.a11y', {
+      accessibilityLabel={t('hotSpot.a11y', {
         venue: venueName,
         going: bandLabel(goingBand),
         maybe: bandLabel(maybeBand),

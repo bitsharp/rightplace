@@ -36,7 +36,7 @@ describe('statsView', () => {
   });
 });
 
-describe('statsView: presenze stimate', () => {
+describe('statsView: fasce con presenze stimate', () => {
   it('statistiche null + fascia con stime: il segmento è nascosto e lo segnala', () => {
     expect(
       statsView({ avgAge: null, femalePct: null, malePct: null, isEstimate: true }, 'going'),

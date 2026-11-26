@@ -111,12 +111,11 @@ describe('venues api', () => {
       goingBand: '20–30',
       maybeBand: 'pochi',
       isSponsored: true,
-      isEstimate: false,
     });
     expect(bands.get('v2')?.maybeBand).toBe('10–20');
   });
 
-  it('is_estimate true arriva come isEstimate', async () => {
+  it('is_estimate passa lo schema ma il campo non arriva al client', async () => {
     fakeSupabase.rpc.mockResolvedValueOnce({
       data: [
         {
@@ -129,7 +128,7 @@ describe('venues api', () => {
       ],
       error: null,
     });
-    expect((await fetchVenueBands('milano')).get('v1')?.isEstimate).toBe(true);
+    expect((await fetchVenueBands('milano')).get('v1')).not.toHaveProperty('isEstimate');
   });
 
   it('rifiuta una fascia che non esiste (niente numeri esatti)', async () => {

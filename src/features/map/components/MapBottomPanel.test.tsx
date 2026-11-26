@@ -13,7 +13,6 @@ const busiest: BusiestVenue[] = [
     photoUrl: null,
     goingBand: '20–30',
     maybeBand: '3–10',
-    isEstimate: true,
   },
 ];
 

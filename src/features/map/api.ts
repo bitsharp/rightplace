@@ -26,8 +26,6 @@ const mapRowSchema = z.object({
   friends_going_ids: z.array(z.string()).nullish(),
   friends_count: z.number().int().nullable(),
   is_spot: z.boolean().default(false),
-  // Optional with a default: a database not yet migrated omits it and the map shows no STIMA.
-  is_estimate: z.boolean().default(false),
 });
 
 // Bands and typical levels only: k-anonymity is enforced inside get_city_map (principles 2, 11).
@@ -52,7 +50,6 @@ export async function fetchCityMap(citySlug: string, view: MapViewMode): Promise
       friendIds: row.friends_going_ids ?? null,
       friendsCount: row.friends_count,
       isSpot: row.is_spot,
-      isEstimate: row.is_estimate,
     }));
 }
 
@@ -109,7 +106,6 @@ const recommendedRowSchema = z.object({
   name: z.string(),
   kind: z.enum(VENUE_KINDS),
   reason: z.enum(['history', 'hot']),
-  is_estimate: z.boolean().default(false),
 });
 
 export type RecommendedVenue = {
@@ -117,7 +113,6 @@ export type RecommendedVenue = {
   name: string;
   kind: VenueKind;
   reason: 'history' | 'hot';
-  isEstimate: boolean;
 };
 
 export async function fetchRecommendedVenue(citySlug: string): Promise<RecommendedVenue | null> {
@@ -131,7 +126,6 @@ export async function fetchRecommendedVenue(citySlug: string): Promise<Recommend
     name: row.name,
     kind: row.kind,
     reason: row.reason,
-    isEstimate: row.is_estimate,
   };
 }
 
@@ -143,7 +137,6 @@ const busiestRowSchema = z.object({
   cover_photo_url: z.string().nullish(),
   going_band: bandSchema,
   maybe_band: bandSchema,
-  is_estimate: z.boolean().default(false),
 });
 
 export type BusiestVenue = {
@@ -155,11 +148,10 @@ export type BusiestVenue = {
   photoUrl: string | null;
   goingBand: Band;
   maybeBand: Band;
-  isEstimate: boolean;
 };
 
 // "I più animati": the "di solito" level of now and the next hours, plus tonight's bands. Catalog data and
-// bands only, no person (principles 2, 11); the bands may include estimated presence (isEstimate).
+// bands only, no person (principles 2, 11).
 export async function fetchBusiestTonight(citySlug: string): Promise<BusiestVenue[]> {
   const data = await callRpc<unknown>('get_busiest_tonight', { p_city_slug: citySlug });
   return z
@@ -173,6 +165,5 @@ export async function fetchBusiestTonight(citySlug: string): Promise<BusiestVenu
       photoUrl: row.cover_photo_url ?? null,
       goingBand: row.going_band,
       maybeBand: row.maybe_band,
-      isEstimate: row.is_estimate,
     }));
 }

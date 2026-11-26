@@ -32,14 +32,11 @@ const respondWith = (data: unknown, error: unknown = null) =>
   fakeSupabase.rpc.mockResolvedValueOnce({ data, error });
 
 describe('fetchCityMap: presenze stimate', () => {
-  it('is_estimate true arriva come isEstimate', async () => {
+  it('una riga con is_estimate passa lo schema ma il campo non arriva al client', async () => {
     respondWith([mapRow({ is_estimate: true })]);
-    expect((await fetchCityMap('milano', 'general'))[0]?.isEstimate).toBe(true);
-  });
-
-  it('senza is_estimate (database non aggiornato) vale false: nessun errore, nessuna STIMA', async () => {
-    respondWith([mapRow()]);
-    expect((await fetchCityMap('milano', 'general'))[0]?.isEstimate).toBe(false);
+    const [first] = await fetchCityMap('milano', 'general');
+    expect(first).toBeDefined();
+    expect(first).not.toHaveProperty('isEstimate');
   });
 });
 
@@ -80,7 +77,6 @@ describe('fetchCityMap', () => {
         friendIds: ['u-volpe'],
         friendsCount: 1,
         isSpot: false,
-        isEstimate: false,
       },
     ]);
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_city_map', {
@@ -180,7 +176,6 @@ describe('fetchRecommendedVenue', () => {
       name: 'Sunset Rooftop',
       kind: 'rooftop',
       reason: 'history',
-      isEstimate: false,
     });
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_recommended_venue', {
       p_city_slug: 'milano',
@@ -199,9 +194,9 @@ describe('fetchRecommendedVenue', () => {
 });
 
 describe('fetchRecommendedVenue: presenze stimate', () => {
-  it('is_estimate true arriva come isEstimate', async () => {
+  it('is_estimate passa lo schema ma il campo non arriva al client', async () => {
     respondWith([{ venue_id: 'v2', name: 'X', kind: 'bar', reason: 'hot', is_estimate: true }]);
-    await expect(fetchRecommendedVenue('milano')).resolves.toMatchObject({ isEstimate: true });
+    await expect(fetchRecommendedVenue('milano')).resolves.not.toHaveProperty('isEstimate');
   });
 });
 
@@ -229,7 +224,6 @@ describe('fetchBusiestTonight', () => {
         photoUrl: 'https://lh3.googleusercontent.com/p/a',
         goingBand: '20–30',
         maybeBand: '3–10',
-        isEstimate: true,
       },
     ]);
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_busiest_tonight', {
@@ -237,11 +231,12 @@ describe('fetchBusiestTonight', () => {
     });
   });
 
-  it('is_estimate assente vale false e una foto assente è null', async () => {
+  it('is_estimate assente passa lo schema e una foto assente è null', async () => {
     const { is_estimate: _missing, ...row } = busyRow();
     respondWith([row]);
     const [first] = await fetchBusiestTonight('milano');
-    expect(first).toMatchObject({ isEstimate: false, photoUrl: null });
+    expect(first).toMatchObject({ photoUrl: null });
+    expect(first).not.toHaveProperty('isEstimate');
   });
 
   it('rifiuta una fascia che non esiste (niente numeri esatti)', async () => {

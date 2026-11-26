@@ -20,13 +20,13 @@ function glowColor(): unknown {
 }
 
 describe('HotSpot: presenze stimate', () => {
-  it('non disegna nessun segno ≈, ma lo dice nell’etichetta accessibile', async () => {
+  it('non disegna nessun segno ≈ e l’etichetta accessibile è quella normale', async () => {
     await render(
       <HotSpot
         venueName="Navigli"
         goingBand="20–30"
         maybeBand="pochi"
-        isEstimate
+        {...{ isEstimate: true }}
         onPress={jest.fn()}
       />,
     );
@@ -35,7 +35,7 @@ describe('HotSpot: presenze stimate', () => {
     ).not.toBeOnTheScreen();
     expect(screen.queryByText('≈', { includeHiddenElements: true })).not.toBeOnTheScreen();
     expect(
-      screen.getByRole('button', { name: /ui:hotSpot.a11yEstimate/, includeHiddenElements: true }),
+      screen.getByRole('button', { name: /^ui:hotSpot\.a11y\(/, includeHiddenElements: true }),
     ).toBeOnTheScreen();
   });
 });

@@ -3,12 +3,16 @@
 Decisione di Luca (26 nov 2026, rischio accettato): per non far sembrare vuota l'app al lancio, i locali più frequentati secondo lo
 strato "di solito" ricevono **presenze stimate** generate dal server, diverse ogni giorno. Principi 2 e 11 di `CLAUDE.md`.
 
+**Nessuna etichetta in UI (decisione di Luca, 26 nov 2026, rischio accettato):** l'app non scrive STIMA/ESTIMATE da nessuna parte
+(né testo né etichette accessibili); le fasce sembrano tutte persone. L'unica spiegazione è il paragrafo dei termini d'uso
+(`legal.json`, it/en). Le RPC espongono ancora `is_estimate`, che il client usa solo per scegliere il messaggio neutro di "Chi ci va".
+
 ## Cosa sono e cosa non sono
 
 - **Solo affluenza.** Nessun profilo finto, nessun @handle, nessuna riga in `declarations`. Tabella `private.night_bot_presence`
   (`venue_id`, `night_date`, `going`, `maybe`): nessun privilegio a `anon`/`authenticated`, RLS attiva.
 - Vengono **sommate** alle dichiarazioni vere nelle **fasce** di: `get_city_map` (vista generale), `get_venue_stats`, `search_venues`,
-  `get_recommended_venue` (card "più caldo stasera"), `get_busiest_tonight`. Ogni RPC espone `is_estimate` e il client mostra **STIMA**.
+  `get_recommended_venue` (card "più caldo stasera"), `get_busiest_tonight`. Ogni RPC espone `is_estimate`; il client non lo mostra.
 - **Non** entrano in: mappa amici, chat, feed, notifiche, adesioni degli eventi dei creator (`get_event_detail`, `get_event_attendance`,
   `get_city_events`, `get_my_creator_events`), storia tipica (`refresh_typical_from_history` legge solo `declarations`), spot.
 - Mai il numero esatto, né dei veri né dei bot: solo fasce.
@@ -16,8 +20,8 @@ strato "di solito" ricevono **presenze stimate** generate dal server, diverse og
 ## Garanzia k (principio 2)
 
 Età media, % genere, amici e ogni statistica su persone si calcolano **solo sulle dichiarazioni vere** e solo se le persone vere sono
-**≥ 3**: i bot non sbloccano mai un dato personale. Se la fascia include stime ma le persone vere sono < 3, il client scrive
-"Statistiche disponibili con almeno 3 dichiarazioni reali" (non "meno di 3 persone"). Test con valori noti in
+**≥ 3**: i bot non sbloccano mai un dato personale. Se la fascia include stime ma le persone vere sono < 3, il client scrive il messaggio neutro
+"Statistiche non ancora disponibili" (non "meno di 3 persone", che contraddirebbe la fascia mostrata, e senza parlare di stime). Test con valori noti in
 `supabase/tests/40_night_bots.sql` (3 veri di 20/30/40 anni + bot: età media 30, donne 67 %, uomini 33 %).
 
 ## Generazione
@@ -51,7 +55,9 @@ Rigenerare a mano (per esempio subito dopo il primo `db push`): `select private.
 ## Rischi accettati
 
 - Percezione di affluenza non reale e delusione degli utenti.
-- Rischio di "pratica commerciale scorretta" (mitigato dall'etichetta STIMA, dalla legenda della mappa e dai termini d'uso).
+- Rischio di "pratica commerciale ingannevole" (UE): senza etichetta in UI l'unica mitigazione è il paragrafo dei termini d'uso.
+- Rischio di rifiuto o rimozione in revisione degli store (App Store / Play) se le stime vengono giudicate fuorvianti.
+- Perdita di fiducia degli utenti se scoprono che parte dell'affluenza non è fatta di persone.
 - Revisione degli store (App Store / Play).
 - Fiducia dei creator, che vedono locali con affluenza stimata.
 

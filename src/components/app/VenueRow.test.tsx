@@ -71,10 +71,9 @@ describe('VenueRow: presenze stimate', () => {
     onPress: jest.fn(),
   } as const;
 
-  it('con estimate mostra STIMA, senza no', async () => {
-    const { rerender } = await render(<VenueRow {...rowProps} estimate />);
-    expect(screen.getByText('ui:estimate.tag')).toBeOnTheScreen();
-    await rerender(<VenueRow {...rowProps} />);
+  it('non mostra nessuna etichetta di stima nemmeno se il dato la porta', async () => {
+    await render(<VenueRow {...rowProps} {...{ estimate: true }} />);
     expect(screen.queryByText('ui:estimate.tag')).not.toBeOnTheScreen();
+    expect(screen.queryByText(/estimate|stima/i)).not.toBeOnTheScreen();
   });
 });

@@ -38,7 +38,6 @@ const hot: HotSpotVenue = {
   friendIds: null,
   friendsCount: null,
   isSpot: false,
-  isEstimate: false,
 };
 
 const baseProps = {
