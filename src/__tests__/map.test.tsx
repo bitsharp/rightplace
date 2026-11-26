@@ -107,8 +107,6 @@ function seedBackend(overrides: Record<string, unknown> = {}) {
 
 const hotSpot = (venue: string, going: string) =>
   `ui:hotSpot.a11y({"venue":"${venue}","going":"${going}","maybe":"ui:band.few"})`;
-const typicalDot = (venue: string, level: string) =>
-  `ui:typical.a11y({"venue":"${venue}","level":"ui:typical.${level}"})`;
 
 describe('mappa', () => {
   afterEach(() => jest.restoreAllMocks());
@@ -129,15 +127,15 @@ describe('mappa', () => {
   });
 
   describe('vista generale', () => {
-    it('mostra il punto caldo con la sua fascia e il typical dot grigio, senza sommarli', async () => {
+    it('mostra il punto caldo con la sua fascia e nessun punto grigio "di solito"', async () => {
       await renderApp('ready', '/map');
       expect(
         await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') }),
       ).toBeOnTheScreen();
       expect(
-        screen.getByRole('button', { name: typicalDot('Bar Quieto', 'lively') }),
-      ).toBeOnTheScreen();
-      expect(screen.queryByRole('button', { name: typicalDot('Arena Club', 'packed') })).toBeNull();
+        screen.queryByTestId('marker-typical-quiet', { includeHiddenElements: true }),
+      ).toBeNull();
+      expect(screen.queryByRole('button', { name: /ui:typical\.a11y/ })).toBeNull();
     });
 
     it('con 3 righe is_hot_spot dal server disegna 3 punti caldi (dati demo di Milano)', async () => {
@@ -178,12 +176,12 @@ describe('mappa', () => {
       expect(screen.queryByText('map:legend.tonight')).toBeNull();
     });
 
-    it('a schermo intero compare la legenda con i due strati, e si richiude', async () => {
+    it('a schermo intero compare la legenda (solo "stasera"), e si richiude', async () => {
       await renderApp('ready', '/map');
       await fireEvent.press(await screen.findByRole('button', { name: 'map:fullscreen.open' }));
       expect(screen.queryByText(/map:hint/)).toBeNull();
       expect(screen.getByText('map:legend.tonight')).toBeOnTheScreen();
-      expect(screen.getByText('map:legend.usually')).toBeOnTheScreen();
+      expect(screen.queryByText('map:legend.usually')).toBeNull();
       await fireEvent.press(screen.getByRole('button', { name: 'map:fullscreen.close' }));
       expect(screen.queryByText('map:legend.tonight')).toBeNull();
     });
@@ -231,12 +229,12 @@ describe('mappa', () => {
       expect(screen.getByText('ui:friendsGoing({"count":1}) · @gatto.blu')).toBeOnTheScreen();
     });
 
-    it('i typical dot restano, ma non c’è più il punto caldo generale degli altri locali', async () => {
+    it('nessun typical dot nemmeno nella vista amici', async () => {
       await openFriendsView();
       await screen.findByRole('button', { name: hotSpot('Terrazza', 'ui:band.few') });
       expect(
-        screen.getByRole('button', { name: typicalDot('Bar Quieto', 'lively') }),
-      ).toBeOnTheScreen();
+        screen.queryByTestId('marker-typical-quiet', { includeHiddenElements: true }),
+      ).toBeNull();
     });
 
     it('un tap su un locale della lista apre il dettaglio', async () => {

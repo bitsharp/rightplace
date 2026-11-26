@@ -81,8 +81,7 @@
     "quiet": "quiet",
     "lively": "lively",
     "packed": "packed",
-    "usually": "usually {{level}}",
-    "a11y": "{{venue}}: usually {{level}}. Open details"
+    "usually": "usually {{level}}"
   },
   "photoSource": {
     "title": "Add a photo",

@@ -37,36 +37,34 @@ describe('buildGeneralLayers', () => {
     expect(ids(layers.hotSpots)).toEqual(['a', 'b', 'c']);
   });
 
-  it('un locale con fascia visibile è un punto caldo e non anche un typical dot', () => {
+  it('un locale con fascia visibile è un punto caldo, qualunque sia il suo livello "di solito"', () => {
     const layers = buildGeneralLayers([
       venue({ venueId: 'hot', isHotSpot: true, goingBand: '3–10', typicalLevel: 2 }),
     ]);
-    expect(ids(layers.hotSpots)).toEqual(['hot']);
-    expect(layers.typicalDots).toEqual([]);
+    expect(layers).toEqual({ hotSpots: [expect.objectContaining({ venueId: 'hot' })], spots: [] });
   });
 
-  it('2 dichiarati con typical 2 → typical dot (la fascia resta "pochi")', () => {
-    const layers = buildGeneralLayers([venue({ venueId: 'few', typicalLevel: 2 })]);
-    expect(layers.hotSpots).toEqual([]);
-    expect(ids(layers.typicalDots)).toEqual(['few']);
-  });
-
-  it('2 dichiarati con typical 0 → il locale non compare in nessuno strato', () => {
-    const layers = buildGeneralLayers([venue({ venueId: 'empty', typicalLevel: 0 })]);
-    expect(layers).toEqual({ hotSpots: [], spots: [], typicalDots: [] });
+  it('righe con solo il livello "di solito" (nessun punto caldo) non disegnano nessun marker', () => {
+    const layers = buildGeneralLayers([
+      venue({ venueId: 'few', typicalLevel: 2 }),
+      venue({ venueId: 'quiet', typicalLevel: 1 }),
+      venue({ venueId: 'full', typicalLevel: 3 }),
+      venue({ venueId: 'empty', typicalLevel: 0 }),
+    ]);
+    expect(layers).toEqual({ hotSpots: [], spots: [] });
   });
 
   it('un locale sponsorizzato senza affluenza né typical non disegna nulla sulla mappa', () => {
     const layers = buildGeneralLayers([venue({ venueId: 'ad', isSponsored: true })]);
-    expect(layers).toEqual({ hotSpots: [], spots: [], typicalDots: [] });
+    expect(layers).toEqual({ hotSpots: [], spots: [] });
   });
 
   it('mantiene l’ordine ricevuto dal server', () => {
     const layers = buildGeneralLayers([
-      venue({ venueId: 'b', typicalLevel: 1 }),
-      venue({ venueId: 'a', typicalLevel: 3 }),
+      venue({ venueId: 'b', isHotSpot: true, goingBand: '3–10' }),
+      venue({ venueId: 'a', isHotSpot: true, goingBand: '3–10' }),
     ]);
-    expect(ids(layers.typicalDots)).toEqual(['b', 'a']);
+    expect(ids(layers.hotSpots)).toEqual(['b', 'a']);
   });
 });
 
@@ -117,22 +115,21 @@ describe('buildFriendsLayers', () => {
   ];
 
   it('mostra punti caldi solo per i locali con amici', () => {
-    const layers = buildFriendsLayers(friendRows, []);
+    const layers = buildFriendsLayers(friendRows);
     expect(ids(layers.hotSpots)).toEqual(['arena', 'bar', 'club']);
   });
 
-  it('i typical dot restano nella vista amici, ma non sopra un punto caldo amici', () => {
-    const general = [
-      venue({ venueId: 'arena', typicalLevel: 3 }),
-      venue({ venueId: 'quiet', typicalLevel: 1 }),
-      venue({ venueId: 'closed', typicalLevel: 0 }),
-    ];
-    const layers = buildFriendsLayers(friendRows, general);
-    expect(ids(layers.typicalDots)).toEqual(['quiet']);
+  it('nella vista amici i marker sono solo i locali con amici, mai i livelli "di solito"', () => {
+    const layers = buildFriendsLayers([
+      ...friendRows,
+      venue({ venueId: 'quiet', typicalLevel: 1, friendsCount: 0 }),
+    ]);
+    expect(ids(layers.hotSpots)).toEqual(['arena', 'bar', 'club']);
+    expect(layers.spots).toEqual([]);
   });
 
   it('elenca i locali degli amici per numero di amici decrescente, poi per nome', () => {
-    const layers = buildFriendsLayers(friendRows, []);
+    const layers = buildFriendsLayers(friendRows);
     expect(layers.friendVenues).toEqual([
       {
         venueId: 'arena',
@@ -147,10 +144,10 @@ describe('buildFriendsLayers', () => {
   });
 
   it('senza amici nei locali la lista è vuota', () => {
-    const layers = buildFriendsLayers([], [venue({ venueId: 'q', typicalLevel: 2 })]);
+    const layers = buildFriendsLayers([]);
     expect(layers.friendVenues).toEqual([]);
     expect(layers.hotSpots).toEqual([]);
-    expect(ids(layers.typicalDots)).toEqual(['q']);
+    expect(layers.spots).toEqual([]);
   });
 });
 
@@ -165,11 +162,10 @@ describe('spot (strato "stasera", mai con numeri sotto k)', () => {
       ...overrides,
     });
 
-  it('uno spot sotto k va nello strato spot, non tra punti caldi né typical dot', () => {
+  it('uno spot sotto k va nello strato spot, non tra i punti caldi', () => {
     const layers = buildGeneralLayers([spot('s1'), venue({ venueId: 'v', typicalLevel: 2 })]);
     expect(ids(layers.spots)).toEqual(['s1']);
     expect(layers.hotSpots).toEqual([]);
-    expect(ids(layers.typicalDots)).toEqual(['v']);
   });
 
   it('a 3 dichiarazioni lo spot è un punto caldo normale, non più uno spot', () => {
@@ -186,14 +182,11 @@ describe('spot (strato "stasera", mai con numeri sotto k)', () => {
   });
 
   it('la mappa amici disegna come spot quelli sotto k con amici, con il loro conteggio', () => {
-    const layers = buildFriendsLayers(
-      [
-        spot('s1', { friendsCount: 1, friendsGoing: ['volpe.viola'] }),
-        spot('s2', { friendsCount: 0, friendsGoing: [] }),
-        venue({ venueId: 'v', friendsCount: 2, friendsGoing: ['a.b', 'c.d'] }),
-      ],
-      [],
-    );
+    const layers = buildFriendsLayers([
+      spot('s1', { friendsCount: 1, friendsGoing: ['volpe.viola'] }),
+      spot('s2', { friendsCount: 0, friendsGoing: [] }),
+      venue({ venueId: 'v', friendsCount: 2, friendsGoing: ['a.b', 'c.d'] }),
+    ]);
     expect(ids(layers.spots)).toEqual(['s1']);
     expect(ids(layers.hotSpots)).toEqual(['v']);
     expect(layers.friendVenues.map((row) => row.venueId)).toEqual(['v', 's1']);

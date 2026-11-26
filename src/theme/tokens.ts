@@ -37,7 +37,6 @@ export const colors = {
   female: palette.female,
   male: palette.male,
   mapCanvas: palette.mapCanvas,
-  typicalDot: palette.surface3,
   error: palette.error,
   overlay: withAlpha(palette.background, 0.9),
   backdrop: withAlpha(palette.background, 0.7),

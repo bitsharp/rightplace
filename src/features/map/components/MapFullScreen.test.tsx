@@ -43,7 +43,7 @@ const hot: HotSpotVenue = {
 const baseProps = {
   visible: true,
   city: { slug: 'milano', name: 'Milano', lat: 45.4642, lng: 9.19, defaultZoom: 13 },
-  layers: { hotSpots: [hot], typicalDots: [], spots: [] },
+  layers: { hotSpots: [hot], spots: [] },
   view: 'general' as const,
   you: null,
   initialRegion: undefined,

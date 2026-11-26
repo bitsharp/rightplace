@@ -6,13 +6,13 @@ import { colors } from '@/theme/tokens';
 import { MapLegend } from './MapLegend';
 
 describe('MapLegend', () => {
-  it('ha due righe separate: STASERA (SI, FORSE, Tu) e DI SOLITO', async () => {
+  it('ha un solo blocco, STASERA (SI, FORSE, Tu), senza lo strato grigio "di solito"', async () => {
     await render(<MapLegend />);
     expect(screen.getByText('map:legend.tonight')).toBeOnTheScreen();
     expect(screen.getByText('ui:intent.going')).toBeOnTheScreen();
     expect(screen.getByText('ui:intent.maybe')).toBeOnTheScreen();
     expect(screen.getByText('ui:you')).toBeOnTheScreen();
-    expect(screen.getByText('map:legend.usually')).toBeOnTheScreen();
+    expect(screen.queryByText('map:legend.usually')).toBeNull();
   });
 
   it('nello strato "stasera" c’è anche la voce Serata, col pallino tratteggiato', async () => {
@@ -34,20 +34,15 @@ describe('MapLegend', () => {
     await render(<MapLegend />);
     expect(screen.queryByText('map:legend.estimate')).toBeNull();
     expect(screen.queryByText('map:legend.brightness')).toBeNull();
-    expect(screen.getAllByTestId('legend-items')).toHaveLength(2);
+    expect(screen.getAllByTestId('legend-items')).toHaveLength(1);
   });
 
-  it('descrive lo strato grigio a parole: tranquillo · animato · pieno', async () => {
+  it('non descrive né disegna lo strato grigio: niente tranquillo · animato · pieno, niente pallini grigi', async () => {
     await render(<MapLegend />);
-    expect(screen.getByText('ui:typical.quiet')).toBeOnTheScreen();
-    expect(screen.getByText('ui:typical.lively')).toBeOnTheScreen();
-    expect(screen.getByText('ui:typical.packed')).toBeOnTheScreen();
-  });
-
-  it('disegna tre pallini grigi crescenti per "di solito"', async () => {
-    await render(<MapLegend />);
-    const dots = screen.getAllByTestId('legend-typical-dot');
-    expect(dots).toHaveLength(3);
+    expect(screen.queryByText('ui:typical.quiet')).toBeNull();
+    expect(screen.queryByText('ui:typical.lively')).toBeNull();
+    expect(screen.queryByText('ui:typical.packed')).toBeNull();
+    expect(screen.queryAllByTestId('legend-typical-dot')).toHaveLength(0);
   });
 
   it('non attribuisce lo strato grigio a Google', async () => {
@@ -60,12 +55,12 @@ describe('MapLegend', () => {
     for (const row of screen.getAllByTestId('legend-items')) {
       expect(StyleSheet.flatten(row.props.style).flexWrap).toBe('wrap');
     }
-    expect(screen.getAllByTestId('legend-items')).toHaveLength(2);
+    expect(screen.getAllByTestId('legend-items')).toHaveLength(1);
   });
 
   it('ogni blocco ha l’etichetta su una riga propria, senza larghezza fissa', async () => {
     await render(<MapLegend />);
-    for (const key of ['map:legend.tonight', 'map:legend.usually']) {
+    for (const key of ['map:legend.tonight']) {
       const label = screen.getByText(key);
       expect(label.props.numberOfLines).toBe(1);
       expect(StyleSheet.flatten(label.props.style).width).toBeUndefined();
@@ -85,7 +80,7 @@ describe('MapLegend', () => {
 
   it('ogni elemento è pallino e testo sulla stessa riga, su una riga sola', async () => {
     await render(<MapLegend />);
-    for (const key of ['ui:intent.going', 'ui:you', 'ui:typical.packed']) {
+    for (const key of ['ui:intent.going', 'ui:you']) {
       const text = screen.getByText(key);
       expect(text.props.numberOfLines).toBe(1);
       expect(StyleSheet.flatten(text.parent?.props.style).flexDirection).toBe('row');

@@ -3,13 +3,6 @@ export const TYPICAL_LEVELS = [0, 1, 2, 3] as const;
 export type TypicalLevel = (typeof TYPICAL_LEVELS)[number];
 export type VisibleTypicalLevel = 1 | 2 | 3;
 
-// Always smaller than the smallest hot spot (44) so the grey layer never reads as "stasera".
-const DIAMETERS: Record<VisibleTypicalLevel, number> = { 1: 14, 2: 20, 3: 28 };
-
-export function typicalDotDiameter(level: VisibleTypicalLevel): number {
-  return DIAMETERS[level];
-}
-
 export type TypicalLabelKey = 'quiet' | 'lively' | 'packed';
 
 const LABEL_KEYS: Record<VisibleTypicalLevel, TypicalLabelKey> = {

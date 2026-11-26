@@ -9,7 +9,7 @@
     "pages": {
       "where": {
         "title": "Where everyone is going tonight",
-        "body": "The map shows the city's hot spots. Grey is where it is usually busy, purple is where people said they are going tonight."
+        "body": "The map shows the city's hot spots: the purple circles are the venues with the most going on tonight, and the bigger they are the more people."
       },
       "declare": {
         "title": "Declare your night",

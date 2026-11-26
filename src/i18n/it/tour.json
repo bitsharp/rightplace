@@ -9,7 +9,7 @@
     "pages": {
       "where": {
         "title": "Dove va la gente stasera",
-        "body": "Sulla mappa vedi i punti caldi della città. Il grigio è dove di solito c'è movimento, il viola è dove la gente ha detto che andrà stasera."
+        "body": "Sulla mappa vedi i punti caldi della città: i cerchi viola sono i locali dove stasera c'è più movimento, più sono grandi più c'è gente."
       },
       "declare": {
         "title": "Dichiara la tua serata",

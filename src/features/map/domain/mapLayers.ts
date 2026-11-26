@@ -34,10 +34,10 @@ export type FriendVenue = {
   count: number;
 };
 
-export type MapLayers = { hotSpots: HotSpotVenue[]; spots: MapVenue[]; typicalDots: MapVenue[] };
+// The grey "di solito" layer is not drawn (Luca, 26/11/2026): the map shows only hot spots (real + estimated), spots,
+// events and "Tu". The typical level stays on the row for the texts of the cards.
+export type MapLayers = { hotSpots: HotSpotVenue[]; spots: MapVenue[] };
 export type FriendsMapLayers = MapLayers & { friendVenues: FriendVenue[] };
-
-const hasTypical = (row: MapVenue) => row.typicalLevel >= 1;
 
 const hasBands = (row: MapVenue): row is HotSpotVenue =>
   row.goingBand !== null && row.maybeBand !== null;
@@ -47,12 +47,11 @@ const isHotSpotRow = (row: MapVenue): row is HotSpotVenue => row.isHotSpot && ha
 // A spot below k is a "stasera" marker without numbers; from k on it is a normal hot spot.
 const isBareSpot = (row: MapVenue) => row.isSpot && !isHotSpotRow(row);
 
-// "Stasera" covers "di solito": a venue is a hot spot, a bare spot or a grey dot, never two (principle 11).
+// A row is a hot spot or a bare spot or nothing: rows with only a "di solito" level draw no marker.
 export function buildGeneralLayers(rows: readonly MapVenue[]): MapLayers {
   return {
     hotSpots: rows.filter(isHotSpotRow),
     spots: rows.filter(isBareSpot),
-    typicalDots: rows.filter((row) => !row.isHotSpot && !row.isSpot && hasTypical(row)),
   };
 }
 
@@ -68,18 +67,13 @@ function toFriendVenue(row: MapVenue): FriendVenue {
   };
 }
 
-export function buildFriendsLayers(
-  friendRows: readonly MapVenue[],
-  generalRows: readonly MapVenue[],
-): FriendsMapLayers {
+export function buildFriendsLayers(friendRows: readonly MapVenue[]): FriendsMapLayers {
   const withFriends = friendRows.filter((row) => friendsOf(row) > 0);
   const hotSpots = withFriends.filter(hasBands);
   const spots = withFriends.filter((row) => !hasBands(row));
-  const shown = new Set(withFriends.map((row) => row.venueId));
   return {
     hotSpots,
     spots,
-    typicalDots: generalRows.filter((row) => hasTypical(row) && !shown.has(row.venueId)),
     friendVenues: withFriends
       .map(toFriendVenue)
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'it')),

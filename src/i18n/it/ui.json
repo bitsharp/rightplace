@@ -81,8 +81,7 @@
     "quiet": "tranquillo",
     "lively": "animato",
     "packed": "pieno",
-    "usually": "di solito {{level}}",
-    "a11y": "{{venue}}: di solito {{level}}. Apri il dettaglio"
+    "usually": "di solito {{level}}"
   },
   "photoSource": {
     "title": "Aggiungi una foto",

@@ -4,7 +4,6 @@ const MAP_KEYS = [
   'view.general',
   'view.friends',
   'legend.tonight',
-  'legend.usually',
   'pill.text',
   'pill.a11y',
   'cards.history',
@@ -14,13 +13,7 @@ const MAP_KEYS = [
   'loadError',
   'mapA11y',
 ];
-const UI_KEYS = [
-  'typical.quiet',
-  'typical.lively',
-  'typical.packed',
-  'typical.usually',
-  'typical.a11y',
-];
+const UI_KEYS = ['typical.quiet', 'typical.lively', 'typical.packed', 'typical.usually'];
 
 function read(language: 'it' | 'en', namespace: 'map' | 'ui', key: string): unknown {
   return key

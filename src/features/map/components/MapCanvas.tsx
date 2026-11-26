@@ -18,14 +18,7 @@ import type { MapViewMode } from '../store/mapStore';
 import { HighlightMarker } from './HighlightMarker';
 import { MapVignette } from './MapVignette';
 import { OwnMarker, type OwnIdentity } from './OwnMarker';
-import {
-  EventMarkers,
-  HotSpotMarkers,
-  MapMarker,
-  SpotMarkers,
-  TypicalMarkers,
-  Z_INDEX,
-} from './MapMarkers';
+import { EventMarkers, HotSpotMarkers, MapMarker, SpotMarkers, Z_INDEX } from './MapMarkers';
 
 const NO_URLS: Record<string, string> = {};
 
@@ -115,7 +108,6 @@ export function MapCanvas({
       toolbarEnabled={false}
       {...mapAppearance}
     >
-      <TypicalMarkers dots={layers.typicalDots} onOpenVenue={onOpenVenue} />
       <SpotMarkers spots={layers.spots} view={view} urls={avatarUrls} onOpenVenue={onOpenVenue} />
       <EventMarkers events={events} onOpenEvent={onOpenEvent} />
       <HotSpotMarkers

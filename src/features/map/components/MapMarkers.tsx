@@ -6,18 +6,15 @@ import { EventSpot } from '@/components/app/EventSpot';
 import { DEFAULT_MAX_FACES, FriendFaces } from '@/components/app/FriendFaces';
 import { HotSpot } from '@/components/app/HotSpot';
 import { SpotMarker } from '@/components/app/SpotMarker';
-import { TypicalDot } from '@/components/app/TypicalDot';
 import type { LatLng } from '@/features/profile/domain/coarsen';
 
 import type { EventSpotPlacement } from '../domain/eventSpots';
 import { friendFacesOf, type HotSpotVenue, type MapVenue } from '../domain/mapLayers';
 import { hotSpotTier, type HotSpotTier } from '../domain/hotSpotTier';
-import { isVisibleTypical } from '../domain/typical';
 import type { MapViewMode } from '../store/mapStore';
 
-// Grey "di solito" dots under the coloured "stasera" hot spots, "Tu" above everything.
+// Coloured "stasera" hot spots, "Tu" above everything.
 export const Z_INDEX = {
-  typical: 1,
   spot: 2,
   event: 3,
   hotSpot: 4,
@@ -170,33 +167,6 @@ const styles = StyleSheet.create({
 
 function friendsCaption(venue: MapVenue, view: MapViewMode): string | undefined {
   return view === 'friends' ? String(venue.friendsCount ?? 0) : undefined;
-}
-
-export function TypicalMarkers({
-  dots,
-  onOpenVenue,
-}: {
-  dots: MapVenue[];
-  onOpenVenue: (venueId: string) => void;
-}) {
-  return dots.map((venue) =>
-    isVisibleTypical(venue.typicalLevel) ? (
-      <MapMarker
-        key={venue.venueId}
-        contentKey={`${venue.venueId}:${venue.typicalLevel}`}
-        testID={`marker-typical-${venue.venueId}`}
-        coordinate={venue}
-        zIndex={Z_INDEX.typical}
-        onPress={() => onOpenVenue(venue.venueId)}
-      >
-        <TypicalDot
-          venueName={venue.name}
-          level={venue.typicalLevel}
-          onPress={() => onOpenVenue(venue.venueId)}
-        />
-      </MapMarker>
-    ) : null,
-  );
 }
 
 export function HotSpotMarkers({

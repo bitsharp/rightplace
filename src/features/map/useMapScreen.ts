@@ -102,7 +102,7 @@ function useMapLayers(citySlug: string, view: MapViewMode) {
   const layers = useMemo(
     () =>
       view === 'friends'
-        ? buildFriendsLayers(friends.data ?? NO_ROWS, generalRows)
+        ? buildFriendsLayers(friends.data ?? NO_ROWS)
         : { ...buildGeneralLayers(generalRows), friendVenues: NO_FRIEND_VENUES },
     [view, friends.data, generalRows],
   );

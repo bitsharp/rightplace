@@ -8,14 +8,11 @@ export type WelcomeArtKind = 'where' | 'declare' | 'privacy';
 const WIDTH = 240;
 const HEIGHT = 140;
 
-// Map with grey "usually" dots and violet "tonight" hot spots.
+// Map with violet "tonight" hot spots.
 function WhereArt() {
   return (
     <>
       <Rect x={0} y={0} width={WIDTH} height={HEIGHT} rx={20} fill={colors.mapCanvas} />
-      <Circle cx={50} cy={90} r={8} fill={colors.typicalDot} />
-      <Circle cx={95} cy={40} r={6} fill={colors.typicalDot} />
-      <Circle cx={190} cy={100} r={10} fill={colors.typicalDot} />
       <Circle cx={140} cy={70} r={26} fill={colors.goingSoft} />
       <Circle cx={140} cy={70} r={14} fill={colors.going} />
       <Circle cx={200} cy={38} r={16} fill={colors.goingSoft} />

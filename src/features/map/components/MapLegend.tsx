@@ -4,12 +4,10 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/Text';
 import { colors, radius, spacing, type ColorToken } from '@/theme/tokens';
 
-import { typicalLabelKey, type VisibleTypicalLevel } from '../domain/typical';
-
 type Entry = {
   key: string;
   label: string;
-  dot: { color?: ColorToken; size?: number; dashed?: boolean; square?: boolean };
+  dot: { color?: ColorToken; dashed?: boolean; square?: boolean };
 };
 
 const TONIGHT: { labelKey: 'intent.going' | 'intent.maybe' | 'you'; color: ColorToken }[] = [
@@ -18,16 +16,10 @@ const TONIGHT: { labelKey: 'intent.going' | 'intent.maybe' | 'you'; color: Color
   { labelKey: 'you', color: 'text' },
 ];
 
-const USUALLY_LEVELS: { level: VisibleTypicalLevel; size: number }[] = [
-  { level: 1, size: 8 },
-  { level: 2, size: 10 },
-  { level: 3, size: 13 },
-];
-
 function dotTestId(dot: Entry['dot']): string | undefined {
   if (dot.dashed) return 'legend-event-dot';
   if (dot.square) return 'legend-spot-dot';
-  return dot.color ? undefined : 'legend-typical-dot';
+  return undefined;
 }
 
 function LegendBlock({ title, entries }: { title: string; entries: Entry[] }) {
@@ -43,8 +35,7 @@ function LegendBlock({ title, entries }: { title: string; entries: Entry[] }) {
               testID={dotTestId(dot)}
               style={[
                 styles.dot,
-                dot.color ? { backgroundColor: colors[dot.color] } : styles.typical,
-                dot.size ? { width: dot.size, height: dot.size } : null,
+                dot.color ? { backgroundColor: colors[dot.color] } : null,
                 dot.dashed ? styles.dashed : null,
                 dot.square ? styles.square : null,
               ]}
@@ -59,7 +50,7 @@ function LegendBlock({ title, entries }: { title: string; entries: Entry[] }) {
   );
 }
 
-// Two blocks on purpose: the coloured "stasera" layer and the grey "di solito" layer never mix.
+// Only the coloured "stasera" layer: the grey "di solito" dots are not drawn any more.
 // No fixed widths: labels and items wrap whatever the language or the screen width.
 export function MapLegend() {
   const { t } = useTranslation('map');
@@ -75,15 +66,9 @@ export function MapLegend() {
     // A declared point that is not a hot spot yet: cyan rounded square, the shape of its marker.
     { key: 'spot', label: t('legend.spot'), dot: { color: 'maybe', square: true } },
   ];
-  const usually = USUALLY_LEVELS.map(({ level, size }) => ({
-    key: String(level),
-    label: t(`ui:typical.${typicalLabelKey(level)}`),
-    dot: { size },
-  }));
   return (
     <View testID="map-legend" style={styles.box}>
       <LegendBlock title={t('legend.tonight')} entries={withEvent} />
-      <LegendBlock title={t('legend.usually')} entries={usually} />
     </View>
   );
 }
@@ -105,7 +90,6 @@ const styles = StyleSheet.create({
   item: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2, flexShrink: 1 },
   dot: { width: 10, height: 10, borderRadius: 999 },
   square: { borderRadius: 3 },
-  typical: { backgroundColor: colors.typicalDot },
   dashed: {
     backgroundColor: colors.goingTint,
     borderWidth: 1.5,
