@@ -11,6 +11,7 @@ import {
   type Band,
   type Intent,
 } from '@/features/nights/domain/band';
+import { hotSpotTier, type HotSpotTier } from '@/features/map/domain/hotSpotTier';
 import { colors, fonts, glow } from '@/theme/tokens';
 
 type Props = {
@@ -19,7 +20,7 @@ type Props = {
   maybeBand: Band;
   onPress: () => void;
   caption?: string;
-  // The bands include estimated presence: a small ≈ sign says so (the full STIMA label is on the cards).
+  // The bands include estimated presence: only the accessibility label says so (the STIMA tag is on the cards).
   isEstimate?: boolean;
 };
 
@@ -38,6 +39,10 @@ const INTENT_STYLE: Record<
     shadowColor: colors.maybe,
   },
 };
+
+// Brightest spots glow and are drawn in full colour; the quiet ones are smaller, dimmer and wordless.
+const TIER_OPACITY: Record<HotSpotTier, number> = { high: 1, mid: 0.7, low: 0.55 };
+const LOW_SCALE = 0.7;
 
 const INNER_SCALE = 0.42;
 // The halo is part of the marker bitmap on Android: the box must be as big as the halo or it is cut.
@@ -72,8 +77,12 @@ export function HotSpot({
 }: Props) {
   const { t } = useTranslation('ui');
   const bandLabel = useBandLabel();
-  const { main, secondary, diameter, inner } = hotSpotLayout(goingBand, maybeBand);
-  const box = Math.round(diameter * GLOW_SCALE);
+  const layout = hotSpotLayout(goingBand, maybeBand);
+  const { main, secondary, inner } = layout;
+  // On the friends map the caption is the friends count, not a turnout: it stays readable (mid, no halo).
+  const tier = caption === undefined ? hotSpotTier(goingBand, maybeBand) : 'mid';
+  const diameter = tier === 'low' ? Math.round(layout.diameter * LOW_SCALE) : layout.diameter;
+  const box = tier === 'high' ? Math.round(diameter * GLOW_SCALE) : diameter;
   return (
     <Pressable
       accessibilityRole="button"
@@ -85,32 +94,36 @@ export function HotSpot({
       onPress={onPress}
       style={[styles.center, { width: box, height: box }]}
     >
-      <Glow
-        testID="hot-spot-glow"
-        color={INTENT_STYLE[main].shadowColor}
-        radius={box / 2}
-        intensity={GLOW_INTENSITY}
-      />
+      {tier === 'high' ? (
+        <Glow
+          testID="hot-spot-glow"
+          color={INTENT_STYLE[main].shadowColor}
+          radius={box / 2}
+          intensity={GLOW_INTENSITY}
+        />
+      ) : null}
       <View
         testID="hot-spot-outer"
-        style={[styles.circle, styles.center, glow, INTENT_STYLE[main], circle(diameter)]}
+        style={[
+          styles.circle,
+          styles.center,
+          tier === 'high' ? glow : null,
+          INTENT_STYLE[main],
+          circle(diameter),
+          { opacity: TIER_OPACITY[tier] },
+        ]}
       >
-        {inner > 0 ? (
+        {inner > 0 && tier !== 'low' ? (
           <View
             testID="hot-spot-inner"
             style={[styles.circle, styles.inner, INTENT_STYLE[secondary], circle(inner)]}
           />
         ) : null}
-        <Text variant="label12" style={styles.label}>
-          {caption ?? bandLabel(goingBand)}
-        </Text>
-        {isEstimate ? (
-          <View testID="hot-spot-estimate" style={styles.estimate}>
-            <Text variant="label10" color="maybe">
-              ≈
-            </Text>
-          </View>
-        ) : null}
+        {tier === 'low' ? null : (
+          <Text variant="label12" style={styles.label}>
+            {caption ?? bandLabel(goingBand)}
+          </Text>
+        )}
       </View>
     </Pressable>
   );
@@ -121,17 +134,4 @@ const styles = StyleSheet.create({
   circle: { borderWidth: 2 },
   inner: { position: 'absolute', right: '22%', bottom: '22%', borderWidth: 1.5, shadowOpacity: 0 },
   label: { fontFamily: fonts.monoBold, color: colors.text },
-  estimate: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.maybe,
-    backgroundColor: colors.surface,
-  },
 });

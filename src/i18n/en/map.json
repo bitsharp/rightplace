@@ -26,7 +26,8 @@
     "usually": "Usually",
     "event": "Event",
     "spot": "Spot",
-    "estimate": "≈ ESTIMATE: turnout estimated from the venue's habits, not real people"
+    "estimate": "Some turnouts are estimates based on venues' habits, not real people",
+    "brightness": "The brighter the colour, the more people"
   },
   "pill": {
     "text": "Tonight: {{venue}} · {{intent}}",

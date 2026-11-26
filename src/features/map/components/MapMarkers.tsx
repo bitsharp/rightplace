@@ -11,11 +11,15 @@ import type { LatLng } from '@/features/profile/domain/coarsen';
 
 import type { EventSpotPlacement } from '../domain/eventSpots';
 import { friendFacesOf, type HotSpotVenue, type MapVenue } from '../domain/mapLayers';
+import { hotSpotTier, type HotSpotTier } from '../domain/hotSpotTier';
 import { isVisibleTypical } from '../domain/typical';
 import type { MapViewMode } from '../store/mapStore';
 
 // Grey "di solito" dots under the coloured "stasera" hot spots, "Tu" above everything.
 export const Z_INDEX = { typical: 1, spot: 2, event: 3, hotSpot: 4, own: 5, you: 6 } as const;
+
+// Brighter hot spots are drawn above the dimmer ones, all still below "Tu" and the own spot.
+const TIER_Z_OFFSET: Record<HotSpotTier, number> = { low: 0, mid: 0.1, high: 0.2 };
 
 type MarkerProps = {
   testID: string;
@@ -207,10 +211,9 @@ export function HotSpotMarkers({
         venue.maybeBand,
         view,
         venue.friendsCount ?? '',
-        venue.isEstimate,
       ].join(':')}
       testID={`marker-hot-${venue.venueId}`}
-      zIndex={Z_INDEX.hotSpot}
+      zIndex={Z_INDEX.hotSpot + TIER_Z_OFFSET[hotSpotTier(venue.goingBand, venue.maybeBand)]}
       onOpenVenue={onOpenVenue}
     >
       <HotSpot

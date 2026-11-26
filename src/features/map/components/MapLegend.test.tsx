@@ -30,9 +30,10 @@ describe('MapLegend', () => {
     expect(dot.borderRadius).not.toBe(999);
   });
 
-  it('spiega ≈ STIMA nella legenda, fuori dai due blocchi dei pallini', async () => {
+  it('spiega le stime nella legenda senza simboli e che il colore più acceso vuol dire più persone, fuori dai due blocchi dei pallini', async () => {
     await render(<MapLegend />);
     expect(screen.getByText('map:legend.estimate')).toBeOnTheScreen();
+    expect(screen.getByText('map:legend.brightness')).toBeOnTheScreen();
     expect(screen.getAllByTestId('legend-items')).toHaveLength(2);
   });
 

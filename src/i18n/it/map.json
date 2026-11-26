@@ -26,7 +26,8 @@
     "usually": "Di solito",
     "event": "Serata",
     "spot": "Spot",
-    "estimate": "≈ STIMA: affluenza stimata dalle abitudini del locale, non persone reali"
+    "estimate": "Alcune affluenze sono stime basate sulle abitudini dei locali, non persone reali",
+    "brightness": "Più il colore è acceso, più persone"
   },
   "pill": {
     "text": "Stasera: {{venue}} · {{intent}}",

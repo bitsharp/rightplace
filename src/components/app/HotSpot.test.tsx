@@ -20,7 +20,7 @@ function glowColor(): unknown {
 }
 
 describe('HotSpot: presenze stimate', () => {
-  it('con isEstimate mostra il piccolo segno ≈ e lo dice nell’etichetta accessibile', async () => {
+  it('non disegna nessun segno ≈, ma lo dice nell’etichetta accessibile', async () => {
     await render(
       <HotSpot
         venueName="Navigli"
@@ -31,22 +31,71 @@ describe('HotSpot: presenze stimate', () => {
       />,
     );
     expect(
-      screen.getByTestId('hot-spot-estimate', { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
-    expect(screen.getByText('≈', { includeHiddenElements: true })).toBeOnTheScreen();
+      screen.queryByTestId('hot-spot-estimate', { includeHiddenElements: true }),
+    ).not.toBeOnTheScreen();
+    expect(screen.queryByText('≈', { includeHiddenElements: true })).not.toBeOnTheScreen();
     expect(
       screen.getByRole('button', { name: /ui:hotSpot.a11yEstimate/, includeHiddenElements: true }),
     ).toBeOnTheScreen();
   });
+});
 
-  it('senza stime non c’è nessun segno', async () => {
-    await render(
-      <HotSpot venueName="Navigli" goingBand="20–30" maybeBand="pochi" onPress={jest.fn()} />,
-    );
+describe('HotSpot: intensità per affluenza', () => {
+  const outer = () => screen.getByTestId('hot-spot-outer', { includeHiddenElements: true });
+  const flat = (style: unknown) => Object.assign({}, ...[style].flat(Infinity));
+  const opacityOf = () => (flat(outer().props.style).opacity as number | undefined) ?? 1;
+
+  it('alta: colore pieno, bagliore e fascia scritta', async () => {
+    await render(<HotSpot venueName="A" goingBand="30–50" maybeBand="pochi" onPress={jest.fn()} />);
+    expect(screen.getByTestId('hot-spot-glow', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByText('30–50', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(opacityOf()).toBe(1);
+  });
+
+  it('media: colore più tenue, niente bagliore, fascia scritta', async () => {
+    await render(<HotSpot venueName="A" goingBand="20–30" maybeBand="pochi" onPress={jest.fn()} />);
     expect(
-      screen.queryByTestId('hot-spot-estimate', { includeHiddenElements: true }),
+      screen.queryByTestId('hot-spot-glow', { includeHiddenElements: true }),
     ).not.toBeOnTheScreen();
-    expect(screen.queryByText('≈', { includeHiddenElements: true })).not.toBeOnTheScreen();
+    expect(screen.getByText('20–30', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(opacityOf()).toBeLessThan(1);
+  });
+
+  it('bassa: pallino più piccolo e più tenue, senza bagliore né scritta', async () => {
+    const { rerender } = await render(
+      <HotSpot venueName="A" goingBand="3–10" maybeBand="pochi" onPress={jest.fn()} />,
+    );
+    const lowOpacity = opacityOf();
+    const lowSize = flat(outer().props.style).width as number;
+    expect(
+      screen.queryByTestId('hot-spot-glow', { includeHiddenElements: true }),
+    ).not.toBeOnTheScreen();
+    expect(screen.queryByText('3–10', { includeHiddenElements: true })).not.toBeOnTheScreen();
+    expect(
+      screen.queryByText('ui:band.few', { includeHiddenElements: true }),
+    ).not.toBeOnTheScreen();
+    await rerender(
+      <HotSpot venueName="A" goingBand="20–30" maybeBand="pochi" onPress={jest.fn()} />,
+    );
+    expect(lowOpacity).toBeLessThan(opacityOf());
+    expect(lowSize).toBeLessThan(flat(outer().props.style).width as number);
+  });
+
+  it('bassa: la fascia resta nell’etichetta accessibile', async () => {
+    await render(<HotSpot venueName="A" goingBand="3–10" maybeBand="pochi" onPress={jest.fn()} />);
+    expect(
+      screen.getByRole('button', {
+        name: 'ui:hotSpot.a11y({"venue":"A","going":"3–10","maybe":"ui:band.few"})',
+        includeHiddenElements: true,
+      }),
+    ).toBeOnTheScreen();
+  });
+
+  it('con la didascalia degli amici scrive sempre il numero, anche su un punto tenue', async () => {
+    await render(
+      <HotSpot venueName="A" goingBand="pochi" maybeBand="pochi" caption="2" onPress={jest.fn()} />,
+    );
+    expect(screen.getByText('2', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 });
 
@@ -85,10 +134,10 @@ describe('HotSpot', () => {
 
   it('scrive "pochi" tradotto invece di un numero', async () => {
     await render(<HotSpot venueName="A" goingBand="pochi" maybeBand="pochi" onPress={jest.fn()} />);
-    expect(screen.getByText('ui:band.few', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(
       screen.queryByTestId('hot-spot-inner', { includeHiddenElements: true }),
     ).not.toBeOnTheScreen();
+    expect(screen.queryByText(/\d/, { includeHiddenElements: true })).not.toBeOnTheScreen();
   });
 
   it('disegna il cerchio interno della fascia secondaria', async () => {
@@ -125,7 +174,7 @@ describe('HotSpot', () => {
     expect(screen.getByTestId('hot-spot-glow', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(glowColor()).toBe(`glow-${colors.going.replace('#', '')}`);
     await rerender(
-      <HotSpot venueName="A" goingBand="pochi" maybeBand="20–30" onPress={jest.fn()} />,
+      <HotSpot venueName="A" goingBand="pochi" maybeBand="30–50" onPress={jest.fn()} />,
     );
     expect(glowColor()).toBe(`glow-${colors.maybe.replace('#', '')}`);
   });

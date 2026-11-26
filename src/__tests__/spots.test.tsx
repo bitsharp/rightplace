@@ -163,12 +163,14 @@ describe('spot dichiarabili sulla mappa', () => {
       expect(screen.queryByTestId(/^marker-hot-/, { includeHiddenElements: true })).toBeNull();
     });
 
-    it('a 3 dichiarazioni diventa un punto caldo normale con la fascia 3–10', async () => {
+    it('a 3 dichiarazioni diventa un punto caldo normale (tenue, la fascia 3–10 è nell’etichetta accessibile)', async () => {
       seed([spotRow({ going_band: '3–10', maybe_band: 'pochi', is_hot_spot: true })]);
       await renderApp('ready', '/map');
       await screen.findByTestId('marker-hot-spot-1', { includeHiddenElements: true });
       expect(screen.queryByText('map:spot.label')).toBeNull();
-      expect(screen.getByText('3–10')).toBeOnTheScreen();
+      expect(
+        screen.getAllByRole('button', { name: /3–10/, includeHiddenElements: true })[0],
+      ).toBeOnTheScreen();
     });
 
     it('un tap sullo spot apre la sua scheda', async () => {
