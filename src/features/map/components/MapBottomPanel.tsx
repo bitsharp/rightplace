@@ -31,6 +31,8 @@ type Props = {
   // Injected for tests.
   busiestNow?: Date;
   onOpenVenue: (venueId: string) => void;
+  // A tap on a "più animati" card: show it on the map first, then open the detail.
+  onSelectBusiest: (venueId: string) => void;
 };
 
 const MAX_HEIGHT = 230;
@@ -59,7 +61,11 @@ export function MapBottomPanel(props: Props) {
             recommended={props.recommended}
             onOpen={onOpenVenue}
           />
-          <BusiestTonightCard venues={props.busiest} now={props.busiestNow} onOpen={onOpenVenue} />
+          <BusiestTonightCard
+            venues={props.busiest}
+            now={props.busiestNow}
+            onOpen={props.onSelectBusiest}
+          />
         </>
       ) : null}
       <DeclarationPill declaration={props.declaration} onPress={onOpenVenue} />

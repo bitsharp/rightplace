@@ -38,6 +38,8 @@ export function MapScreen() {
         header={<MapHeader cityName={map.city?.name ?? null} />}
         onOpenSearch={map.openSearch}
         onEnableLocation={map.openLocationSettings}
+        busiestFocus={map.busiestFocus}
+        highlight={map.highlight}
       />
       <MapBottomPanel
         view={map.view}
@@ -52,6 +54,7 @@ export function MapScreen() {
         busiest={map.busiest}
         declaration={map.declaration}
         onOpenVenue={map.openVenue}
+        onSelectBusiest={map.selectBusiest}
       />
       <SpotSheet point={map.spotPoint} onClose={map.closeSpot} />
       <TourOverlay screen="map" />

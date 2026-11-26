@@ -16,7 +16,15 @@ import { isVisibleTypical } from '../domain/typical';
 import type { MapViewMode } from '../store/mapStore';
 
 // Grey "di solito" dots under the coloured "stasera" hot spots, "Tu" above everything.
-export const Z_INDEX = { typical: 1, spot: 2, event: 3, hotSpot: 4, own: 5, you: 6 } as const;
+export const Z_INDEX = {
+  typical: 1,
+  spot: 2,
+  event: 3,
+  hotSpot: 4,
+  highlight: 4.5,
+  own: 5,
+  you: 6,
+} as const;
 
 // Brighter hot spots are drawn above the dimmer ones, all still below "Tu" and the own spot.
 const TIER_Z_OFFSET: Record<HotSpotTier, number> = { low: 0, mid: 0.1, high: 0.2 };
@@ -29,6 +37,8 @@ type MarkerProps = {
   zIndex: number;
   // Photos still downloading inside the marker: keep capturing until they are drawn (see usePhotoWait).
   waitingForPhotos?: boolean;
+  // Content that moves by itself (an animation): the bitmap is captured on every frame.
+  tracking?: boolean;
   anchor?: { x: number; y: number };
   onPress?: () => void;
   children: ReactNode;
@@ -42,6 +52,7 @@ export function MapMarker({
   coordinate,
   contentKey,
   waitingForPhotos = false,
+  tracking = false,
   children,
   ...props
 }: MarkerProps) {
@@ -54,7 +65,7 @@ export function MapMarker({
     <Marker
       coordinate={{ latitude: coordinate.lat, longitude: coordinate.lng }}
       anchor={{ x: 0.5, y: 0.5 }}
-      tracksViewChanges={settledKey !== contentKey || waitingForPhotos}
+      tracksViewChanges={settledKey !== contentKey || waitingForPhotos || tracking}
       {...props}
     >
       {children}

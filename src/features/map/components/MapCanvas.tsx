@@ -11,9 +11,11 @@ import type { EventSpotPlacement } from '../domain/eventSpots';
 import type { MapLayers } from '../domain/mapLayers';
 import type { OwnSpot as OwnSpotData } from '../domain/ownSpot';
 import { cityRegion, type CityCenter, type MapRegion } from '../domain/region';
+import type { HighlightTarget } from '../useBusiestFocus';
 import { mapAppearance } from '../mapStyle';
 import type { MapViewMode } from '../store/mapStore';
 
+import { HighlightMarker } from './HighlightMarker';
 import { MapVignette } from './MapVignette';
 import { OwnMarker, type OwnIdentity } from './OwnMarker';
 import {
@@ -51,11 +53,18 @@ type Props = {
   // Signed photos of the friends on the friends map (one batch per screen); never used on the general map.
   avatarUrls?: Record<string, string>;
   focus?: MapFocus;
+  // The venue just picked from "I più animati": a ring on its coordinates.
+  highlight?: HighlightTarget | null;
 };
 
 // A request to centre on a point (the coarse "Tu" cell). The object itself is the request: a new object
 // asks again for the same point, a re-render with the same object does not fight the user's panning.
-export type MapFocus = { point: LatLng };
+export type MapFocus = {
+  point: LatLng;
+  // Closer framing than the default (the busiest venues zoom in); animated=false: no camera animation.
+  delta?: number;
+  animated?: boolean;
+};
 
 const FOCUS_DELTA = 0.02;
 const FOCUS_MS = 400;
@@ -77,6 +86,7 @@ export function MapCanvas({
   onPickSpot,
   avatarUrls,
   focus,
+  highlight = null,
 }: Props) {
   const { t } = useTranslation('map');
   const mapRef = useRef<MapView>(null);
@@ -86,10 +96,10 @@ export function MapCanvas({
       {
         latitude: focus.point.lat,
         longitude: focus.point.lng,
-        latitudeDelta: FOCUS_DELTA,
-        longitudeDelta: FOCUS_DELTA,
+        latitudeDelta: focus.delta ?? FOCUS_DELTA,
+        longitudeDelta: focus.delta ?? FOCUS_DELTA,
       },
-      FOCUS_MS,
+      focus.animated === false ? 0 : FOCUS_MS,
     );
   }, [focus]);
   const map = (
@@ -114,6 +124,7 @@ export function MapCanvas({
         urls={avatarUrls}
         onOpenVenue={onOpenVenue}
       />
+      {highlight ? <HighlightMarker target={highlight} /> : null}
       {ownSpot && me ? (
         <OwnMarker spot={ownSpot} me={me} urls={avatarUrls ?? NO_URLS} onOpenVenue={onOpenVenue} />
       ) : null}

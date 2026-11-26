@@ -639,3 +639,80 @@ describe('MapCanvas: vai alla mia posizione', () => {
     expect(animateToRegion).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('MapCanvas: locale evidenziato da "I più animati"', () => {
+  const animateToRegion = jest.requireMock<{ __animateToRegion: jest.Mock }>(
+    'react-native-maps',
+  ).__animateToRegion;
+  const noLayers = { hotSpots: [], typicalDots: [], spots: [] };
+  const point = { lat: 45.47, lng: 9.2 };
+  beforeEach(() => {
+    animateToRegion.mockClear();
+    jest.useFakeTimers();
+  });
+  afterEach(() => jest.useRealTimers());
+
+  it('inquadra più da vicino quando la richiesta porta un delta', async () => {
+    await render(<MapCanvas {...baseProps} layers={noLayers} focus={{ point, delta: 0.008 }} />);
+    expect(animateToRegion.mock.calls[0]?.[0]).toMatchObject({
+      latitudeDelta: 0.008,
+      longitudeDelta: 0.008,
+    });
+    expect(animateToRegion.mock.calls[0]?.[1]).toBeGreaterThan(0);
+  });
+
+  it('con animated=false sposta la camera senza animazione', async () => {
+    await render(
+      <MapCanvas
+        {...baseProps}
+        layers={noLayers}
+        focus={{ point, delta: 0.008, animated: false }}
+      />,
+    );
+    expect(animateToRegion.mock.calls[0]?.[1]).toBe(0);
+  });
+
+  it("disegna l'anello sulle coordinate del locale, sopra i punti caldi e sotto il Tu", async () => {
+    await render(
+      <MapCanvas
+        {...baseProps}
+        you={{ lat: 45.4625, lng: 9.1925 }}
+        layers={{ ...noLayers, hotSpots: [venue({ venueId: 'hot' })] }}
+        highlight={{ venueId: 'hot', point, animated: true }}
+      />,
+    );
+    expect(marker('highlight')).toHaveProp('coordinate', { latitude: 45.47, longitude: 9.2 });
+    expect(Number(marker('highlight').props.zIndex)).toBeGreaterThan(
+      Number(marker('hot-hot').props.zIndex),
+    );
+    expect(Number(marker('highlight').props.zIndex)).toBeLessThan(
+      Number(marker('you').props.zIndex),
+    );
+  });
+
+  it("senza evidenza non c'è nessun anello", async () => {
+    await render(<MapCanvas {...baseProps} layers={noLayers} />);
+    expect(screen.queryByTestId('marker-highlight', { includeHiddenElements: true })).toBeNull();
+  });
+
+  it("l'anello che pulsa tiene il tracking acceso; quello fermo si congela dopo il primo render", async () => {
+    const { rerender } = await render(
+      <MapCanvas
+        {...baseProps}
+        layers={noLayers}
+        highlight={{ venueId: 'x', point, animated: true }}
+      />,
+    );
+    await act(async () => void jest.advanceTimersByTime(1000));
+    expect(marker('highlight')).toHaveProp('tracksViewChanges', true);
+    await rerender(
+      <MapCanvas
+        {...baseProps}
+        layers={noLayers}
+        highlight={{ venueId: 'x', point, animated: false }}
+      />,
+    );
+    await act(async () => void jest.advanceTimersByTime(1000));
+    expect(marker('highlight')).toHaveProp('tracksViewChanges', false);
+  });
+});

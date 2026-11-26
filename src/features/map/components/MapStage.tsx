@@ -9,6 +9,7 @@ import type { MapLayers } from '../domain/mapLayers';
 import type { OwnSpot } from '../domain/ownSpot';
 import type { MapRegion } from '../domain/region';
 import type { MapViewMode } from '../store/mapStore';
+import type { HighlightTarget } from '../useBusiestFocus';
 
 import { MapCanvas, type MapCity, type MapFocus } from './MapCanvas';
 import { MapFullScreen } from './MapFullScreen';
@@ -33,6 +34,9 @@ type Props = {
   header?: ReactNode;
   // Opens the existing location toggle (privacy settings) from the "location is off" notice.
   onEnableLocation?: () => void;
+  // A tap on "I più animati": move the camera there and ring the venue before its detail opens.
+  busiestFocus?: MapFocus;
+  highlight?: HighlightTarget | null;
 };
 
 // Principle 3: the map never asks for a permission by itself. With the toggle on it recentres on the coarse cell;
@@ -63,6 +67,8 @@ export function MapStage({
   header,
   onOpenSearch,
   onEnableLocation,
+  busiestFocus,
+  highlight,
   ...eventProps
 }: Props) {
   const [fullScreen, setFullScreen] = useState(false);
@@ -72,6 +78,12 @@ export function MapStage({
   const [framing, setFraming] = useState<{ slug: string; region: MapRegion } | null>(null);
   const region = framing && framing.slug === city?.slug ? framing.region : undefined;
   const setRegion = (next: MapRegion) => city && setFraming({ slug: city.slug, region: next });
+  // A new request from the busiest cards replaces the current one (adjusted while rendering, no effect).
+  const [seenBusiest, setSeenBusiest] = useState<MapFocus | undefined>(undefined);
+  if (busiestFocus !== seenBusiest) {
+    setSeenBusiest(busiestFocus);
+    if (busiestFocus) setFocus(busiestFocus);
+  }
   const locate = useLocate(you, setFocus, onEnableLocation);
   return (
     <View testID="map-box" style={styles.box}>
@@ -89,6 +101,7 @@ export function MapStage({
               onRegionChange={setRegion}
               onOpenVenue={onOpenVenue}
               focus={focus}
+              highlight={highlight}
               {...eventProps}
             />
           )}

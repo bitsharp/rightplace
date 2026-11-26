@@ -126,3 +126,29 @@ describe('MapStage compatta', () => {
     });
   });
 });
+
+describe('MapStage: richiesta di inquadratura da "I più animati"', () => {
+  const animateToRegion = jest.requireMock<{ __animateToRegion: jest.Mock }>(
+    'react-native-maps',
+  ).__animateToRegion;
+  beforeEach(() => animateToRegion.mockClear());
+
+  it("porta la camera sul locale e ne mostra l'anello", async () => {
+    const point = { lat: 45.47, lng: 9.2 };
+    await render(
+      <MapStage
+        {...baseProps}
+        busiestFocus={{ point, delta: 0.008, animated: true }}
+        highlight={{ venueId: 'v1', point, animated: true }}
+      />,
+    );
+    expect(animateToRegion).toHaveBeenCalledTimes(1);
+    expect(animateToRegion.mock.calls[0]?.[0]).toMatchObject({
+      latitude: 45.47,
+      latitudeDelta: 0.008,
+    });
+    expect(
+      screen.getByTestId('marker-highlight', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
+});

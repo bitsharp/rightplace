@@ -26,6 +26,7 @@ import { buildOwnSpot, coordsOfVenue, type OwnSpot } from './domain/ownSpot';
 import type { FeaturedCard } from './components/MapCards';
 import { useBusiestTonight, useCityMap, useMyDeclaration, useRecommendedVenue } from './hooks';
 import { useMapStore, type MapViewMode } from './store/mapStore';
+import { useBusiestFocus } from './useBusiestFocus';
 import { useCurrentCity } from './useCurrentCity';
 
 const NO_ROWS: readonly MapVenue[] = [];
@@ -138,6 +139,7 @@ export function useMapScreen() {
   ]);
   const coarseCell = useCoarsePositionStore((state) => state.cell);
   const openVenue = useOpenVenue();
+  const busiestFocus = useBusiestFocus(generalRows, openVenue);
   // The point chosen with a 3 s press: while set, the "serata in questo punto" sheet is open.
   const [spotPoint, setSpotPoint] = useState<LatLng | null>(null);
 
@@ -158,6 +160,9 @@ export function useMapScreen() {
     sponsored,
     recommended: recommended.data ?? null,
     busiest: busiest.data ?? NO_BUSIEST,
+    selectBusiest: busiestFocus.select,
+    busiestFocus: busiestFocus.focus,
+    highlight: busiestFocus.highlight,
     declaration: declaration.data ?? null,
     topBar,
     avatarUrls: topBar.avatarUrls,

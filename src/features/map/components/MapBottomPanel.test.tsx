@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import type { BusiestVenue } from '../api';
 
@@ -29,6 +29,7 @@ const base = {
   busiest,
   busiestNow: new Date('2026-11-27T12:00:00Z'),
   onOpenVenue: jest.fn(),
+  onSelectBusiest: jest.fn(),
 };
 
 describe('MapBottomPanel: "I più animati"', () => {
@@ -45,5 +46,21 @@ describe('MapBottomPanel: "I più animati"', () => {
   it('senza righe non la mostra', async () => {
     await render(<MapBottomPanel view="general" {...base} busiest={[]} />);
     expect(screen.queryByText(/map:busiest/)).not.toBeOnTheScreen();
+  });
+
+  it('il tap su una card passa da onSelectBusiest (prima la mappa), non apre subito il dettaglio', async () => {
+    const onSelectBusiest = jest.fn();
+    const onOpenVenue = jest.fn();
+    await render(
+      <MapBottomPanel
+        view="general"
+        {...base}
+        onSelectBusiest={onSelectBusiest}
+        onOpenVenue={onOpenVenue}
+      />,
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Tocqueville 13' }));
+    expect(onSelectBusiest).toHaveBeenCalledWith('v1');
+    expect(onOpenVenue).not.toHaveBeenCalled();
   });
 });
