@@ -1,4 +1,3 @@
-import { useMapStore } from '@/features/map/store/mapStore';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as Location from 'expo-location';
 import { Linking } from 'react-native';
@@ -117,9 +116,6 @@ const pillName = (intent: 'goingAction' | 'maybeAction') =>
 
 describe('dettaglio locale e dichiarazione', () => {
   beforeEach(() => {
-    // These tests are about the general map: the user has already picked "Mappe".
-    useMapStore.setState({ view: 'general' });
-
     jest
       .mocked(Location.getForegroundPermissionsAsync)
       .mockResolvedValue({ granted: false } as never);

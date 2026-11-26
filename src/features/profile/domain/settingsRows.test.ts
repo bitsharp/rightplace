@@ -9,12 +9,13 @@ describe('settingsGroups', () => {
     expect(settingsGroups(base).map((group) => group.key)).toEqual(['account', 'help', 'info']);
   });
 
-  it('nell’account elenca lingua, notifiche, privacy, città, @tag, dati personali e password', () => {
+  it('nell’account elenca lingua, notifiche, privacy, città, mappa all’avvio, @tag, dati personali e password', () => {
     expect(keys(settingsGroups(base), 'account')).toEqual([
       'language',
       'notifications',
       'privacy',
       'city',
+      'mapView',
       'tag',
       'personal',
       'password',

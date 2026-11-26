@@ -43,6 +43,7 @@ Nessuna superficie nuova da moderare in modo diverso:
 
 - `/profile` (tab): barra in alto (anche nella tab Chat, per l'icona feedback), avatar (tocco = Cambia foto / Rimuovi), "N post · N follower · N seguiti", Modifica profilo, Condividi (solo con `EXPO_PUBLIC_SHARE_ENABLED`), griglia a 3 colonne con paginazione a cursore (30 per pagina).
 - `/profile/edit`: tutto il form di prima (foto, @tag, data, genere, posizione, contatti, lingua, città, notifiche, telefono, condividi, bloccati, link creator, account).
+- `/profile/map-view` ("Mappa all'avvio"): preferenza `defaultView` (`general` di default, oppure `friends`) nello store `rightplace.map` (v3; ogni stato precedente riparte dalla generale). La vista corrente `view` non è persistita: a ogni avvio vale `defaultView`, e il selettore Mappe/Amici sulla mappa cambia solo la sessione in corso. Scegliere la preferenza sposta anche la vista corrente, finché il selettore non è stato usato in questa sessione.
 - `/profile/followers` (con "Rimuovi") e `/profile/following` (segui già / richiesta, tocco lungo per segnalare o bloccare).
 - `/u/<handle>`: stesso layout, con Segui / Richiesta inviata / Segui già.
 - Tocco su una miniatura con foto: `PhotoViewer` che scorre tra le foto dei post caricati. Su un post solo testo: foglio con la didascalia intera.

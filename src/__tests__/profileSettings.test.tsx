@@ -99,6 +99,7 @@ describe('profilo: impostazioni a elenco', () => {
       ['settings.rows.notifications', '/profile/notifications'],
       ['settings.rows.privacy', '/profile/privacy'],
       ['settings.rows.city', '/profile/city'],
+      ['settings.rows.mapView', '/profile/map-view'],
       ['settings.rows.tag', '/profile/tag'],
       ['settings.rows.personal', '/profile/personal'],
       ['settings.rows.password', '/reset-password'],

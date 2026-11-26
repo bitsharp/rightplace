@@ -1,4 +1,3 @@
-import { useMapStore } from '@/features/map/store/mapStore';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as Location from 'expo-location';
 
@@ -66,9 +65,6 @@ async function longPressMap(x = 200, y = 300) {
 
 describe('spot dichiarabili sulla mappa', () => {
   beforeEach(() => {
-    // These tests are about the general map: the user has already picked "Mappe".
-    useMapStore.setState({ view: 'general' });
-
     jest
       .mocked(Location.getForegroundPermissionsAsync)
       .mockResolvedValue({ granted: false } as never);

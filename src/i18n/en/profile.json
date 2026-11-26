@@ -38,6 +38,9 @@
       "en": "English"
     }
   },
+  "mapView": {
+    "hint": "Which map you see when you open the app. The switch on the map only changes the current session."
+  },
   "city": {
     "title": "Map city",
     "auto": "Automatic (from your location)",
@@ -168,6 +171,7 @@
       "notifications": "Notifications",
       "privacy": "Privacy",
       "city": "Map city",
+      "mapView": "Map on launch",
       "tag": "@tag",
       "personal": "Personal data",
       "password": "Change password",

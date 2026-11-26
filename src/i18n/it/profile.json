@@ -38,6 +38,9 @@
       "en": "English"
     }
   },
+  "mapView": {
+    "hint": "Quale mappa vedi quando apri l’app. Il selettore sulla mappa cambia solo la sessione in corso."
+  },
   "city": {
     "title": "Città della mappa",
     "auto": "Automatica (dalla tua posizione)",
@@ -168,6 +171,7 @@
       "notifications": "Notifiche",
       "privacy": "Privacy",
       "city": "Città della mappa",
+      "mapView": "Mappa all’avvio",
       "tag": "@tag",
       "personal": "Dati personali",
       "password": "Cambia password",

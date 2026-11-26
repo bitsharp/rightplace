@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 
-import { useMapStore } from '@/features/map/store/mapStore';
 import { useTourStore } from '@/features/tour/store/tourStore';
 import { renderApp } from '@/test/appFlows';
 import { setFakeRpc } from '@/test/fakeSupabase';
@@ -64,7 +63,6 @@ async function dismissAll(ids: string[]) {
 
 describe('fumetti sul posto', () => {
   it('Mappa: il selettore Amici/Mappe, poi i bottoni della mappa, una sola volta', async () => {
-    useMapStore.setState({ view: 'general' });
     setFakeRpc({
       get_active_cities: [
         { slug: 'milano', name: 'Milano', country: 'IT', lat: 45.46, lng: 9.19, default_zoom: 13 },

@@ -6,6 +6,7 @@ import { Divider } from '@/components/ui/Divider';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { useOpenFeedback } from '@/features/feedback/useOpenFeedback';
+import { useMapStore } from '@/features/map/store/mapStore';
 import { useCurrentCityName } from '@/features/map/useCurrentCityName';
 import { useTourStore } from '@/features/tour/store/tourStore';
 import { colors, radius, spacing } from '@/theme/tokens';
@@ -64,10 +65,13 @@ export function SettingsList({ profile }: { profile: MyProfile }) {
 // The right-hand side of the rows that show a current value.
 function useSettingsValues(profile: MyProfile): Partial<Record<Row['key'], string>> {
   const { t } = useTranslation('profile');
+  const { t: tMap } = useTranslation('map');
   const city = useCurrentCityName();
+  const defaultView = useMapStore((state) => state.defaultView);
   return {
     language: t(`form.language.${profile.locale}`),
     city: city ?? undefined,
+    mapView: tMap(`view.${defaultView}`),
     tag: formatHandle(profile.handle),
   };
 }

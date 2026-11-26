@@ -5,6 +5,7 @@ export type SettingsRowKey =
   | 'notifications'
   | 'privacy'
   | 'city'
+  | 'mapView'
   | 'tag'
   | 'personal'
   | 'password'
@@ -21,6 +22,7 @@ export type SettingsTarget =
   | '/profile/notifications'
   | '/profile/privacy'
   | '/profile/city'
+  | '/profile/map-view'
   | '/profile/tag'
   | '/profile/personal'
   | '/reset-password'
@@ -65,6 +67,7 @@ function accountRows({ creatorEnabled, isCreator }: Context): SettingsRow[] {
     row('notifications', 'bell', '/profile/notifications'),
     row('privacy', 'eyeOff', '/profile/privacy'),
     row('city', 'map', '/profile/city'),
+    row('mapView', 'map', '/profile/map-view'),
     row('tag', 'at', '/profile/tag'),
     row('personal', 'profile', '/profile/personal'),
     row('password', 'lock', '/reset-password'),

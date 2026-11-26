@@ -112,6 +112,7 @@ const READY_SCREENS = [
   { name: 'profile/notifications' },
   { name: 'profile/privacy' },
   { name: 'profile/city' },
+  { name: 'profile/map-view' },
   { name: 'profile/tag' },
   { name: 'profile/personal' },
   { name: 'profile/about' },

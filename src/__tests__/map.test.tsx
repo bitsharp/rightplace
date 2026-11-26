@@ -114,22 +114,18 @@ describe('mappa', () => {
   afterEach(() => jest.restoreAllMocks());
 
   beforeEach(() => {
-    useCoarsePositionStore.setState({ cell: null }); // These tests are about the general map: the user has already picked "Mappe".
-    useMapStore.setState({ view: 'general' });
-
+    useCoarsePositionStore.setState({ cell: null });
     jest
       .mocked(Location.getForegroundPermissionsAsync)
       .mockResolvedValue({ granted: false } as never);
     seedBackend();
   });
 
-  it('alla prima apertura la vista selezionata è Amici; "Mappe" resta una scelta ricordata', async () => {
-    useMapStore.setState({ view: useMapStore.getInitialState().view });
+  it('di default la mappa si apre su Mappe e il toggle cambia solo la vista della sessione', async () => {
     await renderApp('ready', '/map');
-    const friends = await screen.findByRole('button', { name: 'map:view.friends' });
-    expect(friends).toBeSelected();
-    await fireEvent.press(screen.getByRole('button', { name: 'map:view.general' }));
-    expect(useMapStore.getState().view).toBe('general');
+    expect(await screen.findByRole('button', { name: 'map:view.general' })).toBeSelected();
+    await fireEvent.press(screen.getByRole('button', { name: 'map:view.friends' }));
+    expect(useMapStore.getState()).toMatchObject({ view: 'friends', defaultView: 'general' });
   });
 
   describe('vista generale', () => {
@@ -251,9 +247,9 @@ describe('mappa', () => {
       expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
     });
 
-    it('ricorda la vista scelta', async () => {
+    it('il toggle non cambia la preferenza salvata nelle impostazioni', async () => {
       await openFriendsView();
-      expect(useMapStore.getState().view).toBe('friends');
+      expect(useMapStore.getState().defaultView).toBe('general');
     });
   });
 
