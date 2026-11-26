@@ -1417,6 +1417,19 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_busiest_tonight: {
+        Args: { p_city_slug: string; p_limit?: number };
+        Returns: {
+          cover_photo_url: string;
+          going_band: string;
+          is_estimate: boolean;
+          kind: string;
+          maybe_band: string;
+          name: string;
+          typical_level: number;
+          venue_id: string;
+        }[];
+      };
       get_chat_photo_paths: {
         Args: { p_message_ids: string[] };
         Returns: {
@@ -1450,6 +1463,7 @@ export type Database = {
           friends_going_ids: string[];
           going_band: string;
           is_declarable: boolean;
+          is_estimate: boolean;
           is_hot_spot: boolean;
           is_sponsored: boolean;
           is_spot: boolean;
@@ -1734,6 +1748,7 @@ export type Database = {
       get_recommended_venue: {
         Args: { p_city_slug: string };
         Returns: {
+          is_estimate: boolean;
           kind: string;
           name: string;
           reason: string;
@@ -1843,6 +1858,7 @@ export type Database = {
           female_pct: number;
           friends: Json;
           going_band: string;
+          is_estimate: boolean;
           is_sponsored: boolean;
           male_pct: number;
           maybe_band: string;
@@ -1904,6 +1920,7 @@ export type Database = {
         Returns: {
           address: string;
           going_band: string;
+          is_estimate: boolean;
           is_sponsored: boolean;
           kind: string;
           maybe_band: string;
