@@ -50,9 +50,9 @@ insert into venue_typical_busyness (venue_id, weekday, hour, level, source)
 select b.venue_id, d, h, 2, 'manual' from m2 b, generate_series(0, 6) d, generate_series(0, 23) h;
 select private.generate_night_bots(:'night'::date);
 select ok((select count(*) between 1 and 9 from private.night_bot_presence p join m2 using (venue_id) where p.night_date = :'night'::date),
-  'livello 2: solo circa 1 su 3, fino al limite (14 - 5 livello 3)');
+  'livello 2: solo i posti rimasti fino al limite (14 - 5 livello 3 - 3 livello 2 di s2)');
 select ok((select count(*) < 90 / 2 from private.night_bot_presence p join m2 using (venue_id) where p.night_date = :'night'::date),
-  'livello 2: ben meno della metà dei locali');
+  'livello 2: ben meno della metà dei locali (il limite di 14 per città)');
 
 select ok((select bool_and(going between 10 and 35 and maybe between 4 and 14) from private.night_bot_presence p join l3 using (venue_id)
             where p.night_date = :'night'::date), 'livello 3: going 10-35, maybe 4-14');
@@ -68,10 +68,10 @@ select is((select count(*)::int from (select * from run1 except
   'stessa data: stessa selezione e stessi numeri');
 
 select private.generate_night_bots(:'night'::date + 1);
-select cmp_ok((select count(*)::int from (
-    select venue_id from private.night_bot_presence where night_date = :'night'::date
-    except select venue_id from private.night_bot_presence where night_date = :'night'::date + 1) d), '>', 0,
-  'un''altra data sceglie anche locali di livello 2 diversi');
+select cmp_ok((select count(*)::int from private.night_bot_presence a join private.night_bot_presence b
+                on a.venue_id = b.venue_id and a.night_date = :'night'::date and b.night_date = :'night'::date + 1
+               where a.going <> b.going or a.maybe <> b.maybe), '>', 0,
+  'un''altra data: stessa selezione (segue la fascia oraria) ma numeri diversi');
 select is((select count(*)::int from private.night_bot_presence p join public.venues v on v.id = p.venue_id
             where p.night_date = :'night'::date + 1 and v.city_id = (select id from cities where slug = 'tunetown')), 14,
   'un''altra data: sempre al massimo 14');

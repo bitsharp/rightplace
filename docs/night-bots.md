@@ -26,20 +26,28 @@ Età media, % genere, amici e ogni statistica su persone si calcolano **solo sul
 
 ## Generazione
 
-`private.generate_night_bots(p_night date default <night corrente, Europe/Rome>)`: per ogni città attiva, i locali attivi non spot con
-**livello tipico di picco** della sera (massimo di `typical_level` sulle ore 21–02, stessa precedenza history > manual > apify) ≥ 2,
-**massimo 14 per città**: entrano tutti i locali di livello 3 (con un ordine pseudo-casuale che cambia ogni giorno, fino al massimo), poi i
-livello 2 scelti in modo deterministico per giorno (circa **1 su 3**, via hash di locale + data) fino al massimo. Numeri deterministici per
-(locale, data) con `hashtext`: stabili durante la serata, diversi ogni giorno. Idempotente (cancella e reinserisce la stessa night).
+Le stime stanno sui locali che "di solito" sono più frequentati **nella fascia oraria che si sta guardando**: l'ora corrente più le 3
+successive (la mappa non ha un selettore orario), nel fuso della città. La fonte unica è `private.busiest_ranking(città, p_at default now())`:
+locali attivi non spot con `lvl` = massimo di `typical_level` sulle 4 ore (stessa precedenza history > manual > apify), `score` = somma
+degli stessi livelli, solo `lvl >= 2`, ordinati per `lvl`, `score` e, a parità, un hash di locale + night (deterministico nella serata,
+diverso ogni giorno). La usano sia la card "I più animati del {giorno}" (`get_busiest_tonight`) sia il generatore, quindi **i locali
+della card hanno sempre le stime** (e il cerchio sulla mappa).
 
-| Livello di picco | `going` | `maybe` |
-| ---------------- | ------- | ------- |
-| 3 (pieno)        | 10–35   | 4–14    |
-| 2 (animato)      | 3–12    | 1–6     |
+`private.generate_night_bots(p_night date default <night corrente, Europe/Rome>)`: per ogni città attiva scrive le stime dei **primi 14**
+del ranking calcolato su `now()`. Numeri deterministici per (locale, night, livello) con `hashtext`: un locale che resta nella selezione
+mantiene gli stessi numeri durante la serata; chi entra o esce col passare delle ore cambia il cerchio, non gli altri. Idempotente
+(cancella e reinserisce la night).
 
-Costanti in testa alla funzione (tarate da `20261126000200_night_bots_tuning.sql`, test in `41_night_bots_tuning.sql`; la migration rigenera subito le stime di stasera). Job pg_cron `generate-night-bots` ogni giorno alle **05:10 UTC** (06:10 a Roma in inverno, 07:10 in
-estate: la night nuova inizia alle 06:00 locali, quindi tra le 06:00 e il job la night non ha ancora stime); lo stesso job cancella
-le righe più vecchie di 2 giorni.
+| Livello nella finestra | `going` | `maybe` |
+| ---------------------- | ------- | ------- |
+| 3 (pieno)              | 10-35   | 4-14    |
+| 2 (animato)            | 3-12    | 1-6     |
+
+Costanti in testa alla funzione (test in `41_night_bots_tuning.sql` e `42_night_bots_by_hour.sql`). Job pg_cron `generate-night-bots`
+**ogni ora al minuto 2** (`2 * * * *`), così la selezione segue le ore; lo stesso job cancella le righe più vecchie di 2 giorni. Tra le
+06:00 locali e il primo giro orario la night nuova può non avere ancora stime, per al massimo un'ora.
+
+Lo strato grigio "di solito" non è più disegnato sulla mappa: i cerchi che si vedono sono i punti caldi (veri + stimati).
 
 ## Interruttore
 

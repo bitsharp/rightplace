@@ -1,6 +1,6 @@
 begin;
 \ir helpers/setup.psql
-select plan(65);
+select plan(66);
 
 -- Fixtures ----------------------------------------------------------------------------------------------------
 insert into public.cities (slug, name, country, center, default_zoom, timezone, taxi_phone, is_active)
@@ -42,7 +42,7 @@ select is(has_function_privilege('authenticated', 'private.generate_night_bots(d
        or has_function_privilege('authenticated', 'private.night_bot_counts(uuid, date)', 'execute'), false,
   'generatore e contatori non sono eseguibili dai client');
 select is((select enabled from private.feature_flags where name = 'night_bots'), true, 'il flag night_bots è acceso di default');
-select is((select schedule from cron.job where jobname = 'generate-night-bots'), '10 5 * * *', 'job pg_cron alle 05:10 UTC');
+select is((select schedule from cron.job where jobname = 'generate-night-bots'), '2 * * * *', 'job pg_cron ogni ora (minuto 2)');
 
 -- Generation --------------------------------------------------------------------------------------------------
 select private.generate_night_bots(:'night'::date) as written \gset
@@ -192,9 +192,13 @@ select tests.make_declaration(tests.create_user(tests.unique_handle('bus'), 25),
 
 select tests.authenticate_as(:'me');
 create temp table busy as select * from get_busiest_tonight('bustown');
-select is((select array_agg(name order by ord) from (select name, row_number() over () as ord from busy) x),
-  array['Alfa tre', 'Beta tre', 'Presto uno poi tre', 'Gamma due'],
-  'più animati: ordine per livello poi nome; considera le prossime 3 ore; esclude livello 0-1, spot e oltre la finestra');
+-- Order is level, then sum of levels, then a per-night hash (private.busiest_ranking): the two level-3 venues with the same score
+-- swap by hash, so compare as sets within the same score and check the rest of the order.
+select is((select array_agg(name order by ord) from (select name, row_number() over () as ord from busy) x where ord > 2),
+  array['Presto uno poi tre', 'Gamma due'],
+  'più animati: livello poi somma dei livelli; considera le prossime 3 ore; esclude livello 0-1, spot e oltre la finestra');
+select is((select array_agg(name order by name) from (select name from busy limit 2) x), array['Alfa tre', 'Beta tre'],
+  'più animati: i due livello 3 a pari punteggio vengono prima (ordine per hash del giorno)');
 select is((select typical_level from busy where name = 'Presto uno poi tre'), 3::smallint, 'il livello è il massimo nella finestra');
 select is((select going_band from busy where name = 'Alfa tre'), public.attendance_band(26), 'fascia stasera = vero + bot');
 select is((select is_estimate from busy where name = 'Alfa tre'), true, 'is_estimate con bot');
