@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Avatar, type AvatarIntent, type AvatarPhoto } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
+import { TourAnchor } from '@/features/tour/components/TourAnchor';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { colors, heights, spacing } from '@/theme/tokens';
 
@@ -81,14 +82,16 @@ export function TopBar({
 function PostButton({ onPress }: { onPress: () => void }) {
   const { t } = useTranslation('ui');
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={t('topBar.post')}
-      onPress={onPress}
-      style={styles.post}
-    >
-      <Icon name="plus" size={22} color="onAccent" strokeWidth={2.4} />
-    </Pressable>
+    <TourAnchor id="topbar.plus" style={styles.postAnchor}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('topBar.post')}
+        onPress={onPress}
+        style={styles.post}
+      >
+        <Icon name="plus" size={22} color="onAccent" strokeWidth={2.4} />
+      </Pressable>
+    </TourAnchor>
   );
 }
 
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
   right: { flexDirection: 'row', alignItems: 'center' },
   feedback: { alignItems: 'center' },
   news: { alignItems: 'flex-end' },
+  postAnchor: { alignSelf: 'flex-start' },
   post: {
     width: 40,
     height: 40,

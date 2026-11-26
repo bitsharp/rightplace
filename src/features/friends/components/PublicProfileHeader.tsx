@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { EnlargeablePhoto } from '@/features/profile/components/EnlargeablePhoto';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
+import { TourAnchor } from '@/features/tour/components/TourAnchor';
 import { formatHandle } from '@/features/profile/domain/handle';
 import type { ProfileSummary } from '@/features/profile/summary/api';
 import { colors, heights, spacing } from '@/theme/tokens';
@@ -67,13 +68,15 @@ export function PublicProfileHeader({
           layout="fill"
         />
         {onMessage ? (
-          <Button
-            label={tDm('profile.message')}
-            variant="secondary"
-            size="md"
-            style={styles.main}
-            onPress={onMessage}
-          />
+          <TourAnchor id="profile.message" testID="message-slot" style={styles.mainAnchor}>
+            <Button
+              label={tDm('profile.message')}
+              variant="secondary"
+              size="md"
+              style={styles.main}
+              onPress={onMessage}
+            />
+          </TourAnchor>
         ) : null}
         <Pressable
           accessibilityRole="button"
@@ -92,7 +95,8 @@ export function PublicProfileHeader({
 
 const styles = StyleSheet.create({
   actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  main: { flex: 1, minWidth: 0, paddingHorizontal: spacing.md },
+  mainAnchor: { flex: 1, minWidth: 0 },
+  main: { paddingHorizontal: spacing.md },
   more: {
     width: heights.minTapTarget,
     height: heights.minTapTarget,

@@ -7,6 +7,8 @@ import { TopBar } from '@/components/app/TopBar';
 import { SearchField } from '@/components/ui/SearchField';
 import { Text } from '@/components/ui/Text';
 import { Toast } from '@/components/ui/Toast';
+import { TourAnchor } from '@/features/tour/components/TourAnchor';
+import { TourOverlay } from '@/features/tour/components/TourOverlay';
 import { colors, spacing } from '@/theme/tokens';
 
 import type { Person } from '../api';
@@ -62,6 +64,7 @@ export function FriendsScreen() {
       </ScrollView>
       {notice ? <Toast tone="success" message={t(`person.${notice}`)} /> : null}
       <PersonSheet person={selected} onClose={() => setSelected(null)} onDone={setNotice} />
+      <TourOverlay screen="friends" />
     </SafeAreaView>
   );
 }
@@ -73,13 +76,15 @@ function SearchHeader({ text, onChangeText }: HeaderProps) {
   const following = useFollowing();
   return (
     <View style={styles.header}>
-      <SearchField
-        label={t('searchLabel')}
-        prefix="handle"
-        placeholder={t('searchPlaceholder')}
-        value={text}
-        onChangeText={onChangeText}
-      />
+      <TourAnchor id="friends.search">
+        <SearchField
+          label={t('searchLabel')}
+          prefix="handle"
+          placeholder={t('searchPlaceholder')}
+          value={text}
+          onChangeText={onChangeText}
+        />
+      </TourAnchor>
       <Text variant="body13" color="textSecondary">
         {t('hint')}
       </Text>

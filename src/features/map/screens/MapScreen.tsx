@@ -1,7 +1,9 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TopBar } from '@/components/app/TopBar';
+import { TourAnchor } from '@/features/tour/components/TourAnchor';
+import { TourOverlay } from '@/features/tour/components/TourOverlay';
 import { SpotSheet } from '@/features/spots/components/SpotSheet';
 import { colors, spacing } from '@/theme/tokens';
 
@@ -17,9 +19,9 @@ export function MapScreen() {
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
       <TopBar {...topBar} />
-      <View style={styles.controls}>
+      <TourAnchor id="map.viewToggle" style={styles.controls}>
         <MapViewSwitch view={map.view} onChange={map.setView} />
-      </View>
+      </TourAnchor>
       <MapStage
         city={map.city}
         layers={map.layers}
@@ -51,6 +53,7 @@ export function MapScreen() {
         onOpenVenue={map.openVenue}
       />
       <SpotSheet point={map.spotPoint} onClose={map.closeSpot} />
+      <TourOverlay screen="map" />
     </SafeAreaView>
   );
 }

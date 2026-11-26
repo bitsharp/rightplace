@@ -36,3 +36,18 @@ export function nextStep(screen: TourScreen, seen: readonly TourStepId[]): TourS
   const next = TOUR_STEPS.find((step) => step.screen === screen && !seen.includes(step.id));
   return next?.id ?? null;
 }
+
+// Like nextStep, but a tip whose anchor is not on screen (e.g. the "+" before declaring) waits its turn
+// instead of blocking the ones after it.
+export function nextVisibleStep(
+  screen: TourScreen,
+  seen: readonly TourStepId[],
+  isAnchored: (id: TourStepId) => boolean,
+): TourStepId | null {
+  const passed = [...seen];
+  for (;;) {
+    const id = nextStep(screen, passed);
+    if (id === null || isAnchored(id)) return id;
+    passed.push(id);
+  }
+}

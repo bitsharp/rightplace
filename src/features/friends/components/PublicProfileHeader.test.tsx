@@ -56,9 +56,10 @@ describe('PublicProfileHeader', () => {
     await renderHeader(undefined, jest.fn());
     const message = screen.getByText('dm:profile.message');
     expect(message.props.numberOfLines).toBe(1);
-    expect(
-      StyleSheet.flatten(screen.getByRole('button', { name: 'dm:profile.message' }).props.style),
-    ).toMatchObject({ flex: 1 });
+    // The slot that holds the button (it is also the anchor of the guide) takes half of the row.
+    expect(StyleSheet.flatten(screen.getByTestId('message-slot').props.style)).toMatchObject({
+      flex: 1,
+    });
     expect(screen.getByText('ui:follow.following').props.numberOfLines).toBe(1);
   });
 });

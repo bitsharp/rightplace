@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/Icon';
+import { TourAnchor } from '@/features/tour/components/TourAnchor';
 import { colors, heights, radius, spacing } from '@/theme/tokens';
 
 type Props = {
@@ -30,11 +31,11 @@ function RoundButton({ icon, label, onPress, going }: ButtonProps) {
 export function MapControls({ onOpenFilters, onExpand, onLocate }: Props) {
   const { t } = useTranslation('map');
   return (
-    <View testID="map-controls" style={styles.column}>
+    <TourAnchor id="map.hotSpot" testID="map-controls" style={styles.column}>
       <RoundButton icon="filters" label={t('header.filters')} onPress={onOpenFilters} />
       <RoundButton icon="expand" label={t('fullscreen.open')} onPress={onExpand} />
       <RoundButton icon="locate" label={t('locate')} onPress={onLocate} going />
-    </View>
+    </TourAnchor>
   );
 }
 

@@ -10,6 +10,8 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Text } from '@/components/ui/Text';
 import { DmInbox } from '@/features/dm/components/DmInbox';
 import { useTopBar } from '@/features/posts/useTopBar';
+import { TourAnchor } from '@/features/tour/components/TourAnchor';
+import { TourOverlay } from '@/features/tour/components/TourOverlay';
 import { colors, spacing } from '@/theme/tokens';
 
 import { RoomRow } from '../components/RoomRow';
@@ -31,14 +33,16 @@ export function ChatListScreen() {
         <Text accessibilityRole="header" variant="display22">
           {t('title')}
         </Text>
-        <SegmentedControl
-          options={[
-            { value: 'nights', label: tDm('tabs.nights'), tone: 'going' },
-            { value: 'messages', label: tDm('tabs.messages'), tone: 'going' },
-          ]}
-          value={section}
-          onChange={setSection}
-        />
+        <TourAnchor id="chat.night">
+          <SegmentedControl
+            options={[
+              { value: 'nights', label: tDm('tabs.nights'), tone: 'going' },
+              { value: 'messages', label: tDm('tabs.messages'), tone: 'going' },
+            ]}
+            value={section}
+            onChange={setSection}
+          />
+        </TourAnchor>
         {section === 'messages' ? <DmInbox /> : null}
         {section === 'nights' && rooms.isError ? (
           <EmptyState message={t('list.loadError')} />
@@ -58,6 +62,7 @@ export function ChatListScreen() {
             ))
           : null}
       </ScrollView>
+      <TourOverlay screen="chat" />
     </SafeAreaView>
   );
 }

@@ -15,6 +15,7 @@ import { useProfileSummary } from '@/features/profile/summary/hooks';
 import { canMessage } from '@/features/dm/domain/linked';
 import { useStartDm } from '@/features/dm/useStartDm';
 import { Toast } from '@/components/ui/Toast';
+import { TourOverlay } from '@/features/tour/components/TourOverlay';
 import { colors, spacing } from '@/theme/tokens';
 
 import type { DmError as DmErrorCode } from '@/features/dm/api';
@@ -71,6 +72,7 @@ export function PublicProfileScreen({ handle }: { handle: string }) {
         />
       ) : null}
       <DmError error={dm.error} />
+      <TourOverlay screen="userProfile" />
       <ProfileGridOverlays grid={grid} />
       <PersonSheet
         person={moderating ? (person ?? null) : null}

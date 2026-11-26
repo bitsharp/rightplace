@@ -1,6 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
+import { AnchorRegistryContext, createAnchorRegistry } from '@/features/tour/anchorRegistry';
+import { mockMeasureInWindow, resetMeasureInWindow } from '@/test/measure';
+
 import { STORY_RING_SIZE } from './StoryAvatar';
 import { TopBar, type Story } from './TopBar';
 
@@ -132,5 +135,23 @@ describe('TopBar', () => {
     const label = StyleSheet.flatten(name.props.style);
     expect(label.width).toBeGreaterThanOrEqual(STORY_RING_SIZE + 8);
     expect(label.textAlign).toBe('center');
+  });
+});
+
+describe('TopBar: ancora della guida', () => {
+  afterEach(() => resetMeasureInWindow());
+
+  it('il bottone “+” si segnala alla guida solo quando c’è', async () => {
+    mockMeasureInWindow({ x: 16, y: 8, width: 40, height: 40 });
+    const registry = createAnchorRegistry();
+    const bar = (canPost: boolean) => (
+      <AnchorRegistryContext.Provider value={registry}>
+        <TopBar {...baseProps} canPost={canPost} />
+      </AnchorRegistryContext.Provider>
+    );
+    const { rerender } = await render(bar(false));
+    expect(registry.rectOf('topbar.plus')).toBeNull();
+    await rerender(bar(true));
+    expect(registry.rectOf('topbar.plus')).toEqual({ x: 16, y: 8, width: 40, height: 40 });
   });
 });

@@ -6,6 +6,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { OpenChatButton } from '@/features/chat/components/OpenChatButton';
 import { Text } from '@/components/ui/Text';
 import type { Band } from '@/features/nights/domain/band';
+import { TourAnchor } from '@/features/tour/components/TourAnchor';
+import { TourOverlay } from '@/features/tour/components/TourOverlay';
 import { colors, spacing } from '@/theme/tokens';
 
 import { AttendanceTiles } from '../components/AttendanceTiles';
@@ -36,7 +38,9 @@ export function VenueScreen({ venueId }: { venueId: string }) {
       </ScrollView>
       {venue ? (
         <>
-          <DeclareCta onPress={screen.openSheet} />
+          <TourAnchor id="venue.declare">
+            <DeclareCta onPress={screen.openSheet} />
+          </TourAnchor>
           <DeclarationSheet
             visible={screen.sheetOpen}
             onClose={screen.closeSheet}
@@ -61,6 +65,7 @@ export function VenueScreen({ venueId }: { venueId: string }) {
           />
         </>
       ) : null}
+      <TourOverlay screen="venue" />
     </SafeAreaView>
   );
 }
@@ -79,7 +84,11 @@ function Bands({ screen }: { screen: Screen }) {
   const going = bandOrDefault(screen.bands?.goingBand, screen.isSpot);
   const maybe = bandOrDefault(screen.bands?.maybeBand, screen.isSpot);
   if (going && maybe) {
-    return <AttendanceTiles going={going} maybe={maybe} />;
+    return (
+      <TourAnchor id="venue.bands">
+        <AttendanceTiles going={going} maybe={maybe} />
+      </TourAnchor>
+    );
   }
   // Below k = 3 a spot shows no number, not even "pochi": only that someone declared it.
   return screen.bands ? (
