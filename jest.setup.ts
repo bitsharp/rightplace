@@ -196,3 +196,8 @@ beforeEach(() =>
     .requireActual<typeof import('@/lib/links/linkActionsStore')>('@/lib/links/linkActionsStore')
     .resetLinkActions(),
 );
+
+// The guided tour is for first-time users: tests start as a user who has already seen it.
+beforeEach(() =>
+  jest.requireActual<typeof import('@/test/tourState')>('@/test/tourState').markTourSeen(),
+);
