@@ -165,6 +165,14 @@ const styles = StyleSheet.create({
   faces: { height: FACES_HEIGHT, alignItems: 'center', justifyContent: 'center' },
 });
 
+// Friends view: a tap opens the friend (or the list of friends) of the venue instead of the venue. A marker is
+// one bitmap, so its faces cannot be tapped one by one.
+const pressOf = (
+  view: MapViewMode,
+  onOpenVenue: (venueId: string) => void,
+  onOpenFriends?: (venueId: string) => void,
+) => (view === 'friends' && onOpenFriends ? onOpenFriends : onOpenVenue);
+
 function friendsCaption(venue: MapVenue, view: MapViewMode): string | undefined {
   return view === 'friends' ? String(venue.friendsCount ?? 0) : undefined;
 }
@@ -174,12 +182,15 @@ export function HotSpotMarkers({
   view,
   urls = NO_URLS,
   onOpenVenue,
+  onOpenFriends,
 }: {
   hotSpots: HotSpotVenue[];
   view: MapViewMode;
   urls?: AvatarUrls;
   onOpenVenue: (venueId: string) => void;
+  onOpenFriends?: (venueId: string) => void;
 }) {
+  const open = pressOf(view, onOpenVenue, onOpenFriends);
   return hotSpots.map((venue) => (
     <VenueMarker
       key={venue.venueId}
@@ -195,14 +206,14 @@ export function HotSpotMarkers({
       ].join(':')}
       testID={`marker-hot-${venue.venueId}`}
       zIndex={Z_INDEX.hotSpot + TIER_Z_OFFSET[hotSpotTier(venue.goingBand, venue.maybeBand)]}
-      onOpenVenue={onOpenVenue}
+      onOpenVenue={open}
     >
       <HotSpot
         venueName={venue.name}
         goingBand={venue.goingBand}
         maybeBand={venue.maybeBand}
         caption={friendsCaption(venue, view)}
-        onPress={() => onOpenVenue(venue.venueId)}
+        onPress={() => open(venue.venueId)}
       />
     </VenueMarker>
   ));
@@ -213,12 +224,15 @@ export function SpotMarkers({
   view,
   urls = NO_URLS,
   onOpenVenue,
+  onOpenFriends,
 }: {
   spots: MapVenue[];
   view: MapViewMode;
   urls?: AvatarUrls;
   onOpenVenue: (venueId: string) => void;
+  onOpenFriends?: (venueId: string) => void;
 }) {
+  const open = pressOf(view, onOpenVenue, onOpenFriends);
   return spots.map((venue) => (
     <VenueMarker
       key={venue.venueId}
@@ -228,12 +242,12 @@ export function SpotMarkers({
       contentKey={[venue.venueId, venue.name, view, venue.friendsCount ?? ''].join(':')}
       testID={`marker-spot-${venue.venueId}`}
       zIndex={Z_INDEX.spot}
-      onOpenVenue={onOpenVenue}
+      onOpenVenue={open}
     >
       <SpotMarker
         name={venue.name}
         caption={friendsCaption(venue, view)}
-        onPress={() => onOpenVenue(venue.venueId)}
+        onPress={() => open(venue.venueId)}
       />
     </VenueMarker>
   ));

@@ -34,6 +34,8 @@ type Props = {
   initialRegion?: MapRegion;
   onRegionChange?: (region: MapRegion) => void;
   onOpenVenue: (venueId: string) => void;
+  // Friends view: a marker tap opens the friend or the list of friends there (see MapMarkers).
+  onOpenFriends?: (venueId: string) => void;
   // Creators' nights tonight ("stasera" layer), already placed so they never overlap a hot spot.
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
@@ -72,6 +74,7 @@ export function MapCanvas({
   initialRegion,
   onRegionChange,
   onOpenVenue,
+  onOpenFriends,
   events = NO_EVENTS,
   onOpenEvent,
   ownSpot = null,
@@ -108,13 +111,20 @@ export function MapCanvas({
       toolbarEnabled={false}
       {...mapAppearance}
     >
-      <SpotMarkers spots={layers.spots} view={view} urls={avatarUrls} onOpenVenue={onOpenVenue} />
+      <SpotMarkers
+        spots={layers.spots}
+        view={view}
+        urls={avatarUrls}
+        onOpenVenue={onOpenVenue}
+        onOpenFriends={onOpenFriends}
+      />
       <EventMarkers events={events} onOpenEvent={onOpenEvent} />
       <HotSpotMarkers
         hotSpots={layers.hotSpots}
         view={view}
         urls={avatarUrls}
         onOpenVenue={onOpenVenue}
+        onOpenFriends={onOpenFriends}
       />
       {highlight ? <HighlightMarker target={highlight} /> : null}
       {ownSpot && me ? (

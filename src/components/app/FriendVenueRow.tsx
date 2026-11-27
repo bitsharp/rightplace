@@ -16,6 +16,8 @@ type Props = {
   faces?: readonly FriendFace[];
   urls?: Record<string, string>;
   onPress: () => void;
+  // Makes each face a link to that friend's profile; the rest of the row still opens the venue.
+  onOpenFriend?: (handle: string) => void;
 };
 
 const NO_FACES: readonly FriendFace[] = [];
@@ -28,6 +30,7 @@ export function FriendVenueRow({
   faces = NO_FACES,
   urls = NO_URLS,
   onPress,
+  onOpenFriend,
 }: Props) {
   const { t } = useTranslation('ui');
   const summary = `${t('friendsGoing', { count: friendHandles.length })} · ${friendHandles.map(formatHandle).join(', ')}`;
@@ -38,7 +41,7 @@ export function FriendVenueRow({
       onPress={onPress}
       style={rowStyles.row}
     >
-      <FriendFaces friends={faces} urls={urls} />
+      <FriendFaces friends={faces} urls={urls} onPressFace={onOpenFriend} />
       <View style={styles.texts}>
         <Text variant="body15Strong">{venueName}</Text>
         <Text variant="body12" color="textSecondary">

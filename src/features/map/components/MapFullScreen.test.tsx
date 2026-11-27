@@ -174,6 +174,26 @@ describe('MapFullScreen', () => {
       expect(calls).toEqual(['close', 'event:e1']);
     });
 
+    it('nella vista amici chiude la mappa e poi apre l’amico', async () => {
+      jest.replaceProperty(Platform, 'OS', 'android');
+      const calls: string[] = [];
+      await render(
+        <MapFullScreen
+          {...baseProps}
+          view="friends"
+          layers={{
+            hotSpots: [{ ...hot, friendsGoing: ['a.a'], friendIds: ['ua'], friendsCount: 1 }],
+            spots: [],
+          }}
+          onClose={() => calls.push('close')}
+          onOpenVenue={(id) => calls.push(`venue:${id}`)}
+          onOpenFriends={(id) => calls.push(`friends:${id}`)}
+        />,
+      );
+      await tapMarker();
+      expect(calls).toEqual(['close', 'friends:hot']);
+    });
+
     it('su iOS chiude subito ma apre il locale solo a onDismiss, una volta', async () => {
       jest.replaceProperty(Platform, 'OS', 'ios');
       const calls: string[] = [];

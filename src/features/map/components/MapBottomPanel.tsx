@@ -31,6 +31,7 @@ type Props = {
   // Injected for tests.
   busiestNow?: Date;
   onOpenVenue: (venueId: string) => void;
+  onOpenFriend?: (handle: string) => void;
   // A tap on a "più animati" card: show it on the map first, then open the detail.
   onSelectBusiest: (venueId: string) => void;
 };
@@ -49,7 +50,12 @@ export function MapBottomPanel(props: Props) {
         </Text>
       ) : null}
       {view === 'friends' && loaded ? (
-        <FriendVenueList venues={props.friendVenues} urls={props.avatarUrls} onOpen={onOpenVenue} />
+        <FriendVenueList
+          venues={props.friendVenues}
+          urls={props.avatarUrls}
+          onOpen={onOpenVenue}
+          onOpenFriend={props.onOpenFriend}
+        />
       ) : null}
       {view === 'general' ? (
         <>

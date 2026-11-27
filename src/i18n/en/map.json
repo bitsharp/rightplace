@@ -60,5 +60,10 @@
   },
   "busiest": {
     "title": "Busiest this {{day}}"
+  },
+  "friendsSheet": {
+    "more_one": "and one more",
+    "more_other": "and {{count}} more",
+    "openVenue": "See venue"
   }
 }

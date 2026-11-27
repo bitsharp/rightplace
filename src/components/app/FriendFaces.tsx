@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/Avatar';
+import { ProfileLink } from '@/components/ui/ProfileLink';
 import { Text } from '@/components/ui/Text';
 import { avatarIntent } from '@/features/friends/domain/avatarColor';
 import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
@@ -17,9 +18,12 @@ type Props = {
   size?: number;
   // A face's photo loaded or failed (see Avatar.onPhotoSettled): the map marker bitmap needs to know.
   onFaceSettled?: (userId: string) => void;
+  // Makes each face a link to the profile (>= 44 tap target). Not for map markers: a marker is one bitmap.
+  onPressFace?: (handle: string) => void;
 };
 
 const OVERLAP = 8;
+const MIN_TARGET = 44;
 
 // How many faces a row or marker draws unless told otherwise: only these photos are ever requested.
 export const DEFAULT_MAX_FACES = 2;
@@ -31,21 +35,37 @@ export function FriendFaces({
   max = DEFAULT_MAX_FACES,
   size = 28,
   onFaceSettled,
+  onPressFace,
 }: Props) {
   if (friends.length === 0) return null;
+  const avatarOf = (friend: FriendFace) => (
+    <Avatar
+      intent={avatarIntent(friend.handle)}
+      initial={friend.handle.charAt(0)}
+      size={size}
+      photo={avatarPhotoFor(urls, friend.userId)}
+      onPhotoSettled={onFaceSettled ? () => onFaceSettled(friend.userId) : undefined}
+    />
+  );
   const shown = friends.slice(0, max);
   const more = friends.length - shown.length;
   return (
     <View testID="friend-faces" style={styles.row}>
       {shown.map((friend, index) => (
         <View key={friend.userId} style={index > 0 ? { marginLeft: -OVERLAP } : undefined}>
-          <Avatar
-            intent={avatarIntent(friend.handle)}
-            initial={friend.handle.charAt(0)}
-            size={size}
-            photo={avatarPhotoFor(urls, friend.userId)}
-            onPhotoSettled={onFaceSettled ? () => onFaceSettled(friend.userId) : undefined}
-          />
+          {onPressFace ? (
+            <ProfileLink
+              handle={friend.handle}
+              onPress={() => onPressFace(friend.handle)}
+              // The overlapping faces keep their look: the width stays the face's, the missing tap area is slop.
+              style={{ minWidth: size }}
+              hitSlop={{ left: (MIN_TARGET - size) / 2, right: (MIN_TARGET - size) / 2 }}
+            >
+              {avatarOf(friend)}
+            </ProfileLink>
+          ) : (
+            avatarOf(friend)
+          )}
         </View>
       ))}
       {more > 0 ? (

@@ -7,6 +7,7 @@ import { TourOverlay } from '@/features/tour/components/TourOverlay';
 import { SpotSheet } from '@/features/spots/components/SpotSheet';
 import { colors, spacing } from '@/theme/tokens';
 
+import { FriendsSheet } from '../components/FriendsSheet';
 import { MapBottomPanel } from '../components/MapBottomPanel';
 import { MapHeader } from '../components/MapHeader';
 import { MapStage } from '../components/MapStage';
@@ -32,6 +33,7 @@ export function MapScreen() {
         you={map.you}
         onChangeView={map.setView}
         onOpenVenue={map.openVenue}
+        onOpenFriends={map.openFriends}
         onOpenEvent={map.openEvent}
         onPickSpot={map.pickSpot}
         avatarUrls={avatarUrls}
@@ -54,7 +56,14 @@ export function MapScreen() {
         busiest={map.busiest}
         declaration={map.declaration}
         onOpenVenue={map.openVenue}
+        onOpenFriend={map.openFriend}
         onSelectBusiest={map.selectBusiest}
+      />
+      <FriendsSheet
+        venue={map.friendsSheetVenue}
+        onClose={map.closeFriendsSheet}
+        onOpenFriend={map.openFriend}
+        onOpenVenue={map.openVenue}
       />
       <SpotSheet point={map.spotPoint} onClose={map.closeSpot} />
       <TourOverlay screen="map" />

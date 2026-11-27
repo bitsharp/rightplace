@@ -39,6 +39,17 @@ describe('FriendVenueList', () => {
     expect(onOpen).toHaveBeenCalledWith('v1');
   });
 
+  it('un tap sul volto di un amico apre il suo profilo, non il locale', async () => {
+    const onOpen = jest.fn();
+    const onOpenFriend = jest.fn();
+    await render(
+      <FriendVenueList venues={venues} urls={{}} onOpen={onOpen} onOpenFriend={onOpenFriend} />,
+    );
+    await fireEvent.press(screen.getByLabelText('ui:profileLink.open({"handle":"@orso.grigio"})'));
+    expect(onOpenFriend).toHaveBeenCalledWith('orso.grigio');
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
   it('senza amici nei locali dice che nessuno ha dichiarato', async () => {
     await render(<FriendVenueList venues={[]} urls={{}} onOpen={jest.fn()} />);
     expect(screen.getByText('map:friendsEmpty')).toBeOnTheScreen();

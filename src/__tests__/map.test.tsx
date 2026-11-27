@@ -186,8 +186,8 @@ describe('mappa', () => {
       expect(screen.queryByText('map:legend.tonight')).toBeNull();
     });
 
-    it('a schermo intero il selettore cambia la vista (stesso store) e un tap sul marker apre il locale', async () => {
-      // Android: no onDismiss, the venue opens right after the map closes.
+    it('a schermo intero il selettore cambia la vista (stesso store) e un tap sul marker di un solo amico apre il suo profilo', async () => {
+      // Android: no onDismiss, the profile opens right after the map closes.
       jest.replaceProperty(Platform, 'OS', 'android');
       await renderApp('ready', '/map');
       await fireEvent.press(await screen.findByRole('button', { name: 'map:fullscreen.open' }));
@@ -197,7 +197,9 @@ describe('mappa', () => {
       await fireEvent.press(
         (await screen.findAllByTestId('marker-hot-terrace', { includeHiddenElements: true }))[0]!,
       );
-      expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
+      expect(
+        await screen.findByRole('header', { name: 'friends:publicProfile.title' }),
+      ).toBeOnTheScreen();
     });
   });
 
@@ -207,6 +209,37 @@ describe('mappa', () => {
       await screen.findByRole('button', { name: hotSpot('Arena Club', '3–10') });
       await fireEvent.press(screen.getByRole('button', { name: 'map:view.friends' }));
     }
+
+    it('un tap sul marker con più amici apre il foglio; “Vedi locale” porta al locale', async () => {
+      jest.replaceProperty(Platform, 'OS', 'android');
+      await openFriendsView();
+      await fireEvent.press(
+        (await screen.findAllByTestId('marker-hot-arena', { includeHiddenElements: true }))[0]!,
+      );
+      expect(
+        await within(await screen.findByTestId('sheet-content')).findByLabelText(
+          'ui:profileLink.open({"handle":"@orso.grigio"})',
+        ),
+      ).toBeOnTheScreen();
+      await fireEvent.press(screen.getByText('map:friendsSheet.openVenue'));
+      expect(await screen.findByRole('header', { name: 'venue:title' })).toBeOnTheScreen();
+    });
+
+    it('un tap su un amico del foglio apre il suo profilo', async () => {
+      jest.replaceProperty(Platform, 'OS', 'android');
+      await openFriendsView();
+      await fireEvent.press(
+        (await screen.findAllByTestId('marker-hot-arena', { includeHiddenElements: true }))[0]!,
+      );
+      await fireEvent.press(
+        await within(await screen.findByTestId('sheet-content')).findByLabelText(
+          'ui:profileLink.open({"handle":"@orso.grigio"})',
+        ),
+      );
+      expect(
+        await screen.findByRole('header', { name: 'friends:publicProfile.title' }),
+      ).toBeOnTheScreen();
+    });
 
     it('mostra solo i locali con amici, con il numero di amici sul punto caldo', async () => {
       await openFriendsView();

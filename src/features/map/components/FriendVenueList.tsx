@@ -12,9 +12,11 @@ type Props = {
   // Signed photos by user id (one batch for the whole map screen); missing = initial.
   urls: Record<string, string>;
   onOpen: (venueId: string) => void;
+  // A tap on a friend's face opens their profile instead of the venue.
+  onOpenFriend?: (handle: string) => void;
 };
 
-export function FriendVenueList({ venues, urls, onOpen }: Props) {
+export function FriendVenueList({ venues, urls, onOpen, onOpenFriend }: Props) {
   const { t } = useTranslation('map');
   if (venues.length === 0) return <EmptyState message={t('friendsEmpty')} />;
   return (
@@ -27,6 +29,7 @@ export function FriendVenueList({ venues, urls, onOpen }: Props) {
           faces={friendFacesOf(venue.handles, venue.friendIds)}
           urls={urls}
           onPress={() => onOpen(venue.venueId)}
+          onOpenFriend={onOpenFriend}
         />
       ))}
     </View>

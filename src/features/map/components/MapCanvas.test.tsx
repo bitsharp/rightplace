@@ -114,6 +114,62 @@ describe('MapCanvas', () => {
     expect(onOpenVenue).toHaveBeenLastCalledWith('hot');
   });
 
+  describe('vista amici: un tap sul marker apre l’amico', () => {
+    const withFriends = venue({
+      venueId: 'hot',
+      friendsGoing: ['volpe.viola'],
+      friendIds: ['u-volpe'],
+      friendsCount: 1,
+    });
+
+    it('chiama onOpenFriends, non onOpenVenue', async () => {
+      const onOpenVenue = jest.fn();
+      const onOpenFriends = jest.fn();
+      await render(
+        <MapCanvas
+          {...baseProps}
+          view="friends"
+          onOpenVenue={onOpenVenue}
+          onOpenFriends={onOpenFriends}
+          layers={{ hotSpots: [withFriends], spots: [] }}
+        />,
+      );
+      await fireEvent.press(marker('hot-hot'));
+      expect(onOpenFriends).toHaveBeenLastCalledWith('hot');
+      expect(onOpenVenue).not.toHaveBeenCalled();
+    });
+
+    it('anche lo spot senza numeri apre gli amici', async () => {
+      const onOpenFriends = jest.fn();
+      await render(
+        <MapCanvas
+          {...baseProps}
+          view="friends"
+          onOpenFriends={onOpenFriends}
+          layers={{ hotSpots: [], spots: [{ ...withFriends, venueId: 's1', isSpot: true }] }}
+        />,
+      );
+      await fireEvent.press(marker('spot-s1'));
+      expect(onOpenFriends).toHaveBeenLastCalledWith('s1');
+    });
+
+    it('la vista generale resta invariata: apre il locale', async () => {
+      const onOpenVenue = jest.fn();
+      const onOpenFriends = jest.fn();
+      await render(
+        <MapCanvas
+          {...baseProps}
+          onOpenVenue={onOpenVenue}
+          onOpenFriends={onOpenFriends}
+          layers={{ hotSpots: [withFriends], spots: [] }}
+        />,
+      );
+      await fireEvent.press(marker('hot-hot'));
+      expect(onOpenVenue).toHaveBeenLastCalledWith('hot');
+      expect(onOpenFriends).not.toHaveBeenCalled();
+    });
+  });
+
   it('3 punti caldi in ingresso → 3 HotSpot disegnati sulla mappa', async () => {
     await render(
       <MapCanvas
