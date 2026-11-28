@@ -136,6 +136,7 @@
     "maybe": "Forse"
   },
   "yourNight": {
+    "friendsEmpty": "Nessun amico ancora: invitali!",
     "openVenue": "Apri il locale",
     "friends": "Amici della serata ({{count}})",
     "transport": {

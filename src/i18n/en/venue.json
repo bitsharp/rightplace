@@ -136,6 +136,7 @@
     "maybe": "Maybe"
   },
   "yourNight": {
+    "friendsEmpty": "No friends yet: invite them!",
     "openVenue": "Open the venue",
     "friends": "Night friends ({{count}})",
     "transport": {

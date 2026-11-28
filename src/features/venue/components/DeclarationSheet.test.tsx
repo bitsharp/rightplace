@@ -247,6 +247,7 @@ describe('DeclarationSheet', () => {
         },
       ],
       urls: {},
+      myHandle: 'lince.rosso',
     };
 
     async function renderNight(state: DeclarationState, onClose = jest.fn()) {
@@ -300,6 +301,19 @@ describe('DeclarationSheet', () => {
       const onClose = await renderNight(hereGoing);
       await fireEvent.press(screen.getByRole('button', { name: 'venue:yourNight.openVenue' }));
       expect(onClose).toHaveBeenCalled();
+    });
+
+    it('una nuova dichiarazione riuscita lascia il foglio aperto: subito "La tua serata" con gli amici', async () => {
+      const onClose = await renderNight(none);
+      await fireEvent.press(screen.getByRole('button', { name: 'venue:declare.going' }));
+      await waitFor(() => expect(rpcNames()).toContain('declare'));
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('cambiare intenzione da una dichiarazione già qui chiude il foglio come prima', async () => {
+      const onClose = await renderNight(hereGoing);
+      await fireEvent.press(screen.getByRole('button', { name: /venue:declare.edit/ }));
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
     });
 
     it('senza dichiarazione qui resta la scelta Ci vado / Forse, senza il blocco', async () => {

@@ -68,23 +68,40 @@ describe('NightTransport', () => {
 
 describe('NightFriends', () => {
   it('titolo con il numero di amici e i loro volti', async () => {
-    await render(<NightFriends friends={friends} urls={{}} />);
+    await render(<NightFriends friends={friends} urls={{}} myHandle={null} />);
     expect(screen.getByText('venue:yourNight.friends({"count":2})')).toBeOnTheScreen();
     expect(screen.getByTestId('friend-faces')).toBeOnTheScreen();
   });
 
   it('foto per chi la rende visibile, iniziale per gli altri', async () => {
     await render(
-      <NightFriends friends={friends} urls={{ 'u-volpe': 'https://signed.test/a/v' }} />,
+      <NightFriends
+        friends={friends}
+        urls={{ 'u-volpe': 'https://signed.test/a/v' }}
+        myHandle={null}
+      />,
     );
     expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(1);
     expect(screen.getByText('O', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
-  it('senza amici: messaggio, nessun volto', async () => {
-    await render(<NightFriends friends={[]} urls={{}} />);
+  it('elenca anche gli @handle degli amici che vanno qui', async () => {
+    await render(<NightFriends friends={friends} urls={{}} myHandle="lince.rosso" />);
+    expect(screen.getByText('@volpe.viola')).toBeOnTheScreen();
+    expect(screen.getByText('@orso.grigio')).toBeOnTheScreen();
+  });
+
+  it('senza amici: invito a invitarli con il bottone di condivisione dell’@tag, nessun volto', async () => {
+    await render(<NightFriends friends={[]} urls={{}} myHandle="lince.rosso" />);
     expect(screen.getByText('venue:yourNight.friends({"count":0})')).toBeOnTheScreen();
-    expect(screen.getByText('venue:friends.empty')).toBeOnTheScreen();
+    expect(screen.getByText('venue:yourNight.friendsEmpty')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'profile:share.cta' })).toBeOnTheScreen();
     expect(screen.queryByTestId('friend-faces')).toBeNull();
+  });
+
+  it('senza @tag proprio (profilo non ancora caricato) niente bottone di condivisione', async () => {
+    await render(<NightFriends friends={[]} urls={{}} myHandle={null} />);
+    expect(screen.getByText('venue:yourNight.friendsEmpty')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'profile:share.cta' })).toBeNull();
   });
 });

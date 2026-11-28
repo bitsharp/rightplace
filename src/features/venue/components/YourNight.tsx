@@ -8,6 +8,8 @@ import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { colors, radius, spacing } from '@/theme/tokens';
 
+import { ShareHandleButton } from '@/features/profile/components/ShareHandleButton';
+import { formatHandle } from '@/features/profile/domain/handle';
 import type { VenueKind } from '@/features/venues/domain/venueList';
 
 import type { VenueFriend } from '../api';
@@ -27,6 +29,8 @@ export type NightContext = {
   // Accepted follows only, as the server returned them; the count is theirs, not an anonymous aggregate.
   friends: readonly VenueFriend[];
   urls: Record<string, string>;
+  // My own @tag, for the invite button when nobody I follow is going yet; null while the profile loads.
+  myHandle: string | null;
 };
 
 const PHOTO_SIZE = 72;
@@ -92,19 +96,30 @@ export function NightTransport({ links, onOpen }: TransportProps) {
   );
 }
 
-export function NightFriends({
-  friends,
-  urls,
-}: {
+type NightFriendsProps = {
   friends: readonly VenueFriend[];
   urls: Record<string, string>;
-}) {
+  myHandle: string | null;
+};
+
+// Accepted follows only (principle 6); photos as the server signed them (principle 1).
+export function NightFriends({ friends, urls, myHandle }: NightFriendsProps) {
   const { t } = useTranslation('venue');
   return (
     <View style={styles.block}>
       <Text variant="display17">{t('yourNight.friends', { count: friends.length })}</Text>
-      {friends.length === 0 ? <EmptyState message={t('friends.empty')} /> : null}
+      {friends.length === 0 ? (
+        <>
+          <EmptyState message={t('yourNight.friendsEmpty')} />
+          {myHandle ? <ShareHandleButton handle={myHandle} /> : null}
+        </>
+      ) : null}
       <FriendFaces friends={friends.map(faceOf)} urls={urls} max={MAX_FACES} size={FACE_SIZE} />
+      {friends.map((friend) => (
+        <Text key={friend.handle} variant="body15Strong">
+          {formatHandle(friend.handle)}
+        </Text>
+      ))}
     </View>
   );
 }

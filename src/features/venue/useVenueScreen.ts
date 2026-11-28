@@ -67,6 +67,7 @@ export function useVenueScreen(venueId: string) {
     bands: stats.data ?? null,
     statsView: current ? statsView(current, segment) : null,
     friends,
+    myHandle: profile?.handle ?? null,
     // One request for the people listed here; only the photos I may see come back.
     avatarUrls,
     segment,

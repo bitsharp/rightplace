@@ -49,7 +49,13 @@ export function DeclarationSheet({ visible, onClose, ...body }: Props) {
 
 function SheetBody({ onClose, target, venue, state, night }: Omit<Props, 'visible'>) {
   const { height } = useWindowDimensions();
-  const actions = useDeclarationActions({ target, venue, state, onClose });
+  const actions = useDeclarationActions({
+    target,
+    venue,
+    state,
+    onClose,
+    stayOpenAfterDeclare: night !== undefined && state.kind !== 'here',
+  });
 
   return (
     <ScrollView style={{ maxHeight: height * 0.75 }} contentContainerStyle={styles.content}>
@@ -127,7 +133,7 @@ function YourNightBottom({ night }: { night: NightContext }) {
   return (
     <>
       <NightTransport links={night.links} onOpen={night.onOpenLink} />
-      <NightFriends friends={night.friends} urls={night.urls} />
+      <NightFriends friends={night.friends} urls={night.urls} myHandle={night.myHandle} />
     </>
   );
 }

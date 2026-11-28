@@ -62,6 +62,7 @@ export function VenueScreen({ venueId }: { venueId: string }) {
               onOpenLink: screen.openLink,
               friends: screen.friends,
               urls: screen.avatarUrls,
+              myHandle: screen.myHandle,
             }}
           />
         </>

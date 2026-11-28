@@ -14,6 +14,8 @@ type Params = {
   venue: { id: string; name: string };
   state: DeclarationState;
   onClose: () => void;
+  // A new declaration keeps the sheet open: it turns into "La tua serata" with the friends going.
+  stayOpenAfterDeclare?: boolean;
 };
 
 const errorCodeOf = (error: unknown): RpcErrorCode | null => {
@@ -23,7 +25,13 @@ const errorCodeOf = (error: unknown): RpcErrorCode | null => {
 
 // The sheet closes only after the server accepted the change; until then the optimistic cache
 // update already shows the new state, and a refusal rolls it back and keeps the sheet open.
-export function useDeclarationActions({ target, venue, state, onClose }: Params) {
+export function useDeclarationActions({
+  target,
+  venue,
+  state,
+  onClose,
+  stayOpenAfterDeclare = false,
+}: Params) {
   const declare = useDeclare();
   const undeclare = useUndeclare();
   const [confirming, setConfirming] = useState<PendingConfirm>(null);
@@ -33,7 +41,7 @@ export function useDeclarationActions({ target, venue, state, onClose }: Params)
       { target, intent, venue },
       {
         onSuccess: () => {
-          onClose();
+          if (!stayOpenAfterDeclare) onClose();
           // notifications: first declaration asks for permission once the sheet is gone
           requestPrePermission();
         },
