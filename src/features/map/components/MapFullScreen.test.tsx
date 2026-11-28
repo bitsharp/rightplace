@@ -51,6 +51,8 @@ const baseProps = {
   onRegionChange: jest.fn(),
   onClose: jest.fn(),
   onOpenVenue: jest.fn(),
+  onOpenSearch: jest.fn(),
+  onLocate: jest.fn(),
 };
 
 describe('MapFullScreen', () => {
@@ -108,6 +110,54 @@ describe('MapFullScreen', () => {
     await render(<MapFullScreen {...baseProps} />);
     await fireEvent.press(screen.getByRole('button', { name: 'map:view.friends' }));
     expect(baseProps.onChangeView).toHaveBeenCalledWith('friends');
+  });
+
+  it('ha la stessa colonna di tre bottoni della home e niente X in alto', async () => {
+    await render(<MapFullScreen {...baseProps} />);
+    expect(screen.getByTestId('map-controls')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'map:header.filters' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'map:locate' })).toBeOnTheScreen();
+    expect(screen.getByTestId('icon-collapse', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.queryByTestId('icon-close', { includeHiddenElements: true })).toBeNull();
+  });
+
+  it('la posizione resta a schermo intero e chiama onLocate', async () => {
+    await render(<MapFullScreen {...baseProps} />);
+    await fireEvent.press(screen.getByRole('button', { name: 'map:locate' }));
+    expect(baseProps.onLocate).toHaveBeenCalledTimes(1);
+    expect(baseProps.onClose).not.toHaveBeenCalled();
+  });
+
+  it('la ricerca chiude lo schermo intero e poi si apre (Android: subito)', async () => {
+    jest.replaceProperty(Platform, 'OS', 'android');
+    const calls: string[] = [];
+    await render(
+      <MapFullScreen
+        {...baseProps}
+        onClose={() => calls.push('close')}
+        onOpenSearch={() => calls.push('search')}
+      />,
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'map:header.filters' }));
+    expect(calls).toEqual(['close', 'search']);
+    jest.restoreAllMocks();
+  });
+
+  it('su iOS la ricerca si apre solo a onDismiss', async () => {
+    jest.replaceProperty(Platform, 'OS', 'ios');
+    const calls: string[] = [];
+    await render(
+      <MapFullScreen
+        {...baseProps}
+        onClose={() => calls.push('close')}
+        onOpenSearch={() => calls.push('search')}
+      />,
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'map:header.filters' }));
+    expect(calls).toEqual(['close']);
+    await fireEvent(screen.getByTestId('map-fullscreen'), 'dismiss');
+    expect(calls).toEqual(['close', 'search']);
+    jest.restoreAllMocks();
   });
 
   it('il bottone chiudi e il tasto indietro di Android chiudono', async () => {

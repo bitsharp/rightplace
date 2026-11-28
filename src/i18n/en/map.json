@@ -40,7 +40,7 @@
   "mapA11y": "Map of venues in {{city}}",
   "fullscreen": {
     "open": "Open the map full screen",
-    "close": "Close the map"
+    "close": "Shrink the map"
   },
   "own": {
     "going": "You're going",

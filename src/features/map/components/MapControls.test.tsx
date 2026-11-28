@@ -40,4 +40,14 @@ describe('MapControls', () => {
     expect(h.onExpand).toHaveBeenCalledTimes(1);
     expect(h.onLocate).toHaveBeenCalledTimes(1);
   });
+
+  it('a schermo intero il bottone espandi diventa "riduci": icona e nome diversi', async () => {
+    const h = handlers();
+    await render(<MapControls {...h} expanded />);
+    expect(screen.getByTestId('icon-collapse', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.queryByTestId('icon-expand', { includeHiddenElements: true })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'map:fullscreen.open' })).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'map:fullscreen.close' }));
+    expect(h.onExpand).toHaveBeenCalledTimes(1);
+  });
 });

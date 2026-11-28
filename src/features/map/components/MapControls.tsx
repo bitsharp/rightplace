@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { TourAnchor } from '@/features/tour/components/TourAnchor';
@@ -10,6 +10,8 @@ type Props = {
   onOpenFilters: () => void;
   onExpand: () => void;
   onLocate: () => void;
+  // Full screen: the same column, but the expand button shrinks back to the compact map.
+  expanded?: boolean;
 };
 
 type ButtonProps = { icon: IconName; label: string; onPress: () => void; going?: boolean };
@@ -28,13 +30,30 @@ function RoundButton({ icon, label, onPress, going }: ButtonProps) {
 }
 
 // One column in the top right corner of the compact map: same x, same size, even spacing.
-export function MapControls({ onOpenFilters, onExpand, onLocate }: Props) {
+export function MapControls({ onOpenFilters, onExpand, onLocate, expanded = false }: Props) {
   const { t } = useTranslation('map');
+  const buttons = (
+    <>
+      <RoundButton icon="filters" label={t('header.filters')} onPress={onOpenFilters} />
+      <RoundButton
+        icon={expanded ? 'collapse' : 'expand'}
+        label={expanded ? t('fullscreen.close') : t('fullscreen.open')}
+        onPress={onExpand}
+      />
+      <RoundButton icon="locate" label={t('locate')} onPress={onLocate} going />
+    </>
+  );
+  // The tour points at the compact map only: a second anchor in full screen would fight for the id.
+  if (expanded) {
+    return (
+      <View testID="map-controls" style={styles.column}>
+        {buttons}
+      </View>
+    );
+  }
   return (
     <TourAnchor id="map.hotSpot" testID="map-controls" style={styles.column}>
-      <RoundButton icon="filters" label={t('header.filters')} onPress={onOpenFilters} />
-      <RoundButton icon="expand" label={t('fullscreen.open')} onPress={onExpand} />
-      <RoundButton icon="locate" label={t('locate')} onPress={onLocate} going />
+      {buttons}
     </TourAnchor>
   );
 }

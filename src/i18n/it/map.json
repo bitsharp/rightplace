@@ -40,7 +40,7 @@
   "mapA11y": "Mappa dei locali di {{city}}",
   "fullscreen": {
     "open": "Apri la mappa a schermo intero",
-    "close": "Chiudi la mappa"
+    "close": "Riduci la mappa"
   },
   "own": {
     "going": "Ci vai",

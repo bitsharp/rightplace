@@ -116,6 +116,9 @@ export function MapStage({
             onChangeView={onChangeView}
             onRegionChange={setRegion}
             onClose={() => setFullScreen(false)}
+            onOpenSearch={onOpenSearch}
+            onLocate={locate}
+            focus={focus}
             onOpenVenue={onOpenVenue}
             {...eventProps}
           />

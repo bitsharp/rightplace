@@ -35,6 +35,7 @@ const GLYPHS = {
   minus: [<Path key="p" d="M5 12h14" />],
   close: [<Path key="p" d="M6 6l12 12M18 6L6 18" />],
   expand: [<Path key="p" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />],
+  collapse: [<Path key="p" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" />],
   check: [<Path key="p" d="M5 12l4.5 4.5L19 7" />],
   send: [<Path key="p" d="M5 12h14M13 6l6 6-6 6" />],
   heart: [
