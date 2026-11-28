@@ -259,6 +259,21 @@ describe('MapFullScreen', () => {
       await fireEvent(screen.getByTestId('map-fullscreen'), 'dismiss');
       expect(calls).toEqual(['close', 'open:hot']);
     });
+
+    it('su iOS il locale si apre anche se il genitore ricrea le callback prima di onDismiss', async () => {
+      jest.replaceProperty(Platform, 'OS', 'ios');
+      const calls: string[] = [];
+      const first = (id: string) => calls.push(`old:${id}`);
+      const latest = (id: string) => calls.push(`new:${id}`);
+      const onClose = () => calls.push('close');
+      const { rerender } = await render(
+        <MapFullScreen {...baseProps} onClose={onClose} onOpenVenue={first} />,
+      );
+      await tapMarker();
+      await rerender(<MapFullScreen {...baseProps} onClose={onClose} onOpenVenue={latest} />);
+      await fireEvent(screen.getByTestId('map-fullscreen'), 'dismiss');
+      expect(calls).toEqual(['close', 'new:hot']);
+    });
   });
 
   describe('pressione lunga per uno spot', () => {

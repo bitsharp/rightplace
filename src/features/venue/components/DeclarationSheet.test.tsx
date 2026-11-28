@@ -313,6 +313,35 @@ describe('DeclarationSheet', () => {
       jest.restoreAllMocks();
     });
 
+    it('su iOS il profilo si apre a onDismiss anche se il genitore ricrea onOpenFriend', async () => {
+      jest.replaceProperty(Platform, 'OS', 'ios');
+      const calls: string[] = [];
+      const { Wrapper } = createQueryWrapper();
+      setFakeRpc({});
+      const sheet = (onOpenFriend: (handle: string) => void) => (
+        <DeclarationSheet
+          visible
+          onClose={() => calls.push('close')}
+          target={{ kind: 'night', id: 'v1' }}
+          venue={venue}
+          state={hereGoing}
+          night={{ ...night, onOpenFriend }}
+        />
+      );
+      const { rerender } = await render(
+        sheet((handle) => calls.push(`old:${handle}`)),
+        {
+          wrapper: Wrapper,
+        },
+      );
+      const [link] = screen.getAllByLabelText('ui:profileLink.open({"handle":"@volpe.viola"})');
+      await fireEvent.press(link!);
+      await rerender(sheet((handle) => calls.push(`new:${handle}`)));
+      await fireEvent(screen.getByTestId('sheet-modal'), 'dismiss');
+      expect(calls).toEqual(['close', 'new:volpe.viola']);
+      jest.restoreAllMocks();
+    });
+
     it('la freccia della card chiude il foglio e riporta al locale', async () => {
       const onClose = await renderNight(hereGoing);
       await fireEvent.press(screen.getByRole('button', { name: 'venue:yourNight.openVenue' }));

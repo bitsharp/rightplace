@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { RangeStat } from '@/components/ui/RangeStat';
@@ -8,7 +7,7 @@ import { Sheet } from '@/components/ui/Sheet';
 import { Text } from '@/components/ui/Text';
 import { onDeclarationSheetDismiss } from '@/features/notifications/prePermission';
 import type { Band } from '@/features/nights/domain/band';
-import { afterModalDismiss } from '@/lib/afterModalDismiss';
+import { useAfterModalDismiss } from '@/lib/useAfterModalDismiss';
 import type { RpcErrorCode } from '@/lib/rpcError';
 import { spacing } from '@/theme/tokens';
 
@@ -44,10 +43,7 @@ type Props = {
 export function DeclarationSheet({ visible, onClose, ...body }: Props) {
   const openFriend = body.night?.onOpenFriend;
   // A profile is another screen: on iOS it opens only once the sheet's Modal is gone.
-  const deferred = useMemo(
-    () => afterModalDismiss<string>(Platform.OS, (handle) => openFriend?.(handle)),
-    [openFriend],
-  );
+  const deferred = useAfterModalDismiss<string>((handle) => openFriend?.(handle));
   const night = body.night && {
     ...body.night,
     onOpenFriend: (handle: string) => {

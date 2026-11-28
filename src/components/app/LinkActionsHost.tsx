@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Sheet } from '@/components/ui/Sheet';
 import { Text } from '@/components/ui/Text';
 import { Toast } from '@/components/ui/Toast';
-import { afterModalDismiss } from '@/lib/afterModalDismiss';
+import { useAfterModalDismiss } from '@/lib/useAfterModalDismiss';
 import { useLinkActions } from '@/lib/links/linkActionsStore';
 import { copyToClipboard, openLink } from '@/lib/links/links';
 import { spacing } from '@/theme/tokens';
@@ -30,9 +30,7 @@ function LinkSheet() {
   const url = useLinkActions((state) => state.sheetUrl);
   const close = useLinkActions((state) => state.closeSheet);
   // Same rule as the photo picker: on iOS the browser opens only once the Modal is gone.
-  const [deferred] = useState(() =>
-    afterModalDismiss<string>(Platform.OS, (link) => void openLink(link)),
-  );
+  const deferred = useAfterModalDismiss<string>((link) => void openLink(link));
   // The Modal keeps showing the last link while it slides out.
   const [shown, setShown] = useState<string | null>(null);
   if (url && url !== shown) setShown(url);

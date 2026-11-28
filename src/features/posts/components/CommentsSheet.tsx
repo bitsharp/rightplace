@@ -1,13 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-  type ScrollViewInstance,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { LinkedText } from '@/components/ui/LinkedText';
@@ -20,7 +13,7 @@ import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
 import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { useOpenProfile, type ProfileTarget } from '@/features/profile/useOpenProfile';
-import { afterModalDismiss } from '@/lib/afterModalDismiss';
+import { useAfterModalDismiss } from '@/lib/useAfterModalDismiss';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import type { PostComment } from '../domain/types';
@@ -40,7 +33,7 @@ type Props = {
 export function CommentsSheet({ postId, onClose, highlightId = null }: Props) {
   const openProfile = useOpenProfile();
   // Same rule as the link sheet: on iOS the navigation runs only once the Modal is gone.
-  const [deferred] = useState(() => afterModalDismiss<ProfileTarget>(Platform.OS, openProfile));
+  const deferred = useAfterModalDismiss<ProfileTarget>(openProfile);
   const openAuthor = (target: ProfileTarget) => {
     deferred.request(target);
     onClose();

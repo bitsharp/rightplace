@@ -1,9 +1,8 @@
-import { useMemo } from 'react';
-import { Modal, Platform, StyleSheet, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { LatLng } from '@/features/profile/domain/coarsen';
-import { afterModalDismiss } from '@/lib/afterModalDismiss';
+import { useAfterModalDismiss } from '@/lib/useAfterModalDismiss';
 import { colors, spacing } from '@/theme/tokens';
 
 import type { EventSpotPlacement } from '../domain/eventSpots';
@@ -109,16 +108,12 @@ export function MapFullScreen({
   ...content
 }: Props) {
   const { onClose } = content;
-  const deferred = useMemo(
-    () =>
-      afterModalDismiss<Destination>(Platform.OS, (destination) => {
-        if (destination.kind === 'search') return onOpenSearch();
-        if (destination.kind === 'spot') return onPickSpot?.(destination.point);
-        if (destination.kind === 'venue') return onOpenVenue(destination.id);
-        onOpenEvent?.(destination.id);
-      }),
-    [onOpenVenue, onOpenEvent, onPickSpot, onOpenSearch],
-  );
+  const deferred = useAfterModalDismiss<Destination>((destination) => {
+    if (destination.kind === 'search') return onOpenSearch();
+    if (destination.kind === 'spot') return onPickSpot?.(destination.point);
+    if (destination.kind === 'venue') return onOpenVenue(destination.id);
+    onOpenEvent?.(destination.id);
+  });
   const openAfterClose = (kind: 'venue' | 'event') => (id: string) => {
     onClose();
     deferred.request({ kind, id });

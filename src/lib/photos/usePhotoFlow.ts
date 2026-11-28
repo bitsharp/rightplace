@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 
-import { afterModalDismiss } from '@/lib/afterModalDismiss';
+import { useAfterModalDismiss } from '@/lib/useAfterModalDismiss';
 
 import { AVATAR_MAX_SIDE, MAX_PHOTO_SIDE } from './photoSize';
 import { pickPhoto, preparePhoto, type PhotoShape, type PhotoSource } from './photos';
@@ -40,9 +39,7 @@ export function usePhotoFlow(onReady: (cleanUri: string) => void, kind: PhotoKin
 
   const [launch, setLaunch] = useState<{ source: PhotoSource } | null>(null);
   // Not an effect on `launch` alone: onReady may change identity between the tap and onDismiss.
-  const [deferred] = useState(() =>
-    afterModalDismiss<PhotoSource>(Platform.OS, (source) => setLaunch({ source })),
-  );
+  const deferred = useAfterModalDismiss<PhotoSource>((source) => setLaunch({ source }));
 
   useEffect(() => {
     if (launch) void pick(launch.source, kind, onReady, setNotice);
