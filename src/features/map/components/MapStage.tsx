@@ -23,7 +23,6 @@ type Props = {
   you: { lat: number; lng: number } | null;
   onChangeView: (view: MapViewMode) => void;
   onOpenVenue: (venueId: string) => void;
-  onOpenFriends?: (venueId: string) => void;
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;

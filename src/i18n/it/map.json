@@ -60,10 +60,5 @@
   },
   "busiest": {
     "title": "I più animati del {{day}}"
-  },
-  "friendsSheet": {
-    "more_one": "e un altro",
-    "more_other": "e altri {{count}}",
-    "openVenue": "Vedi locale"
   }
 }

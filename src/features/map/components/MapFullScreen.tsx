@@ -33,7 +33,6 @@ type Props = {
   onLocate: () => void;
   focus?: MapFocus;
   onOpenVenue: (venueId: string) => void;
-  onOpenFriends?: (venueId: string) => void;
   events?: readonly EventSpotPlacement[];
   onOpenEvent?: (eventId: string) => void;
   ownSpot?: OwnSpot | null;
@@ -71,7 +70,6 @@ function FullScreenContent(props: ContentProps) {
           initialRegion={props.initialRegion}
           onRegionChange={props.onRegionChange}
           onOpenVenue={props.onOpenVenue}
-          onOpenFriends={props.onOpenFriends}
           events={props.events}
           onOpenEvent={props.onOpenEvent}
           ownSpot={props.ownSpot}
@@ -99,15 +97,12 @@ function FullScreenContent(props: ContentProps) {
 }
 
 type Destination =
-  | { kind: 'venue' | 'friends' | 'event'; id: string }
-  | { kind: 'spot'; point: LatLng }
-  | { kind: 'search' };
+  { kind: 'venue' | 'event'; id: string } | { kind: 'spot'; point: LatLng } | { kind: 'search' };
 
 // The only place where the legend is drawn over the map.
 export function MapFullScreen({
   visible,
   onOpenVenue,
-  onOpenFriends,
   onOpenEvent,
   onPickSpot,
   onOpenSearch,
@@ -120,12 +115,11 @@ export function MapFullScreen({
         if (destination.kind === 'search') return onOpenSearch();
         if (destination.kind === 'spot') return onPickSpot?.(destination.point);
         if (destination.kind === 'venue') return onOpenVenue(destination.id);
-        if (destination.kind === 'friends') return onOpenFriends?.(destination.id);
         onOpenEvent?.(destination.id);
       }),
-    [onOpenVenue, onOpenFriends, onOpenEvent, onPickSpot, onOpenSearch],
+    [onOpenVenue, onOpenEvent, onPickSpot, onOpenSearch],
   );
-  const openAfterClose = (kind: 'venue' | 'friends' | 'event') => (id: string) => {
+  const openAfterClose = (kind: 'venue' | 'event') => (id: string) => {
     onClose();
     deferred.request({ kind, id });
   };
@@ -153,7 +147,6 @@ export function MapFullScreen({
         <FullScreenContent
           {...content}
           onOpenVenue={openAfterClose('venue')}
-          onOpenFriends={onOpenFriends ? openAfterClose('friends') : undefined}
           onOpenEvent={openAfterClose('event')}
           onPickSpot={onPickSpot ? pickAfterClose : undefined}
           onOpenSearch={searchAfterClose}
