@@ -75,6 +75,12 @@
     }
   },
   "cta": "Declare your night",
+  "ctaChange": "Change your night",
+  "ctaMove": "Move your night here",
+  "ctaStatus": {
+    "going": "You're going",
+    "maybe": "Maybe"
+  },
   "declare": {
     "label": "Your night",
     "heading": "Declare your night",

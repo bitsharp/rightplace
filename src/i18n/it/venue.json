@@ -75,6 +75,12 @@
     }
   },
   "cta": "Dichiara la tua serata",
+  "ctaChange": "Modifica la tua serata",
+  "ctaMove": "Sposta qui la tua serata",
+  "ctaStatus": {
+    "going": "Ci vai",
+    "maybe": "Forse"
+  },
   "declare": {
     "label": "La tua serata",
     "heading": "Dichiara la tua serata",

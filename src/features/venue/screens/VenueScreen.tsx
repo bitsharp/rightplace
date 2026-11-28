@@ -39,7 +39,7 @@ export function VenueScreen({ venueId }: { venueId: string }) {
       {venue ? (
         <>
           <TourAnchor id="venue.declare">
-            <DeclareCta onPress={screen.openSheet} />
+            <DeclareCta state={screen.declaration} onPress={screen.openSheet} />
           </TourAnchor>
           <DeclarationSheet
             visible={screen.sheetOpen}

@@ -78,7 +78,11 @@ function Declaration({ screen }: { screen: Screen }) {
   if (!event) return null;
   return (
     <>
-      <DeclareCta onPress={screen.openSheet} disabled={!screen.canDeclare} />
+      <DeclareCta
+        state={screen.declaration}
+        onPress={screen.openSheet}
+        disabled={!screen.canDeclare}
+      />
       <DeclarationSheet
         visible={screen.sheetOpen && screen.canDeclare}
         onClose={screen.closeSheet}

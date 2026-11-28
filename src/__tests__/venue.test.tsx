@@ -346,7 +346,7 @@ describe('dettaglio locale e dichiarazione', () => {
           }),
       });
       await renderApp('ready', '/venue/arena');
-      await fireEvent.press(await screen.findByRole('button', { name: 'venue:cta' }));
+      await fireEvent.press(await screen.findByRole('button', { name: 'venue:ctaChange' }));
       expect(await screen.findByText('venue:yourNight.friends({"count":1})')).toBeOnTheScreen();
       expect(screen.getByText('venue:yourNight.transport.uber')).toBeOnTheScreen();
       expect(screen.queryByText(/condivid|share/i)).toBeNull();
@@ -433,7 +433,7 @@ describe('dettaglio locale e dichiarazione', () => {
       seedBackend({ mine: 'going' });
       await renderApp('ready', '/map');
       await fireEvent.press(await screen.findByRole('button', { name: pillName('goingAction') }));
-      await fireEvent.press(await screen.findByRole('button', { name: 'venue:cta' }));
+      await fireEvent.press(await screen.findByRole('button', { name: 'venue:ctaChange' }));
       await fireEvent.press(await screen.findByRole('button', { name: /venue:declare.edit/ }));
       await fireEvent.press(await screen.findByRole('button', { name: 'venue:back' }));
       expect(
@@ -445,7 +445,7 @@ describe('dettaglio locale e dichiarazione', () => {
       seedBackend({ mine: 'going' });
       await renderApp('ready', '/map');
       await fireEvent.press(await screen.findByRole('button', { name: pillName('goingAction') }));
-      await fireEvent.press(await screen.findByRole('button', { name: 'venue:cta' }));
+      await fireEvent.press(await screen.findByRole('button', { name: 'venue:ctaChange' }));
       await fireEvent.press(await screen.findByRole('button', { name: 'venue:declare.cancel' }));
       await fireEvent.press(screen.getByRole('button', { name: 'venue:declare.confirmYes' }));
       await fireEvent.press(await screen.findByRole('button', { name: 'venue:back' }));
@@ -593,7 +593,7 @@ describe('scheda di uno spot', () => {
       get_chat_rooms: [],
     });
     await renderApp('ready', '/venue/spot-1');
-    await fireEvent.press(await screen.findByRole('button', { name: 'venue:cta' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'venue:ctaChange' }));
     expect(await screen.findByText('venue:declare.edit')).toBeOnTheScreen();
   });
 });
