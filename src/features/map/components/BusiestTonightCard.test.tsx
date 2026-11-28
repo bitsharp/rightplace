@@ -68,7 +68,7 @@ describe('BusiestTonightCard', () => {
       />,
     );
     expect(screen.getAllByTestId('busiest-photo')).toHaveLength(1);
-    expect(screen.getAllByTestId(/^venue-cover-art-/)).toHaveLength(1);
+    expect(screen.getAllByTestId('venue-cover-art')).toHaveLength(1);
   });
 
   it('un tap apre il dettaglio di quel locale', async () => {

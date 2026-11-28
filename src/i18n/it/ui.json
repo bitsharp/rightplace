@@ -144,13 +144,6 @@
     }
   },
   "coverArt": {
-    "label": "Immagine illustrativa: {{kind}}",
-    "kind": {
-      "club": "club",
-      "rooftop": "rooftop",
-      "bar": "bar",
-      "live": "live",
-      "generic": "locale"
-    }
+    "label": "Immagine illustrativa del locale"
   }
 }

@@ -144,13 +144,6 @@
     }
   },
   "coverArt": {
-    "label": "Illustration: {{kind}}",
-    "kind": {
-      "club": "club",
-      "rooftop": "rooftop",
-      "bar": "bar",
-      "live": "live",
-      "generic": "venue"
-    }
+    "label": "Illustration of a venue"
   }
 }

@@ -8,7 +8,7 @@ describe('VenueCoverPhoto', () => {
   it('senza foto mostra il segnaposto del tipo di locale, senza didascalia', async () => {
     await render(<VenueCoverPhoto photoUrl={null} kind="club" />);
     expect(screen.getByTestId('venue-hero')).toBeOnTheScreen();
-    expect(screen.getByTestId('venue-cover-art-club')).toBeOnTheScreen();
+    expect(screen.getByTestId('venue-cover-art')).toBeOnTheScreen();
     expect(screen.queryByTestId('venue-cover-photo')).toBeNull();
     expect(screen.queryByText('venue:cover.caption')).toBeNull();
   });
@@ -34,7 +34,7 @@ describe('VenueCoverPhoto', () => {
     });
     expect(screen.queryByTestId('venue-cover-photo')).toBeNull();
     expect(screen.queryByText('venue:cover.caption')).toBeNull();
-    expect(screen.getByTestId('venue-cover-art-club')).toBeOnTheScreen();
+    expect(screen.getByTestId('venue-cover-art')).toBeOnTheScreen();
   });
 
   it('il tocco apre il visualizzatore con quella sola foto', async () => {

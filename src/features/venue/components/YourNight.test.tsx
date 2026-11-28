@@ -37,7 +37,7 @@ describe('NightVenueCard', () => {
     await render(<NightVenueCard {...base} photoUrl={url} />);
     expect(screen.getByLabelText('venue:cover.caption')).toBeOnTheScreen();
     await screen.rerender(<NightVenueCard {...base} />);
-    expect(screen.getByTestId('venue-cover-art-bar')).toBeOnTheScreen();
+    expect(screen.getByTestId('venue-cover-art')).toBeOnTheScreen();
   });
 
   it('la freccia riporta al locale', async () => {
