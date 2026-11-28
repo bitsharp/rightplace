@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useSession } from '@/features/auth/useSession';
 import { useStories } from '@/features/map/hooks';
@@ -7,7 +7,8 @@ import { useOpenProfile } from '@/features/profile/useOpenProfile';
 import { useAvatarUrls } from '@/features/profile/avatar/hooks';
 
 import { storyKey } from './domain/stories';
-import { usePostPhotoUrls, useStoryPosts } from './hooks';
+import { usePostPhotoUrls, useStoryPosts, useToggleLike } from './hooks';
+import type { FeedPost } from './domain/types';
 import { useSeenStories } from './store/seenStories';
 
 // The key must be the one the TopBar ring uses: the server's latest_post_at for other people
@@ -31,6 +32,8 @@ export function useStoryViewer(userId: string) {
   const openProfile = useOpenProfile();
   const posts = useStoryPosts(userId);
   const key = useStoryKey(userId, posts.data);
+  const toggleLike = useToggleLike();
+  const [commentsFor, setCommentsFor] = useState<string | null>(null);
   const markSeen = useSeenStories((state) => state.markSeen);
   const photoIds = (posts.data ?? []).filter((post) => post.hasPhoto).map((post) => post.id);
   const photoUrls = usePostPhotoUrls(photoIds);
@@ -48,6 +51,10 @@ export function useStoryViewer(userId: string) {
     isError: posts.isError,
     photoUrls,
     avatarUrls,
+    // Same like mutation as the feed: it patches the story list too.
+    toggleLike: (post: FeedPost) => toggleLike.mutate({ postId: post.id, liked: !post.likedByMe }),
+    commentsFor,
+    openComments: setCommentsFor,
     // Every post of a story has the same author: the first one names them.
     openAuthor: () => {
       const first = posts.data?.[0];

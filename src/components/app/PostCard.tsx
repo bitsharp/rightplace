@@ -87,7 +87,7 @@ export function PostCard({
       />
       <View style={styles.footer}>
         {caption ? <LinkedText testID="post-caption" text={caption} variant="body14" /> : null}
-        <SocialActions {...social} />
+        <PostSocialActions {...social} />
       </View>
     </Pressable>
   );
@@ -135,7 +135,8 @@ function PostPhoto({ uri, scene, caption, cacheKey, onOpen }: PostPhotoProps) {
   );
 }
 
-function SocialActions({
+// Like and comments: shared by the feed card and the stories viewer.
+export function PostSocialActions({
   likeCount,
   liked,
   commentCount,

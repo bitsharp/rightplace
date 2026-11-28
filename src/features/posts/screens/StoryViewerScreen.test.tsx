@@ -14,10 +14,22 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 const mockAvatars: Record<string, string> = {};
 const mockOpenAuthor = jest.fn();
+const mockToggleLike = jest.fn();
+const mockOpenComments = jest.fn();
+let mockCommentsFor: string | null = null;
+jest.mock('../components/CommentsSheet', () => ({
+  CommentsSheet: ({ postId }: { postId: string | null }) => {
+    const { Text } = jest.requireActual('react-native');
+    return postId ? <Text testID="comments-sheet">{postId}</Text> : null;
+  },
+}));
 jest.mock('../useStoryViewer', () => ({
   useStoryViewer: () => ({
     avatarUrls: mockAvatars,
     openAuthor: mockOpenAuthor,
+    toggleLike: mockToggleLike,
+    commentsFor: mockCommentsFor,
+    openComments: mockOpenComments,
     posts: [
       {
         id: 'p1',
@@ -27,6 +39,9 @@ jest.mock('../useStoryViewer', () => ({
         caption: null,
         hasPhoto: false,
         visibleFrom: '2026-11-05T10:00:00Z',
+        likeCount: 4,
+        likedByMe: false,
+        commentCount: 2,
       },
     ],
     photoUrls: {},
@@ -36,7 +51,37 @@ jest.mock('../useStoryViewer', () => ({
 }));
 
 describe('StoryViewerScreen', () => {
-  beforeEach(() => mockOpenAuthor.mockClear());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCommentsFor = null;
+  });
+
+  describe('like e commenti come nel feed', () => {
+    it('mostra i contatori di like e commenti del post', async () => {
+      await render(<StoryViewerScreen userId="u1" />);
+      expect(screen.getByRole('button', { name: 'ui:post.like' })).toBeOnTheScreen();
+      expect(screen.getByText('4')).toBeOnTheScreen();
+      expect(screen.getByText('2')).toBeOnTheScreen();
+    });
+
+    it('il cuore mette e toglie il like al post corrente', async () => {
+      await render(<StoryViewerScreen userId="u1" />);
+      await fireEvent.press(screen.getByRole('button', { name: 'ui:post.like' }));
+      expect(mockToggleLike).toHaveBeenCalledWith(expect.objectContaining({ id: 'p1' }));
+    });
+
+    it('il bottone commenti apre i commenti di quel post', async () => {
+      await render(<StoryViewerScreen userId="u1" />);
+      await fireEvent.press(screen.getByRole('button', { name: 'ui:post.comments' }));
+      expect(mockOpenComments).toHaveBeenCalledWith('p1');
+    });
+
+    it('il foglio dei commenti si apre sul post scelto', async () => {
+      mockCommentsFor = 'p1';
+      await render(<StoryViewerScreen userId="u1" />);
+      expect(screen.getByTestId('comments-sheet')).toHaveTextContent('p1');
+    });
+  });
 
   it('il tocco su avatar e titolo dell’intestazione apre il profilo dell’autore', async () => {
     await render(<StoryViewerScreen userId="u1" />);

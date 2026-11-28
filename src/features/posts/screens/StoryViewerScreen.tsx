@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PhotoViewer } from '@/components/app/PhotoViewer';
 import { PhotoFrame } from '@/components/app/PhotoFrame';
+import { PostSocialActions } from '@/components/app/PostCard';
 import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { LinkedText } from '@/components/ui/LinkedText';
@@ -15,6 +16,7 @@ import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { colors, heights, spacing } from '@/theme/tokens';
 
+import { CommentsSheet } from '../components/CommentsSheet';
 import { postMetaText } from '../domain/postMeta';
 import type { FeedPost } from '../domain/types';
 import { useStoryViewer } from '../useStoryViewer';
@@ -57,10 +59,13 @@ export function StoryViewerScreen({ userId }: { userId: string }) {
             position={index + 1}
             total={viewer.posts.length}
             photoUri={viewer.photoUrls[item.id]}
+            onToggleLike={viewer.toggleLike}
+            onOpenComments={viewer.openComments}
             onOpenPhoto={item.hasPhoto ? () => setZoomedId(item.id) : undefined}
           />
         )}
       />
+      <CommentsSheet postId={viewer.commentsFor} onClose={() => viewer.openComments(null)} />
       <PhotoViewer
         photos={
           zoomed ? [{ id: zoomed.id, uri: viewer.photoUrls[zoomed.id], cacheKey: zoomed.id }] : []
@@ -135,9 +140,20 @@ type PageProps = {
   total: number;
   photoUri?: string;
   onOpenPhoto?: () => void;
+  onToggleLike: (post: FeedPost) => void;
+  onOpenComments: (postId: string) => void;
 };
 
-function StoryPage({ post, width, position, total, photoUri, onOpenPhoto }: PageProps) {
+function StoryPage({
+  post,
+  width,
+  position,
+  total,
+  photoUri,
+  onOpenPhoto,
+  onToggleLike,
+  onOpenComments,
+}: PageProps) {
   const { t } = useTranslation('feed');
   const { t: tUi } = useTranslation('ui');
   return (
@@ -161,6 +177,13 @@ function StoryPage({ post, width, position, total, photoUri, onOpenPhoto }: Page
       <Text variant="body13" color="textSecondary">
         {postMetaText(t, post, new Date())}
       </Text>
+      <PostSocialActions
+        likeCount={post.likeCount}
+        liked={post.likedByMe}
+        commentCount={post.commentCount}
+        onToggleLike={() => onToggleLike(post)}
+        onOpenComments={() => onOpenComments(post.id)}
+      />
     </View>
   );
 }
