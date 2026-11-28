@@ -5,6 +5,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { colors } from '@/theme/tokens';
 
+import { HalftonePattern } from './scenes/shared';
 import { CANVAS, SCENES, SKY_ACCENT, sceneForKind } from './venueCoverScenes';
 
 type Props = {
@@ -12,12 +13,14 @@ type Props = {
   kind: string;
 };
 
-// Stylised night illustration shown where a venue has no photo (or it failed to load): drawn in SVG from the
+// Comic-style (thick ink outlines, flat shadows, halftone dots) night illustration shown where a venue has no photo (or it failed to load): drawn in SVG from the
 // theme tokens, nothing downloaded. It fills its container ("slice"), so it works as a 72 px thumbnail and as a
 // full-width cover. It is not a photo: it never carries the "Foto da Google Maps" caption.
 export function VenueCoverArt({ kind }: Props) {
   const { t } = useTranslation('ui');
-  const gradientId = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const gradientId = `g${uid}`;
+  const halftoneId = `h${uid}`;
   const scene = sceneForKind(kind);
   const Scene = SCENES[scene];
   return (
@@ -39,9 +42,10 @@ export function VenueCoverArt({ kind }: Props) {
             <Stop offset="0" stopColor={colors.background} stopOpacity={1} />
             <Stop offset="1" stopColor={SKY_ACCENT[scene]} stopOpacity={0.45} />
           </LinearGradient>
+          <HalftonePattern id={halftoneId} />
         </Defs>
         <Rect width={CANVAS.width} height={CANVAS.height} fill={`url(#${gradientId})`} />
-        <Scene />
+        <Scene halftone={halftoneId} />
       </Svg>
     </View>
   );
