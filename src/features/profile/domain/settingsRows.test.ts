@@ -1,6 +1,6 @@
 import { settingsGroups, type SettingsGroup } from './settingsRows';
 
-const base = { creatorEnabled: false, isCreator: false, isSupport: false };
+const base = { creatorEnabled: false, isCreator: false, isSupport: false, isAdmin: false };
 const keys = (groups: SettingsGroup[], group: string) =>
   groups.find((candidate) => candidate.key === group)?.rows.map((row) => row.key);
 
@@ -45,6 +45,15 @@ describe('settingsGroups', () => {
     ]);
   });
 
+  it('"Utilizzo app" compare solo per l’amministratore e apre la schermata admin', () => {
+    expect(keys(settingsGroups(base), 'help')).not.toContain('usageLog');
+    const rows = settingsGroups({ ...base, isAdmin: true }).flatMap((group) => group.rows);
+    expect(rows.find((row) => row.key === 'usageLog')).toMatchObject({
+      titleKey: 'app.usageLog',
+      target: '/admin/usage',
+    });
+  });
+
   it('“Come funziona” è la prima voce di aiuto, prima del feedback', () => {
     const help = settingsGroups(base).find((group) => group.key === 'help');
     expect(help?.rows[0]).toMatchObject({
@@ -59,9 +68,12 @@ describe('settingsGroups', () => {
   });
 
   it('ogni voce ha una destinazione: una rotta, il feedback o la guida', () => {
-    const rows = settingsGroups({ creatorEnabled: true, isCreator: true, isSupport: true }).flatMap(
-      (group) => group.rows,
-    );
+    const rows = settingsGroups({
+      creatorEnabled: true,
+      isCreator: true,
+      isSupport: true,
+      isAdmin: true,
+    }).flatMap((group) => group.rows);
     expect(
       rows.every(
         (row) => row.target === 'feedback' || row.target === 'tour' || row.target.startsWith('/'),

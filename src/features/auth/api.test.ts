@@ -1,3 +1,4 @@
+import { endActiveUsageSession } from '@/features/usage/activeTracker';
 import { useNotificationStore } from '@/features/notifications/store/notificationStore';
 import { fakeSupabase } from '@/test/fakeSupabase';
 
@@ -10,6 +11,11 @@ import {
   signUp,
   updatePassword,
 } from './api';
+
+jest.mock('@/features/usage/activeTracker', () => ({
+  endActiveUsageSession: jest.fn(async () => undefined),
+  setActiveTracker: jest.fn(),
+}));
 
 jest.mock('expo-linking', () => ({
   createURL: (path: string, options?: { queryParams?: Record<string, string> }) =>
@@ -102,5 +108,47 @@ describe('signOut', () => {
       p_token: 'ExponentPushToken[abc]',
     });
     expect(unregisterOrder).toBeLessThan(signOutOrder ?? 0);
+  });
+});
+
+describe('registro degli accessi', () => {
+  const loginCalls = () => fakeSupabase.rpc.mock.calls.filter(([name]) => name === 'log_login');
+
+  it('un accesso riuscito registra un solo login con piattaforma e versione', async () => {
+    await signIn(credentials);
+    expect(loginCalls()).toEqual([['log_login', { p_platform: 'ios', p_app_version: null }]]);
+  });
+
+  it('un accesso fallito non registra nulla', async () => {
+    fakeSupabase.auth.signInWithPassword.mockResolvedValueOnce({
+      data: null,
+      error: { name: 'AuthApiError', code: 'invalid_credentials' },
+    });
+    await signIn(credentials);
+    expect(loginCalls()).toHaveLength(0);
+  });
+
+  it('lo scambio del codice di conferma email (crea la sessione) registra un login', async () => {
+    await exchangeAuthCode('code-1');
+    expect(loginCalls()).toHaveLength(1);
+  });
+
+  it('se il registro fallisce l’accesso riesce comunque', async () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    fakeSupabase.rpc.mockResolvedValueOnce({ data: null, error: { message: 'down' } });
+    await expect(signIn(credentials)).resolves.toEqual({ ok: true });
+  });
+
+  it('il logout chiude prima la sessione di utilizzo', async () => {
+    const order: string[] = [];
+    fakeSupabase.auth.signOut.mockImplementationOnce(async () => {
+      order.push('signOut');
+      return { error: null };
+    });
+    jest.mocked(endActiveUsageSession).mockImplementationOnce(async () => {
+      order.push('endUsage');
+    });
+    await signOut();
+    expect(order).toEqual(['endUsage', 'signOut']);
   });
 });

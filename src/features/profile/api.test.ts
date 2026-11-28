@@ -37,6 +37,42 @@ describe('profile api', () => {
     await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ isSupport: true });
   });
 
+  it('legge se il profilo è dell’amministratore (false di default)', async () => {
+    setFakeTable('profiles', [fakeProfileRow()]);
+    await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ isAdmin: false });
+    setFakeTable('profiles', [fakeProfileRow({ is_admin: true })]);
+    await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ isAdmin: true });
+  });
+
+  it('prima del db push (colonna is_admin assente) il profilo si carica lo stesso, admin = false', async () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    setFakeTable('profiles', [fakeProfileRow()]);
+    const real = fakeSupabase.from.getMockImplementation();
+    fakeSupabase.from.mockImplementation(((table: string) => {
+      const builder = real?.(table);
+      if (!builder) throw new Error('fake missing');
+      return {
+        ...builder,
+        select: (columns?: string) => {
+          return columns === 'is_admin'
+            ? {
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: null,
+                    error: { code: '42703', message: 'column profiles.is_admin does not exist' },
+                  }),
+                }),
+              }
+            : builder.select(columns);
+        },
+      };
+    }) as never);
+    await expect(fetchMyProfile('user-1')).resolves.toMatchObject({
+      handle: 'lince.rosso',
+      isAdmin: false,
+    });
+  });
+
   it('espone lo slug della città del proprio profilo, null se non ne ha', async () => {
     setFakeTable('profiles', [fakeProfileRow({ cities: { slug: 'las-palmas' } })]);
     await expect(fetchMyProfile('user-1')).resolves.toMatchObject({ citySlug: 'las-palmas' });

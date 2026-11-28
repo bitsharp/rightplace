@@ -1,3 +1,4 @@
+import enAdmin from './en/admin.json';
 import enAuth from './en/auth.json';
 import enChat from './en/chat.json';
 import enCommon from './en/common.json';
@@ -19,6 +20,7 @@ import enTour from './en/tour.json';
 import enUi from './en/ui.json';
 import enVenue from './en/venue.json';
 import enVenues from './en/venues.json';
+import itAdmin from './it/admin.json';
 import itAuth from './it/auth.json';
 import itChat from './it/chat.json';
 import itCommon from './it/common.json';
@@ -44,6 +46,7 @@ import itVenues from './it/venues.json';
 export const resources = {
   it: {
     common: itCommon,
+    admin: itAdmin,
     auth: itAuth,
     map: itMap,
     friends: itFriends,
@@ -67,6 +70,7 @@ export const resources = {
   },
   en: {
     common: enCommon,
+    admin: enAdmin,
     auth: enAuth,
     map: enMap,
     friends: enFriends,

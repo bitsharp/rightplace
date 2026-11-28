@@ -26,6 +26,10 @@ const profileRowSchema = z.object({
   cities: z.object({ slug: z.string() }).nullable(),
 });
 
+// Read apart from the profile: before the migration is applied the column does not exist and the read fails,
+// which must not take the whole profile down (the client ships before `db push`).
+const adminRowSchema = z.object({ is_admin: z.boolean().optional().default(false) });
+
 const PROFILE_COLUMNS = Object.keys(profileRowSchema.shape)
   .map((column) => (column === 'cities' ? 'cities(slug)' : column))
   .join(', ');
@@ -46,12 +50,14 @@ export type MyProfile = {
   isCreator: boolean;
   // support team: sees the feedback inbox (set only with SQL on the server)
   isSupport: boolean;
+  // administrator: sees the usage log (set only with SQL on the server)
+  isAdmin: boolean;
   // slug of profiles.city_id (the city the server uses for e.g. the feed digest); null = never set
   citySlug: string | null;
   deleted: boolean;
 };
 
-function toMyProfile(row: z.infer<typeof profileRowSchema>): MyProfile {
+function toMyProfile(row: z.infer<typeof profileRowSchema>, isAdmin: boolean): MyProfile {
   return {
     id: row.id,
     handle: row.handle,
@@ -65,6 +71,7 @@ function toMyProfile(row: z.infer<typeof profileRowSchema>): MyProfile {
     contactsOptIn: row.contacts_opt_in,
     isCreator: row.is_creator,
     isSupport: row.is_support,
+    isAdmin,
     citySlug: row.cities?.slug ?? null,
     deleted: row.deleted_at !== null,
   };
@@ -72,13 +79,25 @@ function toMyProfile(row: z.infer<typeof profileRowSchema>): MyProfile {
 
 // Own row only: RLS on profiles never returns other people (they go through public_profiles).
 export async function fetchMyProfile(userId: string): Promise<MyProfile | null> {
+  const [{ data, error }, isAdmin] = await Promise.all([
+    supabase.from('profiles').select(PROFILE_COLUMNS).eq('id', userId).maybeSingle(),
+    fetchIsAdmin(userId),
+  ]);
+  if (error) throw new RpcError(toRpcErrorCode(error));
+  return data ? toMyProfile(profileRowSchema.parse(data), isAdmin) : null;
+}
+
+async function fetchIsAdmin(userId: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('profiles')
-    .select(PROFILE_COLUMNS)
+    .select('is_admin')
     .eq('id', userId)
     .maybeSingle();
-  if (error) throw new RpcError(toRpcErrorCode(error));
-  return data ? toMyProfile(profileRowSchema.parse(data)) : null;
+  if (error) {
+    console.warn('admin flag unavailable', error);
+    return false;
+  }
+  return adminRowSchema.parse(data ?? {}).is_admin;
 }
 
 export type ProfileInput = {

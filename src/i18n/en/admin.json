@@ -1,0 +1,28 @@
+{
+  "usage": {
+    "title": "App usage",
+    "searchLabel": "Search by @tag",
+    "empty": "No usage in this period.",
+    "loadError": "I can't load the data. Pull down to retry.",
+    "period": {
+      "d7": "7 days",
+      "d30": "30 days",
+      "d90": "90 days"
+    },
+    "logins_one": "{{count}} login",
+    "logins_other": "{{count}} logins",
+    "sessions_one": "{{count}} session",
+    "sessions_other": "{{count}} sessions",
+    "lastSeen": "Last seen {{when}}",
+    "totalTime": "Time used {{time}}",
+    "openUser": "Open usage details for {{handle}}",
+    "detail": {
+      "title": "Usage details",
+      "empty": "No events recorded."
+    },
+    "kind": {
+      "login": "Login",
+      "session": "Session"
+    }
+  }
+}

@@ -1,4 +1,6 @@
 import { prepareForSignOut } from '@/features/notifications/signOutCleanup';
+import { endActiveUsageSession } from '@/features/usage/activeTracker';
+import { logLogin } from '@/features/usage/api';
 import type { Language } from '@/i18n/domain/pickLanguage';
 import { authCallbackUrl } from '@/lib/deepLinks';
 import { supabase } from '@/lib/supabase';
@@ -16,6 +18,14 @@ async function outcome(call: () => PromiseLike<{ error: unknown }>): Promise<Aut
   } catch (thrown) {
     return { ok: false, error: toAuthErrorCode(thrown) };
   }
+}
+
+// A session was really created (password sign-in, email confirmation link): one login for the usage log.
+// Fire and forget, logLogin never throws: recording must not slow down or break signing in.
+async function withLoginLog(pending: Promise<AuthOutcome>): Promise<AuthOutcome> {
+  const result = await pending;
+  if (result.ok) void logLogin();
+  return result;
 }
 
 const captcha = (token: string | null) => token ?? undefined;
@@ -41,16 +51,19 @@ export function signUp({
 }
 
 export function signIn({ email, password, captchaToken }: Credentials) {
-  return outcome(() =>
-    supabase.auth.signInWithPassword({
-      email,
-      password,
-      options: { captchaToken: captcha(captchaToken) },
-    }),
+  return withLoginLog(
+    outcome(() =>
+      supabase.auth.signInWithPassword({
+        email,
+        password,
+        options: { captchaToken: captcha(captchaToken) },
+      }),
+    ),
   );
 }
 
 export async function signOut() {
+  await endActiveUsageSession();
   await prepareForSignOut();
   return outcome(() => supabase.auth.signOut());
 }
@@ -79,5 +92,5 @@ export function updatePassword(password: string) {
 }
 
 export function exchangeAuthCode(code: string) {
-  return outcome(() => supabase.auth.exchangeCodeForSession(code));
+  return withLoginLog(outcome(() => supabase.auth.exchangeCodeForSession(code)));
 }

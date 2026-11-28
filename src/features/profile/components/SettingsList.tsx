@@ -37,6 +37,7 @@ export function SettingsList({ profile }: { profile: MyProfile }) {
     creatorEnabled: showCreatorProfileLink,
     isCreator: profile.isCreator,
     isSupport: profile.isSupport,
+    isAdmin: profile.isAdmin,
   });
   return (
     <>

@@ -1,0 +1,28 @@
+{
+  "usage": {
+    "title": "Utilizzo app",
+    "searchLabel": "Cerca per @tag",
+    "empty": "Nessun utilizzo nel periodo.",
+    "loadError": "Non riesco a caricare i dati. Trascina verso il basso per riprovare.",
+    "period": {
+      "d7": "7 giorni",
+      "d30": "30 giorni",
+      "d90": "90 giorni"
+    },
+    "logins_one": "{{count}} accesso",
+    "logins_other": "{{count}} accessi",
+    "sessions_one": "{{count}} sessione",
+    "sessions_other": "{{count}} sessioni",
+    "lastSeen": "Ultimo accesso {{when}}",
+    "totalTime": "Tempo d'uso {{time}}",
+    "openUser": "Apri il dettaglio di {{handle}}",
+    "detail": {
+      "title": "Dettaglio utilizzo",
+      "empty": "Nessun evento registrato."
+    },
+    "kind": {
+      "login": "Accesso",
+      "session": "Sessione"
+    }
+  }
+}

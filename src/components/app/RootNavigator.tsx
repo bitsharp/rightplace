@@ -11,6 +11,7 @@ import { useCreatorUi } from '@/features/creator/useCreatorUi';
 import { resetSeenStories } from '@/features/posts/store/seenStories';
 import { PrePermissionSheet } from '@/features/notifications/components/PrePermissionSheet';
 import { useNotificationRuntime } from '@/features/notifications/useNotificationRuntime';
+import { useUsageTracking } from '@/features/usage/useUsageTracking';
 import { useCoarseLocationSync } from '@/features/profile/location';
 import { useDeviceLanguageSync } from '@/i18n/useDeviceLanguageSync';
 import { colors } from '@/theme/tokens';
@@ -28,6 +29,7 @@ export function RootNavigator() {
   useSyncProfileCity(status === 'ready');
   useClearCacheOnSignOut(userId);
   useNotificationRuntime(status === 'ready');
+  useUsageTracking(status === 'ready');
   if (status === 'loading')
     return <BootScreen error={profileError} onRetry={() => void retryProfile()} />;
   return <AppStack status={status} />;
@@ -35,7 +37,9 @@ export function RootNavigator() {
 
 function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
   const { canOpenCreatorRoutes } = useCreatorUi();
-  const isSupport = useSession().profile?.isSupport === true;
+  const profile = useSession().profile;
+  const isSupport = profile?.isSupport === true;
+  const isAdmin = profile?.isAdmin === true;
   return (
     <>
       <PrePermissionSheet />
@@ -45,6 +49,7 @@ function AppStack({ status }: { status: Exclude<SessionStatus, 'loading'> }) {
         status={status}
         canOpenCreatorRoutes={canOpenCreatorRoutes}
         canOpenSupportRoutes={isSupport}
+        canOpenAdminRoutes={isAdmin}
       />
     </>
   );
@@ -54,10 +59,12 @@ function AppScreens({
   status,
   canOpenCreatorRoutes,
   canOpenSupportRoutes,
+  canOpenAdminRoutes,
 }: {
   status: Exclude<SessionStatus, 'loading'>;
   canOpenCreatorRoutes: boolean;
   canOpenSupportRoutes: boolean;
+  canOpenAdminRoutes: boolean;
 }) {
   return (
     <Stack
@@ -91,6 +98,11 @@ function AppScreens({
       {/* The feedback inbox exists only for support accounts: anyone else is redirected by the router. */}
       <Stack.Protected guard={status === 'ready' && canOpenSupportRoutes}>
         <Stack.Screen name="support/feedback" />
+      </Stack.Protected>
+      {/* The usage log exists only for the administrator: anyone else is redirected by the router. */}
+      <Stack.Protected guard={status === 'ready' && canOpenAdminRoutes}>
+        <Stack.Screen name="admin/usage" />
+        <Stack.Screen name="admin/usage/[userId]" />
       </Stack.Protected>
       <Stack.Protected guard={__DEV__}>
         <Stack.Screen name="(dev)/ui-kit" />

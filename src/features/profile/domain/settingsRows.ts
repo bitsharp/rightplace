@@ -13,6 +13,7 @@ export type SettingsRowKey =
   | 'howItWorks'
   | 'feedback'
   | 'supportFeedback'
+  | 'usageLog'
   | 'about'
   | 'terms'
   | 'privacyPolicy';
@@ -28,6 +29,7 @@ export type SettingsTarget =
   | '/reset-password'
   | '/creator'
   | '/support/feedback'
+  | '/admin/usage'
   | '/profile/about'
   | '/legal/terms'
   | '/legal/privacy'
@@ -46,7 +48,12 @@ export type SettingsRow = {
 export type SettingsGroupKey = 'account' | 'help' | 'info';
 export type SettingsGroup = { key: SettingsGroupKey; rows: SettingsRow[] };
 
-type Context = { creatorEnabled: boolean; isCreator: boolean; isSupport: boolean };
+type Context = {
+  creatorEnabled: boolean;
+  isCreator: boolean;
+  isSupport: boolean;
+  isAdmin: boolean;
+};
 
 const row = (
   key: SettingsRowKey,
@@ -75,13 +82,14 @@ function accountRows({ creatorEnabled, isCreator }: Context): SettingsRow[] {
   ];
 }
 
-function helpRows({ isSupport }: Context): SettingsRow[] {
+function helpRows({ isSupport, isAdmin }: Context): SettingsRow[] {
   return [
     row('howItWorks', 'info', 'tour'),
     row('feedback', 'feedback', 'feedback'),
     ...(isSupport
       ? [row('supportFeedback', 'chat', '/support/feedback', 'app.supportFeedback')]
       : []),
+    ...(isAdmin ? [row('usageLog', 'eye', '/admin/usage', 'app.usageLog')] : []),
   ];
 }
 

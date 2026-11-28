@@ -14,6 +14,7 @@ const profile: MyProfile = {
   contactsOptIn: false,
   isCreator: true,
   isSupport: false,
+  isAdmin: false,
   citySlug: 'milano',
   deleted: false,
 };
