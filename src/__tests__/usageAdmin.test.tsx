@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
+import { simulateHermesIntl } from '@/test/hermesIntl';
 import { renderApp } from '@/test/appFlows';
 import { fakeSupabase, setFakeRpc } from '@/test/fakeSupabase';
 
@@ -55,9 +56,22 @@ describe('Utilizzo app (amministratore)', () => {
     expect(screen.getByText('@volpe.viola2')).toBeOnTheScreen();
     expect(screen.getAllByText('admin:usage.logins({"count":2})')).toHaveLength(2);
     expect(screen.getAllByText('admin:usage.sessions({"count":3})')).toHaveLength(2);
-    expect(screen.getAllByText(/45\s*min/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/usage\.duration\.minutes\(\{\\"count\\":45\}\)/).length).toBe(2);
+    expect(screen.getAllByText(/usage\.since\.(hours|days|minutes)/).length).toBe(2);
     expect(screen.getAllByText(/android · 1\.4\.0/).length).toBe(2);
     expect(calls('get_usage_overview')[0]?.[1]).toEqual({ p_days: 30, p_search: null });
+  });
+
+  it('la panoramica e il dettaglio non si rompono sul motore Hermes (niente RelativeTimeFormat né unit)', async () => {
+    const restore = simulateHermesIntl();
+    try {
+      await renderApp('ready', '/admin/usage', admin);
+      expect(await screen.findByText('@lince.rosso')).toBeOnTheScreen();
+      await fireEvent.press(screen.getByText('@lince.rosso'));
+      expect(await screen.findByText('admin:usage.kind.login')).toBeOnTheScreen();
+    } finally {
+      restore();
+    }
   });
 
   it('cambiare periodo richiede quel numero di giorni', async () => {
@@ -101,7 +115,7 @@ describe('Utilizzo app (amministratore)', () => {
     await waitFor(() => expect(screen).toHavePathname('/admin/usage/u1'));
     expect(await screen.findByText('admin:usage.kind.login')).toBeOnTheScreen();
     expect(screen.getByText('admin:usage.kind.session')).toBeOnTheScreen();
-    expect(screen.getAllByText(/12\s*min/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('admin:usage.duration.minutes({"count":12})').length).toBe(1);
     expect(calls('get_user_usage')[0]?.[1]).toEqual({
       p_user: 'u1',
       p_before: null,

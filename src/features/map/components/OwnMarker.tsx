@@ -4,6 +4,7 @@ import { avatarPhotoFor } from '@/features/profile/avatar/avatarPhoto';
 import type { OwnSpot as OwnSpotData } from '../domain/ownSpot';
 
 import { MapMarker, usePhotoWait, Z_INDEX } from './MapMarkers';
+import { MarkerTapArea, markerPress } from './MarkerTapArea';
 
 // The face sits just above the venue so it does not hide the hot spot circle under it, and apart from the
 // friends' faces, which hang below it.
@@ -21,6 +22,7 @@ type Props = {
 
 export function OwnMarker({ spot, me, urls, onOpenVenue }: Props) {
   const photos = usePhotoWait([me], urls);
+  const open = () => onOpenVenue(spot.venueId);
   return (
     <MapMarker
       testID="marker-own"
@@ -29,15 +31,16 @@ export function OwnMarker({ spot, me, urls, onOpenVenue }: Props) {
       coordinate={spot}
       zIndex={Z_INDEX.own}
       anchor={OWN_ANCHOR}
-      onPress={() => onOpenVenue(spot.venueId)}
+      onPress={markerPress(open)}
     >
-      <OwnSpot
-        intent={spot.intent}
-        initial={me.handle.charAt(0)}
-        photo={avatarPhotoFor(urls, me.userId)}
-        onPhotoSettled={() => photos.onFaceSettled(me.userId)}
-        onPress={() => onOpenVenue(spot.venueId)}
-      />
+      <MarkerTapArea testID="marker-own" onPress={open}>
+        <OwnSpot
+          intent={spot.intent}
+          initial={me.handle.charAt(0)}
+          photo={avatarPhotoFor(urls, me.userId)}
+          onPhotoSettled={() => photos.onFaceSettled(me.userId)}
+        />
+      </MarkerTapArea>
     </MapMarker>
   );
 }

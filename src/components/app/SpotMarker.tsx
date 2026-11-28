@@ -1,14 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui/Text';
 import { colors, fonts, glow, heights, radius, spacing } from '@/theme/tokens';
+
+import { TapTarget } from './TapTarget';
 
 type Props = {
   name: string;
   // Only the friends map passes one (how many of my friends go): never a turnout number.
   caption?: string;
-  onPress: () => void;
+  // Optional: on the map a single tap area around the whole marker handles the tap (MarkerTapArea).
+  onPress?: () => void;
 };
 
 // A point someone declared that is not (yet) a hot spot: cyan, a rounded tag with the name, never a circle,
@@ -16,7 +19,7 @@ type Props = {
 export function SpotMarker({ name, caption, onPress }: Props) {
   const { t } = useTranslation('map');
   return (
-    <Pressable
+    <TapTarget
       accessibilityRole="button"
       accessibilityLabel={t('spot.a11y', { name })}
       onPress={onPress}
@@ -37,7 +40,7 @@ export function SpotMarker({ name, caption, onPress }: Props) {
           {name}
         </Text>
       </View>
-    </Pressable>
+    </TapTarget>
   );
 }
 

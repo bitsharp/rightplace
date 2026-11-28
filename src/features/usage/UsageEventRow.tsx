@@ -6,16 +6,19 @@ import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { spacing } from '@/theme/tokens';
 
-import { formatMinutes } from './domain/format';
+import { describeMinutes, parseTimestamp } from './domain/format';
 import type { UsageEvent } from './domain/types';
 
 // One login or session: when, for how long (sessions only), on which platform and version.
 export function UsageEventRow({ event }: { event: UsageEvent }) {
   const { t, i18n } = useTranslation('admin');
-  const when = new Intl.DateTimeFormat(i18n.language, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(event.startedAt));
+  const startedAt = parseTimestamp(event.startedAt);
+  const when = startedAt
+    ? new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
+        startedAt,
+      )
+    : '';
+  const duration = describeMinutes(event.minutes);
   const device = [event.platform, event.appVersion].filter(Boolean).join(' · ');
   return (
     <Card style={styles.card}>
@@ -24,7 +27,7 @@ export function UsageEventRow({ event }: { event: UsageEvent }) {
         <MonoLabel tone="muted">{when}</MonoLabel>
       </View>
       {event.kind === 'session' ? (
-        <Text variant="body13">{formatMinutes(event.minutes, i18n.language)}</Text>
+        <Text variant="body13">{t(duration.key, duration.params)}</Text>
       ) : null}
       <Text variant="body12" color="textSecondary">
         {device}

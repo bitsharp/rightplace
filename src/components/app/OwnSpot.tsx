@@ -1,17 +1,20 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Avatar, type AvatarPhoto } from '@/components/ui/Avatar';
 import { Glow } from '@/components/ui/Glow';
 import type { Intent } from '@/features/nights/domain/band';
 import { colors } from '@/theme/tokens';
 
+import { TapTarget } from './TapTarget';
+
 type Props = {
   intent: Intent;
   // My own initial and photo: only I (and nobody else) see them here, so principle 1 holds.
   initial: string;
   photo?: AvatarPhoto;
-  onPress: () => void;
+  // Optional: on the map a single tap area around the whole marker handles the tap (MarkerTapArea).
+  onPress?: () => void;
   // The photo finished loading or failed: the marker bitmap waits for it (see usePhotoWait).
   onPhotoSettled?: () => void;
 };
@@ -27,7 +30,7 @@ const RING_COLOR: Record<Intent, string> = { going: colors.primary, maybe: color
 export function OwnSpot({ intent, initial, photo, onPress, onPhotoSettled }: Props) {
   const { t } = useTranslation('map');
   return (
-    <Pressable
+    <TapTarget
       accessibilityRole="button"
       accessibilityLabel={t(`own.marker.${intent}`)}
       onPress={onPress}
@@ -43,7 +46,7 @@ export function OwnSpot({ intent, initial, photo, onPress, onPhotoSettled }: Pro
           onPhotoSettled={onPhotoSettled}
         />
       </View>
-    </Pressable>
+    </TapTarget>
   );
 }
 

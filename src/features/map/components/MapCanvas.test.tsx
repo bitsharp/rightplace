@@ -31,6 +31,8 @@ const baseProps = {
 };
 
 const marker = (id: string) => screen.getByTestId(`marker-${id}`, { includeHiddenElements: true });
+// iOS (the test default): the tap goes through the Pressable around the marker's whole content.
+const tap = (id: string) => screen.getByTestId(`tap-marker-${id}`, { includeHiddenElements: true });
 
 describe('MapCanvas', () => {
   it('non usa la posizione nativa, né POI né traffico: il "Tu" lo disegniamo noi', async () => {
@@ -110,7 +112,7 @@ describe('MapCanvas', () => {
         }}
       />,
     );
-    await fireEvent.press(marker('hot-hot'));
+    await fireEvent.press(tap('hot-hot'));
     expect(onOpenVenue).toHaveBeenLastCalledWith('hot');
   });
 
@@ -132,7 +134,7 @@ describe('MapCanvas', () => {
           layers={{ hotSpots: [withFriends], spots: [] }}
         />,
       );
-      await fireEvent.press(marker('hot-hot'));
+      await fireEvent.press(tap('hot-hot'));
       expect(onOpenVenue).toHaveBeenLastCalledWith('hot');
     });
 
@@ -146,7 +148,7 @@ describe('MapCanvas', () => {
           layers={{ hotSpots: [], spots: [{ ...withFriends, venueId: 's1', isSpot: true }] }}
         />,
       );
-      await fireEvent.press(marker('spot-s1'));
+      await fireEvent.press(tap('spot-s1'));
       expect(onOpenVenue).toHaveBeenLastCalledWith('s1');
     });
   });
@@ -261,7 +263,7 @@ describe('MapCanvas', () => {
           me={me}
         />,
       );
-      await fireEvent.press(marker('own'));
+      await fireEvent.press(tap('own'));
       expect(onOpenVenue).toHaveBeenCalledWith('mine');
     });
 
@@ -512,7 +514,7 @@ describe('MapCanvas', () => {
           onOpenEvent={onOpenEvent}
         />,
       );
-      await fireEvent.press(marker('event-e1'));
+      await fireEvent.press(tap('event-e1'));
       expect(onOpenEvent).toHaveBeenCalledWith('e1');
       expect(onOpenVenue).not.toHaveBeenCalled();
     });
@@ -557,7 +559,7 @@ describe('MapCanvas', () => {
           layers={{ hotSpots: [], spots: [spot('s1')] }}
         />,
       );
-      await fireEvent.press(marker('spot-s1'));
+      await fireEvent.press(tap('spot-s1'));
       expect(onOpenVenue).toHaveBeenLastCalledWith('s1');
     });
 

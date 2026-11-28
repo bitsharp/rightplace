@@ -13,6 +13,8 @@ import { friendFacesOf, type HotSpotVenue, type MapVenue } from '../domain/mapLa
 import { hotSpotTier, type HotSpotTier } from '../domain/hotSpotTier';
 import type { MapViewMode } from '../store/mapStore';
 
+import { MarkerTapArea, markerPress } from './MarkerTapArea';
+
 // Coloured "stasera" hot spots, "Tu" above everything.
 export const Z_INDEX = {
   spot: 2,
@@ -137,25 +139,28 @@ function VenueMarker({
 }: FaceMarkerProps) {
   const faces = view === 'friends' ? facesOf(venue) : [];
   const photos = usePhotoWait(faces, urls);
+  const open = () => onOpenVenue(venue.venueId);
   return (
     <MapMarker
       contentKey={`${contentKey}:${photos.key}`}
       waitingForPhotos={photos.waiting}
       coordinate={venue}
-      onPress={() => onOpenVenue(venue.venueId)}
+      onPress={markerPress(open)}
       {...props}
     >
-      {faces.length === 0 ? (
-        children
-      ) : (
-        <View style={styles.stack}>
-          <View style={styles.faces} />
-          {children}
-          <View style={styles.faces}>
-            <FriendFaces friends={faces} urls={urls} onFaceSettled={photos.onFaceSettled} />
+      <MarkerTapArea testID={props.testID} onPress={open}>
+        {faces.length === 0 ? (
+          children
+        ) : (
+          <View style={styles.stack}>
+            <View style={styles.faces} />
+            {children}
+            <View style={styles.faces}>
+              <FriendFaces friends={faces} urls={urls} onFaceSettled={photos.onFaceSettled} />
+            </View>
           </View>
-        </View>
-      )}
+        )}
+      </MarkerTapArea>
     </MapMarker>
   );
 }
@@ -202,7 +207,6 @@ export function HotSpotMarkers({
         goingBand={venue.goingBand}
         maybeBand={venue.maybeBand}
         caption={friendsCaption(venue, view)}
-        onPress={() => onOpenVenue(venue.venueId)}
       />
     </VenueMarker>
   ));
@@ -230,11 +234,7 @@ export function SpotMarkers({
       zIndex={Z_INDEX.spot}
       onOpenVenue={onOpenVenue}
     >
-      <SpotMarker
-        name={venue.name}
-        caption={friendsCaption(venue, view)}
-        onPress={() => onOpenVenue(venue.venueId)}
-      />
+      <SpotMarker name={venue.name} caption={friendsCaption(venue, view)} />
     </VenueMarker>
   ));
 }
@@ -253,14 +253,14 @@ export function EventMarkers({
       testID={`marker-event-${event.eventId}`}
       coordinate={{ lat, lng }}
       zIndex={Z_INDEX.event}
-      onPress={() => onOpenEvent?.(event.eventId)}
+      onPress={markerPress(() => onOpenEvent?.(event.eventId))}
     >
-      <EventSpot
-        name={event.name}
-        goingBand={event.goingBand}
-        maybeBand={event.maybeBand}
+      <MarkerTapArea
+        testID={`marker-event-${event.eventId}`}
         onPress={() => onOpenEvent?.(event.eventId)}
-      />
+      >
+        <EventSpot name={event.name} goingBand={event.goingBand} maybeBand={event.maybeBand} />
+      </MarkerTapArea>
     </MapMarker>
   ));
 }

@@ -7,14 +7,15 @@ import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
 import { spacing } from '@/theme/tokens';
 
-import { formatMinutes, formatSince } from './domain/format';
+import { describeMinutes, describeSince, type Phrase } from './domain/format';
 import type { UsageUser } from './domain/types';
 
 type Props = { user: UsageUser; now: Date; onOpen: (user: UsageUser) => void };
 
 // One user of the overview: handle and initial only (the admin is not necessarily "linked": no photo).
 export function UsageUserRow({ user, now, onOpen }: Props) {
-  const { t, i18n } = useTranslation('admin');
+  const { t } = useTranslation('admin');
+  const phrase = (p: Phrase) => t(p.key, p.params);
   const device = [user.lastPlatform, user.lastAppVersion].filter(Boolean).join(' · ');
   return (
     <Pressable
@@ -27,7 +28,7 @@ export function UsageUserRow({ user, now, onOpen }: Props) {
         <View style={styles.body}>
           <Text variant="body14Medium">{formatHandle(user.handle)}</Text>
           <Text variant="body12" color="textSecondary">
-            {t('usage.lastSeen', { when: formatSince(user.lastSeenAt, now, i18n.language) })}
+            {t('usage.lastSeen', { when: phrase(describeSince(user.lastSeenAt, now)) })}
           </Text>
           <Text variant="body12" color="textSecondary">
             {t('usage.logins', { count: user.logins })}
@@ -36,7 +37,7 @@ export function UsageUserRow({ user, now, onOpen }: Props) {
             {t('usage.sessions', { count: user.sessions })}
           </Text>
           <Text variant="body12" color="textSecondary">
-            {t('usage.totalTime', { time: formatMinutes(user.totalMinutes, i18n.language) })}
+            {t('usage.totalTime', { time: phrase(describeMinutes(user.totalMinutes)) })}
           </Text>
           <Text variant="body12" color="textSecondary">
             {device}

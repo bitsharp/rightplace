@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui/Text';
 import { useBandLabel } from '@/components/ui/useBandLabel';
@@ -11,11 +11,14 @@ import {
 } from '@/features/nights/domain/band';
 import { colors, fonts, glow } from '@/theme/tokens';
 
+import { TapTarget } from './TapTarget';
+
 type Props = {
   name: string;
   goingBand: Band;
   maybeBand: Band;
-  onPress: () => void;
+  // Optional: on the map a single tap area around the whole marker handles the tap (MarkerTapArea).
+  onPress?: () => void;
 };
 
 const INTENT_STYLE: Record<
@@ -43,7 +46,7 @@ export function EventSpot({ name, goingBand, maybeBand, onPress }: Props) {
   const main = dominantIntent(goingBand, maybeBand);
   const diameter = hotSpotDiameter(main === 'going' ? goingBand : maybeBand);
   return (
-    <Pressable
+    <TapTarget
       accessibilityRole="button"
       accessibilityLabel={t('eventSpot.a11y', {
         event: name,
@@ -67,7 +70,7 @@ export function EventSpot({ name, goingBand, maybeBand, onPress }: Props) {
           {bandLabel(goingBand)}
         </Text>
       </View>
-    </Pressable>
+    </TapTarget>
   );
 }
 

@@ -23,6 +23,21 @@
     "kind": {
       "login": "Accesso",
       "session": "Sessione"
+    },
+    "duration": {
+      "minutes": "{{count}} min",
+      "hours": "{{count}} h",
+      "hoursMinutes": "{{hours}} h {{minutes}} min"
+    },
+    "since": {
+      "now": "adesso",
+      "minutes_one": "{{count}} min fa",
+      "minutes_other": "{{count}} min fa",
+      "hours_one": "{{count}} ora fa",
+      "hours_other": "{{count}} ore fa",
+      "yesterday": "ieri",
+      "days_one": "{{count}} giorno fa",
+      "days_other": "{{count}} giorni fa"
     }
   }
 }

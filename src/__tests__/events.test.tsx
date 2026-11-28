@@ -260,7 +260,9 @@ describe('serate sulla mappa', () => {
   it('le serate di stasera sono marker propri e un tap apre la serata', async () => {
     seedBackend({ events: [cityEvent(), tomorrowEvent] });
     await renderApp('ready', '/map');
-    await fireEvent.press(await marker('e1'));
+    await fireEvent.press(
+      await screen.findByTestId('tap-marker-event-e1', { includeHiddenElements: true }),
+    );
     expect(await screen.findByRole('header', { name: 'venue:eventTitle' })).toBeOnTheScreen();
     expect(fakeSupabase.rpc).toHaveBeenCalledWith('get_city_events', {
       p_city_slug: 'milano',

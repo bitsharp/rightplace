@@ -171,8 +171,11 @@ describe('MapFullScreen', () => {
   describe('tap su un marker', () => {
     afterEach(() => jest.restoreAllMocks());
 
-    const tapMarker = () =>
-      fireEvent.press(screen.getByTestId('marker-hot-hot', { includeHiddenElements: true }));
+    // iOS taps the Pressable around the marker, Android the Marker itself.
+    const tapId = (id: string) => (Platform.OS === 'ios' ? `tap-marker-${id}` : `marker-${id}`);
+    const tapById = (id: string) =>
+      fireEvent.press(screen.getByTestId(tapId(id), { includeHiddenElements: true }));
+    const tapMarker = () => tapById('hot-hot');
 
     it('su Android chiude la mappa e apre subito il locale', async () => {
       jest.replaceProperty(Platform, 'OS', 'android');
@@ -220,7 +223,7 @@ describe('MapFullScreen', () => {
           ]}
         />,
       );
-      await fireEvent.press(screen.getByTestId('marker-event-e1', { includeHiddenElements: true }));
+      await tapById('event-e1');
       expect(calls).toEqual(['close', 'event:e1']);
     });
 

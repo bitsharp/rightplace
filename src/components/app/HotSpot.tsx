@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Glow } from '@/components/ui/Glow';
 import { Text } from '@/components/ui/Text';
@@ -14,11 +14,14 @@ import {
 import { hotSpotTier, type HotSpotTier } from '@/features/map/domain/hotSpotTier';
 import { colors, fonts, glow } from '@/theme/tokens';
 
+import { TapTarget } from './TapTarget';
+
 type Props = {
   venueName: string;
   goingBand: Band;
   maybeBand: Band;
-  onPress: () => void;
+  // Optional: on the map a single tap area around the whole marker handles the tap (MarkerTapArea).
+  onPress?: () => void;
   caption?: string;
 };
 
@@ -75,7 +78,7 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
   const diameter = tier === 'low' ? Math.round(layout.diameter * LOW_SCALE) : layout.diameter;
   const box = tier === 'high' ? Math.round(diameter * GLOW_SCALE) : diameter;
   return (
-    <Pressable
+    <TapTarget
       accessibilityRole="button"
       accessibilityLabel={t('hotSpot.a11y', {
         venue: venueName,
@@ -122,7 +125,7 @@ export function HotSpot({ venueName, goingBand, maybeBand, onPress, caption }: P
           </Text>
         )}
       </View>
-    </Pressable>
+    </TapTarget>
   );
 }
 
