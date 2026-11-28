@@ -9,6 +9,7 @@ import { openTransportLink } from '@/features/venue/domain/openTransportLink';
 import { statsView } from '@/features/venue/domain/statsState';
 import type { TransportDirection } from '@/features/venue/domain/transport';
 import { useVenueDetail } from '@/features/venue/hooks';
+import { useOpenFriend } from '@/features/venue/useOpenFriend';
 import { linksFor } from '@/features/venue/useVenueScreen';
 
 import { useAvatarUrls } from '@/features/profile/avatar/hooks';
@@ -29,6 +30,7 @@ function useTransport(venue: VenueDetail | null) {
 
 export function useEventScreen(eventId: string) {
   const router = useRouter();
+  const openFriend = useOpenFriend();
   const detail = useEventDetail(eventId);
   const event = detail.data ?? null;
   // The venue catalog gives country, Google place and taxi number for "Andare e tornare".
@@ -50,6 +52,7 @@ export function useEventScreen(eventId: string) {
     venue,
     avatarUrls,
     openFriends: () => router.push('/friends'),
+    openFriend,
     loadFailed: detail.isError,
     cancelled,
     canDeclare: event !== null && !cancelled && !ended,

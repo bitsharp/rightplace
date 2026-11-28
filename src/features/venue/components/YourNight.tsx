@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { FriendFaces } from '@/components/app/FriendFaces';
+import { ProfileLink } from '@/components/ui/ProfileLink';
 import { VenueCoverImage } from '@/components/app/VenueCoverImage';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
@@ -31,6 +32,7 @@ export type NightContext = {
   urls: Record<string, string>;
   // My own @tag, for the invite button when nobody I follow is going yet; null while the profile loads.
   myHandle: string | null;
+  onOpenFriend: (handle: string) => void;
 };
 
 const PHOTO_SIZE = 72;
@@ -100,10 +102,11 @@ type NightFriendsProps = {
   friends: readonly VenueFriend[];
   urls: Record<string, string>;
   myHandle: string | null;
+  onOpenFriend: (handle: string) => void;
 };
 
 // Accepted follows only (principle 6); photos as the server signed them (principle 1).
-export function NightFriends({ friends, urls, myHandle }: NightFriendsProps) {
+export function NightFriends({ friends, urls, myHandle, onOpenFriend }: NightFriendsProps) {
   const { t } = useTranslation('venue');
   return (
     <View style={styles.block}>
@@ -114,11 +117,21 @@ export function NightFriends({ friends, urls, myHandle }: NightFriendsProps) {
           {myHandle ? <ShareHandleButton handle={myHandle} /> : null}
         </>
       ) : null}
-      <FriendFaces friends={friends.map(faceOf)} urls={urls} max={MAX_FACES} size={FACE_SIZE} />
+      <FriendFaces
+        friends={friends.map(faceOf)}
+        urls={urls}
+        max={MAX_FACES}
+        size={FACE_SIZE}
+        onPressFace={onOpenFriend}
+      />
       {friends.map((friend) => (
-        <Text key={friend.handle} variant="body15Strong">
-          {formatHandle(friend.handle)}
-        </Text>
+        <ProfileLink
+          key={friend.handle}
+          handle={friend.handle}
+          onPress={() => onOpenFriend(friend.handle)}
+        >
+          <Text variant="body15Strong">{formatHandle(friend.handle)}</Text>
+        </ProfileLink>
       ))}
     </View>
   );

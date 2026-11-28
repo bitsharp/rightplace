@@ -63,6 +63,7 @@ export function VenueScreen({ venueId }: { venueId: string }) {
               friends: screen.friends,
               urls: screen.avatarUrls,
               myHandle: screen.myHandle,
+              onOpenFriend: screen.openFriend,
             }}
           />
         </>
@@ -119,6 +120,7 @@ function VenueBody({ screen }: BodyProps) {
           friends={screen.friends}
           urls={screen.avatarUrls}
           onSeeAll={screen.openFriends}
+          onOpenFriend={screen.openFriend}
         />
         {screen.chatRoomId ? <OpenChatButton onPress={screen.openChat} /> : null}
         <GettingThere

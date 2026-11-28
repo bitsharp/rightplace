@@ -55,6 +55,7 @@ function Body({ screen }: { screen: Screen }) {
         friends={event.friends}
         urls={screen.avatarUrls}
         onSeeAll={screen.openFriends}
+        onOpenFriend={screen.openFriend}
       />
       {screen.chatRoomId ? <OpenChatButton onPress={screen.openChat} /> : null}
       <EventVenueCard name={event.venueName} kind={event.venueKind} onPress={screen.openVenue} />

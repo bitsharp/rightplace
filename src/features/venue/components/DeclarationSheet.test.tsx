@@ -248,6 +248,7 @@ describe('DeclarationSheet', () => {
       ],
       urls: {},
       myHandle: 'lince.rosso',
+      onOpenFriend: jest.fn(),
     };
 
     async function renderNight(state: DeclarationState, onClose = jest.fn()) {
@@ -295,6 +296,21 @@ describe('DeclarationSheet', () => {
       await renderNight(hereGoing);
       await fireEvent.press(screen.getByText('venue:yourNight.transport.uber'));
       expect(night.onOpenLink).toHaveBeenCalledWith(night.links[1]);
+    });
+
+    it('il tocco su un amico chiude il foglio e poi apre il suo profilo (Android: subito)', async () => {
+      jest.replaceProperty(Platform, 'OS', 'android');
+      const calls: string[] = [];
+      night.onOpenFriend.mockImplementation((handle: string) => calls.push(`open:${handle}`));
+      const onClose = await renderNight(
+        hereGoing,
+        jest.fn(() => calls.push('close')),
+      );
+      expect(onClose).not.toHaveBeenCalled();
+      const [link] = screen.getAllByLabelText('ui:profileLink.open({"handle":"@volpe.viola"})');
+      await fireEvent.press(link!);
+      expect(calls).toEqual(['close', 'open:volpe.viola']);
+      jest.restoreAllMocks();
     });
 
     it('la freccia della card chiude il foglio e riporta al locale', async () => {

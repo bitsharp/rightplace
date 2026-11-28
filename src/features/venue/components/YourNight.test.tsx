@@ -68,7 +68,9 @@ describe('NightTransport', () => {
 
 describe('NightFriends', () => {
   it('titolo con il numero di amici e i loro volti', async () => {
-    await render(<NightFriends friends={friends} urls={{}} myHandle={null} />);
+    await render(
+      <NightFriends friends={friends} urls={{}} myHandle={null} onOpenFriend={jest.fn()} />,
+    );
     expect(screen.getByText('venue:yourNight.friends({"count":2})')).toBeOnTheScreen();
     expect(screen.getByTestId('friend-faces')).toBeOnTheScreen();
   });
@@ -79,6 +81,7 @@ describe('NightFriends', () => {
         friends={friends}
         urls={{ 'u-volpe': 'https://signed.test/a/v' }}
         myHandle={null}
+        onOpenFriend={jest.fn()}
       />,
     );
     expect(screen.getAllByTestId('avatar-image', { includeHiddenElements: true })).toHaveLength(1);
@@ -86,13 +89,29 @@ describe('NightFriends', () => {
   });
 
   it('elenca anche gli @handle degli amici che vanno qui', async () => {
-    await render(<NightFriends friends={friends} urls={{}} myHandle="lince.rosso" />);
+    await render(
+      <NightFriends friends={friends} urls={{}} myHandle="lince.rosso" onOpenFriend={jest.fn()} />,
+    );
     expect(screen.getByText('@volpe.viola')).toBeOnTheScreen();
     expect(screen.getByText('@orso.grigio')).toBeOnTheScreen();
   });
 
+  it('il tocco sul volto o sull’@handle apre il profilo', async () => {
+    const onOpenFriend = jest.fn();
+    await render(
+      <NightFriends friends={friends} urls={{}} myHandle={null} onOpenFriend={onOpenFriend} />,
+    );
+    const links = screen.getAllByLabelText('ui:profileLink.open({"handle":"@orso.grigio"})');
+    expect(links.length).toBeGreaterThanOrEqual(2);
+    for (const link of links) await fireEvent.press(link);
+    expect(onOpenFriend).toHaveBeenCalledTimes(links.length);
+    expect(onOpenFriend).toHaveBeenCalledWith('orso.grigio');
+  });
+
   it('senza amici: invito a invitarli con il bottone di condivisione dell’@tag, nessun volto', async () => {
-    await render(<NightFriends friends={[]} urls={{}} myHandle="lince.rosso" />);
+    await render(
+      <NightFriends friends={[]} urls={{}} myHandle="lince.rosso" onOpenFriend={jest.fn()} />,
+    );
     expect(screen.getByText('venue:yourNight.friends({"count":0})')).toBeOnTheScreen();
     expect(screen.getByText('venue:yourNight.friendsEmpty')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'profile:share.cta' })).toBeOnTheScreen();
@@ -100,7 +119,7 @@ describe('NightFriends', () => {
   });
 
   it('senza @tag proprio (profilo non ancora caricato) niente bottone di condivisione', async () => {
-    await render(<NightFriends friends={[]} urls={{}} myHandle={null} />);
+    await render(<NightFriends friends={[]} urls={{}} myHandle={null} onOpenFriend={jest.fn()} />);
     expect(screen.getByText('venue:yourNight.friendsEmpty')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'profile:share.cta' })).toBeNull();
   });

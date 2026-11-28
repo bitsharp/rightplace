@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { rowStyles } from '@/components/app/VenueRow';
 import { FriendFaces } from '@/components/app/FriendFaces';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ProfileLink } from '@/components/ui/ProfileLink';
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { Text } from '@/components/ui/Text';
 import { formatHandle } from '@/features/profile/domain/handle';
@@ -17,6 +18,8 @@ type Props = {
   urls: Record<string, string>;
   // Opens the friends list (the existing tab): the venue page has no list of its own to grow.
   onSeeAll: () => void;
+  // A face or an @handle opens that friend's profile.
+  onOpenFriend: (handle: string) => void;
 };
 
 const MAX_FACES = 6;
@@ -29,7 +32,7 @@ export const faceOf = (friend: VenueFriend) => ({
 });
 
 // Accepted follows only (principle 6): the server filters, there is nothing to follow here.
-export function FriendsGoing({ friends, urls, onSeeAll }: Props) {
+export function FriendsGoing({ friends, urls, onSeeAll, onOpenFriend }: Props) {
   const { t } = useTranslation('venue');
   return (
     <View style={styles.block}>
@@ -50,27 +53,37 @@ export function FriendsGoing({ friends, urls, onSeeAll }: Props) {
       </View>
       <MonoLabel tone="going">{t('ui:friendsGoing', { count: friends.length })}</MonoLabel>
       {friends.length === 0 ? <EmptyState message={t('friends.empty')} /> : null}
-      <FriendFaces friends={friends.map(faceOf)} urls={urls} max={MAX_FACES} size={FACE_SIZE} />
+      <FriendFaces
+        friends={friends.map(faceOf)}
+        urls={urls}
+        max={MAX_FACES}
+        size={FACE_SIZE}
+        onPressFace={onOpenFriend}
+      />
       {friends.map((friend) => (
-        <FriendLine key={friend.handle} friend={friend} />
+        <FriendLine key={friend.handle} friend={friend} onOpen={onOpenFriend} />
       ))}
     </View>
   );
 }
 
 // The faces above carry the photos; the lines say who is going and how sure (handle, band, intent).
-function FriendLine({ friend }: { friend: VenueFriend }) {
+function FriendLine({ friend, onOpen }: { friend: VenueFriend; onOpen: (handle: string) => void }) {
   const { t } = useTranslation('venue');
   const age = friend.ageBand.replace('-', '–');
   const isGoing = friend.intent === 'going';
   return (
     <View style={rowStyles.row}>
-      <View style={styles.texts}>
+      <ProfileLink
+        handle={friend.handle}
+        onPress={() => onOpen(friend.handle)}
+        style={styles.texts}
+      >
         <Text variant="body15Strong">{formatHandle(friend.handle)}</Text>
         <Text variant="body12" color="textSecondary">
           {t('friends.meta', { age, gender: t(`gender.${friend.gender}`) })}
         </Text>
-      </View>
+      </ProfileLink>
       <Text variant="label11" color={isGoing ? 'going' : 'maybe'}>
         {t(isGoing ? 'ui:intent.goingAction' : 'ui:intent.maybeAction')}
       </Text>

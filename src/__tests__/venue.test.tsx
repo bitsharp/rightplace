@@ -307,6 +307,31 @@ describe('dettaglio locale e dichiarazione', () => {
       ).toBeOnTheScreen();
     });
 
+    it('il tocco su un amico del locale apre il suo profilo', async () => {
+      seedBackend({
+        stats: () =>
+          stats({
+            friends: [
+              {
+                user_id: 'u-volpe',
+                handle: 'volpe.viola',
+                age_band: '18-24',
+                gender: 'female',
+                intent: 'going',
+              },
+            ],
+          }),
+      });
+      await renderApp('ready', '/venue/arena');
+      const [link] = await screen.findAllByLabelText(
+        'ui:profileLink.open({"handle":"@volpe.viola"})',
+      );
+      await fireEvent.press(link!);
+      expect(
+        await screen.findByRole('header', { name: 'friends:publicProfile.title' }),
+      ).toBeOnTheScreen();
+    });
+
     it('"Vedi tutti" apre la lista amici', async () => {
       seedBackend({
         stats: () =>

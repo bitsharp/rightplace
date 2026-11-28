@@ -16,6 +16,7 @@ import { venueOpenStatus } from './domain/openingHours';
 import { openTransportLink } from './domain/openTransportLink';
 import { statsView, type StatsSegment } from './domain/statsState';
 import { buildTransportLinks, type TransportDirection } from './domain/transport';
+import { useOpenFriend } from './useOpenFriend';
 import { useRefreshVenueDetails, useVenueDetail, useVenueStats } from './hooks';
 
 const NO_FRIENDS: VenueFriend[] = [];
@@ -48,6 +49,7 @@ export function useVenueScreen(venueId: string) {
   const chatRoom = useMyChatRooms().data?.find(
     (room) => room.venueId === venueId && room.eventId === null,
   );
+  const openFriend = useOpenFriend();
   const [direction, setDirection] = useState<TransportDirection>('there');
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -68,6 +70,7 @@ export function useVenueScreen(venueId: string) {
     statsView: current ? statsView(current, segment) : null,
     friends,
     myHandle: profile?.handle ?? null,
+    openFriend,
     // One request for the people listed here; only the photos I may see come back.
     avatarUrls,
     segment,

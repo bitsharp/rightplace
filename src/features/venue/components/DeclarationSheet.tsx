@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { MonoLabel } from '@/components/ui/MonoLabel';
 import { RangeStat } from '@/components/ui/RangeStat';
@@ -7,6 +8,7 @@ import { Sheet } from '@/components/ui/Sheet';
 import { Text } from '@/components/ui/Text';
 import { onDeclarationSheetDismiss } from '@/features/notifications/prePermission';
 import type { Band } from '@/features/nights/domain/band';
+import { afterModalDismiss } from '@/lib/afterModalDismiss';
 import type { RpcErrorCode } from '@/lib/rpcError';
 import { spacing } from '@/theme/tokens';
 
@@ -40,9 +42,26 @@ type Props = {
 
 // Same body for a venue night and, from prompt 12, for a creator's event: only `target` differs.
 export function DeclarationSheet({ visible, onClose, ...body }: Props) {
+  const openFriend = body.night?.onOpenFriend;
+  // A profile is another screen: on iOS it opens only once the sheet's Modal is gone.
+  const deferred = useMemo(
+    () => afterModalDismiss<string>(Platform.OS, (handle) => openFriend?.(handle)),
+    [openFriend],
+  );
+  const night = body.night && {
+    ...body.night,
+    onOpenFriend: (handle: string) => {
+      onClose();
+      deferred.request(handle);
+    },
+  };
+  const onDismiss = () => {
+    onDeclarationSheetDismiss();
+    deferred.onDismiss();
+  };
   return (
-    <Sheet visible={visible} onClose={onClose} onDismiss={onDeclarationSheetDismiss}>
-      <SheetBody onClose={onClose} {...body} />
+    <Sheet visible={visible} onClose={onClose} onDismiss={onDismiss}>
+      <SheetBody onClose={onClose} {...body} night={night} />
     </Sheet>
   );
 }
@@ -133,7 +152,12 @@ function YourNightBottom({ night }: { night: NightContext }) {
   return (
     <>
       <NightTransport links={night.links} onOpen={night.onOpenLink} />
-      <NightFriends friends={night.friends} urls={night.urls} myHandle={night.myHandle} />
+      <NightFriends
+        friends={night.friends}
+        urls={night.urls}
+        myHandle={night.myHandle}
+        onOpenFriend={night.onOpenFriend}
+      />
     </>
   );
 }
