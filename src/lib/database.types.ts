@@ -876,6 +876,7 @@ export type Database = {
           handle_confirmed_at: string | null;
           handle_free_change_used: boolean;
           id: string;
+          is_admin: boolean;
           is_creator: boolean;
           is_support: boolean;
           locale: string;
@@ -899,6 +900,7 @@ export type Database = {
           handle_confirmed_at?: string | null;
           handle_free_change_used?: boolean;
           id: string;
+          is_admin?: boolean;
           is_creator?: boolean;
           is_support?: boolean;
           locale?: string;
@@ -921,6 +923,7 @@ export type Database = {
           handle_confirmed_at?: string | null;
           handle_free_change_used?: boolean;
           id?: string;
+          is_admin?: boolean;
           is_creator?: boolean;
           is_support?: boolean;
           locale?: string;
@@ -1100,6 +1103,55 @@ export type Database = {
             foreignKeyName: 'subscriptions_user_id_fkey';
             columns: ['user_id'];
             isOneToOne: true;
+            referencedRelation: 'public_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      usage_events: {
+        Row: {
+          app_version: string | null;
+          ended_at: string | null;
+          id: number;
+          kind: string;
+          last_seen_at: string;
+          platform: string | null;
+          started_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          app_version?: string | null;
+          ended_at?: string | null;
+          id?: never;
+          kind: string;
+          last_seen_at?: string;
+          platform?: string | null;
+          started_at?: string;
+          user_id: string;
+        };
+        Update: {
+          app_version?: string | null;
+          ended_at?: string | null;
+          id?: never;
+          kind?: string;
+          last_seen_at?: string;
+          platform?: string | null;
+          started_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'usage_events_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'usage_events_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
             referencedRelation: 'public_profiles';
             referencedColumns: ['id'];
           },
@@ -1390,6 +1442,7 @@ export type Database = {
       delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
       delete_post: { Args: { p_post_id: string }; Returns: undefined };
       delete_post_comment: { Args: { p_comment_id: string }; Returns: undefined };
+      end_usage_session: { Args: { p_id: number }; Returns: undefined };
       generate_handle: { Args: Record<PropertyKey, never>; Returns: string };
       get_active_cities: {
         Args: Record<PropertyKey, never>;
@@ -1808,6 +1861,19 @@ export type Database = {
           screen: string;
         }[];
       };
+      get_usage_overview: {
+        Args: { p_days?: number; p_search?: string };
+        Returns: {
+          handle: string;
+          last_app_version: string;
+          last_platform: string;
+          last_seen_at: string;
+          logins: number;
+          sessions: number;
+          total_minutes: number;
+          user_id: string;
+        }[];
+      };
       get_user_posts: {
         Args: {
           p_before_id?: string;
@@ -1829,6 +1895,19 @@ export type Database = {
           post_id: string;
           venue_name: string;
           visible_from: string;
+        }[];
+      };
+      get_user_usage: {
+        Args: { p_before?: string; p_limit?: number; p_user: string };
+        Returns: {
+          app_version: string;
+          ended_at: string;
+          id: number;
+          kind: string;
+          last_seen_at: string;
+          minutes: number;
+          platform: string;
+          started_at: string;
         }[];
       };
       get_venue_detail: {
@@ -1878,6 +1957,7 @@ export type Database = {
       is_adult: { Args: { p_birth_date: string }; Returns: boolean };
       is_handle_available: { Args: { p_handle: string }; Returns: string };
       level_from_avg: { Args: { p_avg: number }; Returns: number };
+      log_login: { Args: { p_app_version: string; p_platform: string }; Returns: undefined };
       mark_dm_read: { Args: { p_thread: string }; Returns: undefined };
       match_contacts: {
         Args: { p_hashes: string[] };
@@ -1959,6 +2039,7 @@ export type Database = {
         Args: { p_google_place_id: string; p_website_uri: string };
         Returns: boolean;
       };
+      start_usage_session: { Args: { p_app_version: string; p_platform: string }; Returns: number };
       submit_feedback: {
         Args: {
           p_app_version: string;
@@ -1979,6 +2060,7 @@ export type Database = {
           updated: number;
         }[];
       };
+      touch_usage_session: { Args: { p_id: number }; Returns: undefined };
       typical_level: { Args: { p_at: string; p_venue_id: string }; Returns: number };
       unblock_user: { Args: { p_user_id: string }; Returns: undefined };
       undeclare: { Args: Record<PropertyKey, never>; Returns: undefined };
